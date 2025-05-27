@@ -1,0 +1,20 @@
+{
+    "WEBSITE_NAME": "osu! scores inspector",
+    "DEV_MODE": true,
+    "API": {
+        "PRODUCTION": {
+            "AUTH_REDIRECT": "https://score.kirino.sh/",
+            "API_URL": "https://api.kirino.sh/inspector/",
+            "OSU_CLIENT_ID": 19537
+        },
+        "DEVELOPMENT": {
+            "AUTH_REDIRECT": "http://localhost:3006/",
+            "API_URL": "http://localhost:3863",
+            "OSU_CLIENT_ID": 19559
+        }
+    },
+    "NOTIFICATIONS": {
+        "position": "top-right",
+        "theme": "dark"
+    }
+}
