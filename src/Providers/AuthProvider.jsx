@@ -37,6 +37,7 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         if(!token || !refreshToken || !tokenExpiry) {
+            setLoading(false);
             return;
         }
 
