@@ -4,10 +4,11 @@ import { Link } from "react-router";
 import { useAuth } from "../Providers/AuthProvider";
 import { useState } from "react";
 import { GetOsuAuthUrl } from "../Misc/ApiHelper";
+import LoadingButton from "./LoadingButton";
 
 function Header() {
     const [showMenu, setShowMenu] = useState(null);
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
 
     return <AppBar position="static">
         <Box sx={{ pl: 2, pr: 2 }}>
@@ -46,9 +47,9 @@ function Header() {
                                 </Box>
                             </Menu>
                         </> : <>
-                            <Button component={Link} to={GetOsuAuthUrl()} variant="outlined" color="inherit" sx={{ mr: 2 }}>
+                            <LoadingButton loading={loading} component={Link} to={GetOsuAuthUrl()} variant="outlined" color="inherit" sx={{ mr: 2 }}>
                                 Login with osu!
-                            </Button>
+                            </LoadingButton>
                         </>
                     }
                 </Box>
