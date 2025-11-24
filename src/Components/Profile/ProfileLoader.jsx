@@ -21,7 +21,7 @@ function ProfileLoader() {
                     <Grid item size={4}>
                         {/* center vertically and horizontally */}
                         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                            <Box sx={{width:'130px', height:'130px'}}>
+                            <Box sx={{width:'150px', height:'150px'}}>
                                 {
                                     userLive?.user_id ? <Avatar
                                         variant="rounded"
