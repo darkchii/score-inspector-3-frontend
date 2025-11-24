@@ -7,6 +7,7 @@ import RouteIndex from "./Routes/RouteIndex";
 import RouteProfile from "./Routes/RouteProfile";
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
+import Route404 from "./Routes/Route404";
 
 const theme = createTheme({
   palette: {
@@ -24,8 +25,10 @@ function App() {
   }
 
   const routes = [
+    { path: "*", element: <Route404 /> },
     { path: "/", element: <RouteIndex /> },
     { path: "/user/:userId", element: <RouteProfile /> },
+
   ];
 
   const getRoute = (obj, is_child = false) => {
@@ -72,7 +75,7 @@ function App() {
       <Box>
         <Header />
       </Box>
-      <Paper>
+      <Paper elevation={2}>
         <CardContent>
           <Routes>
             {
