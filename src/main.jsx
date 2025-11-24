@@ -7,11 +7,14 @@ import '@fontsource/roboto/700.css';
 import './main.css';
 import { BrowserRouter } from 'react-router';
 import { AuthProvider } from './Providers/AuthProvider.jsx';
+import { ApiProvider } from './Providers/ApiProvider.jsx';
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter basename='/'>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
+    <ApiProvider>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </ApiProvider>
   </BrowserRouter>,
 )
