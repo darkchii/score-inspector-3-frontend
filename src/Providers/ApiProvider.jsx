@@ -13,7 +13,7 @@ export function ApiProvider({ children }) {
     }
 
     const getUserLive = async (userId) => {
-        const url = `${getApiUrl()}user/${userId}/live`;
+        const url = `${getApiUrl()}user/${userId}/profile`;
         const response = await axios.get(url);
         return response.data;
     }

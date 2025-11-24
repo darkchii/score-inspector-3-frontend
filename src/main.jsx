@@ -8,12 +8,15 @@ import './main.css';
 import { BrowserRouter } from 'react-router';
 import { AuthProvider } from './Providers/AuthProvider.jsx';
 import { ApiProvider } from './Providers/ApiProvider.jsx';
+import { ProfileProvider } from './Providers/ProfileProvider.jsx';
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter basename='/'>
     <ApiProvider>
       <AuthProvider>
-        <App />
+        <ProfileProvider>
+          <App />
+        </ProfileProvider>
       </AuthProvider>
     </ApiProvider>
   </BrowserRouter>,
