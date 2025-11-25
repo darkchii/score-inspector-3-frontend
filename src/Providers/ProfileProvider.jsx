@@ -63,7 +63,7 @@ export function ProfileProvider({ children }) {
             _fetchLog.push("%working% Fetching beatmaps");
             setFetchLog(_fetchLog);
             startMs = Date.now();
-            const beatmaps = await getBeatmaps(4141);
+            const beatmaps = await getBeatmaps();
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched ${FormatNumber(beatmaps.length)} beatmaps`);
