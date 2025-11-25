@@ -2,6 +2,7 @@ import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useApi } from "./ApiProvider";
 import { FormatNumber } from "../Misc/Helper";
+import { BuildProfileStatistics, MapScoreBeatmaps, ProcessBeatmaps, ProcessScores } from "../Misc/ProfileHelper";
 
 const ProfileContext = createContext();
 
@@ -10,13 +11,14 @@ export function ProfileProvider({ children }) {
     const [userLive, setUserLive] = useState(null);
     const [scoresLive, setScoresLive] = useState(null);
     const [beatmapsLive, setBeatmapsLive] = useState(null);
+    const [profileStatistics, setProfileStatistics] = useState(null);
     const [errorMessage, setErrorMessage] = useState(false);
     const { getUserLive, getScoresLive, getBeatmapsLive } = useApi();
     const [fetchLog, setFetchLog] = useState([]);
     const [isFinished, setIsFinished] = useState(false);
 
     const getUser = async (_userId) => {
-        const _user = await getUserLive(_userId);  
+        const _user = await getUserLive(_userId);
         setUserLive(_user);
         setUserId(_userId);
         return _user;
@@ -69,8 +71,45 @@ export function ProfileProvider({ children }) {
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched ${FormatNumber(beatmaps.length)} beatmaps`);
             setFetchLog(_fetchLog);
 
+            _fetchLog.push("%working% Processing beatmaps");
+            setFetchLog(_fetchLog);
+            startMs = Date.now();
+            await ProcessBeatmaps(beatmaps);
+            endMs = Date.now();
+            _fetchLog.pop();
+            _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Processed beatmaps`);
+            setFetchLog(_fetchLog);
+
+            _fetchLog.push("%working% Mapping beatmaps to scores");
+            setFetchLog(_fetchLog);
+            startMs = Date.now();
+            const [mappedScores, missingCount] = await MapScoreBeatmaps(scores, beatmaps);
+            endMs = Date.now();
+            _fetchLog.pop();
+            _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Mapped beatmaps to scores (${FormatNumber(missingCount)} scores missing beatmaps)`);
+            setFetchLog(_fetchLog);
+
+            _fetchLog.push("%working% Processing scores");
+            setFetchLog(_fetchLog);
+            startMs = Date.now();
+            await ProcessScores(scores);
+            endMs = Date.now();
+            _fetchLog.pop();
+            _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Processed scores`);
+            setFetchLog(_fetchLog);
+
+            _fetchLog.push("%working% Building profile statistics");
+            setFetchLog(_fetchLog);
+            startMs = Date.now();
+            const profileStats = await BuildProfileStatistics(scores, beatmaps);
+            endMs = Date.now();
+            _fetchLog.pop();
+            _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Built profile statistics`);
+            setFetchLog(_fetchLog);
+            setProfileStatistics(profileStats);
+
             setIsFinished(true);
-        }catch(error){
+        } catch (error) {
             console.error("Error fetching full profile:", error);
             setErrorMessage(error.message || "An unknown error occurred while fetching profile data.");
         }
