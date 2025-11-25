@@ -12,14 +12,32 @@ export function ApiProvider({ children }) {
         return import.meta.env.VITE_API_BASE_URL;
     }
 
-    const getUserLive = async (userId) => {
-        const url = `${getApiUrl()}user/${userId}/profile`;
-        const response = await axios.get(url);
+    const apiGet = async (endpoint, progressEvent = null) => {
+        //return both data and progress
+        const url = `${getApiUrl()}${endpoint}`;
+        const response = await axios.get(url, {
+            onDownloadProgress: progressEvent
+        });
         return response.data;
     }
 
+    const getBeatmapsLive = async (progressEvent = null) => {
+        const response = await apiGet('beatmap/all', progressEvent);
+        return response;
+    }
+
+    const getUserLive = async (userId, progressEvent = null) => {
+        const response = await apiGet(`user/${userId}/profile`, progressEvent);
+        return response;
+    }
+
+    const getScoresLive = async (userId, progressEvent = null) => {
+        const response = await apiGet(`user/${userId}/scores`, progressEvent);
+        return response;
+    }
+
     return (
-        <ApiContext.Provider value={{ getUserLive }}>
+        <ApiContext.Provider value={{ getUserLive, getScoresLive, getBeatmapsLive }}>
             {children}
         </ApiContext.Provider>
     )

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ProfileLoader from "../Components/Profile/ProfileLoader";
 
 function RouteProfile() {
-    const { getUser, userLive } = useProfile();
+    const { fetchFullProfile } = useProfile();
     const { userId } = useParams();
     const [isWorking, setIsWorking] = useState(false);
 
@@ -12,7 +12,7 @@ function RouteProfile() {
         (async () => {
             setIsWorking(true);
             try {
-                await getUser(userId);
+                await fetchFullProfile(userId);
             } catch (error) {
                 console.error("Error fetching user profile:", error);
             }

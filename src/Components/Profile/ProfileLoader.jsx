@@ -1,42 +1,100 @@
-import { Avatar, Box, Card, Grid, Skeleton, Typography } from "@mui/material";
+import { Avatar, Box, Card, CircularProgress, Collapse, Divider, Grid, Grow, LinearProgress, List, ListItem, ListItemText, Skeleton, Step, StepLabel, Stepper, Typography } from "@mui/material";
 import { useProfile } from "../../Providers/ProfileProvider";
+import { TransitionGroup } from "react-transition-group";
+import { green, red } from "@mui/material/colors";
+import ErrorIcon from '@mui/icons-material/Error';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 function ProfileLoader() {
     //This is the display shown while the profile is loading, showing details of whats going on
-    const { userLive } = useProfile();
+    const { userLive, scoresLive, errorMessage, fetchLog, isFinished } = useProfile();
 
     return (<>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-            <Card sx={{
-                p: 2,
-                m: 2,
-                width: '650px',
-                height: '350px',
-                //minWidth mobile 100%
-                '@media (max-width:650px)': {
-                    minWidth: '100%',
-                }
-            }}>
-                <Grid container spacing={2} sx={{ height: '100%' }}>
-                    <Grid item size={4}>
-                        {/* center vertically and horizontally */}
-                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                            <Box sx={{width:'150px', height:'150px'}}>
+            <Grow in={true} timeout={500}>
+                <Card sx={{
+                    p: 2,
+                    m: 2,
+                    width: '650px',
+                    //minWidth mobile 100%
+                    '@media (max-width:650px)': {
+                        minWidth: '100%',
+                    }
+                }}>
+                    <Box>
+                        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                            <Box sx={{ width: '150px', height: '150px' }}>
                                 {
                                     userLive?.user_id ? <Avatar
-                                        variant="rounded"
+                                        variant="circular"
                                         sx={{ width: '100%', height: '100%' }}
                                         src={`https://a.ppy.sh/${userLive.user_id}`}
-                                    /> : <Skeleton variant="rectangular" width={'100%'} height={'100%'} />
+                                    /> : <Skeleton variant="circular" width={'100%'} height={'100%'} />
                                 }
                             </Box>
+                            <Box>
+                                <Typography variant="h6">{userLive?.username || 'Loading user'}</Typography>
+                            </Box>
+                            {/* Progress user */}
+                            {
+                                errorMessage ?
+                                    //big red error icon (same size as circular progress)
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                                        <ErrorIcon sx={{ color: red[500], fontSize: 80 }} />
+                                        <Typography sx={{ color: red[500] }}>{errorMessage}</Typography>
+                                    </Box>
+
+                                    : (isFinished ?
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                                            <CheckCircleIcon sx={{ color: green[500], fontSize: 80 }} />
+                                        </Box>
+                                        :
+                                        <CircularProgress
+                                            variant="indeterminate"
+                                            size={80}
+                                        />)
+                            }
+                            <Divider />
+                            {
+                                fetchLog.length > 0 &&
+                                <Box sx={{ width: '100%' }}>
+                                    <List dense>
+                                        <TransitionGroup>
+                                            {fetchLog.map((log, index) => (
+                                                <Collapse key={index}>
+                                                    <ListItem>
+                                                        {/* <ListItemText primary={log} /> */}
+                                                        {/* format log to show working/finished using icon/circularprogress */}
+                                                        <ListItemText primary={
+                                                            log.startsWith("%working%") ?
+                                                                (errorMessage ?
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                        <ErrorIcon sx={{ color: red[500] }} />
+                                                                        <span>{log.replace("%working% ", "")}</span>
+                                                                    </Box>
+                                                                    :
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                        <CircularProgress size={16} />
+                                                                        <span>{log.replace("%working% ", "")}</span>
+                                                                    </Box>)
+                                                                : log.startsWith("%finished%") ?
+                                                                    (<Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: green[500] }}>
+                                                                        <CheckCircleIcon fontSize="small" />
+                                                                        <span>{log.replace("%finished% ", "")}</span>
+                                                                    </Box>)
+                                                                    : log
+                                                        } />
+                                                    </ListItem>
+                                                </Collapse>
+                                            ))}
+                                        </TransitionGroup>
+                                    </List>
+                                </Box>
+                            }
                         </Box>
-                    </Grid>
-                    <Grid item size={8}>
-                        <Typography variant="h5">Loading {userLive?.username || 'user data'}...</Typography>
-                    </Grid>
-                </Grid>
-            </Card>
+                    </Box>
+                </Card>
+            </Grow>
         </Box>
     </>)
 }

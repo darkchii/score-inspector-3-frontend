@@ -60,6 +60,9 @@ function App() {
         console.log(`Attempting to login with code: ${code}`);
         try {
           await login(code);
+          //remove code from url
+          window.history.replaceState({}, document.title, window.location.pathname);
+          // ShowNotification("Login successful!", "success");
         } catch (error) {
           console.error("Login error:", error);
           // ShowNotification("Login failed. Please try again.", "error");
