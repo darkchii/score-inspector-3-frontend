@@ -13,3 +13,24 @@ body {
     padding: 15px 0;
     user-select: none;
 }
+
+.profile-ruleset-icon {
+    transition: all 0.2s ease-in-out;
+
+    /* 0.7 alpha */
+    filter: opacity(0.7);
+    -webkit-filter: opacity(0.7);
+}
+
+.profile-selected-ruleset {
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+    -webkit-filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}
+
+.profile-selected-ruleset img {
+    transform: scale(1.2);
+    -webkit-transform: scale(1.2);
+    filter: opacity(1);
+    -webkit-filter: opacity(1);
+    transition: all 0.2s ease-in-out;
+}

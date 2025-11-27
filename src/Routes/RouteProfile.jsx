@@ -3,6 +3,7 @@ import { useProfile } from "../Providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import ProfileLoader from "../Components/Profile/ProfileLoader";
 import ProfileHeader from "../Components/Profile/ProfileHeader";
+import { Box } from "@mui/material";
 
 function RouteProfile() {
     const { fetchFullProfile, errorMessage, activeRuleset, setActiveRuleset } = useProfile();
@@ -38,7 +39,9 @@ function RouteProfile() {
     }
 
     return (<>
-        <ProfileHeader />
+        <Box>
+            <ProfileHeader />
+        </Box>
     </>)
 }
 
