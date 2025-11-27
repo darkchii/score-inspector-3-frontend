@@ -15,6 +15,29 @@ import SVGGradeSH from './Grades/GradeSmall-S-Silver.svg';
 import SVGGradeX from './Grades/GradeSmall-SS.svg';
 import SVGGradeXH from './Grades/GradeSmall-SS-Silver.svg';
 
+//Import EVERYTHING from ./Flags/ (country flags, its not feasible to do manually)
+
+//do it here
+
+export function getFlagIcon(country_code){
+    //get flag icons (dynamic import)
+    if(country_code === null || country_code === undefined){
+        country_code = '__';
+    }
+    country_code = country_code.toUpperCase();
+    try {
+        // const flag = import(`../Assets/Flags/${country_code}.png`);
+        const path = `./Flags/${country_code}.png`;
+        const flag_modules = import.meta.glob('./Flags/*.png', {
+            eager: true
+        });
+        return flag_modules[path].default;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
 export const TextureDatabase = {
     PageNotFoundKirino,
     RulesetCatchIcon,

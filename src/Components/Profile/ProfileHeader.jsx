@@ -1,6 +1,7 @@
 import { Avatar, Box, Container, Typography } from "@mui/material";
 import { useProfile } from "../../Providers/ProfileProvider";
 import ProfileRulesetSelector from "./ProfileRulesetSelector";
+import { getFlagIcon } from "../../Data/Textures/TextureDatabase";
 
 const _profileHeaderImageRatio = 20 / 5; //Width / Height (2000x500)
 
@@ -63,7 +64,12 @@ function ProfileHeader() {
                             />
 
                             <Box sx={{m: '22px'}}>
-                                <Typography variant="h4" > {userLive.osuApi.username} </Typography>
+                                <Typography variant="h4" >{userLive.osuApi.username}</Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                                    <img src={getFlagIcon(userLive.osuApi.country_code)} alt={userLive.osuApi.country_code} height={24} />
+                                    <Typography variant="body1">{userLive.osuApi.country.name}</Typography>
+                                </Box>
+                                {/* <Typography variant="body1"><img src={getFlagIcon(userLive.osuApi.country_code)} alt={userLive.osuApi.country_code} /> {userLive.osuApi.country.name}</Typography> */}
                             </Box>
 
                             <Box className="profile-header-actions">
