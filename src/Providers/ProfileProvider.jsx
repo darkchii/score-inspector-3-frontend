@@ -17,6 +17,8 @@ export function ProfileProvider({ children }) {
     const [fetchLog, setFetchLog] = useState([]);
     const [isFinished, setIsFinished] = useState(false);
 
+    const [activeRuleset, setActiveRuleset] = useState(0);
+
     const getUser = async (_userId) => {
         const _user = await getUserLive(_userId);
         setUserLive(_user);
@@ -36,10 +38,20 @@ export function ProfileProvider({ children }) {
         return _beatmaps;
     }
 
-    const fetchFullProfile = async (_userId) => {
-        setFetchLog([]);
+    const reset = () => {
+        setUserId(null);
+        setUserLive(null);
+        setScoresLive(null);
+        setBeatmapsLive(null);
+        setProfileStatistics(null);
         setErrorMessage(false);
+        setFetchLog([]);
         setIsFinished(false);
+        setActiveRuleset(0);
+    }
+
+    const fetchFullProfile = async (_userId) => {
+        reset();
         try {
             //This setup is kinda ass but I dont think it matters
             let _fetchLog = [];
@@ -116,7 +128,7 @@ export function ProfileProvider({ children }) {
     }
 
     return (
-        <ProfileContext.Provider value={{ getUser, userLive, scoresLive, setUserId, fetchFullProfile, errorMessage, fetchLog, isFinished }}>
+        <ProfileContext.Provider value={{ getUser, userLive, scoresLive, setUserId, fetchFullProfile, errorMessage, fetchLog, isFinished, activeRuleset, setActiveRuleset }}>
             {children}
         </ProfileContext.Provider>
     )

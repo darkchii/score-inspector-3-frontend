@@ -2,6 +2,7 @@ import { useParams } from "react-router";
 import { useProfile } from "../Providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import ProfileLoader from "../Components/Profile/ProfileLoader";
+import ProfileHeader from "../Components/Profile/ProfileHeader";
 
 function RouteProfile() {
     const { fetchFullProfile } = useProfile();
@@ -13,6 +14,9 @@ function RouteProfile() {
             setIsWorking(true);
             try {
                 await fetchFullProfile(userId);
+                //brief wait to show the completion
+                await new Promise(resolve => setTimeout(resolve, 500));
+                setIsWorking(false);
             } catch (error) {
                 console.error("Error fetching user profile:", error);
             }
@@ -26,7 +30,7 @@ function RouteProfile() {
     }
 
     return (<>
-        <p>Loading profile</p>
+        <ProfileHeader />
     </>)
 }
 

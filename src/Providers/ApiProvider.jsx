@@ -2,8 +2,10 @@ import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 
 const ApiContext = createContext();
+const apiAge = 1000 * 60 * 10; //10 minutes
 
 export function ApiProvider({ children }) {
+    const [apiCache, setApiCache] = useState({});
 
     const getApiUrl = () => {
         if(import.meta.env.NODE_ENV === 'development') {
@@ -13,11 +15,26 @@ export function ApiProvider({ children }) {
     }
 
     const apiGet = async (endpoint, progressEvent = null) => {
+        const now = Date.now();
+        const cached = apiCache[endpoint];
+        if (cached && (now - cached.timestamp < apiAge)) {
+            return cached.data;
+        }
+
         //return both data and progress
         const url = `${getApiUrl()}${endpoint}`;
         const response = await axios.get(url, {
             onDownloadProgress: progressEvent
         });
+
+        setApiCache({
+            ...apiCache,
+            [endpoint]: {
+                data: response.data,
+                timestamp: now
+            }
+        });
+
         return response.data;
     }
 

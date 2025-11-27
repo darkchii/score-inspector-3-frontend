@@ -25,15 +25,15 @@ function ProfileLoader() {
                         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
                             <Box sx={{ width: '150px', height: '150px' }}>
                                 {
-                                    userLive?.user_id ? <Avatar
+                                    userLive?.osuAlternative?.user_id ? <Avatar
                                         variant="circular"
                                         sx={{ width: '100%', height: '100%' }}
-                                        src={`https://a.ppy.sh/${userLive.user_id}`}
+                                        src={`https://a.ppy.sh/${userLive.osuAlternative.user_id}`}
                                     /> : <Skeleton variant="circular" width={'100%'} height={'100%'} />
                                 }
                             </Box>
                             <Box>
-                                <Typography variant="h6">{userLive?.username || 'Loading user'}</Typography>
+                                <Typography variant="h6">{userLive?.osuAlternative?.username || 'Loading user'}</Typography>
                             </Box>
                             {/* Progress user */}
                             {

@@ -78,15 +78,15 @@ function App() {
       <Box>
         <Header />
       </Box>
-      <Paper elevation={2}>
-        <CardContent>
+      {/* <Paper elevation={2}> */}
+        {/* <CardContent> */}
           <Routes>
             {
               routes.map((route) => getRoute(route))
             }
           </Routes>
-        </CardContent>
-      </Paper>
+        {/* </CardContent> */}
+      {/* </Paper> */}
       <Footer />
     </ThemeProvider>
   )

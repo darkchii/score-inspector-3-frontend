@@ -1,3 +1,15 @@
 body {
     font-family: 'Roboto', sans-serif;
 }
+
+.profile-header-content {
+    align-items: flex-end;
+    display: flex;
+    width: 100%;
+}
+
+.profile-header-actions {
+    margin-left: auto;
+    padding: 15px 0;
+    user-select: none;
+}
