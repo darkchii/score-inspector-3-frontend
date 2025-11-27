@@ -27,7 +27,7 @@ function App() {
   const routes = [
     { path: "*", element: <Route404 /> },
     { path: "/", element: <RouteIndex /> },
-    { path: "/user/:userId", element: <RouteProfile /> },
+    { path: "/user/:userId/:ruleset?", element: <RouteProfile /> },
 
   ];
 

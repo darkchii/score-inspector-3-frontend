@@ -17,7 +17,7 @@ export function ProfileProvider({ children }) {
     const [fetchLog, setFetchLog] = useState([]);
     const [isFinished, setIsFinished] = useState(false);
 
-    const [activeRuleset, setActiveRuleset] = useState(0);
+    const [activeRuleset, setActiveRuleset] = useState('all');
 
     const getUser = async (_userId) => {
         const _user = await getUserLive(_userId);
@@ -51,6 +51,11 @@ export function ProfileProvider({ children }) {
     }
 
     const fetchFullProfile = async (_userId) => {
+        //if user id didnt change, keep as is
+        if(userId === _userId){
+            return;
+        }
+
         reset();
         try {
             //This setup is kinda ass but I dont think it matters

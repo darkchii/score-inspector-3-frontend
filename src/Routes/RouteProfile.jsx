@@ -5,25 +5,33 @@ import ProfileLoader from "../Components/Profile/ProfileLoader";
 import ProfileHeader from "../Components/Profile/ProfileHeader";
 
 function RouteProfile() {
-    const { fetchFullProfile } = useProfile();
-    const { userId } = useParams();
+    const { fetchFullProfile, errorMessage, activeRuleset, setActiveRuleset } = useProfile();
+    const { userId, ruleset } = useParams();
     const [isWorking, setIsWorking] = useState(false);
 
     useEffect(() => {
         (async () => {
+            setActiveRuleset(ruleset || 'all');
             setIsWorking(true);
             try {
                 await fetchFullProfile(userId);
                 //brief wait to show the completion
-                await new Promise(resolve => setTimeout(resolve, 500));
-                setIsWorking(false);
+                if (!errorMessage) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    setIsWorking(false);
+                }
             } catch (error) {
                 console.error("Error fetching user profile:", error);
             }
         })();
     }, [userId]);
 
-    if(isWorking){
+    useEffect(() => {
+        //change url without reloading
+        window.history.replaceState(null, null, `/user/${userId}/${activeRuleset || 'all'}`);
+    }, [activeRuleset]);
+
+    if (isWorking) {
         return (<>
             <ProfileLoader />
         </>)
