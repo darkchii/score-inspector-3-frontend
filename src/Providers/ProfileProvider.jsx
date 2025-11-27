@@ -19,6 +19,30 @@ export function ProfileProvider({ children }) {
 
     const [activeRuleset, setActiveRuleset] = useState('all');
 
+    const getRulesetStatistics = (ruleset) => {
+        if (!profileStatistics) return null;
+
+        switch (ruleset) {
+            case 'osu':
+            case 0:
+                return profileStatistics.rulesets['0'];
+            case 'taiko':
+            case 1:
+                return profileStatistics.rulesets['1'];
+            case 'fruits':
+            case 2:
+                return profileStatistics.rulesets['2'];
+            case 'mania':
+            case 3:
+                return profileStatistics.rulesets['3'];
+            case 'all':
+            case 'total':
+                return profileStatistics.rulesets['total'];
+            default:
+                return null;
+        }
+    }
+
     const getUser = async (_userId) => {
         const _user = await getUserLive(_userId);
         setUserLive(_user);
@@ -52,7 +76,7 @@ export function ProfileProvider({ children }) {
 
     const fetchFullProfile = async (_userId) => {
         //if user id didnt change, keep as is
-        if(userId === _userId){
+        if (userId === _userId) {
             return;
         }
 
@@ -133,7 +157,7 @@ export function ProfileProvider({ children }) {
     }
 
     return (
-        <ProfileContext.Provider value={{ getUser, userLive, scoresLive, setUserId, fetchFullProfile, errorMessage, fetchLog, isFinished, activeRuleset, setActiveRuleset }}>
+        <ProfileContext.Provider value={{ getUser, userLive, scoresLive, setUserId, fetchFullProfile, errorMessage, fetchLog, isFinished, activeRuleset, setActiveRuleset, getRulesetStatistics }}>
             {children}
         </ProfileContext.Provider>
     )
