@@ -1,12 +1,13 @@
-import { Avatar, Box, Container, Typography } from "@mui/material";
+import { Avatar, Box, Container, Fade, Typography } from "@mui/material";
 import { useProfile } from "../../Providers/ProfileProvider";
 import ProfileRulesetSelector from "./ProfileRulesetSelector";
 import { getFlagIcon } from "../../Data/Textures/TextureDatabase";
+import NumberFlow from "@number-flow/react";
 
 const _profileHeaderImageRatio = 20 / 5; //Width / Height (2000x500)
 
 function ProfileHeader() {
-    const { userLive } = useProfile();
+    const { userLive, activeRuleset, getRulesetUser } = useProfile();
 
     if (!userLive) {
         return null;
@@ -56,14 +57,14 @@ function ProfileHeader() {
                         alignItems: 'flex-end',
                     }}>
                         <Box className="profile-header-content">
-                            <Avatar 
+                            <Avatar
                                 src={userLive.osuApi.avatar_url}
                                 alt={userLive.osuApi.username}
                                 sx={{ width: 160, height: 160 }}
                                 variant="rounded"
                             />
 
-                            <Box sx={{m: '22px'}}>
+                            <Box sx={{ m: '12px' }}>
                                 <Typography variant="h4" >{userLive.osuApi.username}</Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
                                     <img src={getFlagIcon(userLive.osuApi.country_code)} alt={userLive.osuApi.country_code} height={24} />
@@ -72,16 +73,23 @@ function ProfileHeader() {
                                 {/* <Typography variant="body1"><img src={getFlagIcon(userLive.osuApi.country_code)} alt={userLive.osuApi.country_code} /> {userLive.osuApi.country.name}</Typography> */}
                             </Box>
 
+                            <Fade in={activeRuleset !== 'all'}>
+                                <Box sx={{ m: '12px' }} >
+                                    <Typography variant="h6">Rank</Typography>
+                                    <Typography variant="h5">#<NumberFlow value={getRulesetUser(activeRuleset)?.global_rank} fallback="N/A" /></Typography>
+                                </Box>
+                            </Fade>
+
                             <Box className="profile-header-actions">
                                 <ProfileRulesetSelector />
                             </Box>
                         </Box>
                     </Container>
                 </Box>
-            </Box>
+            </Box >
 
 
-        </div>
+        </div >
     );
 }
 

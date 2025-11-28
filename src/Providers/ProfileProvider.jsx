@@ -1,8 +1,8 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useApi } from "./ApiProvider";
-import { FormatNumber } from "../Misc/Helper";
-import { BuildProfileStatistics, MapScoreBeatmaps, ProcessBeatmaps, ProcessScores } from "../Misc/ProfileHelper";
+import { FormatNumber, GetRulesetNameFromId } from "../Misc/Helper";
+import { BuildProfileStatistics, MapScoreBeatmaps, ProcessBeatmaps, ProcessScores, ProcessUser } from "../Misc/ProfileHelper";
 import { useParams } from "react-router";
 
 const ProfileContext = createContext();
@@ -19,32 +19,26 @@ export function ProfileProvider({ children }) {
     const [isFinished, setIsFinished] = useState(false);
 
     const [activeRuleset, setActiveRuleset] = useState(null);
+    const [availableRulesets, setAvailableRulesets] = useState([]);
 
     const getRulesetStatistics = (ruleset) => {
         if (!profileStatistics) return null;
 
-        switch (ruleset) {
-            default:
-            case 'osu':
-            case 0:
-                return profileStatistics.rulesets['0'];
-            case 'taiko':
-            case 1:
-                return profileStatistics.rulesets['1'];
-            case 'fruits':
-            case 2:
-                return profileStatistics.rulesets['2'];
-            case 'mania':
-            case 3:
-                return profileStatistics.rulesets['3'];
-            case 'all':
-            case 'total':
-                return profileStatistics.rulesets['total'];
-        }
+        const internalId = GetRulesetNameFromId(ruleset);
+        return profileStatistics.rulesets[internalId];
+    }
+
+    const getRulesetUser = (ruleset) => {
+        if (!userLive) return null;
+
+        const internalId = GetRulesetNameFromId(ruleset);
+        return userLive.osuAlternative.rulesets[internalId];
     }
 
     const getUser = async (_userId) => {
-        const _user = await getUserLive(_userId);
+        let _user = await getUserLive(_userId);
+        _user = await ProcessUser(_user);
+        console.log(_user);
         setUserLive(_user);
         setUserId(_userId);
         return _user;
@@ -52,12 +46,14 @@ export function ProfileProvider({ children }) {
 
     const getScores = async (_userId) => {
         const _score = await getScoresLive(_userId);
+        console.log(_score);
         setScoresLive(_score);
         return _score;
     }
 
     const getBeatmaps = async () => {
         const _beatmaps = await getBeatmapsLive();
+        console.log(_beatmaps);
         setBeatmapsLive(_beatmaps);
         return _beatmaps;
     }
@@ -149,6 +145,18 @@ export function ProfileProvider({ children }) {
             setFetchLog(_fetchLog);
             setProfileStatistics(profileStats);
 
+            setAvailableRulesets(Object.keys(profileStats.rulesets));
+
+            //If available rulesets only has 'total', throw error (user has no scores)
+            if (Object.keys(profileStats.rulesets).length === 1 && profileStats.rulesets['total']) {
+                throw new Error("User has no scores available.");
+            }
+
+            //If current active ruleset is set to a "non-existent" ruleset, set it to 'all'
+            if (!profileStats.rulesets[GetRulesetNameFromId(activeRuleset)]) {
+                setActiveRuleset('all');
+            }
+
             setIsFinished(true);
         } catch (error) {
             console.error("Error fetching full profile:", error);
@@ -157,7 +165,7 @@ export function ProfileProvider({ children }) {
     }
 
     return (
-        <ProfileContext.Provider value={{ getUser, userLive, scoresLive, setUserId, fetchFullProfile, errorMessage, fetchLog, isFinished, activeRuleset, setActiveRuleset, getRulesetStatistics }}>
+        <ProfileContext.Provider value={{ getUser, userLive, scoresLive, setUserId, fetchFullProfile, errorMessage, fetchLog, isFinished, activeRuleset, setActiveRuleset, getRulesetStatistics, getRulesetUser, availableRulesets }}>
             {children}
         </ProfileContext.Provider>
     )

@@ -3,18 +3,23 @@ import { useProfile } from "../Providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import ProfileLoader from "../Components/Profile/ProfileLoader";
 import ProfileHeader from "../Components/Profile/ProfileHeader";
-import { Box } from "@mui/material";
+import { Box, Collapse, Fade, Tab, Tabs, useTheme } from "@mui/material";
 import ProfileMain from "../Components/Profile/Pages/ProfileMain";
+import ProfileScores from "../Components/Profile/Pages/ProfileScores";
+import ProfilePacks from "../Components/Profile/Pages/ProfilePacks";
 
 const pageComponents = {
-    'main': { component: ProfileMain, title: 'Profile' },
+    'main': { component: ProfileMain, title: 'Overview' },
+    'scores': { component: ProfileScores, title: 'Scores' },
+    'packs': { component: ProfilePacks, title: 'Packs' },
 };
 
 function RouteProfile() {
     const { fetchFullProfile, errorMessage, activeRuleset, setActiveRuleset } = useProfile();
-    const { userId, ruleset } = useParams();
-    const [page, setPage] = useState('main');
+    const { userId, ruleset, page } = useParams();
+    const [activePage, setPage] = useState('main');
     const [isWorking, setIsWorking] = useState(false);
+    const theme = useTheme();
 
     useEffect(() => {
         (async () => {
@@ -34,14 +39,22 @@ function RouteProfile() {
 
     useEffect(() => {
         //change url without reloading
-        window.history.replaceState(null, null, `/user/${userId}/${activeRuleset || 'all'}`);
-    }, [activeRuleset]);
+        window.history.replaceState(null, null, `/user/${userId}/${activeRuleset || 'all'}/${activePage || 'main'}`);
+
+        console.log({ activeRuleset, activePage });
+    }, [activeRuleset, activePage]);
 
     useEffect(() => {
         if(ruleset !== activeRuleset){
             setActiveRuleset(ruleset || 'all');
         }
     }, [ruleset]);
+
+    useEffect(() => {
+        if(page !== activePage){
+            setPage(page || 'main');
+        }
+    }, [page]);
 
     if (isWorking) {
         return (<>
@@ -55,30 +68,34 @@ function RouteProfile() {
             <ProfileHeader />
 
             {/* page selection */}
-            <Box sx={{ display: 'flex', gap: 2, mb: 2, mt: 2, justifyContent: 'center' }}>
-                {Object.keys(pageComponents).map((key) => {
-                    return (
-                        <Box key={key}
-                            sx={{
-                                padding: '4px 8px',
-                                cursor: 'pointer',
-                                borderBottom: page === key ? '2px solid black' : 'none'
-                            }}
-                            onClick={() => setPage(key)}
-                        >
-                            {pageComponents[key].title}
-                        </Box>
-                    );
-                })}
+            <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 1, justifyContent: 'center' }}>
+                <Tabs aria-label='profile-page-tabs' value={activePage} textColor="primary" indicatorColor="primary">
+                    {Object.keys(pageComponents).map((key) => {
+                        return (
+                            <Tab 
+                                key={`profile-page-tab-${key}`} 
+                                label={pageComponents[key].title} 
+                                value={key} 
+                                onClick={() => setPage(key)}
+                            />
+                        );
+                    })}
+                </Tabs>
             </Box>
 
-            {/* page */}
             {
-                pageComponents[page] &&
-                (() => {
-                    const PageComponent = pageComponents[page].component;
-                    return <PageComponent />;
-                })()
+                Object.keys(pageComponents).map((key) => {
+                    return (
+                        <Collapse key={key} in={activePage === key} unmountOnExit>
+                            <Box>
+                                {(() => {
+                                    const PageComponent = pageComponents[key].component;
+                                    return <PageComponent />;
+                                })()}
+                            </Box>
+                        </Collapse>
+                    )
+                })
             }
         </Box>
     </>)

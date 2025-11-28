@@ -8,10 +8,16 @@ import RouteProfile from "./Routes/RouteProfile";
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
 import Route404 from "./Routes/Route404";
+import { pink } from "@mui/material/colors";
 
 const theme = createTheme({
   palette: {
     mode: 'dark',
+    primary: {
+      main: pink[500],
+      light: pink[300],
+      dark: pink[700],
+    },
   },
 });
 
@@ -27,7 +33,7 @@ function App() {
   const routes = [
     { path: "*", element: <Route404 /> },
     { path: "/", element: <RouteIndex /> },
-    { path: "/user/:userId/:ruleset?", element: <RouteProfile /> },
+    { path: "/user/:userId/:ruleset?/:page?", element: <RouteProfile /> },
 
   ];
 
@@ -79,13 +85,13 @@ function App() {
         <Header />
       </Box>
       {/* <Paper elevation={2}> */}
-        {/* <CardContent> */}
-          <Routes>
-            {
-              routes.map((route) => getRoute(route))
-            }
-          </Routes>
-        {/* </CardContent> */}
+      {/* <CardContent> */}
+      <Routes>
+        {
+          routes.map((route) => getRoute(route))
+        }
+      </Routes>
+      {/* </CardContent> */}
       {/* </Paper> */}
       <Footer />
     </ThemeProvider>

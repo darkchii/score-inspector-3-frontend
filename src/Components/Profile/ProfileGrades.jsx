@@ -8,12 +8,13 @@ function ProfileGrades() {
     const { activeRuleset, getRulesetStatistics } = useProfile();
 
     return (
-        <Paper elevation={3} sx={{ padding: 2 }}>
+        <Paper elevation={3} sx={{ padding: 1 }}>
             <Container>
                 {/* we need a desktop and mobile view */}
 
-                <Grid container spacing={2}>
-                    <Grid item size={{ xs: 12, sm: 12, md: 1.5, lg: 1.5 }}>
+                {/* spacing 2 for desktop, 0.5 for mobile */}
+                <Grid container spacing={{ xs: 0, sm: 2 }}>
+                    <Grid item size={{ xs: 12, sm: 6, md: 1.5, lg: 1.5 }}>
                         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start', gap: 1 }}>
                             <img src={TextureDatabase.SVGGradeXH} alt="XH" width={48} height={48} />
                             <Tooltip title={`Including overrides: ${FormatNumber(getRulesetStatistics(activeRuleset)?.scores_set.grades?.XH || 0)} total`}>
@@ -21,7 +22,7 @@ function ProfileGrades() {
                             </Tooltip>
                         </Box>
                     </Grid>
-                    <Grid item size={{ xs: 12, sm: 12, md: 1.5, lg: 1.5 }}>
+                    <Grid item size={{ xs: 12, sm: 6, md: 1.5, lg: 1.5 }}>
                         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start', gap: 1 }}>
                             <img src={TextureDatabase.SVGGradeX} alt="X" width={48} height={48} />
                             <Tooltip title={`Including overrides: ${FormatNumber(getRulesetStatistics(activeRuleset)?.scores_set.grades?.X || 0)} total`}>
@@ -29,7 +30,7 @@ function ProfileGrades() {
                             </Tooltip>
                         </Box>
                     </Grid>
-                    <Grid item size={{ xs: 12, sm: 12, md: 1.5, lg: 1.5 }}>
+                    <Grid item size={{ xs: 12, sm: 6, md: 1.5, lg: 1.5 }}>
                         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start', gap: 1 }}>
                             <img src={TextureDatabase.SVGGradeSH} alt="SH" width={48} height={48} />
                             <Tooltip title={`Including overrides: ${FormatNumber(getRulesetStatistics(activeRuleset)?.scores_set.grades?.SH || 0)} total`}>
@@ -37,7 +38,7 @@ function ProfileGrades() {
                             </Tooltip>
                         </Box>
                     </Grid>
-                    <Grid item size={{ xs: 12, sm: 12, md: 1.5, lg: 1.5 }}>
+                    <Grid item size={{ xs: 12, sm: 6, md: 1.5, lg: 1.5 }}>
                         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start', gap: 1 }}>
                             <img src={TextureDatabase.SVGGradeS} alt="S" width={48} height={48} />
                             <Tooltip title={`Including overrides: ${FormatNumber(getRulesetStatistics(activeRuleset)?.scores_set.grades?.S || 0)} total`}>
@@ -45,7 +46,7 @@ function ProfileGrades() {
                             </Tooltip>
                         </Box>
                     </Grid>
-                    <Grid item size={{ xs: 12, sm: 12, md: 1.5, lg: 1.5 }}>
+                    <Grid item size={{ xs: 12, sm: 6, md: 1.5, lg: 1.5 }}>
                         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start', gap: 1 }}>
                             <img src={TextureDatabase.SVGGradeA} alt="A" width={48} height={48} />
                             <Tooltip title={`Including overrides: ${FormatNumber(getRulesetStatistics(activeRuleset)?.scores_set.grades?.A || 0)} total`}>
@@ -53,7 +54,7 @@ function ProfileGrades() {
                             </Tooltip>
                         </Box>
                     </Grid>
-                    <Grid item size={{ xs: 12, sm: 12, md: 1.5, lg: 1.5 }}>
+                    <Grid item size={{ xs: 12, sm: 6, md: 1.5, lg: 1.5 }}>
                         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start', gap: 1 }}>
                             <img src={TextureDatabase.SVGGradeB} alt="B" width={48} height={48} />
                             <Tooltip title={`Including overrides: ${FormatNumber(getRulesetStatistics(activeRuleset)?.scores_set.grades?.B || 0)} total`}>
@@ -61,7 +62,7 @@ function ProfileGrades() {
                             </Tooltip>
                         </Box>
                     </Grid>
-                    <Grid item size={{ xs: 12, sm: 12, md: 1.5, lg: 1.5 }}>
+                    <Grid item size={{ xs: 12, sm: 6, md: 1.5, lg: 1.5 }}>
                         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start', gap: 1 }}>
                             <img src={TextureDatabase.SVGGradeC} alt="C" width={48} height={48} />
                             <Tooltip title={`Including overrides: ${FormatNumber(getRulesetStatistics(activeRuleset)?.scores_set.grades?.C || 0)} total`}>
@@ -69,7 +70,7 @@ function ProfileGrades() {
                             </Tooltip>
                         </Box>
                     </Grid>
-                    <Grid item size={{ xs: 12, sm: 12, md: 1.5, lg: 1.5 }}>
+                    <Grid item size={{ xs: 12, sm: 6, md: 1.5, lg: 1.5 }}>
                         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start', gap: 1 }}>
                             <img src={TextureDatabase.SVGGradeD} alt="D" width={48} height={48} />
                             <Tooltip title={`Including overrides: ${FormatNumber(getRulesetStatistics(activeRuleset)?.scores_set.grades?.D || 0)} total`}>
