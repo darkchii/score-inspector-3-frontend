@@ -222,22 +222,31 @@ export class ProfileStatistics {
 export class ProfileRulesetScoreSet {
     constructor() {
         this.scores = [];
-
         this.grades = {};
 
         this.clears = 0;
+        this.ranked_clears = 0;
 
         this.legacy_total_score = 0;
         this.score = 0;
 
         this.performance_points = 0;
         this.bonus_performance_points = 0;
+
+        this.duration_seconds = 0;
+
+        this.recent_scores = [];
     }
 
     addScore(score) {
         this.scores.push(score);
 
         this.clears += 1;
+        if(score.beatmap && (score.beatmap.status === 'ranked' || score.beatmap.status === 'approved')){
+            this.ranked_clears += 1;
+        }
+
+        this.duration_seconds += score.duration || 0;
 
         //count grades
         const grade = score.grade;
@@ -260,6 +269,10 @@ export class ProfileRulesetScoreSet {
     calculate(){
         this.performance_points = calculateRawPerformance(this.scores);
         this.bonus_performance_points = calculateBonusPerformance(this.scores.length);
+
+        //recent scores should be max 100, ordered by ended_at descending
+        this.reorder('ended_at', true);
+        this.recent_scores = this.scores.slice(0, 100);
     }
 }
 
@@ -274,8 +287,12 @@ export class ProfileRulesetStatistics {
             this.beatmaps_with_converts = beatmaps.filter(b => b.ruleset_id === GetRulesetId(ruleset) || b.ruleset_id === 0);
         }
 
+
         this.beatmap_count = this.beatmaps.length;
         this.beatmap_count_with_converts = this.beatmaps_with_converts.length;
+
+        this.beatmap_count_ranked = this.beatmaps.filter(b => b.status === 'ranked' || b.status === 'approved').length;
+        this.beatmap_count_ranked_with_converts = this.beatmaps_with_converts.filter(b => b.status === 'ranked' || b.status === 'approved').length;
 
         this.scores_set = new ProfileRulesetScoreSet();
         this.scores_set_by_pp = new ProfileRulesetScoreSet();
@@ -304,9 +321,8 @@ export class ProfileRulesetStatistics {
 
     calculate() {
         //calculate completion
-        const _scoreCount = this.scores_set_by_pp.scores.length;
-        this.completion = _scoreCount / this.beatmap_count;
-        this.completion_with_converts = _scoreCount / this.beatmap_count_with_converts;
+        this.completion = this.scores_set_by_pp.ranked_clears / this.beatmap_count_ranked;
+        this.completion_with_converts = this.scores_set_by_pp.ranked_clears / this.beatmap_count_ranked_with_converts;
 
         this.scores_set.calculate();
         this.scores_set_by_pp.calculate();
