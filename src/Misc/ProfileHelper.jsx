@@ -1,4 +1,4 @@
-import { GetRulesetId, GetRulesetNameFromId } from "./Helper";
+import { calculateBonusPerformance, calculateRawPerformance, GetRulesetId, GetRulesetNameFromId } from "./Helper";
 
 export async function ProcessUser(user){
     user.osuAlternative.rulesets = {};
@@ -8,7 +8,11 @@ export async function ProcessUser(user){
     for(const key in user.osuAlternative){
         if(key.startsWith('osu_')){
             const newKey = key.replace('osu_', '');
-            user.osuAlternative.rulesets['osu'][newKey] = user.osuAlternative[key];
+            let value = user.osuAlternative[key];
+            if(typeof value === 'string' && !isNaN(Number(value))){
+                value = Number(value);
+            }
+            user.osuAlternative.rulesets['osu'][newKey] = value;
             delete user.osuAlternative[key];
         }
     }
@@ -17,7 +21,11 @@ export async function ProcessUser(user){
     for(const key in user.osuAlternative){
         if(key.startsWith('taiko_')){
             const newKey = key.replace('taiko_', '');
-            user.osuAlternative.rulesets['taiko'][newKey] = user.osuAlternative[key];
+            let value = user.osuAlternative[key];
+            if(typeof value === 'string' && !isNaN(Number(value))){
+                value = Number(value);
+            }
+            user.osuAlternative.rulesets['taiko'][newKey] = value;
             delete user.osuAlternative[key];
         }
     }
@@ -26,7 +34,11 @@ export async function ProcessUser(user){
     for(const key in user.osuAlternative){
         if(key.startsWith('fruits_')){
             const newKey = key.replace('fruits_', '');
-            user.osuAlternative.rulesets['fruits'][newKey] = user.osuAlternative[key];
+            let value = user.osuAlternative[key];
+            if(typeof value === 'string' && !isNaN(Number(value))){
+                value = Number(value);
+            }
+            user.osuAlternative.rulesets['fruits'][newKey] = value;
             delete user.osuAlternative[key];
         }
     }
@@ -35,10 +47,30 @@ export async function ProcessUser(user){
     for(const key in user.osuAlternative){
         if(key.startsWith('mania_')){
             const newKey = key.replace('mania_', '');
-            user.osuAlternative.rulesets['mania'][newKey] = user.osuAlternative[key];
+            let value = user.osuAlternative[key];
+            if(typeof value === 'string' && !isNaN(Number(value))){
+                value = Number(value);
+            }
+            user.osuAlternative.rulesets['mania'][newKey] = value;
             delete user.osuAlternative[key];
         }
     }
+
+    user.osuAlternative.rulesets['total'] = {};
+    for(const key in user.osuAlternative){
+        if(key.startsWith('total_')){
+            const newKey = key.replace('total_', '');
+            let value = user.osuAlternative[key];
+            if(typeof value === 'string' && !isNaN(Number(value))){
+                value = Number(value);
+            }
+            user.osuAlternative.rulesets['total'][newKey] = value;
+            delete user.osuAlternative[key];
+        }
+    }
+
+    //Some manual, theres missing values in total
+    user.osuAlternative.rulesets['total'].total_score = ['osu','taiko','fruits','mania'].reduce((acc, ruleset) => { return acc + (user.osuAlternative.rulesets[ruleset]?.total_score || 0); }, 0);
 
     return user;
 }
@@ -193,12 +225,19 @@ export class ProfileRulesetScoreSet {
 
         this.grades = {};
 
+        this.clears = 0;
+
         this.legacy_total_score = 0;
         this.score = 0;
+
+        this.performance_points = 0;
+        this.bonus_performance_points = 0;
     }
 
     addScore(score) {
         this.scores.push(score);
+
+        this.clears += 1;
 
         //count grades
         const grade = score.grade;
@@ -216,6 +255,11 @@ export class ProfileRulesetScoreSet {
                 return a[param] - b[param];
             }
         });
+    }
+
+    calculate(){
+        this.performance_points = calculateRawPerformance(this.scores);
+        this.bonus_performance_points = calculateBonusPerformance(this.scores.length);
     }
 }
 
@@ -263,5 +307,9 @@ export class ProfileRulesetStatistics {
         const _scoreCount = this.scores_set_by_pp.scores.length;
         this.completion = _scoreCount / this.beatmap_count;
         this.completion_with_converts = _scoreCount / this.beatmap_count_with_converts;
+
+        this.scores_set.calculate();
+        this.scores_set_by_pp.calculate();
+        this.scores_set_by_score.calculate();
     }
 }

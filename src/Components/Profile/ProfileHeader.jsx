@@ -1,13 +1,15 @@
-import { Avatar, Box, Container, Fade, Typography } from "@mui/material";
+import { Avatar, Box, Container, Fade, Typography, useTheme } from "@mui/material";
 import { useProfile } from "../../Providers/ProfileProvider";
 import ProfileRulesetSelector from "./ProfileRulesetSelector";
 import { getFlagIcon } from "../../Data/Textures/TextureDatabase";
 import NumberFlow from "@number-flow/react";
+import { getContrastColor } from "../../Misc/Helper";
 
 const _profileHeaderImageRatio = 20 / 5; //Width / Height (2000x500)
 
 function ProfileHeader() {
     const { userLive, activeRuleset, getRulesetUser } = useProfile();
+    const theme = useTheme();
 
     if (!userLive) {
         return null;
@@ -65,7 +67,15 @@ function ProfileHeader() {
                             />
 
                             <Box sx={{ m: '12px' }}>
-                                <Typography variant="h4" >{userLive.osuApi.username}</Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                                    {
+                                        userLive.team &&
+                                        <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: userLive.team.color || '#000000', p: 0.5, borderRadius: `${theme.shape.borderRadius}px` }}>
+                                            <Typography variant="h4" sx={{ color: getContrastColor(userLive.team.color || '#000000') }} >{userLive.team.short_name}</Typography>
+                                        </Box>
+                                    }
+                                    <Typography variant="h4" >{userLive.osuApi.username}</Typography>
+                                </Box>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
                                     <img src={getFlagIcon(userLive.osuApi.country_code)} alt={userLive.osuApi.country_code} height={24} />
                                     <Typography variant="body1">{userLive.osuApi.country.name}</Typography>
@@ -76,7 +86,7 @@ function ProfileHeader() {
                             <Fade in={activeRuleset !== 'all'}>
                                 <Box sx={{ m: '12px' }} >
                                     <Typography variant="h6">Rank</Typography>
-                                    <Typography variant="h5">#<NumberFlow value={getRulesetUser(activeRuleset)?.global_rank} fallback="N/A" /></Typography>
+                                    <Typography variant="h5">#<NumberFlow value={getRulesetUser(activeRuleset)?.global_rank > 0 ? getRulesetUser(activeRuleset)?.global_rank : null} fallback="N/A" /></Typography>
                                 </Box>
                             </Fade>
 

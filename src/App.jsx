@@ -18,7 +18,7 @@ const theme = createTheme({
       light: pink[300],
       dark: pink[700],
     },
-  },
+  }
 });
 
 function App() {

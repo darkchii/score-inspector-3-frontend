@@ -108,3 +108,32 @@ export const GetRulesets = () => {
         },
     ]
 }
+
+export const getContrastColor = (bgColor) => {
+    // Calculate the luminance of the background color
+    const color = bgColor.charAt(0) === '#' ? bgColor.substring(1, 7) : bgColor;
+    const r = parseInt(color.substring(0, 2), 16) / 255;
+    const g = parseInt(color.substring(2, 4), 16) / 255;
+    const b = parseInt(color.substring(4, 6), 16) / 255;
+    const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+    // Return black for light backgrounds and white for dark backgrounds
+    return luminance > 0.5 ? '#000000' : '#FFFFFF';
+}
+
+export const calculateRawPerformance = (scores) => {
+    //Sort scores by performance descending
+    scores.sort((a, b) => b.pp - a.pp);
+    //Use top 500 scores only
+
+    const topScores = scores.slice(0, 500);
+    let totalPerformance = 0;
+    topScores.forEach((score, index) => {
+        const weight = Math.pow(0.95, index);
+        totalPerformance += score.pp * weight;
+    });
+    return totalPerformance;
+}
+
+export const calculateBonusPerformance = (scoreCount) => {
+    return 416.6667 * (1 - Math.pow(0.9995, Math.min(scoreCount, 1000)));
+}
