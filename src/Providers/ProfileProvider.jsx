@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useApi } from "./ApiProvider";
 import { FormatNumber } from "../Misc/Helper";
 import { BuildProfileStatistics, MapScoreBeatmaps, ProcessBeatmaps, ProcessScores } from "../Misc/ProfileHelper";
+import { useParams } from "react-router";
 
 const ProfileContext = createContext();
 
@@ -17,12 +18,13 @@ export function ProfileProvider({ children }) {
     const [fetchLog, setFetchLog] = useState([]);
     const [isFinished, setIsFinished] = useState(false);
 
-    const [activeRuleset, setActiveRuleset] = useState('all');
+    const [activeRuleset, setActiveRuleset] = useState(null);
 
     const getRulesetStatistics = (ruleset) => {
         if (!profileStatistics) return null;
 
         switch (ruleset) {
+            default:
             case 'osu':
             case 0:
                 return profileStatistics.rulesets['0'];
@@ -38,8 +40,6 @@ export function ProfileProvider({ children }) {
             case 'all':
             case 'total':
                 return profileStatistics.rulesets['total'];
-            default:
-                return null;
         }
     }
 

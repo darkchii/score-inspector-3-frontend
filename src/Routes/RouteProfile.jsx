@@ -18,7 +18,6 @@ function RouteProfile() {
 
     useEffect(() => {
         (async () => {
-            setActiveRuleset(ruleset || 'all');
             setIsWorking(true);
             try {
                 await fetchFullProfile(userId);
@@ -37,6 +36,12 @@ function RouteProfile() {
         //change url without reloading
         window.history.replaceState(null, null, `/user/${userId}/${activeRuleset || 'all'}`);
     }, [activeRuleset]);
+
+    useEffect(() => {
+        if(ruleset !== activeRuleset){
+            setActiveRuleset(ruleset || 'all');
+        }
+    }, [ruleset]);
 
     if (isWorking) {
         return (<>
