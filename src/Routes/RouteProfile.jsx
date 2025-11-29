@@ -4,14 +4,16 @@ import { useEffect, useState } from "react";
 import ProfileLoader from "../Components/Profile/ProfileLoader";
 import ProfileHeader from "../Components/Profile/ProfileHeader";
 import { Box, Collapse, Fade, Tab, Tabs, useTheme } from "@mui/material";
-import ProfileMain from "../Components/Profile/Pages/ProfileMain";
-import ProfileScores from "../Components/Profile/Pages/ProfileScores";
-import ProfilePacks from "../Components/Profile/Pages/ProfilePacks";
+import ProfilePageMain from "../Components/Profile/Pages/ProfilePageMain";
+import ProfilePageSessions from "../Components/Profile/Pages/ProfilePageSessions";
+import ProfilePageScores from "../Components/Profile/Pages/ProfilePageScores";
+import ProfilePagePacks from "../Components/Profile/Pages/ProfilePagePacks";
 
 const pageComponents = {
-    'main': { component: ProfileMain, title: 'Overview' },
-    'scores': { component: ProfileScores, title: 'Scores' },
-    'packs': { component: ProfilePacks, title: 'Packs' },
+    'main': { component: ProfilePageMain, title: 'Overview' },
+    'sessions': { component: ProfilePageSessions, title: 'Sessions' },
+    'scores': { component: ProfilePageScores, title: 'Scores' },
+    'packs': { component: ProfilePagePacks, title: 'Packs' },
 };
 
 function RouteProfile() {

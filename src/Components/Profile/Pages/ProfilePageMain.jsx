@@ -2,7 +2,7 @@ import { Box, Container } from "@mui/material";
 import ProfileGrades from "../ProfileGrades";
 import ProfileHighlightCollection from "../ProfileHighlightCollection";
 
-function ProfileMain() {
+function ProfilePageMain() {
     return (
         <>
             <ProfileGrades />
@@ -13,4 +13,4 @@ function ProfileMain() {
     );
 }
 
-export default ProfileMain;
+export default ProfilePageMain;

@@ -1,4 +1,5 @@
 import { calculateBonusPerformance, calculateRawPerformance, GetRulesetId, GetRulesetNameFromId } from "./Helper";
+import { GenerateSessions } from "./SessionHelper";
 
 export async function ProcessUser(user){
     user.osuAlternative.rulesets = {};
@@ -141,6 +142,8 @@ export async function ProcessScores(scores) {
 }
 
 async function ProcessScore(score) {
+    score.is_lazer = score.build_id !== null && score.build_id !== undefined; //Only lazer scores have build_id
+
     score.accuracy = Number(score.accuracy);
     score.beatmap_id = Number(score.beatmap_id);
 
@@ -236,6 +239,8 @@ export class ProfileRulesetScoreSet {
         this.duration_seconds = 0;
 
         this.recent_scores = [];
+
+        this.sessions = [];
     }
 
     addScore(score) {
@@ -273,6 +278,11 @@ export class ProfileRulesetScoreSet {
         //recent scores should be max 100, ordered by ended_at descending
         this.reorder('ended_at', true);
         this.recent_scores = this.scores.slice(0, 100);
+
+        this.sessions = GenerateSessions(this.scores);
+        this.sessions.sessions.sort((a, b) => b.start - a.start);
+
+        console.log(this.sessions);
     }
 }
 
@@ -294,6 +304,7 @@ export class ProfileRulesetStatistics {
         this.beatmap_count_ranked = this.beatmaps.filter(b => b.status === 'ranked' || b.status === 'approved').length;
         this.beatmap_count_ranked_with_converts = this.beatmaps_with_converts.filter(b => b.status === 'ranked' || b.status === 'approved').length;
 
+        //scores_set is the defacto statistics holder
         this.scores_set = new ProfileRulesetScoreSet();
         this.scores_set_by_pp = new ProfileRulesetScoreSet();
         this.scores_set_by_score = new ProfileRulesetScoreSet();

@@ -4,6 +4,7 @@ import { useApi } from "./ApiProvider";
 import { FormatNumber, GetRulesetNameFromId } from "../Misc/Helper";
 import { BuildProfileStatistics, MapScoreBeatmaps, ProcessBeatmaps, ProcessScores, ProcessUser } from "../Misc/ProfileHelper";
 import { useParams } from "react-router";
+import { GenerateSessions } from "../Misc/SessionHelper";
 
 const ProfileContext = createContext();
 
@@ -90,8 +91,10 @@ export function ProfileProvider({ children }) {
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched user data`);
             setFetchLog(_fetchLog);
 
+            
             _fetchLog.push("%working% Fetching scores");
             setFetchLog(_fetchLog);
+            await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             const scores = await getScores(_userId);
             endMs = Date.now();
@@ -99,8 +102,10 @@ export function ProfileProvider({ children }) {
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched ${FormatNumber(scores.length)} scores`);
             setFetchLog(_fetchLog);
 
+            
             _fetchLog.push("%working% Fetching beatmaps");
             setFetchLog(_fetchLog);
+            await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             const beatmaps = await getBeatmaps();
             endMs = Date.now();
@@ -108,8 +113,10 @@ export function ProfileProvider({ children }) {
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched ${FormatNumber(beatmaps.length)} beatmaps`);
             setFetchLog(_fetchLog);
 
+            
             _fetchLog.push("%working% Processing beatmaps");
             setFetchLog(_fetchLog);
+            await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             await ProcessBeatmaps(beatmaps);
             endMs = Date.now();
@@ -117,8 +124,10 @@ export function ProfileProvider({ children }) {
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Processed beatmaps`);
             setFetchLog(_fetchLog);
 
+            
             _fetchLog.push("%working% Mapping beatmaps to scores");
             setFetchLog(_fetchLog);
+            await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             const [mappedScores, missingCount] = await MapScoreBeatmaps(scores, beatmaps);
             endMs = Date.now();
@@ -126,8 +135,10 @@ export function ProfileProvider({ children }) {
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Mapped beatmaps to scores (${FormatNumber(missingCount)} scores missing beatmaps)`);
             setFetchLog(_fetchLog);
 
+            
             _fetchLog.push("%working% Processing scores");
             setFetchLog(_fetchLog);
+            await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             await ProcessScores(scores);
             endMs = Date.now();
@@ -135,8 +146,10 @@ export function ProfileProvider({ children }) {
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Processed scores`);
             setFetchLog(_fetchLog);
 
+            
             _fetchLog.push("%working% Building profile statistics");
             setFetchLog(_fetchLog);
+            await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             const profileStats = await BuildProfileStatistics(scores, beatmaps);
             endMs = Date.now();
