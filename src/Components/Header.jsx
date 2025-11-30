@@ -1,4 +1,4 @@
-import { alpha, AppBar, Avatar, Box, Button, IconButton, InputBase, Menu, styled, Toolbar, Typography } from "@mui/material";
+import { alpha, AppBar, Avatar, Box, Button, IconButton, InputBase, Menu, styled, Toolbar, Typography, useTheme } from "@mui/material";
 import Config from "../Data/Config";
 import { Link } from "react-router";
 import { useAuth } from "../Providers/AuthProvider";
@@ -52,15 +52,29 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 function Header() {
     const [showMenu, setShowMenu] = useState(null);
     const { user, loading } = useAuth();
+    const theme = useTheme();
 
     return <AppBar position="static">
         <Box sx={{ pl: 2, pr: 2 }}>
             <Toolbar disableGutters>
-                <Typography variant='h6' noWrap component={Link} to={`/`} sx={{
-                    mr: 2,
-                    color: 'inherit',
-                    textDecoration: 'none',
-                }}>{Config.WEBSITE_NAME}</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography
+                        variant='h6'
+                        noWrap
+                        component={Link}
+                        to={`/`}
+                        sx={{
+                            color: 'inherit',
+                            textDecoration: 'none',
+                        }}>{Config.WEBSITE_NAME}</Typography>
+                    <Typography
+                        variant='subtitle2'
+                        sx={{
+                            color: theme.palette.primary.light,
+                            mr: 2,
+                            fontStyle: 'italic',
+                        }}>v3</Typography>
+                </Box>
                 <Search>
                     <SearchIconWrapper>
                         <SearchIcon />
