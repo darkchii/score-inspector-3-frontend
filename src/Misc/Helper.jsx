@@ -11,6 +11,10 @@ export const FormatNumber = (number) => {
     return new Intl.NumberFormat().format(number);
 }
 
+export const FormatNumberWithPrecision = (number, precision) => {
+    return new Intl.NumberFormat(undefined, { minimumFractionDigits: precision, maximumFractionDigits: precision }).format(number);
+}
+
 export const GetRulesetIconFromId = (rulesetId) => {
     switch (rulesetId) {
         default:

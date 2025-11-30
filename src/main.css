@@ -1,3 +1,7 @@
+:root {
+    --mod-automation: 
+}
+
 body {
     font-family: 'Roboto', sans-serif;
 }
@@ -33,33 +37,4 @@ body {
     filter: opacity(1);
     -webkit-filter: opacity(1);
     transition: all 0.2s ease-in-out;
-}
-
-.mod-icon {
-    position: relative;
-    width: 1.42em;
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-.mod-icon::before {
-    /* temporary */
-    background-color: red;
-
-    mask-image: url('/images/mods/blanks/mod-icon.svg');
-    mask-size: contain;
-    mask-position: center;
-    mask-repeat: no-repeat;
-    content: "";
-    display: flex;
-}
-
-.mod-icon::after {
-    content: attr(data-acronym);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 900;
-    font-size: 0.4em;
 }

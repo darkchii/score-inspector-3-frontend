@@ -27,6 +27,7 @@ function ComponentScoreList({ scores, onSelectScore }) {
                     {scores?.map((score, index) => (
                         <TableRow
                             key={score.id}
+                            data-id={score.id}
                             onClick={() => onSelectScore(score)}
                             sx={{
                                 cursor: 'pointer',
@@ -70,15 +71,7 @@ function ComponentScoreList({ scores, onSelectScore }) {
                                     </Typography>
                                 </Box>
                             </TableCell>
-                            <TableCell>
-                                {/* mods */}
-                                {/* {
-                                    score.mods.length > 0 ? (
-                                        score.mods.map((mod) => (
-                                            <span key={mod} style={{ fontSize: '0.8rem', marginRight: 4 }}>{mod.acronym}</span>
-                                        ))
-                                    ) : null
-                                } */}
+                            <TableCell sx={{ maxWidth: '300px' }}>
                                 <ModDisplay ruleset={GetRulesetNameFromId(score.ruleset_id)} mods={score.mods} />
                             </TableCell>
                             <TableCell>

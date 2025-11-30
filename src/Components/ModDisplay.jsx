@@ -4,7 +4,13 @@ import { GetModData } from "../Misc/ModHelper";
 
 function ModDisplay({ ruleset, mods }) {
     return (
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+        <Box sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '2px',
+            fontSize: '22px',
+            overflow: 'hidden',
+        }}>
             {mods.map((mod) => (
                 <Mod key={mod.acronym} mod={mod} data={GetModData(ruleset, mod.acronym)} />
             ))}
