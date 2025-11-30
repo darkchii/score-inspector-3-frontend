@@ -6,7 +6,7 @@ import { GetRulesetIconFromId, GetRulesetNameFromId, TimeAgo } from "../Misc/Hel
 import NumberFlow from "@number-flow/react";
 import ModDisplay from "./ModDisplay";
 
-function ComponentScoreList({ scores, onSelectScore }) {
+function ScoreList({ scores, onSelectScore }) {
     const theme = useTheme();
 
     return (
@@ -88,4 +88,4 @@ function ComponentScoreList({ scores, onSelectScore }) {
     )
 }
 
-export default ComponentScoreList;
+export default ScoreList;

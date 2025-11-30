@@ -174,6 +174,7 @@ export function ProfileProvider({ children }) {
         } catch (error) {
             console.error("Error fetching full profile:", error);
             setErrorMessage(error.message || "An unknown error occurred while fetching profile data.");
+            setIsFinished(false);
         }
     }
 

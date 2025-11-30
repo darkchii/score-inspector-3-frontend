@@ -12,7 +12,7 @@ function ModDisplay({ ruleset, mods }) {
             overflow: 'hidden',
         }}>
             {mods.map((mod) => (
-                <Mod key={mod.acronym} mod={mod} data={GetModData(ruleset, mod.acronym)} />
+                <Mod key={mod.acronym} mod={mod} data={GetModData(ruleset, mod.acronym)} ruleset={ruleset} />
             ))}
         </Box>
     )

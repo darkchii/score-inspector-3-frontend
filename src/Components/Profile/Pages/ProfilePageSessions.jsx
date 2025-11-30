@@ -1,6 +1,7 @@
-import { Box, Grid, List, ListItemButton, ListItemText, Paper, Typography } from "@mui/material";
+import { Box, Divider, Grid, List, ListItemButton, ListItemText, Paper, Typography } from "@mui/material";
 import { useProfile } from "../../../Providers/ProfileProvider";
 import { useState } from "react";
+import ScoreList from "../../ScoreList";
 
 function ProfilePageSessions() {
     const { getRulesetStatistics, activeRuleset } = useProfile();
@@ -17,7 +18,7 @@ function ProfilePageSessions() {
                 {/* Session listing sidebar*/}
                 <Grid item size={{ xs: 12, sm: 12, md: 4, lg: 3 }}>
                     <Paper elevation={3} sx={{ width: '100%', height: '100%', p: 2 }}>
-                        <Box sx={{ maxHeight: '50vh', overflowY: 'auto' }}>
+                        <Box sx={{ maxHeight: '100vh', overflowY: 'auto' }}>
                             <List>
                                 {
                                     getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.length === 0 ? (
@@ -57,6 +58,17 @@ function ProfilePageSessions() {
                                             <ListItemText key={grade} primary={`${grade}: ${count}`} />
                                         ))}
                                     </List>
+                                    <Divider sx={{ my: 2 }} />
+                                    <Typography variant="h6">Scores</Typography>
+                                    <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                                        {
+                                            getSession().scores.length === 0 ? (
+                                                <Typography>No scores in this session.</Typography>
+                                            ) : (
+                                                <ScoreList scores={getSession().scores} onSelectScore={() => { }} />
+                                            )
+                                        }
+                                    </Box>
                                 </Box>
                             )
                         }

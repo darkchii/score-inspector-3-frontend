@@ -1,4 +1,5 @@
 import { calculateBonusPerformance, calculateRawPerformance, GetRulesetId, GetRulesetNameFromId } from "./Helper";
+import { ReorderMods } from "./ModHelper";
 import { GenerateSessions } from "./SessionHelper";
 
 export async function ProcessUser(user){
@@ -186,6 +187,8 @@ async function ProcessScore(score) {
             score.duration = (endedAt - startedAt) / 1000; //duration in seconds
         }
     }
+
+    score.mods = ReorderMods(GetRulesetNameFromId(score.ruleset_id), score.mods || []);
 
     return score;
 }
