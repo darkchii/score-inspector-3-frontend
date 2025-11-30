@@ -46,19 +46,6 @@ function ProfilePageSessions() {
                                         setSelectedSessionId,
                                     }}
                                 />
-                                // <List>
-                                //     {
-                                //         getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.get().map((session) => (
-                                //             <ListItemButton
-                                //                 key={session.id}
-                                //                 selected={selectedSessionId === session.id}
-                                //                 onClick={() => setSelectedSessionId(session.id)}
-                                //             >
-                                //                 <ListItemText primary={`${session.start.toLocaleString()}`} secondary={`Duration: ${Math.floor(session.duration / 60)} minutes, Scores: ${session.score_count}`} />
-                                //             </ListItemButton>
-                                //         ))
-                                //     }
-                                // </List>
                             )}
                         </Box>
                     </Paper>

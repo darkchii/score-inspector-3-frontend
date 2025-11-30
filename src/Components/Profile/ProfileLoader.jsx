@@ -1,9 +1,10 @@
 import { Avatar, Box, Card, CircularProgress, Collapse, Divider, Grid, Grow, LinearProgress, List, ListItem, ListItemText, Skeleton, Step, StepLabel, Stepper, Typography } from "@mui/material";
 import { useProfile } from "../../Providers/ProfileProvider";
 import { TransitionGroup } from "react-transition-group";
-import { green, red } from "@mui/material/colors";
+import { green, orange, red } from "@mui/material/colors";
 import ErrorIcon from '@mui/icons-material/Error';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import WarningIcon from '@mui/icons-material/Warning';
 
 function ProfileLoader() {
     //This is the display shown while the profile is loading, showing details of whats going on
@@ -81,6 +82,11 @@ function ProfileLoader() {
                                                                     (<Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: green[500] }}>
                                                                         <CheckCircleIcon fontSize="small" />
                                                                         <span>{log.replace("%finished% ", "")}</span>
+                                                                    </Box>)
+                                                                : log.startsWith("%warning%") ?
+                                                                    (<Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: orange[700] }}>
+                                                                        <WarningIcon fontSize="small" />
+                                                                        <span>{log.replace("%warning% ", "")}</span>
                                                                     </Box>)
                                                                     : log
                                                         } />

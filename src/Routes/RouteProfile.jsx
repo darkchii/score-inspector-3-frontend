@@ -17,7 +17,7 @@ const pageComponents = {
 };
 
 function RouteProfile() {
-    const { fetchFullProfile, errorMessage, activeRuleset, setActiveRuleset } = useProfile();
+    const { fetchFullProfile, errorMessage, activeRuleset, setActiveRuleset, userLive } = useProfile();
     const { userId, ruleset, page } = useParams();
     const [activePage, setPage] = useState('main');
     const [isWorking, setIsWorking] = useState(false);
@@ -66,6 +66,13 @@ function RouteProfile() {
 
     return (<>
         <Box>
+            {
+                userLive?.is_sync === false &&
+                <Box sx={{ width: '100%', p: 1, bgcolor: theme.palette.error.main, color: theme.palette.error.contrastText, textAlign: 'center' }}>
+                    <strong>Warning:</strong> User is not yet synced. Data may be incomplete or outdated.
+                </Box>
+            }
+
             {/* header */}
             <ProfileHeader />
 

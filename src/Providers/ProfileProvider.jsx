@@ -85,10 +85,14 @@ export function ProfileProvider({ children }) {
             _fetchLog.push("%working% Fetching user data");
             setFetchLog(_fetchLog);
             let startMs = Date.now();
-            await getUser(_userId);
+            const user = await getUser(_userId);
             let endMs = Date.now();
             _fetchLog.pop();
-            _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched user data`);
+            if(!user.is_sync){
+                _fetchLog.push(`%warning% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched user data (not synced)`);
+            }else{
+                _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched user data`);
+            }
             setFetchLog(_fetchLog);
 
             
