@@ -2,6 +2,20 @@ import { Box, Divider, Grid, List, ListItemButton, ListItemText, Paper, Typograp
 import { useProfile } from "../../../Providers/ProfileProvider";
 import { useState } from "react";
 import ScoreList from "../../ScoreList";
+import { List as VirtualList } from "react-window";
+
+function renderSessionListItem({ index, sessions, selectedSessionId, setSelectedSessionId }) {
+    const session = sessions[index];
+    return (
+        <ListItemButton
+            key={session.id}
+        selected={selectedSessionId === session.id}
+        onClick={() => setSelectedSessionId(session.id)}
+        >
+            <ListItemText primary={`${session.start.toLocaleString()}`} secondary={`Duration: ${Math.floor(session.duration / 60)} minutes, Scores: ${session.score_count}`} />
+        </ListItemButton>
+    )
+}
 
 function ProfilePageSessions() {
     const { getRulesetStatistics, activeRuleset } = useProfile();
@@ -19,23 +33,33 @@ function ProfilePageSessions() {
                 <Grid item size={{ xs: 12, sm: 12, md: 4, lg: 3 }}>
                     <Paper elevation={3} sx={{ width: '100%', height: '100%', p: 2 }}>
                         <Box sx={{ maxHeight: '100vh', overflowY: 'auto' }}>
-                            <List>
-                                {
-                                    getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.length === 0 ? (
-                                        <Typography>No sessions available.</Typography>
-                                    ) : (
-                                        getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.get().map((session) => (
-                                            <ListItemButton
-                                                key={session.id}
-                                                selected={selectedSessionId === session.id}
-                                                onClick={() => setSelectedSessionId(session.id)}
-                                            >
-                                                <ListItemText primary={`${session.start.toLocaleString()}`} secondary={`Duration: ${Math.floor(session.duration / 60)} minutes, Scores: ${session.score_count}`} />
-                                            </ListItemButton>
-                                        ))
-                                    )
-                                }
-                            </List>
+                            {getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.length === 0 ? (
+                                <Typography>No sessions available.</Typography>
+                            ) : (
+                                <VirtualList
+                                    rowHeight={60}
+                                    rowCount={getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.length || 0}
+                                    rowComponent={renderSessionListItem}
+                                    rowProps={{
+                                        sessions: getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.get() || [],
+                                        selectedSessionId,
+                                        setSelectedSessionId,
+                                    }}
+                                />
+                                // <List>
+                                //     {
+                                //         getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.get().map((session) => (
+                                //             <ListItemButton
+                                //                 key={session.id}
+                                //                 selected={selectedSessionId === session.id}
+                                //                 onClick={() => setSelectedSessionId(session.id)}
+                                //             >
+                                //                 <ListItemText primary={`${session.start.toLocaleString()}`} secondary={`Duration: ${Math.floor(session.duration / 60)} minutes, Scores: ${session.score_count}`} />
+                                //             </ListItemButton>
+                                //         ))
+                                //     }
+                                // </List>
+                            )}
                         </Box>
                     </Paper>
                 </Grid>
