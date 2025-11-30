@@ -74,10 +74,10 @@ function ScoreList({ scores, onSelectScore }) {
                             <TableCell sx={{ maxWidth: '300px' }}>
                                 <ModDisplay ruleset={GetRulesetNameFromId(score.ruleset_id)} mods={score.mods} />
                             </TableCell>
-                            <TableCell>
-                                <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold', color: '#ea0' }}><NumberFlow format={{ maximumFractionDigits: 2 }} value={score.accuracy * 100} suffix="%" /></Typography>
+                            <TableCell sx={{ width: '80px' }}>
+                                <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold', color: 'rgba(238, 170, 0, 1)' }}><NumberFlow format={{ maximumFractionDigits: 2 }} value={score.accuracy * 100} suffix="%" /></Typography>
                             </TableCell>
-                            <TableCell>
+                            <TableCell sx={{ width: '100px', textAlign: 'right', backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
                                 <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold' }}><NumberFlow format={{ maximumFractionDigits: 2 }} value={score.pp || 0} suffix="pp" /></Typography>
                             </TableCell>
                         </TableRow>

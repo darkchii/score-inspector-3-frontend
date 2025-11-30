@@ -1,5 +1,6 @@
 import { Box, List, ListItem, ListItemText, styled, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, Tooltip, Typography, useTheme } from "@mui/material";
 import { GetModSettingForDisplay } from "../../Misc/ModHelper";
+import ModDisplay from "../ModDisplay";
 
 const LocalStyledTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} componentsProps={{ tooltip: { className: className } }} />
@@ -12,6 +13,7 @@ const LocalStyledTooltip = styled(({ className, ...props }) => (
 function ModTooltipContent({ mod, data, ruleset }) {
     const theme = useTheme();
 
+    console.log(data);
     return (
         <Box sx={{
             backgroundColor: '#293d2a',
@@ -67,12 +69,24 @@ function ModTooltipContent({ mod, data, ruleset }) {
                             </TableContainer>
                         </>
                 }
+
+                {/* incompatible mods */}
+                <Typography variant="subtitle2" sx={{ mt: 2, fontWeight: 'bold' }}>Incompatible Mods:</Typography>
+                {
+                    data.IncompatibleMods.length === 0
+                        ? <Typography>None</Typography>
+                        : <ModDisplay ruleset={ruleset} mods={data.IncompatibleMods.map(acronym => ({ acronym }))} />
+                }
             </Box>
         </Box>
     )
 }
 
-function ModTooltip({ children, mod, data, ruleset }) {
+function ModTooltip({ children, mod, data, ruleset, disabled = false }) {
+    if (disabled) {
+        return children;
+    }
+
     return (
         <LocalStyledTooltip
             title={<ModTooltipContent mod={mod} data={data} ruleset={ruleset} />}
