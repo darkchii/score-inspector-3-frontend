@@ -38,6 +38,31 @@ export function getFlagIcon(country_code){
     }
 }
 
+export function getGradeIcon(grade){
+    switch(grade){
+        case 'XH':
+            return SVGGradeXH;
+        case 'X':
+            return SVGGradeX;
+        case 'SH':
+            return SVGGradeSH;
+        case 'S':
+            return SVGGradeS;
+        case 'A':
+            return SVGGradeA;
+        case 'B':
+            return SVGGradeB;
+        case 'C':
+            return SVGGradeC;
+        case 'D':
+            return SVGGradeD;
+        case 'F':
+            return SVGGradeF;
+        default:
+            return null;
+    }
+}
+
 export const TextureDatabase = {
     PageNotFoundKirino,
     RulesetCatchIcon,

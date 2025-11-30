@@ -137,3 +137,36 @@ export const calculateRawPerformance = (scores) => {
 export const calculateBonusPerformance = (scoreCount) => {
     return 416.6667 * (1 - Math.pow(0.9995, Math.min(scoreCount, 1000)));
 }
+
+export const TimeAgo = (date, detailed = false) => {
+    //smart time ago function (pick largest unit, and if detailed, show next every next unit as well)
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+
+    let interval = Math.floor(seconds / 31536000);
+    if (interval >= 1) {
+        return interval + " year" + (interval > 1 ? "s" : "") + (detailed ? detailedTimeAgo(seconds % 31536000) : " ago");
+    }
+
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) {
+        return interval + " month" + (interval > 1 ? "s" : "") + (detailed ? detailedTimeAgo(seconds % 2592000) : " ago");
+    }
+
+    interval = Math.floor(seconds / 86400);
+    if (interval >= 1) {
+        return interval + " day" + (interval > 1 ? "s" : "") + (detailed ? detailedTimeAgo(seconds % 86400) : " ago");
+    }
+
+    interval = Math.floor(seconds / 3600);
+    if (interval >= 1) {
+        return interval + " hour" + (interval > 1 ? "s" : "") + (detailed ? detailedTimeAgo(seconds % 3600) : " ago");
+    }
+
+    interval = Math.floor(seconds / 60);
+    if (interval >= 1) {
+        return interval + " minute" + (interval > 1 ? "s" : "") + (detailed ? detailedTimeAgo(seconds % 60) : " ago");
+    }
+
+    return Math.floor(seconds) + " second" + (seconds > 1 ? "s" : "") + " ago";
+}

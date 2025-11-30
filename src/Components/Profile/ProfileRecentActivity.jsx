@@ -1,8 +1,27 @@
+import { Box, List, Stack, Typography } from "@mui/material";
+import { useProfile } from "../../Providers/ProfileProvider";
+import ScoreList from "../ScoreList";
+
 function ProfileRecentActivity() {
+    const { getRulesetStatistics, activeRuleset } = useProfile();
+
     return (
-        <div>
-            Recent Activity Component
-        </div>
+        <Box>
+            <Typography variant="h6" gutterBottom>
+                Recent Activity
+            </Typography>
+            <Box>
+                <Stack spacing={1} sx={{ mb: 1 }}>
+                    {
+                        getRulesetStatistics(activeRuleset)?.scores_set?.recent_scores?.length === 0
+                            ? <Typography>No recent activity available.</Typography>
+                            //only show 20 recent scores
+                            : 
+                            <ScoreList scores={getRulesetStatistics(activeRuleset)?.scores_set?.recent_scores?.slice(0, 20)} onSelectScore={() => { }} />
+                    }
+                </Stack>
+            </Box>
+        </Box>
     );
 }
 

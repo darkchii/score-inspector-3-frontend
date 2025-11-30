@@ -225,6 +225,7 @@ export class ProfileStatistics {
 export class ProfileRulesetScoreSet {
     constructor() {
         this.scores = [];
+        this.scores_map = {};
         this.grades = {};
 
         this.clears = 0;
@@ -245,6 +246,8 @@ export class ProfileRulesetScoreSet {
 
     addScore(score) {
         this.scores.push(score);
+
+        this.scores_map[score.id] = score;
 
         this.clears += 1;
         if(score.beatmap && (score.beatmap.status === 'ranked' || score.beatmap.status === 'approved')){
@@ -283,6 +286,10 @@ export class ProfileRulesetScoreSet {
         this.sessions.sessions.sort((a, b) => b.start - a.start);
 
         console.log(this.sessions);
+    }
+
+    getById(id) {
+        return this.scores_map[id];
     }
 }
 
