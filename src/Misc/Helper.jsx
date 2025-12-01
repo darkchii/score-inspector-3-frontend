@@ -15,6 +15,22 @@ export const FormatNumberWithPrecision = (number, precision) => {
     return new Intl.NumberFormat(undefined, { minimumFractionDigits: precision, maximumFractionDigits: precision }).format(number);
 }
 
+export const FormatDuration = (seconds, style = 'narrow') => {
+    const duration = {
+        years: Math.floor(seconds / 31536000),
+        days: Math.floor((seconds % 31536000) / 86400),
+        hours: Math.floor((seconds % 86400) / 3600),
+        minutes: Math.floor((seconds % 3600) / 60),
+        seconds: Math.floor(seconds % 60)
+    }
+
+    if (style === 'raw') {
+        return duration;
+    }
+
+    return new Intl.DurationFormat('en', { style: style }).format(duration);
+}
+
 export const GetRulesetIconFromId = (rulesetId) => {
     switch (rulesetId) {
         default:
