@@ -15,11 +15,12 @@ function ProfilePageMain() {
 
                     </Grid>
                     <Grid item size={{ xs: 12, sm: 12, md: 6, lg: 8 }}>
-                        <Paper elevation={3} sx={{ padding: 2, height: '100%' }}>
-                            <ProfileRecentActivity />
-                        </Paper>
                     </Grid>
                 </Grid>
+                <Divider sx={{ my: 2 }} />
+                <Paper elevation={3} sx={{ padding: 2, height: '100%' }}>
+                    <ProfileRecentActivity />
+                </Paper>
             </Box>
         </>
     );

@@ -5,6 +5,7 @@ import { getGradeIcon } from "../Data/Textures/TextureDatabase";
 import { GetRulesetIconFromId, GetRulesetNameFromId, TimeAgo } from "../Misc/Helper";
 import NumberFlow from "@number-flow/react";
 import ModDisplay from "./ModDisplay";
+import { grey } from "@mui/material/colors";
 
 function ScoreList({ scores, onSelectScore }) {
     const theme = useTheme();
@@ -51,11 +52,15 @@ function ScoreList({ scores, onSelectScore }) {
                             }}
                         >
                             <TableCell width={30}>
-                                <img src={GetRulesetIconFromId(score.ruleset_id)} alt={score.grade} width={20} height={20} />
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
+                                    <img src={GetRulesetIconFromId(score.ruleset_id)} alt={score.grade} width={20} height={20} />
+                                </Box>
                             </TableCell>
                             {/* Grade, should be as small as possible */}
                             <TableCell width={30}>
-                                <img src={getGradeIcon(score.grade)} alt={score.grade} width={30} height={20} />
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
+                                    <img src={getGradeIcon(score.grade)} alt={score.grade} width={40} height={30} />
+                                </Box>
                             </TableCell>
                             <TableCell>
                                 <Box sx={{
@@ -71,7 +76,24 @@ function ScoreList({ scores, onSelectScore }) {
                                     </Typography>
                                 </Box>
                             </TableCell>
-                            <TableCell sx={{ maxWidth: '300px' }}>
+                            <TableCell sx={{ maxWidth: '100px' }}>
+                                <Typography sx={{ fontSize: '0.85rem', fontWeight: 'bold' }}>{score.total_score.toLocaleString()}</Typography>
+                                {
+                                    (score.ruleset_id === 0 || score.ruleset_id === 2) &&
+                                    <Typography sx={{ fontSize: '0.75rem', color: grey[300] }}>{score.classic_total_score.toLocaleString()}</Typography>
+                                }
+                            </TableCell>
+                            <TableCell>
+                                <Typography sx={{
+                                    fontSize: '0.85rem',
+                                    ...(
+                                        score.combo === score.beatmap.max_combo
+                                            ? { color: '#4caf50', fontWeight: 'bold' }
+                                            : {}
+                                    )
+                                }}>{score.combo.toLocaleString()}/{score.beatmap.max_combo.toLocaleString()}x</Typography>
+                            </TableCell>
+                            <TableCell sx={{ maxWidth: '250px' }}>
                                 <ModDisplay ruleset={GetRulesetNameFromId(score.ruleset_id)} mods={score.mods} />
                             </TableCell>
                             <TableCell sx={{ width: '80px' }}>
