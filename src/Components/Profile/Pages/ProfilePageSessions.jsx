@@ -166,6 +166,10 @@ function ProfilePageSessions() {
     useEffect(() => {
         const count = getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.length || 0;
         setSessionCount(count);
+
+        //reset selection
+        setSelectedSessionId(null);
+        setSessionSelectorPage(0);
     }, [getRulesetStatistics, activeRuleset]);
 
     const getSession = () => {
