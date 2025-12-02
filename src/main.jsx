@@ -10,14 +10,20 @@ import { AuthProvider } from './Providers/AuthProvider.jsx';
 import { ApiProvider } from './Providers/ApiProvider.jsx';
 import { ProfileProvider } from './Providers/ProfileProvider.jsx';
 
+const _providers = [
+  ApiProvider,
+  AuthProvider,
+  ProfileProvider,
+]
+
+const _wrapWithProviders = (children) => {
+  return _providers.reduceRight((acc, Provider) => {
+    return <Provider>{acc}</Provider>
+  }, children);
+}
+
 createRoot(document.getElementById('root')).render(
   <BrowserRouter basename='/'>
-    <ApiProvider>
-      <AuthProvider>
-        <ProfileProvider>
-          <App />
-        </ProfileProvider>
-      </AuthProvider>
-    </ApiProvider>
+    {_wrapWithProviders(<App />)}
   </BrowserRouter>,
 )
