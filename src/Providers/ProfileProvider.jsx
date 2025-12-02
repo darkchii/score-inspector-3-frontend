@@ -39,7 +39,6 @@ export function ProfileProvider({ children }) {
     const getUser = async (_userId) => {
         let _user = await getUserLive(_userId);
         _user = await ProcessUser(_user);
-        console.log(_user);
         setUserLive(_user);
         setUserId(_userId);
         return _user;
@@ -47,14 +46,11 @@ export function ProfileProvider({ children }) {
 
     const getScores = async (_userId) => {
         const _score = await getScoresLive(_userId);
-        console.log(_score);
-        setScoresLive(_score);
         return _score;
     }
 
     const getBeatmaps = async () => {
         const _beatmaps = await getBeatmapsLive();
-        console.log(_beatmaps);
         setBeatmapsLive(_beatmaps);
         return _beatmaps;
     }
@@ -134,6 +130,8 @@ export function ProfileProvider({ children }) {
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             const [mappedScores, missingCount] = await MapScoreBeatmaps(scores, beatmaps);
+            console.log(mappedScores);
+            setScoresLive(mappedScores);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Mapped beatmaps to scores (${FormatNumber(missingCount)} scores missing beatmaps)`);
@@ -155,7 +153,7 @@ export function ProfileProvider({ children }) {
             setFetchLog(_fetchLog);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
-            const profileStats = await BuildProfileStatistics(scores, beatmaps);
+            const profileStats = await BuildProfileStatistics(mappedScores, beatmaps);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Built profile statistics`);
