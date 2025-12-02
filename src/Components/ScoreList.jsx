@@ -2,7 +2,7 @@
 
 import { Box, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, tableRowClasses, Typography, useTheme } from "@mui/material";
 import { getGradeIcon } from "../Data/Textures/TextureDatabase";
-import { GetRulesetIconFromId, GetRulesetNameFromId, TimeAgo } from "../Misc/Helper";
+import { FormatNumberWithPrecision, GetRulesetIconFromId, GetRulesetNameFromId, TimeAgo } from "../Misc/Helper";
 import NumberFlow from "@number-flow/react";
 import ModDisplay from "./ModDisplay";
 import { grey } from "@mui/material/colors";
@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 
 const truncateStep = 10;
 
-function ScoreList({ scores, onSelectScore, truncate = false, truncateStartStep = truncateStep }) {
+function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, truncate = false, truncateStartStep = truncateStep }) {
     const theme = useTheme();
     const [displayCount, setDisplayCount] = useState(truncate ? truncateStartStep : scores?.length || 0);
 
@@ -64,6 +64,12 @@ function ScoreList({ scores, onSelectScore, truncate = false, truncateStartStep 
                                     },
                                 }}
                             >
+                                {showIndex &&
+                                    <TableCell width={40}>
+                                        <Typography sx={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{startIndex + index + 1}</Typography>
+                                    </TableCell>
+                                }
+                                {/* Ruleset Icon */}
                                 <TableCell width={30}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
                                         <img src={GetRulesetIconFromId(score.ruleset_id)} alt={score.grade} width={20} height={20} />
@@ -110,10 +116,10 @@ function ScoreList({ scores, onSelectScore, truncate = false, truncateStartStep 
                                     <ModDisplay ruleset={GetRulesetNameFromId(score.ruleset_id)} mods={score.mods} />
                                 </TableCell>
                                 <TableCell sx={{ width: '80px' }}>
-                                    <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold', color: 'rgba(238, 170, 0, 1)' }}><NumberFlow format={{ maximumFractionDigits: 2 }} value={score.accuracy * 100} suffix="%" /></Typography>
+                                    <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold', color: 'rgba(238, 170, 0, 1)' }}>{FormatNumberWithPrecision(score.accuracy * 100, 2)}%</Typography>
                                 </TableCell>
                                 <TableCell sx={{ width: '100px', textAlign: 'right', backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
-                                    <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold' }}><NumberFlow format={{ maximumFractionDigits: 2 }} value={score.pp || 0} suffix="pp" /></Typography>
+                                    <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold' }}>{FormatNumberWithPrecision(score.pp || 0, 2)}pp</Typography>
                                 </TableCell>
                             </TableRow>
                         ))}
