@@ -7,10 +7,12 @@ import NumberFlow from "@number-flow/react";
 import ModDisplay from "./ModDisplay";
 import { grey } from "@mui/material/colors";
 import { useEffect, useState } from "react";
+import { useScoreView } from "../Providers/ScoreViewProvider";
 
 const truncateStep = 10;
 
 function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, truncate = false, truncateStartStep = truncateStep }) {
+    const { loadScoreView } = useScoreView();
     const theme = useTheme();
     const [displayCount, setDisplayCount] = useState(truncate ? truncateStartStep : scores?.length || 0);
 
@@ -42,7 +44,7 @@ function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, t
                             <TableRow
                                 key={score.id}
                                 data-id={score.id}
-                                onClick={() => onSelectScore(score)}
+                                onClick={() => loadScoreView(score)}
                                 sx={{
                                     cursor: 'pointer',
                                     //content should be vertically centered and horizontally aligned to the left

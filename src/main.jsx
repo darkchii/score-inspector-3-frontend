@@ -9,11 +9,13 @@ import { BrowserRouter } from 'react-router';
 import { AuthProvider } from './Providers/AuthProvider.jsx';
 import { ApiProvider } from './Providers/ApiProvider.jsx';
 import { ProfileProvider } from './Providers/ProfileProvider.jsx';
+import { ScoreViewProvider } from './Providers/ScoreViewProvider.jsx';
 
 const _providers = [
   ApiProvider,
   AuthProvider,
   ProfileProvider,
+  ScoreViewProvider
 ]
 
 const _wrapWithProviders = (children) => {

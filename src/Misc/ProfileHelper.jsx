@@ -133,12 +133,14 @@ export async function MapScoreBeatmaps(scores, beatmaps) {
     return [scores, missingCount];
 }
 
-export async function ProcessScores(scores) {
+export async function ProcessScores(scores, user = null) {
     for (let i = 0; i < scores.length; i++) {
         scores[i] = await ProcessScore(scores[i]);
-    }
 
-    console.log(scores[0]);
+        if(user){
+            scores[i].user = user;
+        }
+    }
     return scores;
 }
 

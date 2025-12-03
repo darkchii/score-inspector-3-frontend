@@ -5,6 +5,7 @@ import { FormatNumber, GetRulesetNameFromId } from "../Misc/Helper";
 import { BuildProfileStatistics, MapScoreBeatmaps, ProcessBeatmaps, ProcessScores, ProcessUser } from "../Misc/ProfileHelper";
 import { useParams } from "react-router";
 import { GenerateSessions } from "../Misc/SessionHelper";
+import { useScoreView } from "./ScoreViewProvider";
 
 const ProfileContext = createContext();
 
@@ -21,6 +22,7 @@ export function ProfileProvider({ children }) {
 
     const [activeRuleset, setActiveRuleset] = useState(null);
     const [availableRulesets, setAvailableRulesets] = useState([]);
+
 
     const getRulesetStatistics = (ruleset) => {
         if (!profileStatistics) return null;
@@ -142,7 +144,7 @@ export function ProfileProvider({ children }) {
             setFetchLog(_fetchLog);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
-            await ProcessScores(scores);
+            await ProcessScores(scores, user);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Processed scores`);

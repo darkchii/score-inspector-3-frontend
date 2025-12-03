@@ -1,9 +1,52 @@
+@font-face {
+    font-family: "Torus";
+    font-weight: 100;
+    src: local('Torus-Thin') url("./Data/Fonts/Torus Pro/toruspro-thin.otf");
+}
+
+@font-face {
+    font-family: "Torus";
+    font-weight: 600;
+    src: local('Torus-SemiBold') url("./Data/Fonts/Torus Pro/toruspro-semibold.otf");
+}
+
+@font-face {
+    font-family: "Torus";
+    font-weight: 700;
+    src: local('Torus-Bold') url("./Data/Fonts/Torus Pro/toruspro-semibold.otf");
+}
+
+@font-face {
+    font-family: "Torus";
+    font-weight: 400;
+    src: local('Torus-Regular') url("./Data/Fonts/Torus Pro/toruspro-regular.otf");
+}
+
+@font-face {
+    font-family: "Torus";
+    font-weight: 300;
+    src: local('Torus-Light') url("./Data/Fonts/Torus Pro/toruspro-light.otf");
+}
+
+@font-face {
+    font-family: "Torus";
+    font-weight: 900;
+    src: local('Torus-Heavy') url("./Data/Fonts/Torus Pro/toruspro-heavy.otf");
+}
+
+@font-face {
+    font-family: "Torus";
+    font-weight: 800;
+    src: local('Torus-Bold') url("./Data/Fonts/Torus Pro/toruspro-bold.otf");
+}
+
 :root {
-    --mod-automation: 
+    --mod-automation:
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: "Torus", "Inter", "Helvetica Neue", Tahoma, Arial, "Hiragino Kaku Gothic ProN", Meiryo,
+        "Microsoft YaHei", "Apple SD Gothic Neo", sans-serif !important;
 }
 
 .profile-header-content {
