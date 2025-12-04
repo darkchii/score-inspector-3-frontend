@@ -53,7 +53,6 @@ export function ProfileProvider({ children }) {
 
     const getBeatmaps = async () => {
         const _beatmaps = await getBeatmapsLive();
-        setBeatmapsLive(_beatmaps);
         return _beatmaps;
     }
 
@@ -120,7 +119,8 @@ export function ProfileProvider({ children }) {
             setFetchLog(_fetchLog);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
-            await ProcessBeatmaps(beatmaps);
+            const _beatmaps = ProcessBeatmaps(beatmaps);
+            setBeatmapsLive(_beatmaps);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Processed beatmaps`);
@@ -131,8 +131,7 @@ export function ProfileProvider({ children }) {
             setFetchLog(_fetchLog);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
-            const [mappedScores, missingCount] = await MapScoreBeatmaps(scores, beatmaps);
-            console.log(mappedScores);
+            const [mappedScores, missingCount] = await MapScoreBeatmaps(scores, _beatmaps);
             setScoresLive(mappedScores);
             endMs = Date.now();
             _fetchLog.pop();
@@ -155,7 +154,7 @@ export function ProfileProvider({ children }) {
             setFetchLog(_fetchLog);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
-            const profileStats = await BuildProfileStatistics(mappedScores, beatmaps);
+            const profileStats = await BuildProfileStatistics(mappedScores, _beatmaps);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Built profile statistics`);
@@ -173,6 +172,10 @@ export function ProfileProvider({ children }) {
             if (!profileStats.rulesets[GetRulesetNameFromId(activeRuleset)]) {
                 setActiveRuleset('all');
             }
+
+            console.log("DEV ===============================");
+            console.log(mappedScores[0]);
+            console.log("DEV ===============================");
 
             setIsFinished(true);
         } catch (error) {

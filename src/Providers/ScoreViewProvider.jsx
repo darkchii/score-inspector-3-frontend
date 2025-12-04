@@ -27,7 +27,7 @@ export function ScoreViewProvider({ children }) {
                 closeAfterTransition
             >
                 <Fade in={enabled}>
-                    <div className={modalStyles.modal}>
+                    <div>
                         <ScoreView score={scoreData} />
                     </div>
                 </Fade>

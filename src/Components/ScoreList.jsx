@@ -1,7 +1,7 @@
 //Basically a Table wrapper, so all columns line up properly
 
 import { Box, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, tableRowClasses, Typography, useTheme } from "@mui/material";
-import { getGradeIcon } from "../Data/Textures/TextureDatabase";
+import { getGradeIcon } from "../Assets/Textures/TextureDatabase";
 import { FormatNumberWithPrecision, GetRulesetIconFromId, GetRulesetNameFromId, TimeAgo } from "../Misc/Helper";
 import NumberFlow from "@number-flow/react";
 import ModDisplay from "./ModDisplay";

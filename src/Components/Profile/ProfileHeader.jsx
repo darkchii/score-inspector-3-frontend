@@ -1,7 +1,7 @@
 import { Avatar, Box, Container, Fade, Typography, useTheme } from "@mui/material";
 import { useProfile } from "../../Providers/ProfileProvider";
 import ProfileRulesetSelector from "./ProfileRulesetSelector";
-import { getFlagIcon } from "../../Data/Textures/TextureDatabase";
+import { getFlagIcon } from "../../Assets/Textures/TextureDatabase";
 import NumberFlow from "@number-flow/react";
 import { getContrastColor } from "../../Misc/Helper";
 

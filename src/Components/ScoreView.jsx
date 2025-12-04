@@ -1,60 +1,48 @@
 import { Box, Grid, Stack, Typography } from '@mui/material';
-import modalStyles from '../Style/modal.module.less';
+import scoreModalStyles from '../Style/score-modal.module.less';
+import scoreInfoStyles from '../Style/score-info.module.less';
+import ScoreDial from './ScoreDial';
+import NumberFlow from '@number-flow/react';
+import { DateToString, FormatNumber } from '../Misc/Helper';
+import ModDisplay from './ModDisplay';
 
 function ScoreView({ score }) {
 
-    console.log(modalStyles);
     return (
-        <div className={modalStyles.modal__content}>
-            <div style={{ width: '100%', height: '100%' }}>
-                <div
-                    crossOrigin='anonymous'
-                    className={modalStyles.modal__content__background}
-                    style={{
-                        zIndex: -2,
-                        backgroundImage: `url(https://assets.ppy.sh/beatmaps/${score.beatmap.beatmapset_id}/covers/fullsize.jpg)`,
-                    }} />
-                <div
-                    className={modalStyles.modal__content__background}
-                    style={{
-                        zIndex: -1,
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    }} />
-                <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
-                    <Grid container spacing={2} sx={{ padding: 2 }}>
-                        <Grid item size={{ xs: 12, md: 3 }}>
-                            {/* Left side content */}
-                            <h2>Score by {score.user.username}</h2>
-                        </Grid>
-                        <Grid item size={{ xs: 12, md: 6 }}>
-                            <Stack direction="column" spacing={1} sx={{
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                width: '100%'
-                            }}>
-                                <Box sx={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    width: '100%',
-                                    fontFamily: 'Torus !important',
-
-                                    //they should stack on top of each other
-                                    flexDirection: 'column',
-                                }}>
-                                    <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{score.beatmap.title}</Typography>
-                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{score.beatmap.artist}</Typography>
-                                </Box>
-                            </Stack>
-                        </Grid>
-                        <Grid item size={{ xs: 12, md: 6 }}>
-                            {/* Full width content */}
-                            <p>PP: {score.pp.toLocaleString()}</p>
-                        </Grid>
-                    </Grid>
+        <div className={scoreModalStyles['score-modal']}>
+            <div>
+                <p>user data area</p>
+            </div>
+            <div className={scoreModalStyles['score-modal__content']}>
+                <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__title']}`}>
+                        <span>{score.beatmap.title}</span>
+                    </div>
+                    <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__artist']}`}>
+                        <span>{score.beatmap.artist}</span>
+                    </div>
+                    <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__dial']}`}>
+                        <ScoreDial score={score} />
+                    </div>
+                    <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__score']}`}>
+                        <span>{FormatNumber(score.total_score)}</span>
+                    </div>
+                    <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__subscore']}`}>
+                        <span>{FormatNumber(score.classic_total_score)}</span>
+                    </div>
+                    <div className={scoreInfoStyles['score-info']}>
+                        <ModDisplay ruleset={score.ruleset} mods={score.mods} />
+                    </div>
+                    <div className={`${scoreInfoStyles['score-info']}`}>
+                        <span className={scoreInfoStyles['score-info__version']}>{score.beatmap.version}</span>
+                        <span>mapped by <span style={{fontWeight: 'bold'}}>{score.beatmap.mapper || 'N/A'}</span></span>
+                    </div>
+                    <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__rankdate']}`}>
+                        <span>Ranked on {DateToString(score.beatmap.ranked_date)}</span>
+                    </div>
                 </Box>
             </div>
-        </div>
+        </div >
     )
 }
 

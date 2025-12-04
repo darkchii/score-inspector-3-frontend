@@ -77,16 +77,16 @@ export async function ProcessUser(user){
     return user;
 }
 
-export async function ProcessBeatmaps(beatmaps) {
+export function ProcessBeatmaps(beatmaps) {
     //Corrects data types
     for (let i = 0; i < beatmaps.length; i++) {
-        beatmaps[i] = await ProcessBeatmap(beatmaps[i]);
+        beatmaps[i] = ProcessBeatmap(beatmaps[i]);
     }
 
     return beatmaps;
 }
 
-async function ProcessBeatmap(beatmap) {
+function ProcessBeatmap(beatmap) {
     beatmap.ar = Number(beatmap.ar);
     beatmap.cs = Number(beatmap.cs);
     beatmap.hp = Number(beatmap.hp);
@@ -95,7 +95,9 @@ async function ProcessBeatmap(beatmap) {
     beatmap.stars = Number(beatmap.stars);
     beatmap.ruleset_id = Number(beatmap.mode);
 
-    beatmap.tags = beatmap.tags ? beatmap.tags.split(" ") : [];
+    if(beatmap.tags && typeof beatmap.tags === 'string'){
+        beatmap.tags = beatmap.tags ? beatmap.tags.split(" ") : [];
+    }
 
     beatmap.last_updated = beatmap.last_updated ? new Date(beatmap.last_updated) : null;
     beatmap.lchg_time = beatmap.lchg_time ? new Date(beatmap.lchg_time) : null;
@@ -121,6 +123,7 @@ export async function MapScoreBeatmaps(scores, beatmaps) {
         const beatmap = beatmapMap.get(Number(score.beatmap_id));
         if (beatmap) {
             score.beatmap = JSON.parse(JSON.stringify(beatmap)); // Deep copy to avoid reference issues
+            score.beatmap = ProcessBeatmap(score.beatmap); // Ensure beatmap is processed
         } else {
             missingCount++;
             score.beatmap = null; // No matching beatmap found
@@ -149,6 +152,7 @@ async function ProcessScore(score) {
 
     score.accuracy = Number(score.accuracy);
     score.beatmap_id = Number(score.beatmap_id);
+    score.ruleset = GetRulesetNameFromId(score.ruleset_id);
 
     score.classic_total_score = Number(score.classic_total_score);
 

@@ -1,6 +1,6 @@
 import { Box, Container, Grid, Paper, SvgIcon, Tooltip, Typography } from "@mui/material";
 import { useProfile } from "../../Providers/ProfileProvider";
-import { TextureDatabase } from "../../Data/Textures/TextureDatabase";
+import { TextureDatabase } from "../../Assets/Textures/TextureDatabase";
 import { FormatNumber } from "../../Misc/Helper";
 import NumberFlow from '@number-flow/react'
 

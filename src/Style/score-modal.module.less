@@ -1,0 +1,22 @@
+@import '../Style/functions.module.less';
+@import '../Style/colors.module.less';
+
+@score-modal-width: 450px;
+@score-modal-radius: 20px;
+
+.score-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: @gray-dark;
+    width: @score-modal-width;
+    border-radius: @score-modal-radius;
+
+    &__content {
+        position: relative;
+        padding: 20px;
+        background-color: @gray;
+        border-radius: @score-modal-radius;
+    }
+}

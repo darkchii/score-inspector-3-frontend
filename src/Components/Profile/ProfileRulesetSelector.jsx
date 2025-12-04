@@ -1,8 +1,6 @@
 import { Box, Button, Divider, IconButton, Tooltip, useTheme } from "@mui/material";
 import { useProfile } from "../../Providers/ProfileProvider";
-import { TextureDatabase } from "../../Data/Textures/TextureDatabase";
-import BlockIcon from '@mui/icons-material/Block';
-import { red } from "@mui/material/colors";
+import { TextureDatabase } from "../../Assets/Textures/TextureDatabase";
 import { GetRulesetColor, GetRulesets } from "../../Misc/Helper";
 
 function ProfileRulesetSelector() {

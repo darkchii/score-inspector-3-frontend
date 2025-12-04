@@ -1,11 +1,29 @@
 import Config from '../Data/Config.json';
 import { toast } from "react-toastify";
-import { TextureDatabase } from '../Data/Textures/TextureDatabase';
+import { TextureDatabase } from '../Assets/Textures/TextureDatabase';
 import { blue, green, pink, purple } from '@mui/material/colors';
+import { HasHiddenMod, HasMod } from './ModHelper';
+import ScoreData from '../Data/ScoreData.json';
 
 export const ShowNotification = (message, severity) => {
     toast[severity](message, Config.NOTIFICATIONS);
 };
+
+export const DateToString = (date) => {
+    //Convert date object to "DD/MM/YYYY HH:MM (Timezone)" format, timezone would be UTC+9 for example, no commas
+    if (!date) return 'N/A';
+
+    const options = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZoneName: 'short'
+    };
+
+    return new Intl.DateTimeFormat('en-GB', options).format(date).replace(/,/g, '');
+}
 
 export const FormatNumber = (number) => {
     return new Intl.NumberFormat().format(number);
@@ -190,3 +208,109 @@ export const TimeAgo = (date, detailed = false) => {
 
     return Math.floor(seconds) + " second" + (seconds > 1 ? "s" : "") + " ago";
 }
+
+export const displayRank = {
+    "D": "D",
+    "C": "C",
+    "B": "B",
+    "A": "A",
+    "S": "S",
+    "SH": "S",
+    "X": "SS",
+    "XH": "SS"
+}
+
+export const rankCutoffs = (score) => {
+    const hasCL = score.mods && HasMod(score.mods, "CL");
+    const ruleset = score.ruleset || GetRulesetIconFromId(score.ruleset_id);
+
+    let absoluteCutoffs = [];
+
+    if (hasCL) {
+        switch (ruleset) {
+            case 'fruits':
+                absoluteCutoffs = [0, 0.8501, 0.9001, 0.9401, 0.9801, 0.99, 1];
+                break;
+
+            case 'mania':
+                absoluteCutoffs = [0, 0.7, 0.8, 0.9, 0.95, 0.99, 1];
+                break;
+
+            case 'osu':
+                absoluteCutoffs = [0, 0.6, 0.8, 0.867, 0.933, 0.99, 1];
+                break;
+
+            case 'taiko':
+                absoluteCutoffs = [0, 0.6, 0.75, 0.833, 0.917, 0.99, 1];
+                break;
+        }
+    } else {
+        switch (ruleset) {
+            case 'fruits':
+                absoluteCutoffs = [0, 0.85, 0.9, 0.94, 0.98, 0.99, 1];
+                break;
+
+            case 'mania':
+            case 'osu':
+            case 'taiko':
+                absoluteCutoffs = [0, 0.7, 0.8, 0.9, 0.95, 0.99, 1];
+                break;
+        }
+    }
+
+    return differenceBetweenConsecutiveElements(absoluteCutoffs);
+}
+
+function differenceBetweenConsecutiveElements(arr) {
+    const result = [];
+
+    for (let i = 1; i < arr.length; i++) {
+        result.push(arr[i] - arr[i - 1]);
+    }
+
+    return result;
+}
+
+export function GetGradeFromAccuracy(score, accuracy) {
+    const cutoffs = ScoreData.accuracyCutoffs;
+    let grade;
+
+    if (accuracy >= cutoffs.x) {
+        grade = 'X';
+    } else if (accuracy >= cutoffs.s) {
+        grade = 'S';
+    } else if (accuracy >= cutoffs.a) {
+        grade = 'A';
+    } else if (accuracy >= cutoffs.b) {
+        grade = 'B';
+    } else if (accuracy >= cutoffs.c) {
+        grade = 'C';
+    } else {
+        grade = 'D';
+    }
+
+    
+    if(score.ruleset_id === 3){ //mania specific
+        if(grade === "S") {
+            const anyImperfect = 
+                score.maximum_statistics_good > 0 ||
+                score.maximum_statistics_ok > 0 ||
+                score.maximum_statistics_meh > 0 ||
+                score.maximum_statistics_miss > 0;
+
+            grade = anyImperfect ? grade : 'X';
+        }
+    }else {
+        if( grade === 'S' && score.maximum_statistics_miss > 0){
+            grade = 'A';
+        }
+    }
+
+    if((grade === 'X' || grade === 'S') && HasHiddenMod(score.mods)){
+        grade += 'H';
+    }
+
+
+    return grade;
+}
+

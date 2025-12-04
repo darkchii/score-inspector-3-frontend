@@ -2,7 +2,7 @@ import { Alert, Box, Divider, Grid, List, ListItemButton, ListItemText, Paginati
 import { useProfile } from "../../../Providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import ScoreList from "../../ScoreList";
-import { TextureDatabase } from "../../../Data/Textures/TextureDatabase";
+import { TextureDatabase } from "../../../Assets/Textures/TextureDatabase";
 import NumberFlow from "@number-flow/react";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { FormatDuration } from "../../../Misc/Helper";

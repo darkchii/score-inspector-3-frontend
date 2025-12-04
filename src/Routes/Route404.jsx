@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { TextureDatabase } from "../Data/Textures/TextureDatabase";
+import { TextureDatabase } from "../Assets/Textures/TextureDatabase";
 
 function Route404() {
     return (

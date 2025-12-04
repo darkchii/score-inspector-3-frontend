@@ -84,3 +84,12 @@ function BuildDatabase() {
         }
     }
 }
+
+export function HasMod(mods, acronym) {
+    return mods.some(mod => mod.acronym === acronym);
+}
+
+export function HasHiddenMod(mods) {
+    //HD, FL, FI (these mods give silver grades)
+    return mods.some(mod => ['HD', 'FL', 'FI'].includes(mod.acronym));
+}
