@@ -1,0 +1,26 @@
+@import '../Style/variables.module.less';
+@import '../Style/colors.module.less';
+
+.difficulty-badge {
+    border-radius: 10000px;
+    background-color: var(--bg);
+    color: hsl(var(--hsl-b6));
+    padding: 0 0.5em;
+    display: flex;
+    align-items: center;
+    font-weight: 800;
+    height: 100%;
+
+    &--expert-plus {
+        color: hsl(var(--hsl-orange-1));
+    }
+
+    &__icon {
+        margin-right: 0.4em;
+        font-size: 0.9em !important;
+    }
+
+    &__rating {
+        min-width: 0.67em * 3 + 0.20em;
+    }
+}
