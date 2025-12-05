@@ -197,6 +197,8 @@ async function ProcessScore(score) {
 
     score.mods = ReorderMods(GetRulesetNameFromId(score.ruleset_id), score.mods || []);
 
+    score.diff_missing = !score.attr_diff || score.attr_recalc;
+
     return score;
 }
 
@@ -241,6 +243,8 @@ export class ProfileRulesetScoreSet {
         this.clears = 0;
         this.ranked_clears = 0;
 
+        this.missing_difficulty = 0; //number of scores with missing beatmap difficulty data (its likely in queue for processing)
+
         this.legacy_total_score = 0;
         this.score = 0;
 
@@ -272,6 +276,10 @@ export class ProfileRulesetScoreSet {
 
         this.legacy_total_score += score.legacy_total_score;
         this.score += score.total_score;
+
+        if(score.diff_missing){
+            this.missing_difficulty += 1;
+        }
     }
 
     reorder(param, descending = true) {

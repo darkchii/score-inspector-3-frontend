@@ -7,6 +7,7 @@ import NumberFlow from '@number-flow/react';
 import { DateToString, FormatNumber, GetRulesetIconFromId } from '../Misc/Helper';
 import ModDisplay from './ModDisplay';
 import DifficultyBadge from './DifficultyBadge';
+import { GetStarRating } from '../Misc/ScoreHelper';
 
 function ScoreView({ score }) {
 
@@ -38,7 +39,7 @@ function ScoreView({ score }) {
                     </div>
                     {/* row flex */}
                     <div className={scoreInfoStyles['score-info']} style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
-                        <DifficultyBadge difficulty={score.beatmap.stars} />
+                        <DifficultyBadge difficulty={GetStarRating(score)} />
                         <img src={GetRulesetIconFromId(score.ruleset_id)} alt="Ruleset Icon" style={{ width: '24px', height: '24px' }} />
                         <ModDisplay ruleset={score.ruleset} mods={score.mods} />
                     </div>
@@ -52,6 +53,9 @@ function ScoreView({ score }) {
                     </div>
                     <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__rankdate']}`}>
                         <span>Played on {DateToString(score.ended_at)}</span>
+                    </div>
+                    <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__rankdate']}`}>
+                        <span>ID: {score.id}</span>
                     </div>
                 </Box>
             </div>

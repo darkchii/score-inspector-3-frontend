@@ -8,6 +8,9 @@ import ModDisplay from "./ModDisplay";
 import { grey } from "@mui/material/colors";
 import { useEffect, useState } from "react";
 import { useScoreView } from "../Providers/ScoreViewProvider";
+import WarningIcon from '@mui/icons-material/Warning';
+import DifficultyBadge from "./DifficultyBadge";
+import { GetStarRating } from "../Misc/ScoreHelper";
 
 const truncateStep = 10;
 
@@ -114,6 +117,11 @@ function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, t
                                         )
                                     }}>{score.combo.toLocaleString()}/{score.beatmap.max_combo.toLocaleString()}x</Typography>
                                 </TableCell>
+                                <TableCell>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <DifficultyBadge difficulty={GetStarRating(score)} />
+                                    </div>
+                                </TableCell>
                                 <TableCell sx={{ maxWidth: '250px' }}>
                                     <ModDisplay ruleset={GetRulesetNameFromId(score.ruleset_id)} mods={score.mods} />
                                 </TableCell>
@@ -122,6 +130,13 @@ function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, t
                                 </TableCell>
                                 <TableCell sx={{ width: '100px', textAlign: 'right', backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
                                     <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold' }}>{FormatNumberWithPrecision(score.pp || 0, 2)}pp</Typography>
+                                </TableCell>
+                                <TableCell sx={{ width: '40px', textAlign: 'right', backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
+                                    {
+                                        score.diff_missing ?
+                                            <WarningIcon sx={{ color: theme.palette.warning.main, fontSize: '1.2rem' }} />
+                                            : null
+                                    }
                                 </TableCell>
                             </TableRow>
                         ))}

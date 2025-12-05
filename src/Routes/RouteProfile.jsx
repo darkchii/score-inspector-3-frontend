@@ -8,6 +8,7 @@ import ProfilePageMain from "../Components/Profile/Pages/ProfilePageMain";
 import ProfilePageSessions from "../Components/Profile/Pages/ProfilePageSessions";
 import ProfilePageScores from "../Components/Profile/Pages/ProfilePageScores";
 import ProfilePagePacks from "../Components/Profile/Pages/ProfilePagePacks";
+import NumberFlow from "@number-flow/react";
 
 const pageComponents = {
     'main': { component: ProfilePageMain, title: 'Overview' },
@@ -17,7 +18,7 @@ const pageComponents = {
 };
 
 function RouteProfile() {
-    const { fetchFullProfile, errorMessage, activeRuleset, setActiveRuleset, userLive } = useProfile();
+    const { fetchFullProfile, errorMessage, activeRuleset, setActiveRuleset, userLive, getRulesetStatistics } = useProfile();
     const { userId, ruleset, page } = useParams();
     const [activePage, setPage] = useState('main');
     const [isWorking, setIsWorking] = useState(false);
@@ -47,13 +48,13 @@ function RouteProfile() {
     }, [activeRuleset, activePage]);
 
     useEffect(() => {
-        if(ruleset !== activeRuleset){
+        if (ruleset !== activeRuleset) {
             setActiveRuleset(ruleset || 'all');
         }
     }, [ruleset]);
 
     useEffect(() => {
-        if(page !== activePage){
+        if (page !== activePage) {
             setPage(page || 'main');
         }
     }, [page]);
@@ -73,6 +74,13 @@ function RouteProfile() {
                 </Box>
             }
 
+            {
+                getRulesetStatistics(activeRuleset)?.scores_set?.missing_difficulty > 0 &&
+                <Box sx={{ width: '100%', p: 1, bgcolor: theme.palette.warning.main, color: theme.palette.warning.contrastText, textAlign: 'center' }}>
+                    <strong>Warning:</strong> <NumberFlow value={getRulesetStatistics(activeRuleset)?.scores_set?.missing_difficulty} /> scores have no or outdated difficulty attributes. They will likely show incorrect data. They will be processed soon.
+                </Box>
+            }
+
             {/* header */}
             <ProfileHeader />
 
@@ -81,10 +89,10 @@ function RouteProfile() {
                 <Tabs aria-label='profile-page-tabs' value={activePage} textColor="primary" indicatorColor="primary">
                     {Object.keys(pageComponents).map((key) => {
                         return (
-                            <Tab 
-                                key={`profile-page-tab-${key}`} 
-                                label={pageComponents[key].title} 
-                                value={key} 
+                            <Tab
+                                key={`profile-page-tab-${key}`}
+                                label={pageComponents[key].title}
+                                value={key}
                                 onClick={() => setPage(key)}
                             />
                         );
