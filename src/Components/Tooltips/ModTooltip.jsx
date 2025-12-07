@@ -8,6 +8,7 @@ const LocalStyledTooltip = styled(({ className, ...props }) => (
     padding: 0;
     background-color: transparent;
     box-shadow: none;
+    color: white;
 `);
 
 function ModTooltipContent({ mod, data, ruleset }) {
@@ -19,7 +20,7 @@ function ModTooltipContent({ mod, data, ruleset }) {
             backgroundColor: '#293d2a',
             maxWidth: '600px',
             borderRadius: theme.shape.borderRadius,
-            border: `1px solid #334C35`,
+            border: `1px solid #334C35`
         }}>
             {/* Top bar */}
             <Box sx={{
@@ -45,7 +46,7 @@ function ModTooltipContent({ mod, data, ruleset }) {
                                 <Table size="small" sx={{
                                     [`& .${tableCellClasses.root}`]: {
                                         borderBottom: "none",
-                                    },
+                                    }
                                 }}>
                                     <TableBody>
                                         {

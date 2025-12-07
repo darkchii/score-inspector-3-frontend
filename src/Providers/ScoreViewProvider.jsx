@@ -25,9 +25,21 @@ export function ScoreViewProvider({ children }) {
                 open={enabled}
                 onClose={unloadScoreView}
                 closeAfterTransition
+                style={{
+                    //prevent blue outline on focus
+                    '&:focus': {
+                        outline: 'none',
+                    },
+                }}
             >
                 <Fade in={enabled}>
-                    <div>
+                    <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        outline: 0,
+                    }}>
                         <ScoreView score={scoreData} />
                     </div>
                 </Fade>

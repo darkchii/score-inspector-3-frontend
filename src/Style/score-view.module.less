@@ -1,0 +1,97 @@
+@import '../Style/colors.module.less';
+@import '../Style/variables.module.less';
+
+@score-view-width: 450px;
+@score-view-extended-width: 700px; //This display more detailed score information
+@score-view-radius: 20px;
+@score-view-userdata-height: 80px;
+@username-font-size: @font-size--title-small-3;
+@score-view-side-button-width: 40px;
+
+.score-view {
+    background-color: @gray-dark;
+    border-radius: @score-view-radius;
+    display: flex;
+    flex-direction: 'row';
+    align-items: 'center';
+    justify-content: 'center';
+
+    &__base {
+        width: @score-view-width;
+        position: relative;
+        padding-top: (@score-view-userdata-height / 2) + @username-font-size + 5; //to account for the user data sticking out
+
+        &__user-data {
+            //sticks out on the top by 50%, centered horizontally
+            position: absolute;
+            top: -(@score-view-userdata-height / 2);
+            left: 50%;
+            transform: translateX(-50%);
+            height: @score-view-userdata-height;
+            width: calc(100% - 40px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            &__username {
+                font-size: @username-font-size;
+                font-weight: 500;
+            }
+        }
+
+        &__content {
+            position: relative;
+            padding: 20px;
+            background-color: @gray;
+            border-radius: @score-view-radius;
+        }
+
+        &__background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            //background image is set dynamically
+            border-radius: @score-view-radius;
+            background-size: cover;
+            background-position: center;
+
+            &__overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                //gradient overlay from transparent to @gray
+                background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, @gray 100%);
+                border-radius: @score-view-radius;
+            }
+        }
+    }
+
+    &__extended {
+        width: @score-view-extended-width;
+    }
+
+    &__extender-button {
+        width: @score-view-side-button-width;
+        min-height: 100%;
+        background-color: @gray-dark;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        user-select: none;
+        border-top-right-radius: @score-view-radius;
+        border-bottom-right-radius: @score-view-radius;
+        transition: all 0.3s ease;
+
+        //on hover
+        &:hover {
+            background-color: lighten(@gray-dark, 10%);
+            transition: all 0.3s ease;
+        }
+    }
+}
