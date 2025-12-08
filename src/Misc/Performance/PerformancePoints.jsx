@@ -25,7 +25,8 @@ class PerformancePoints {
         }
 
         this.calculator = calculator;
-        //todo
+
+        this.pp = this.calculator.totalPerformance;
     }
 
     static getCalculator(score) {
