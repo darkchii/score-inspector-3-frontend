@@ -108,11 +108,6 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
             }
 
             let sliderNerfFactor = (1 - score.attr_diff.slider_factor) * Math.pow(1 - estimateImproperlyFollowedDifficultSliders / score.attr_diff.aim_difficult_slider_count, 3) + score.attr_diff.slider_factor;
-            console.log("Slider Nerf Factor: " + sliderNerfFactor);
-            console.log("estimateImproperlyFollowedDifficultSliders: " + estimateImproperlyFollowedDifficultSliders);
-            console.log("countSliderEndsDropped: " + this.countSliderEndsDropped);
-            console.log("countSliderTickMiss: " + this.countSliderTickMiss);
-            console.log("aim_difficult_slider_count: " + score.attr_diff.aim_difficult_slider_count);
             aimDifficulty *= sliderNerfFactor;
         }
 

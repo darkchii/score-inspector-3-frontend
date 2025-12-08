@@ -214,10 +214,8 @@ async function ProcessScore(score) {
             //todo: SS, FC
         }
     } catch (e) {
-        console.error("Error calculating performance:", e);
+        // console.error("Error calculating performance:", e);
     }
-
-    console.log("Processed Score:", score);
 
     return score;
 }
