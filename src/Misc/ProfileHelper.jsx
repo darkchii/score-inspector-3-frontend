@@ -4,16 +4,16 @@ import PerformancePoints from "./Performance/PerformancePoints";
 import { BeatmapApplyModsToDifficulty } from "./ScoreHelper";
 import { GenerateSessions } from "./SessionHelper";
 
-export async function ProcessUser(user){
+export async function ProcessUser(user) {
     user.osuAlternative.rulesets = {};
 
     //map everything with osu_ prefix to ruleset 0
     user.osuAlternative.rulesets['osu'] = {};
-    for(const key in user.osuAlternative){
-        if(key.startsWith('osu_')){
+    for (const key in user.osuAlternative) {
+        if (key.startsWith('osu_')) {
             const newKey = key.replace('osu_', '');
             let value = user.osuAlternative[key];
-            if(typeof value === 'string' && !isNaN(Number(value))){
+            if (typeof value === 'string' && !isNaN(Number(value))) {
                 value = Number(value);
             }
             user.osuAlternative.rulesets['osu'][newKey] = value;
@@ -22,11 +22,11 @@ export async function ProcessUser(user){
     }
 
     user.osuAlternative.rulesets['taiko'] = {};
-    for(const key in user.osuAlternative){
-        if(key.startsWith('taiko_')){
+    for (const key in user.osuAlternative) {
+        if (key.startsWith('taiko_')) {
             const newKey = key.replace('taiko_', '');
             let value = user.osuAlternative[key];
-            if(typeof value === 'string' && !isNaN(Number(value))){
+            if (typeof value === 'string' && !isNaN(Number(value))) {
                 value = Number(value);
             }
             user.osuAlternative.rulesets['taiko'][newKey] = value;
@@ -35,11 +35,11 @@ export async function ProcessUser(user){
     }
 
     user.osuAlternative.rulesets['fruits'] = {};
-    for(const key in user.osuAlternative){
-        if(key.startsWith('fruits_')){
+    for (const key in user.osuAlternative) {
+        if (key.startsWith('fruits_')) {
             const newKey = key.replace('fruits_', '');
             let value = user.osuAlternative[key];
-            if(typeof value === 'string' && !isNaN(Number(value))){
+            if (typeof value === 'string' && !isNaN(Number(value))) {
                 value = Number(value);
             }
             user.osuAlternative.rulesets['fruits'][newKey] = value;
@@ -48,11 +48,11 @@ export async function ProcessUser(user){
     }
 
     user.osuAlternative.rulesets['mania'] = {};
-    for(const key in user.osuAlternative){
-        if(key.startsWith('mania_')){
+    for (const key in user.osuAlternative) {
+        if (key.startsWith('mania_')) {
             const newKey = key.replace('mania_', '');
             let value = user.osuAlternative[key];
-            if(typeof value === 'string' && !isNaN(Number(value))){
+            if (typeof value === 'string' && !isNaN(Number(value))) {
                 value = Number(value);
             }
             user.osuAlternative.rulesets['mania'][newKey] = value;
@@ -61,11 +61,11 @@ export async function ProcessUser(user){
     }
 
     user.osuAlternative.rulesets['total'] = {};
-    for(const key in user.osuAlternative){
-        if(key.startsWith('total_')){
+    for (const key in user.osuAlternative) {
+        if (key.startsWith('total_')) {
             const newKey = key.replace('total_', '');
             let value = user.osuAlternative[key];
-            if(typeof value === 'string' && !isNaN(Number(value))){
+            if (typeof value === 'string' && !isNaN(Number(value))) {
                 value = Number(value);
             }
             user.osuAlternative.rulesets['total'][newKey] = value;
@@ -74,7 +74,7 @@ export async function ProcessUser(user){
     }
 
     //Some manual, theres missing values in total
-    user.osuAlternative.rulesets['total'].total_score = ['osu','taiko','fruits','mania'].reduce((acc, ruleset) => { return acc + (user.osuAlternative.rulesets[ruleset]?.total_score || 0); }, 0);
+    user.osuAlternative.rulesets['total'].total_score = ['osu', 'taiko', 'fruits', 'mania'].reduce((acc, ruleset) => { return acc + (user.osuAlternative.rulesets[ruleset]?.total_score || 0); }, 0);
 
     return user;
 }
@@ -97,7 +97,7 @@ function ProcessBeatmap(beatmap) {
     beatmap.stars = Number(beatmap.stars);
     beatmap.ruleset_id = Number(beatmap.mode);
 
-    if(beatmap.tags && typeof beatmap.tags === 'string'){
+    if (beatmap.tags && typeof beatmap.tags === 'string') {
         beatmap.tags = beatmap.tags ? beatmap.tags.split(" ") : [];
     }
 
@@ -145,7 +145,7 @@ export async function ProcessScores(scores, user = null) {
     for (let i = 0; i < scores.length; i++) {
         scores[i] = await ProcessScore(scores[i]);
 
-        if(user){
+        if (user) {
             scores[i].user = user;
         }
     }
@@ -193,7 +193,7 @@ async function ProcessScore(score) {
         //Calculate the duration of the score
         score.duration = score.beatmap.drain_time_modded;
 
-        if(score.ended_at && score.started_at) {
+        if (score.ended_at && score.started_at) {
             const startedAt = new Date(score.started_at);
             const endedAt = new Date(score.ended_at);
             score.duration = (endedAt - startedAt) / 1000; //duration in seconds
@@ -208,19 +208,16 @@ async function ProcessScore(score) {
 
     score.using_classic_slider_accuracy = GetModSetting(score.mods, 'SL', 'classic_slider_accuracy') === true;
 
-    try{
+    try {
         score.performance = {
             'base': new PerformancePoints(score),
             //todo: SS, FC
         }
-    }catch(e){
+    } catch (e) {
         console.error("Error calculating performance:", e);
     }
 
-    if(score.id === 5793366609){
-        // Debugging specific score
-        console.log("Processed Score:", score);
-    }
+    console.log("Processed Score:", score);
 
     return score;
 }
@@ -240,7 +237,7 @@ export class ProfileStatistics {
         for (const score of scores) {
             const ruleset = GetRulesetNameFromId(score.ruleset_id);
 
-            if(!this.rulesets[ruleset]) {
+            if (!this.rulesets[ruleset]) {
                 this.rulesets[ruleset] = new ProfileRulesetStatistics(beatmaps, ruleset);
             }
 
@@ -285,7 +282,7 @@ export class ProfileRulesetScoreSet {
         this.scores_map[score.id] = score;
 
         this.clears += 1;
-        if(score.beatmap && (score.beatmap.status === 'ranked' || score.beatmap.status === 'approved')){
+        if (score.beatmap && (score.beatmap.status === 'ranked' || score.beatmap.status === 'approved')) {
             this.ranked_clears += 1;
         }
 
@@ -298,7 +295,7 @@ export class ProfileRulesetScoreSet {
         this.legacy_total_score += score.legacy_total_score;
         this.score += score.total_score;
 
-        if(score.diff_missing){
+        if (score.diff_missing) {
             this.missing_difficulty += 1;
         }
     }
@@ -313,7 +310,7 @@ export class ProfileRulesetScoreSet {
         });
     }
 
-    calculate(){
+    calculate() {
         this.performance_points = calculateRawPerformance(this.scores);
         this.bonus_performance_points = calculateBonusPerformance(this.scores.length);
 
@@ -335,7 +332,7 @@ export class ProfileRulesetStatistics {
         //ProfileRulesetScoreSets
         this.beatmaps = beatmaps;
         this.beatmaps_with_converts = beatmaps;
-        if(ruleset || ruleset === 0) {
+        if (ruleset || ruleset === 0) {
             this.ruleset = ruleset;
             this.beatmaps = beatmaps.filter(b => b.ruleset_id === GetRulesetId(ruleset));
             this.beatmaps_with_converts = beatmaps.filter(b => b.ruleset_id === GetRulesetId(ruleset) || b.ruleset_id === 0);
@@ -363,11 +360,11 @@ export class ProfileRulesetStatistics {
     addScore(score) {
         this.scores_set.addScore(score);
 
-        if(score.highest_pp) {
+        if (score.highest_pp) {
             this.scores_set_by_pp.addScore(score);
         }
 
-        if(score.highest_score) {
+        if (score.highest_score) {
             this.scores_set_by_score.addScore(score);
         }
 

@@ -3,6 +3,7 @@
 
 import PerformanceCalculator from "./PerformanceCalculator";
 import PerformanceCalculatorOsu from "./PerformanceCalculatorOsu";
+import PerformanceCalculatorTaiko from "./PerformanceCalculatorTaiko";
 
 class PerformancePoints {
     constructor(score, overrides = {}) {
@@ -28,13 +29,9 @@ class PerformancePoints {
     static getCalculator(score) {
         switch (score.ruleset) {
             case 'osu':
-                //not implemented yet
-                // throw new Error("osu! performance calculation not implemented yet");
                 return new PerformanceCalculatorOsu(score);
             case 'taiko':
-                //not implemented yet
-                // throw new Error("osu!taiko performance calculation not implemented yet");
-                return null;
+                return new PerformanceCalculatorTaiko(score);
             case 'fruits':
                 //not implemented yet
                 // throw new Error("osu!catch performance calculation not implemented yet");
