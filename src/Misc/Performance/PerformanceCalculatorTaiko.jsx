@@ -32,7 +32,7 @@ class PerformanceCalculatorTaiko extends PerformanceCalculator {
 
         this.difficultyValue = this.computeDifficultyValue(score, isConvert, isClassic) * 1.08;
         this.accuracyValue = this.computeAccuracyValue(score, isConvert) * 1.1;
-        this.totalValue = this.difficultyValue + this.accuracyValue;
+        this.totalPerformance = this.difficultyValue + this.accuracyValue;
     }
 
     computeAccuracyValue(score, isConvert) {

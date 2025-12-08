@@ -3,6 +3,7 @@
 
 import PerformanceCalculator from "./PerformanceCalculator";
 import PerformanceCalculatorFruits from "./PerformanceCalculatorFruits";
+import PerformanceCalculatorMania from "./PerformanceCalculatorMania";
 import PerformanceCalculatorOsu from "./PerformanceCalculatorOsu";
 import PerformanceCalculatorTaiko from "./PerformanceCalculatorTaiko";
 
@@ -36,9 +37,7 @@ class PerformancePoints {
             case 'fruits':
                 return new PerformanceCalculatorFruits(score);
             case 'mania':
-                //not implemented yet
-                // throw new Error("osu!mania performance calculation not implemented yet");
-                return null;
+                return new PerformanceCalculatorMania(score);
             default:
                 throw new Error(`Unknown ruleset: ${ruleset}`);
         }
