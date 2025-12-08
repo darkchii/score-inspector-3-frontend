@@ -220,11 +220,9 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
         }
 
         let flashlightValue = 25 * Math.pow(score.attr_diff.flashlight_difficulty, 2);
-
         if(this.effectiveMissCount > 0){
-            flashlightValue *= 0.97 + Math.pow(1-Math.pow(this.effectiveMissCount/this.totalHits, 0.775), Math.pow(this.effectiveMissCount, 0.875));
+            flashlightValue *= 0.97 * Math.pow(1-Math.pow(this.effectiveMissCount/this.totalHits, 0.775), Math.pow(this.effectiveMissCount, 0.875));
         }
-
         flashlightValue *= this.getComboScalingFactor(score);
 
         flashlightValue *= 0.5 + this.accuracy / 2.0;
