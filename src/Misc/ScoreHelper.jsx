@@ -39,3 +39,54 @@ export function GetHitResultColor(hitResult) {
             return lightBlue;
     }
 }
+
+export function BeatmapApplyModsToDifficulty(ruleset, beatmap, mods) {
+    let modifiedAttributes = {
+        ar: beatmap.ar,
+        od: beatmap.od,
+        hp: beatmap.hp,
+        cs: beatmap.cs,
+        slider_multiplier: beatmap.slider_multiplier,
+        slider_tick_rate: beatmap.slider_tick_rate
+    }
+
+    for (const mod of mods) {
+        switch (mod.acronym) {
+            case 'DA':
+                modifiedAttributes.ar = mod.settings?.approach_rate ?? beatmap.ar;
+                modifiedAttributes.od = mod.settings?.overall_difficulty ?? beatmap.od;
+                modifiedAttributes.hp = mod.settings?.health_drain ?? beatmap.hp;
+                modifiedAttributes.cs = mod.settings?.circle_size ?? beatmap.cs;
+                break;
+            case 'EZ':
+                modifiedAttributes.ar *= 0.5;
+                modifiedAttributes.hp *= 0.5;
+                modifiedAttributes.cs *= 0.5;
+                if (['osu', 'taiko', 'fruits'].includes(ruleset)) {
+                    modifiedAttributes.od *= 0.5;
+                }
+                if (['taiko'].includes(ruleset)) {
+                    modifiedAttributes.slider_multiplier *= 0.8;
+                }
+                break;
+            case 'HR':
+                modifiedAttributes.hp = Math.min(modifiedAttributes.hp * 1.4, 10);
+                if (['osu', 'fruits'].includes(ruleset)) {
+                    modifiedAttributes.od = Math.min(modifiedAttributes.od * 1.4, 10);
+                    modifiedAttributes.cs = Math.min(modifiedAttributes.cs * 1.3, 10);
+                    modifiedAttributes.ar = Math.min(modifiedAttributes.ar * 1.4, 10);
+                }
+                if (['taiko'].includes(ruleset)) {
+                    modifiedAttributes.od = Math.min(modifiedAttributes.od * 1.4, 10);
+                    modifiedAttributes.slider_multiplier *= (1.4 * 4 / 3);
+                }
+                break;
+            case 'TP':
+                if (['osu'].includes(ruleset)) {
+                    modifiedAttributes.ar *= 0.5;
+                }
+        }
+    }
+
+    return modifiedAttributes;
+}

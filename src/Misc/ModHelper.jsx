@@ -93,3 +93,79 @@ export function HasHiddenMod(mods) {
     //HD, FL, FI (these mods give silver grades)
     return mods.some(mod => ['HD', 'FL', 'FI'].includes(mod.acronym));
 }
+
+export function GetMod(mods, acronym) {
+    return mods.find(mod => mod.acronym === acronym);
+}
+
+export function GetModSetting(mods, acronym, key) {
+    const mod = GetMod(mods, acronym);
+    if (!mod || !mod.settings) return null;
+    return mod.settings[key];
+}
+
+export function CalculateRateWithMods(time, mods, difficulty_attributes) {
+    let rate = 1.0;
+
+    for (const mod of mods) {
+        switch (mod.acronym) {
+            //Adaptive Speed
+            case 'AS':
+                rate *= mod.settings?.initial_rate ?? 1.0;
+                break;
+            //Double Time / Nightcore
+            case 'DT':
+            case 'NC':
+                rate *= mod.settings?.speed_change ?? 1.5;
+                break;
+            //Half Time / Daycore
+            case 'HT':
+            case 'DC':
+                rate *= mod.settings?.speed_change ?? 0.75;
+                break;
+            //Wind Up / Wind Down (complicated)
+            case 'WU':
+            case 'WD':
+                rate *= GetTimeRampRate(mod, time, difficulty_attributes.first_object_start_time, difficulty_attributes.last_object_end_time);
+                break;
+            default:
+                break;
+        }
+    }
+
+    return rate;
+}
+
+function GetTimeRampRate(mod, time, firstObjectStart, lastObjectEnd) {
+    let initial_rate = mod.settings?.initial_rate ?? 1.0;
+    let final_rate = mod.settings?.final_rate ?? (mod.acronym === 'WU' ? 1.0 : 0.75);
+
+    let beginRampTime = firstObjectStart;
+    let finalRateTime = firstObjectStart + 0.75 *(lastObjectEnd - firstObjectStart);
+
+    let amount = (time - beginRampTime) / Math.max(1, finalRateTime - beginRampTime);
+    let ramp = initial_rate + (final_rate - initial_rate) * Math.min(Math.max(amount, 0), 1);
+
+    return Math.round(ramp * 100) / 100;
+}
+
+export function CalculateVisibilityBonus(mods, approach_rate, visibility_factor = 1, slider_factor = 1) {
+    //if mode has HD + setting only_fade_approach_circles, or if TC
+    let isAlwaysPartiallyVisible = mods.some(mod => (mod.acronym === 'HD' && mod.settings?.only_fade_approach_circles) || mod.acronym === 'TC');
+
+    let readingBonus = (isAlwaysPartiallyVisible ? 0.025 : 0.04) * (12 - Math.max(approach_rate, 7));
+
+    readingBonus *= visibility_factor;
+
+    let sliderVisibilityFactor = Math.pow(slider_factor, 3);
+
+    if(approach_rate < 7){
+        readingBonus += (isAlwaysPartiallyVisible ? 0.02 : 0.045) * (7 - Math.max(approach_rate, 0)) * sliderVisibilityFactor;
+    }
+
+    if(approachRate < 0){
+        readingBonus += (isAlwaysPartiallyVisible ? 0.01 : 0.1) * (1 - Math.pow(1.5, approach_rate)) * sliderVisibilityFactor;
+    }
+
+    return readingBonus;
+}

@@ -12,10 +12,8 @@ function ProfilePageScores() {
     const [scoreCount, setScoreCount] = useState(0);
 
     useEffect(() => {
-        console.log(getRulesetStatistics());
         const profileStatistics = getRulesetStatistics(activeRuleset);
         if (profileStatistics) {
-            console.log("Rebuilding displayed score database for ruleset:", activeRuleset);
             const allScores = profileStatistics.scores_set.scores?.slice() || [];
             setScoreCount(allScores.length);
 

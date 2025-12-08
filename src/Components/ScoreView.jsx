@@ -4,6 +4,7 @@ import ScoreViewBase from './ScoreViewBase';
 import { Collapse } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ScoreViewExtended from './ScoreViewExtended';
 
 function ScoreView({ score }) {
     const [isExtended, setIsExtended] = useState(false);
@@ -19,10 +20,7 @@ function ScoreView({ score }) {
             {
                 isMobile ? null : <>
                     <Collapse in={isExtended} orientation="horizontal" unmountOnExit>
-                        <div className={scoreViewStyles['score-view__extended']}>
-                            {/* Extended score information can go here */}
-                            <p>Extended Score Information Area</p>
-                        </div>
+                        <ScoreViewExtended score={score} />
                     </Collapse>
                     <div className={scoreViewStyles['score-view__extender-button']} onClick={() => setIsExtended(!isExtended)}>
                         {isExtended ? <ArrowBackIosIcon /> : <ArrowForwardIosIcon />}

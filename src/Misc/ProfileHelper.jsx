@@ -1,5 +1,7 @@
 import { calculateBonusPerformance, calculateRawPerformance, GetRulesetId, GetRulesetNameFromId } from "./Helper";
-import { ReorderMods } from "./ModHelper";
+import { GetModSetting, HasMod, ReorderMods } from "./ModHelper";
+import PerformancePoints from "./Performance/PerformancePoints";
+import { BeatmapApplyModsToDifficulty } from "./ScoreHelper";
 import { GenerateSessions } from "./SessionHelper";
 
 export async function ProcessUser(user){
@@ -104,6 +106,9 @@ function ProcessBeatmap(beatmap) {
     beatmap.ranked_date = beatmap.ranked_date ? new Date(beatmap.ranked_date) : null;
     beatmap.submitted_date = beatmap.submitted_date ? new Date(beatmap.submitted_date) : null;
 
+    beatmap.slider_multiplier = 1.4; //taiko thing
+    beatmap.slider_tick_rate = 1.0; //taiko thing
+
     //Corrects data types
     return beatmap;
 }
@@ -161,7 +166,7 @@ async function ProcessScore(score) {
     score.legacy_score_id = Number(score.legacy_score_id);
     score.total_score = Number(score.total_score);
     score.lazer_score = Number(score.total_score);
-    score.legacy_total_score = Number(score.legacy_total_score);
+    score.legacy_total_score = score.legacy_total_score ? Number(score.legacy_total_score) : null;
     score.pp = Number(score.pp);
 
     score.total_score = Number(score.total_score);
@@ -197,7 +202,25 @@ async function ProcessScore(score) {
 
     score.mods = ReorderMods(GetRulesetNameFromId(score.ruleset_id), score.mods || []);
 
+    score.beatmap_attributes = BeatmapApplyModsToDifficulty(score.ruleset, score.beatmap, score.mods);
+
     score.diff_missing = !score.attr_diff || score.attr_recalc;
+
+    score.using_classic_slider_accuracy = GetModSetting(score.mods, 'SL', 'classic_slider_accuracy') === true;
+
+    try{
+        score.performance = {
+            'base': new PerformancePoints(score),
+            //todo: SS, FC
+        }
+    }catch(e){
+        console.error("Error calculating performance:", e);
+    }
+
+    if(score.id === 5793366609){
+        // Debugging specific score
+        console.log("Processed Score:", score);
+    }
 
     return score;
 }
@@ -228,8 +251,6 @@ export class ProfileStatistics {
         for (const ruleset in this.rulesets) {
             this.rulesets[ruleset].calculate();
         }
-
-        console.log(this);
     }
 
 }
@@ -302,8 +323,6 @@ export class ProfileRulesetScoreSet {
 
         this.sessions = GenerateSessions(this.scores);
         this.sessions.sessions.sort((a, b) => b.start - a.start);
-
-        console.log(this.sessions);
     }
 
     getById(id) {
