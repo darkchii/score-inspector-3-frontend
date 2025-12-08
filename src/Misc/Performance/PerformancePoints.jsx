@@ -2,6 +2,7 @@
 //Overrides means adjusted score values (ie simulating SS on a score that was 94.6%)
 
 import PerformanceCalculator from "./PerformanceCalculator";
+import PerformanceCalculatorFruits from "./PerformanceCalculatorFruits";
 import PerformanceCalculatorOsu from "./PerformanceCalculatorOsu";
 import PerformanceCalculatorTaiko from "./PerformanceCalculatorTaiko";
 
@@ -33,9 +34,7 @@ class PerformancePoints {
             case 'taiko':
                 return new PerformanceCalculatorTaiko(score);
             case 'fruits':
-                //not implemented yet
-                // throw new Error("osu!catch performance calculation not implemented yet");
-                return null;
+                return new PerformanceCalculatorFruits(score);
             case 'mania':
                 //not implemented yet
                 // throw new Error("osu!mania performance calculation not implemented yet");
