@@ -11,6 +11,7 @@ import { useScoreView } from "../Providers/ScoreViewProvider";
 import WarningIcon from '@mui/icons-material/Warning';
 import DifficultyBadge from "./DifficultyBadge";
 import { GetStarRating } from "../Misc/ScoreHelper";
+import ClearIcon from '@mui/icons-material/Clear';
 
 const truncateStep = 10;
 
@@ -129,7 +130,14 @@ function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, t
                                     <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold', color: 'rgba(238, 170, 0, 1)' }}>{FormatNumberWithPrecision(score.accuracy * 100, 2)}%</Typography>
                                 </TableCell>
                                 <TableCell sx={{ width: '100px', textAlign: 'right', backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
-                                    <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold' }}>{FormatNumberWithPrecision(score.pp || 0, 2)}pp</Typography>
+                                    <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold' }}>
+                                        {
+                                            score.performance?.base?.pp !== undefined ?
+                                                FormatNumberWithPrecision(score.performance.base.pp || 0, 2) + "pp"
+                                                : <span style={{ color: grey[500] }}>{FormatNumberWithPrecision(score.pp || 0, 2) + "pp"}</span>
+
+                                        }
+                                    </Typography>
                                 </TableCell>
                                 <TableCell sx={{ width: '40px', textAlign: 'right', backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
                                     {

@@ -1,4 +1,4 @@
-import { Avatar, Box, Grid, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Grid, Stack, Typography, useTheme } from '@mui/material';
 import scoreViewStyles from '../Style/score-view.module.less';
 import scoreInfoStyles from '../Style/score-info.module.less';
 import scoreStatsStyles from '../Style/score-info.module.less';
@@ -8,12 +8,16 @@ import ModDisplay from './ModDisplay';
 import DifficultyBadge from './DifficultyBadge';
 import { GetHitResultColor, GetStarRating } from '../Misc/ScoreHelper';
 import ScoreStat from './ScoreStat';
+import ClearIcon from '@mui/icons-material/Clear';
+import { grey } from '@mui/material/colors';
 
 function ScoreViewBase({ score }) {
+    const theme = useTheme();
+
     return (
         <div className={scoreViewStyles['score-view__base']}>
             <div className={scoreViewStyles['score-view__base__user-data']}>
-                <Avatar src={`https://a.ppy.sh/${score.user_id}`} alt="User Avatar" sx={{ width: 96, height: 96}} variant='rounded' />
+                <Avatar src={`https://a.ppy.sh/${score.user_id}`} alt="User Avatar" sx={{ width: 96, height: 96 }} variant='rounded' />
                 <div className={scoreViewStyles['score-view__base__user-data__username']}>
                     <span>{score.user.osuApi.username}</span>
                 </div>
@@ -53,7 +57,13 @@ function ScoreViewBase({ score }) {
                         <div className={scoreStatsStyles['score-info__group-row']}>
                             <ScoreStat label="Accuracy" value={`${FormatNumberWithPrecision(score.accuracy * 100, 2)}%`} />
                             <ScoreStat label="Max Combo" value={`${FormatNumber(score.combo)}`} limitValue={`${FormatNumber(score.beatmap.max_combo)}`} extraValue={score.combo === score.beatmap.max_combo ? 'Perfect' : null} extraClass={scoreStatsStyles['score-info__stat-row--perfect']} />
-                            <ScoreStat label="PP" value={FormatNumberWithPrecision(score.pp, 0)} />
+                            <ScoreStat label="PP" value={
+                                score.performance?.base?.pp !== undefined ?
+                                    FormatNumberWithPrecision(score.performance.base.pp || 0, 2) + "pp"
+                                    : <span style={{ color: grey[500] }}>{FormatNumberWithPrecision(score.pp || 0, 2) + "pp"}</span>
+
+                            } />
+
                         </div>
                         <div className={scoreStatsStyles['score-info__group-row']}>
                             {
