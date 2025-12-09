@@ -143,7 +143,7 @@ export function ProfileProvider({ children }) {
             setFetchLog(_fetchLog);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
-            await ProcessScores(scores, user);
+            await ProcessScores(mappedScores, user);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Processed scores`);

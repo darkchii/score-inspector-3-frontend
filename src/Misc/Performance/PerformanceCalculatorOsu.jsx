@@ -363,8 +363,8 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
         } else {
             let fullComboThreshold = score.beatmap.max_combo - this.countSliderEndsDropped;
 
-            if (score.combo < fullComboThreshold) {
-                missCount = fullComboThreshold / Math.max(1, score.combo);
+            if (this.combo < fullComboThreshold) {
+                missCount = fullComboThreshold / Math.max(1, this.combo);
             }
 
             missCount = Math.min(missCount, this.countSliderTickMiss + this.countMiss);

@@ -1,5 +1,5 @@
 import { calculateBonusPerformance, calculateRawPerformance, GetRulesetId, GetRulesetNameFromId } from "./Helper";
-import { GetModSetting, HasMod, ReorderMods } from "./ModHelper";
+import { ReorderMods } from "./ModHelper";
 import PerformancePoints from "./Performance/PerformancePoints";
 import { BeatmapApplyModsToDifficulty } from "./ScoreHelper";
 import { GenerateSessions } from "./SessionHelper";
@@ -135,8 +135,8 @@ export async function MapScoreBeatmaps(scores, beatmaps) {
         }
     }
 
-    // Filter out scores without a matching beatmap
-    scores = scores.filter(score => score.beatmap !== null);
+    //remove scores with missing beatmaps
+    scores = scores.filter(s => s.beatmap !== null && s.beatmap !== undefined);
 
     return [scores, missingCount];
 }
@@ -206,7 +206,8 @@ async function ProcessScore(score) {
 
     score.diff_missing = !score.attr_diff || score.attr_recalc;
 
-    score.using_classic_slider_accuracy = GetModSetting(score.mods, 'SL', 'classic_slider_accuracy') === true;
+    //if mods includes CL, and the mod setting using_classic_slider_accuracy is true or undefined, set using_classic_slider_accuracy to true
+    score.using_classic_slider_accuracy = score.mods.some(mod => mod.acronym === 'CL' && (mod.settings?.using_classic_slider_accuracy === true || mod.settings?.using_classic_slider_accuracy === undefined));
 
     try {
         score.performance = {

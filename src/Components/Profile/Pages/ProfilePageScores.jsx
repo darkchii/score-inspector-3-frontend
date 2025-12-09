@@ -17,8 +17,8 @@ function ProfilePageScores() {
             const allScores = profileStatistics.scores_set.scores?.slice() || [];
             setScoreCount(allScores.length);
 
-            //sort by pp descending
-            allScores.sort((a, b) => b.pp - a.pp);
+            //sort by pp descending (first check .performance.base.pp, then fallback to score.pp)
+            allScores.sort((a, b) => (b.performance?.base?.pp ?? b.pp) - (a.performance?.base?.pp ?? a.pp));
 
             //generate all page arrays
             const pages = [];
