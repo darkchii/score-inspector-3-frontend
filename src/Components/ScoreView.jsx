@@ -16,12 +16,18 @@ function ScoreView({ score }) {
 
     return (
         <div className={scoreViewStyles['score-view']}>
-            <ScoreViewBase score={score} />
+            <div className={scoreViewStyles['score-view__backdrop']}>
+                <ScoreViewBase score={score} />
+                {
+                    isMobile ? null : <>
+                        <Collapse in={isExtended} orientation="horizontal" unmountOnExit>
+                            <ScoreViewExtended score={score} />
+                        </Collapse>
+                    </>
+                }
+            </div>
             {
                 isMobile ? null : <>
-                    <Collapse in={isExtended} orientation="horizontal" unmountOnExit>
-                        <ScoreViewExtended score={score} />
-                    </Collapse>
                     <div className={scoreViewStyles['score-view__extender-button']} onClick={() => setIsExtended(!isExtended)}>
                         {isExtended ? <ArrowBackIosIcon /> : <ArrowForwardIosIcon />}
                     </div>

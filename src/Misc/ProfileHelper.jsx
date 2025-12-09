@@ -165,6 +165,8 @@ async function ProcessScore(score) {
     score.beatmap_id = Number(score.beatmap_id);
     score.ruleset = GetRulesetNameFromId(score.ruleset_id);
 
+    score.is_convert = score.ruleset_id !== score.beatmap?.ruleset_id;
+
     score.classic_total_score = Number(score.classic_total_score);
 
     score.id = Number(score.id);

@@ -9,12 +9,19 @@
 @score-view-side-button-width: 40px;
 
 .score-view {
-    background-color: @gray-dark;
-    border-radius: @score-view-radius;
     display: flex;
     flex-direction: 'row';
     align-items: 'center';
     justify-content: 'center';
+
+    &__backdrop {
+        display: flex;
+        flex-direction: 'row';
+        align-items: 'center';
+        justify-content: 'center';
+        background-color: @gray-dark;
+        border-radius: @score-view-radius;
+    }
 
     &__base {
         width: @score-view-width;
@@ -78,19 +85,17 @@
     &__extender-button {
         width: @score-view-side-button-width;
         min-height: 100%;
-        background-color: @gray-dark;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         user-select: none;
-        border-top-right-radius: @score-view-radius;
-        border-bottom-right-radius: @score-view-radius;
         transition: all 0.3s ease;
+        color: white;
 
         //on hover
         &:hover {
-            background-color: lighten(@gray-dark, 10%);
+            text-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white;    
             transition: all 0.3s ease;
         }
     }

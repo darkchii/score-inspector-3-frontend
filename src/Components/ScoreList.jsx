@@ -76,7 +76,7 @@ function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, t
                                     </TableCell>
                                 }
                                 {/* Ruleset Icon */}
-                                <TableCell width={30}>
+                                <TableCell width={25}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
                                         <img src={GetRulesetIconFromId(score.ruleset_id)} alt={score.grade} width={20} height={20} />
                                     </Box>
@@ -112,11 +112,11 @@ function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, t
                                     <Typography sx={{
                                         fontSize: '0.85rem',
                                         ...(
-                                            score.combo === (score.attr_diff.max_combo || score.beatmap.max_combo)
+                                            score.combo === (score.attr_diff?.max_combo || score.beatmap.max_combo)
                                                 ? { color: '#4caf50', fontWeight: 'bold' }
                                                 : {}
                                         )
-                                    }}>{score.combo.toLocaleString()}/{(score.attr_diff.max_combo || score.beatmap.max_combo).toLocaleString()}x</Typography>
+                                    }}>{score.combo.toLocaleString()}/{(score.attr_diff?.max_combo || score.beatmap.max_combo).toLocaleString()}x</Typography>
                                 </TableCell>
                                 <TableCell>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

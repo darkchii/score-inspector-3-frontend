@@ -8,7 +8,6 @@ import ModDisplay from './ModDisplay';
 import DifficultyBadge from './DifficultyBadge';
 import { GetHitResultColor, GetStarRating } from '../Misc/ScoreHelper';
 import ScoreStat from './ScoreStat';
-import ClearIcon from '@mui/icons-material/Clear';
 import { grey } from '@mui/material/colors';
 
 function ScoreViewBase({ score }) {
@@ -56,7 +55,7 @@ function ScoreViewBase({ score }) {
                     <div className={`${scoreInfoStyles['score-info__group']} ${scoreInfoStyles['score-info__group--stats']}`}>
                         <div className={scoreStatsStyles['score-info__group-row']}>
                             <ScoreStat label="Accuracy" value={`${FormatNumberWithPrecision(score.accuracy * 100, 2)}%`} />
-                            <ScoreStat label="Max Combo" value={`${FormatNumber(score.combo)}`} limitValue={`${FormatNumber(score.beatmap.max_combo)}`} extraValue={score.combo === score.beatmap.max_combo ? 'Perfect' : null} extraClass={scoreStatsStyles['score-info__stat-row--perfect']} />
+                            <ScoreStat label="Max Combo" value={`${FormatNumber(score.combo)}`} limitValue={`${FormatNumber(score.attr_diff?.max_combo || score.beatmap.max_combo)}`} extraValue={score.combo === (score.attr_diff?.max_combo || score.beatmap.max_combo) ? 'Perfect' : null} extraClass={scoreStatsStyles['score-info__stat-row--perfect']} />
                             <ScoreStat label="PP" value={
                                 score.performance?.base?.pp !== undefined ?
                                     FormatNumberWithPrecision(score.performance.base.pp || 0, 2) + "pp"
