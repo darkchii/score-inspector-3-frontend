@@ -5,7 +5,7 @@ class OsuLegacyScoreMissCalculator {
     }
 
     calculate() {
-        if(this.score.beatmap.max_combo === 0 || this.score.legacy_total_score === 0){
+        if(this.score.attr_diff.max_combo === 0 || this.score.legacy_total_score === 0){
             return 0;
         }
 
@@ -23,7 +23,7 @@ class OsuLegacyScoreMissCalculator {
             return maximumMissCount;
         }
 
-        let remainingCombo = this.score.beatmap.max_combo - combo;
+        let remainingCombo = this.score.attr_diff.max_combo - combo;
         let expectedRemainingScore = this.calculateScoreAtCombo(remainingCombo, relevantComboPerObject, scoreV1Multiplier);
 
         let scoreBasedMissCount = expectedRemainingScore / remainingScore;
@@ -48,7 +48,7 @@ class OsuLegacyScoreMissCalculator {
 
         comboScore *= accuracy * 300 / 25 * scoreV1Multiplier;
 
-        let objectsHit = (totalHits - countMiss) * combo / this.score.beatmap.max_combo;
+        let objectsHit = (totalHits - countMiss) * combo / this.score.attr_diff.max_combo;
 
         let nonComboScore = (300 + this.score.attr_diff.nested_score_per_object) * accuracy * objectsHit;
 
@@ -70,7 +70,7 @@ class OsuLegacyScoreMissCalculator {
 
         let missCount = 0;
 
-        let fullComboThreshold = this.score.beatmap.max_combo - 0.1 * this.score.beatmap.count_sliders;
+        let fullComboThreshold = this.score.attr_diff.max_combo - 0.1 * this.score.beatmap.count_sliders;
 
         if(combo < fullComboThreshold) {
             missCount = Math.pow(fullComboThreshold / Math.max(1.0, combo), 2.5);
@@ -78,7 +78,7 @@ class OsuLegacyScoreMissCalculator {
 
         missCount = Math.min(missCount, totalImperfectHits);
 
-        let maxPossibleSliderBreaks = Math.min(this.score.beatmap.count_sliders, (this.score.beatmap.max_combo - combo) / 2);
+        let maxPossibleSliderBreaks = Math.min(this.score.beatmap.count_sliders, (this.score.attr_diff.max_combo - combo) / 2);
 
         let scoreMissCount = this.overrides?.statistics_miss ?? this.score.statistics_miss ?? 0;
 
@@ -96,8 +96,8 @@ class OsuLegacyScoreMissCalculator {
 
         comboScore /= 300 / 25 * this.score.attr_diff.legacy_score_base_multiplier;
 
-        let result = (this.score.beatmap.max_combo - 2) * this.score.beatmap.max_combo;
-        result /= Math.max(this.score.beatmap.max_combo + 2 * (comboScore - 1), 1);
+        let result = (this.score.attr_diff.max_combo - 2) * this.score.attr_diff.max_combo;
+        result /= Math.max(this.score.attr_diff.max_combo + 2 * (comboScore - 1), 1);
 
         return result;
     }

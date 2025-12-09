@@ -25,8 +25,8 @@ class PerformanceCalculatorFruits extends PerformanceCalculator {
 
         value *= Math.pow(0.97, this.numMiss);
 
-        if (score.beatmap.max_combo > 0) {
-            value *= Math.min(Math.pow(this.combo, 0.35) / Math.pow(score.beatmap.max_combo, 0.35), 1.0);
+        if (score.attr_diff.max_combo > 0) {
+            value *= Math.min(Math.pow(this.combo, 0.35) / Math.pow(score.attr_diff.max_combo, 0.35), 1.0);
         }
 
         this.clockRate = CalculateRateWithMods(0, score.mods, score.attr_diff);

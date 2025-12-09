@@ -43,8 +43,8 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
         this.scoreBasedEstimatedMissCount = null;
 
         if (score.using_classic_slider_accuracy && score.legacy_total_score > 0) {
-            let legacyScoreMissCalculator = new OsuLegacyScoreMissCalculator(score);
-            this.scoreBasedEstimatedMissCount = legacyScoreMissCalculator.calculate(overrides);
+            let legacyScoreMissCalculator = new OsuLegacyScoreMissCalculator(score, overrides);
+            this.scoreBasedEstimatedMissCount = legacyScoreMissCalculator.calculate();
 
             this.effectiveMissCount = this.scoreBasedEstimatedMissCount;
         } else {
@@ -102,7 +102,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
 
             if (score.using_classic_slider_accuracy) {
                 let maximumPossibleDroppedSliders = this.totalImperfectHits;
-                estimateImproperlyFollowedDifficultSliders = MathHelper.clamp(Math.min(maximumPossibleDroppedSliders, score.beatmap.max_combo - this.combo), 0, score.attr_diff.aim_difficult_slider_count);
+                estimateImproperlyFollowedDifficultSliders = MathHelper.clamp(Math.min(maximumPossibleDroppedSliders, score.attr_diff.max_combo - this.combo), 0, score.attr_diff.aim_difficult_slider_count);
             } else {
                 estimateImproperlyFollowedDifficultSliders = MathHelper.clamp(this.countSliderEndsDropped + this.countSliderTickMiss, 0, score.attr_diff.aim_difficult_slider_count);
             }
@@ -243,7 +243,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
             return 0.0;
         }
 
-        let missedComboPercent = 1.0 - this.combo / score.beatmap.max_combo;
+        let missedComboPercent = 1.0 - this.combo / score.attr_diff.max_combo;
         let estimatedSliderBreaks = Math.min(this.countOk, this.effectiveMissCount * topWeightedSliderFactor);
 
         let okAdjustment = ((this.countOk - estimatedSliderBreaks) + 0.5) / this.countOk;
@@ -345,7 +345,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
         let missCount = this.countMiss;
 
         if (score.using_classic_slider_accuracy) {
-            let fullComboThreshold = score.beatmap.max_combo - 0.1 * score.beatmap.count_sliders;
+            let fullComboThreshold = score.attr_diff.max_combo - 0.1 * score.beatmap.count_sliders;
 
             if (this.combo < fullComboThreshold) {
                 missCount = fullComboThreshold / Math.max(1, this.combo);
@@ -353,7 +353,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
 
             missCount = Math.min(missCount, this.totalImperfectHits);
 
-            let maxPossibleSliders = Math.min(score.beatmap.count_sliders, (score.beatmap.max_combo - this.combo) / 2);
+            let maxPossibleSliders = Math.min(score.beatmap.count_sliders, (score.attr_diff.max_combo - this.combo) / 2);
 
             let sliderBreaks = missCount - this.countMiss;
 
@@ -361,7 +361,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
                 missCount = this.countMiss + maxPossibleSliders;
             }
         } else {
-            let fullComboThreshold = score.beatmap.max_combo - this.countSliderEndsDropped;
+            let fullComboThreshold = score.attr_diff.max_combo - this.countSliderEndsDropped;
 
             if (this.combo < fullComboThreshold) {
                 missCount = fullComboThreshold / Math.max(1, this.combo);
@@ -374,7 +374,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
     }
 
     getComboScalingFactor(score) {
-        return score.beatmap.max_combo <= 0 ? 1.0 : Math.min(Math.pow(this.combo, 0.8) / Math.pow(score.beatmap.max_combo, 0.8), 1.0);
+        return score.attr_diff.max_combo <= 0 ? 1.0 : Math.min(Math.pow(this.combo, 0.8) / Math.pow(score.attr_diff.max_combo, 0.8), 1.0);
     }
 }
 

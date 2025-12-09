@@ -1,25 +1,29 @@
 //Global performance class, will deal with the rulesets and calculations
 //Overrides means adjusted score values (ie simulating SS on a score that was 94.6%)
 
-import PerformanceCalculator from "./PerformanceCalculator";
 import PerformanceCalculatorFruits from "./PerformanceCalculatorFruits";
 import PerformanceCalculatorMania from "./PerformanceCalculatorMania";
 import PerformanceCalculatorOsu from "./PerformanceCalculatorOsu";
 import PerformanceCalculatorTaiko from "./PerformanceCalculatorTaiko";
 
 class PerformancePoints {
-    constructor(score, overrides = {}) {
+    constructor(score, options = {}) {
         if (score.diff_missing) {
             throw new Error("Cannot calculate performance for a score with missing or outdated diff data");
         }
 
-        if(!score.beatmap) {
+        if (!score.beatmap) {
             throw new Error(`Cannot calculate performance for a score with missing beatmap data (id: ${score.id})`);
         }
 
-        const calculator = PerformancePoints.getCalculator(score);
+        let overrides = null;
+        if (options.generate_ss) {
+            overrides = PerformancePoints.getOverridesFor(score, 'ss');
+        }
 
-        if(!calculator) {
+        const calculator = PerformancePoints.getCalculator(score, overrides);
+
+        if (!calculator) {
             // throw new Error(`Performance calculation for ruleset ${score.ruleset} is not implemented yet`);
             return;
         }
@@ -29,19 +33,48 @@ class PerformancePoints {
         this.pp = this.calculator.totalPerformance;
     }
 
-    static getCalculator(score) {
+    static getCalculator(score, overrides = null) {
         switch (score.ruleset) {
             case 'osu':
-                return new PerformanceCalculatorOsu(score);
+                return new PerformanceCalculatorOsu(score, overrides);
             case 'taiko':
-                return new PerformanceCalculatorTaiko(score);
+                return new PerformanceCalculatorTaiko(score, overrides);
             case 'fruits':
-                return new PerformanceCalculatorFruits(score);
+                return new PerformanceCalculatorFruits(score, overrides);
             case 'mania':
-                return new PerformanceCalculatorMania(score);
+                return new PerformanceCalculatorMania(score, overrides);
             default:
                 throw new Error(`Unknown ruleset: ${ruleset}`);
         }
+    }
+
+    static getOverridesFor(score, option) {
+        let overrides = {};
+        switch (option) {
+            case 'ss':
+                overrides.combo = score.attr_diff.max_combo;
+                overrides.accuracy = 1.0;
+                overrides.statistics_perfect = score.maximum_statistics_perfect || 0;
+                overrides.statistics_great = score.maximum_statistics_great || 0;
+                overrides.statistics_good = score.maximum_statistics_good || 0;
+                overrides.statistics_ok = score.maximum_statistics_ok || 0;
+                overrides.statistics_meh = score.maximum_statistics_meh || 0;
+                overrides.statistics_miss = score.maximum_statistics_miss || 0;
+                overrides.statistics_ignore_hit = score.maximum_statistics_ignore_hit || 0;
+                overrides.statistics_ignore_miss = score.maximum_statistics_ignore_miss || 0;
+                overrides.statistics_slider_tail_hit = score.maximum_statistics_slider_tail_hit;
+                overrides.statistics_large_tick_hit = score.maximum_statistics_large_tick_hit;
+                overrides.statistics_large_tick_miss = score.maximum_statistics_large_tick_miss;
+                overrides.statistics_large_bonus = score.maximum_statistics_large_bonus;
+                overrides.statistics_small_bonus = score.maximum_statistics_small_bonus;
+                overrides.statistics_small_tick_hit = score.maximum_statistics_small_tick_hit;
+                overrides.statistics_legacy_combo_increase = score.maximum_statistics_legacy_combo_increase; //unused?
+                break;
+            default:
+                break;
+        }
+
+        return overrides;
     }
 }
 

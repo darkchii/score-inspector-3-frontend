@@ -112,11 +112,11 @@ function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, t
                                     <Typography sx={{
                                         fontSize: '0.85rem',
                                         ...(
-                                            score.combo === score.beatmap.max_combo
+                                            score.combo === (score.attr_diff.max_combo || score.beatmap.max_combo)
                                                 ? { color: '#4caf50', fontWeight: 'bold' }
                                                 : {}
                                         )
-                                    }}>{score.combo.toLocaleString()}/{score.beatmap.max_combo.toLocaleString()}x</Typography>
+                                    }}>{score.combo.toLocaleString()}/{(score.attr_diff.max_combo || score.beatmap.max_combo).toLocaleString()}x</Typography>
                                 </TableCell>
                                 <TableCell>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

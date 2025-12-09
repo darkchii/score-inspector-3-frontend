@@ -97,6 +97,12 @@ function ProcessBeatmap(beatmap) {
     beatmap.stars = Number(beatmap.stars);
     beatmap.ruleset_id = Number(beatmap.mode);
 
+    beatmap.count_circles = Number(beatmap.count_circles);
+    beatmap.count_sliders = Number(beatmap.count_sliders);
+    beatmap.count_spinners = Number(beatmap.count_spinners);
+
+    beatmap.total_objects = beatmap.count_circles + beatmap.count_sliders + beatmap.count_spinners;
+
     if (beatmap.tags && typeof beatmap.tags === 'string') {
         beatmap.tags = beatmap.tags ? beatmap.tags.split(" ") : [];
     }
@@ -212,6 +218,9 @@ async function ProcessScore(score) {
     try {
         score.performance = {
             'base': new PerformancePoints(score),
+            'ss': new PerformancePoints(score, {
+                generate_ss: true
+            })
             //todo: SS, FC
         }
     } catch (e) {
