@@ -12,6 +12,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import DifficultyBadge from "./DifficultyBadge";
 import { GetStarRating } from "../Misc/ScoreHelper";
 import ClearIcon from '@mui/icons-material/Clear';
+import BetterTooltip from "./Tooltips/BetterTooltip";
 
 const truncateStep = 10;
 
@@ -139,7 +140,9 @@ function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, t
                                 <TableCell sx={{ width: '40px', textAlign: 'right', backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
                                     {
                                         score.diff_missing ?
-                                            <WarningIcon sx={{ color: theme.palette.warning.main, fontSize: '1.2rem' }} />
+                                            <BetterTooltip title="This score is missing difficulty attributes, data is likely incorrect.">
+                                                <WarningIcon sx={{ color: theme.palette.warning.main, fontSize: '1.2rem' }} />
+                                            </BetterTooltip>
                                             : null
                                     }
                                 </TableCell>
