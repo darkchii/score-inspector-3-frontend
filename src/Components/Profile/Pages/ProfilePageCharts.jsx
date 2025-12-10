@@ -1,5 +1,9 @@
+import ProfileChartAccuracyDifficulty from "./Charts/ProfileChartAccuracyDifficulty";
+
 function ProfilePageCharts() {
-    return null;
+    return (
+        <ProfileChartAccuracyDifficulty />
+    )
 }
 
 export default ProfilePageCharts;

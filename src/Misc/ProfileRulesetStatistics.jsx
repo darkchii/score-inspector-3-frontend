@@ -28,6 +28,8 @@ export class ProfileRulesetStatistics {
         this.completion_with_converts = 0;
 
         this.implied_playtime_seconds = 0;
+
+        this.charts = {};
     }
 
     //add score
@@ -53,5 +55,26 @@ export class ProfileRulesetStatistics {
         this.scores_set.calculate();
         this.scores_set_by_pp.calculate();
         this.scores_set_by_score.calculate();
+
+        this.calculateAccuracyDifficultyScatterChart();
+    }
+
+    calculateAccuracyDifficultyScatterChart() {
+        const data = [];
+        for (const score of this.scores_set.scores) {
+            //only ranked/approved beatmaps
+            if (!score.beatmap || (score.beatmap.status !== 'ranked' && score.beatmap.status !== 'approved')) {
+                continue;
+            }
+
+            const accuracy = score.accuracy;
+            const stars = score.attr_diff?.star_rating;
+
+            if (accuracy !== null && stars !== null) {
+                data.push({ x: stars, y: accuracy, id: score.id });
+            }
+        }
+
+        this.charts.accuracyDifficultyScatter = data;
     }
 }

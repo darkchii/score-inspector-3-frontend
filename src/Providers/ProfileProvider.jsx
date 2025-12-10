@@ -23,6 +23,12 @@ export function ProfileProvider({ children }) {
     const [activeRuleset, setActiveRuleset] = useState(null);
     const [availableRulesets, setAvailableRulesets] = useState([]);
 
+    //lookup map by score id, primarily for charts that should only store score ids
+    const [scoreMap, setScoreMap] = useState({});
+
+    const getScoreById = (scoreId) => {
+        return scoreMap[scoreId] || null;
+    }
 
     const getRulesetStatistics = (ruleset) => {
         if (!profileStatistics) return null;
@@ -167,6 +173,12 @@ export function ProfileProvider({ children }) {
 
             setAvailableRulesets(Object.keys(profileStats.rulesets));
 
+            let _scoreMap = {};
+            mappedScores.forEach(score => {
+                _scoreMap[score.id] = score;
+            });
+            setScoreMap(_scoreMap);
+
             //If available rulesets only has 'total', throw error (user has no scores)
             if (Object.keys(profileStats.rulesets).length === 1 && profileStats.rulesets['total']) {
                 throw new Error("User has no scores available.");
@@ -177,10 +189,6 @@ export function ProfileProvider({ children }) {
                 setActiveRuleset('all');
             }
 
-            console.log("DEV ===============================");
-            console.log(mappedScores[0]);
-            console.log("DEV ===============================");
-
             setIsFinished(true);
         } catch (error) {
             console.error("Error fetching full profile:", error);
@@ -190,7 +198,7 @@ export function ProfileProvider({ children }) {
     }
 
     return (
-        <ProfileContext.Provider value={{ getUser, getApiUser, userLive, scoresLive, setUserId, fetchFullProfile, errorMessage, fetchLog, isFinished, activeRuleset, setActiveRuleset, getRulesetStatistics, getRulesetUser, availableRulesets }}>
+        <ProfileContext.Provider value={{ getUser, getScoreById, getApiUser, userLive, scoresLive, setUserId, fetchFullProfile, errorMessage, fetchLog, isFinished, activeRuleset, setActiveRuleset, getRulesetStatistics, getRulesetUser, availableRulesets }}>
             {children}
         </ProfileContext.Provider>
     )
