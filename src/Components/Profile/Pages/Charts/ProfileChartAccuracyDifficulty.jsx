@@ -2,6 +2,7 @@ import { ScatterChart } from '@mui/x-charts/ScatterChart';
 import { useProfile } from '../../../../Providers/ProfileProvider';
 import { FormatNumberWithPrecision } from '../../../../Misc/Helper';
 import { useScoreView } from '../../../../Providers/ScoreViewProvider';
+import { Alert } from '@mui/material';
 
 function ProfileChartAccuracyDifficulty() {
     const { getRulesetStatistics, activeRuleset, getScoreById } = useProfile();
@@ -10,6 +11,14 @@ function ProfileChartAccuracyDifficulty() {
     return (
         <>
             <ScatterChart
+                slotProps={
+                    {
+                        //disable tooltip
+                        tooltip: {
+                            display: 'none',
+                        }
+                    }
+                }
                 skipAnimation={true}
                 height={400}
                 series={
@@ -17,7 +26,10 @@ function ProfileChartAccuracyDifficulty() {
                         {
                             markerSize: 2,
                             data: getRulesetStatistics(activeRuleset)?.charts?.accuracyDifficultyScatter || [],
-                            //on hover, show score id
+                            //color based on x,y value
+                            colorGetter: (data) => {
+                                return data.value.color;
+                            },
                             valueFormatter: (value) => {
                                 const score = getScoreById(value.id);
                                 if (score && score.beatmap) {
@@ -30,9 +42,8 @@ function ProfileChartAccuracyDifficulty() {
                     ]
                 }
 
-                onItemClick={(item, scatterItemIdentifier) => {
-                    const _item = getRulesetStatistics(activeRuleset)?.charts?.accuracyDifficultyScatter[scatterItemIdentifier.dataIndex];
-                    const score = getScoreById(_item.id);
+                onItemClick={(event, scatterItemIdentifier) => {
+                    const score = getScoreById(getRulesetStatistics(activeRuleset)?.charts?.accuracyDifficultyScatter[scatterItemIdentifier.dataIndex].id);
                     if (score) {
                         loadScoreView(score);
                     }
@@ -50,10 +61,18 @@ function ProfileChartAccuracyDifficulty() {
                     [
                         {
                             valueFormatter: (value) => `${FormatNumberWithPrecision(value * 100, 2)}%`,
+                            max: 1,
+                            width: 80,
                         }
                     ]
                 }
             />
+            {
+                getRulesetStatistics(activeRuleset)?.scores_set?.clears > 10000 &&
+                <Alert severity="info" sx={{ mt: 2 }}>
+                    The data has been reduced to ~10000 scores ordered by score to keep site responsive.
+                </Alert>
+            }
         </>
     );
 }

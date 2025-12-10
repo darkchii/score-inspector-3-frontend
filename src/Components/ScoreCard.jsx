@@ -36,7 +36,7 @@ function ScoreCard({ score, title = null, value = null }) {
                             <Typography variant='title' sx={{ fontSize: '1em' }}>{score.beatmap.artist} - {score.beatmap.title} [{score.beatmap.version}]</Typography>
                         </Marquee>
                         <Typography variant='h5' sx={{ fontSize: '1.1em' }}>{value}</Typography>
-                        <Typography sx={{ fontSize: '1em' }}>Played <Chip color="primary" label={TimeAgo(score.ended_at)} size="small"></Chip></Typography>
+                        <span style={{ fontSize: '1em' }}>Played <Chip color="primary" label={TimeAgo(score.ended_at)} size="small"></Chip></span>
                         <Button startIcon={<VisibilityIcon />} onClick={() => loadScoreView(score)} variant='contained'>View score</Button>
                     </Stack>
                 </div>

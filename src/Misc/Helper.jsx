@@ -5,6 +5,7 @@ import { blue, green, pink, purple } from '@mui/material/colors';
 import { HasHiddenMod, HasMod } from './ModHelper';
 import ScoreData from '../Data/ScoreData.json';
 import NumberFlow from '@number-flow/react';
+import { LTTB } from 'downsample';
 
 export const ShowNotification = (message, severity) => {
     toast[severity](message, Config.NOTIFICATIONS);
@@ -344,10 +345,10 @@ export function GetGradeFromAccuracy(score, accuracy) {
         grade = 'D';
     }
 
-    
-    if(score.ruleset_id === 3){ //mania specific
-        if(grade === "S") {
-            const anyImperfect = 
+
+    if (score.ruleset_id === 3) { //mania specific
+        if (grade === "S") {
+            const anyImperfect =
                 score.maximum_statistics_good > 0 ||
                 score.maximum_statistics_ok > 0 ||
                 score.maximum_statistics_meh > 0 ||
@@ -355,13 +356,13 @@ export function GetGradeFromAccuracy(score, accuracy) {
 
             grade = anyImperfect ? grade : 'X';
         }
-    }else {
-        if( grade === 'S' && score.maximum_statistics_miss > 0){
+    } else {
+        if (grade === 'S' && score.maximum_statistics_miss > 0) {
             grade = 'A';
         }
     }
 
-    if((grade === 'X' || grade === 'S') && HasHiddenMod(score.mods)){
+    if ((grade === 'X' || grade === 'S') && HasHiddenMod(score.mods)) {
         grade += 'H';
     }
 
@@ -369,3 +370,25 @@ export function GetGradeFromAccuracy(score, accuracy) {
     return grade;
 }
 
+export function GetGradeColor(grade) {
+    switch (grade) {
+        default:
+            return '#ffffff';
+        case 'XH':
+            return '#C0C0C0';
+        case 'X':
+            return '#E8BF3F';
+        case 'SH':
+            return '#C0C0C0';
+        case 'S':
+            return '#E8BF3F';
+        case 'A':
+            return '#72B75D';
+        case 'B':
+            return '#384699';
+        case 'C':
+            return '#50367a';
+        case 'D':
+            return '#7a1f1f';
+    }
+}
