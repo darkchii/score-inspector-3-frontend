@@ -25,6 +25,12 @@ export class ProfileRulesetScoreSet {
 
         this.recent_scores = [];
 
+        this.highlighted_scores = {};
+        this.highlighted_scores['top_pp'] = null;
+        this.highlighted_scores['top_score'] = null;
+        this.highlighted_scores['top_stars'] = null;
+        this.highlighted_scores['oldest'] = null;
+
         this.sessions = [];
     }
 
@@ -38,12 +44,33 @@ export class ProfileRulesetScoreSet {
             this.ranked_clears += 1;
         }
 
-        if(score.is_fc) {
+        if (score.is_fc) {
             this.fc_count += 1;
         }
 
         if (score.combo > this.max_combo) {
             this.max_combo = score.combo;
+        }
+
+        //ranked/approved only
+        if (score.beatmap && (score.beatmap.status === 'ranked' || score.beatmap.status === 'approved')) {
+            if (this.highlighted_scores['top_pp'] === null || (score.performance?.base?.pp || score.pp || 0) > (this.highlighted_scores['top_pp'].performance?.base?.pp || this.highlighted_scores['top_pp'].pp || 0)) {
+                this.highlighted_scores['top_pp'] = score;
+            }
+        }
+
+        if (this.highlighted_scores['top_score'] === null || score.legacy_total_score > this.highlighted_scores['top_score'].legacy_total_score) {
+            this.highlighted_scores['top_score'] = score;
+        }
+
+        if (score.is_fc) {
+            if (this.highlighted_scores['top_stars'] === null || (score.attr_diff?.star_rating || score.beatmap?.stars || 0) > (this.highlighted_scores['top_stars'].attr_diff?.star_rating || this.highlighted_scores['top_stars'].beatmap?.stars || 0)) {
+                this.highlighted_scores['top_stars'] = score;
+            }
+        }
+
+        if (this.highlighted_scores['oldest'] === null || score.ended_at < this.highlighted_scores['oldest'].ended_at) {
+            this.highlighted_scores['oldest'] = score;
         }
 
         this.duration_seconds += score.duration || 0;
