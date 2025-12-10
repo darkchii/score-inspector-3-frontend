@@ -163,7 +163,7 @@ export function CalculateVisibilityBonus(mods, approach_rate, visibility_factor 
         readingBonus += (isAlwaysPartiallyVisible ? 0.02 : 0.045) * (7 - Math.max(approach_rate, 0)) * sliderVisibilityFactor;
     }
 
-    if(approachRate < 0){
+    if(approach_rate < 0){
         readingBonus += (isAlwaysPartiallyVisible ? 0.01 : 0.1) * (1 - Math.pow(1.5, approach_rate)) * sliderVisibilityFactor;
     }
 
