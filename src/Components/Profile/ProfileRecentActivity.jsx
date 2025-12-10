@@ -17,7 +17,7 @@ function ProfileRecentActivity() {
                             ? <Typography>No recent activity available.</Typography>
                             //only show 20 recent scores
                             : 
-                            <ScoreList scores={getRulesetStatistics(activeRuleset)?.scores_set?.recent_scores?.slice(0, 20)} onSelectScore={() => { }} />
+                            <ScoreList scores={getRulesetStatistics(activeRuleset)?.scores_set?.recent_scores} truncate={true}/>
                     }
                 </Stack>
             </Box>

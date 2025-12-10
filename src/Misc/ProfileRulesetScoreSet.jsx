@@ -126,7 +126,6 @@ export class ProfileRulesetScoreSet {
             this.average_stars = totalStars / this.scores.length;
         }
 
-        //recent scores should be max 100, ordered by ended_at descending
         this.reorder('ended_at', true);
         this.recent_scores = this.scores.slice(0, 100);
 

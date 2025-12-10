@@ -149,7 +149,7 @@ function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, t
                 </Table>
             </TableContainer>
             {
-                truncate && displayCount < scores.length ? (
+                truncate && displayCount < (scores?.length || 0) ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
                         <Typography sx={{ cursor: 'pointer', color: theme.palette.primary.main }} onClick={() => setDisplayCount(prev => Math.min(prev + truncateStep, scores.length))}>
                             Show more...
