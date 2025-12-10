@@ -63,7 +63,7 @@ export class ProfileRulesetScoreSet {
             this.highlighted_scores['top_score'] = score;
         }
 
-        if (score.is_fc) {
+        if (score.is_fc && score.beatmap && (score.beatmap.status === 'ranked' || score.beatmap.status === 'approved')) {
             if (this.highlighted_scores['top_stars'] === null || (score.attr_diff?.star_rating || score.beatmap?.stars || 0) > (this.highlighted_scores['top_stars'].attr_diff?.star_rating || this.highlighted_scores['top_stars'].beatmap?.stars || 0)) {
                 this.highlighted_scores['top_stars'] = score;
             }

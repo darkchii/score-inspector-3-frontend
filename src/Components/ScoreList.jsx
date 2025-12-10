@@ -103,10 +103,7 @@ function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, t
                                 </TableCell>
                                 <TableCell sx={{ maxWidth: '100px' }}>
                                     <Typography sx={{ fontSize: '0.85rem', fontWeight: 'bold' }}>{score.total_score.toLocaleString()}</Typography>
-                                    {
-                                        (score.ruleset_id === 0 || score.ruleset_id === 2) &&
-                                        <Typography sx={{ fontSize: '0.75rem', color: grey[300] }}>{score.classic_total_score.toLocaleString()}</Typography>
-                                    }
+                                    <Typography sx={{ fontSize: '0.75rem', color: grey[300] }}>{score.implied_total_score.toLocaleString()}</Typography>
                                 </TableCell>
                                 <TableCell>
                                     <Typography sx={{

@@ -182,7 +182,7 @@ function ProfilePageSessions() {
     }, [selectedSessionId]);
 
     return (
-        <Box sx={{ p: 2 }}>
+        <Box sx={{ px: 2, pb: 2 }}>
             <Grid container spacing={2}>
                 {/* Session listing sidebar*/}
                 <Grid item size={{ xs: 12, sm: 12, md: 4, lg: 3 }}>
