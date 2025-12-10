@@ -34,13 +34,41 @@ export const FormatNumberWithPrecision = (number, precision) => {
     return new Intl.NumberFormat(undefined, { minimumFractionDigits: precision, maximumFractionDigits: precision }).format(number);
 }
 
-export const FormatDuration = (seconds, style = 'narrow') => {
+export const FormatDuration = (seconds, style = 'narrow', highest_tier = null) => {
     const duration = {
         years: Math.floor(seconds / 31536000),
         days: Math.floor((seconds % 31536000) / 86400),
         hours: Math.floor((seconds % 86400) / 3600),
         minutes: Math.floor((seconds % 3600) / 60),
         seconds: Math.floor(seconds % 60)
+    }
+
+    //reprocess to highest tier (so if highest tier is days, sum up the years into days, dont touch the rest since they remain the same)
+    if (highest_tier) {
+        switch (highest_tier) {
+            case 'days':
+                duration.days += duration.years * 365;
+                duration.years = 0;
+                break;
+            case 'hours':
+                duration.hours += (duration.years * 365 + duration.days) * 24;
+                duration.days = 0;
+                duration.years = 0;
+                break;
+            case 'minutes':
+                duration.minutes += ((duration.years * 365 + duration.days) * 24 + duration.hours) * 60;
+                duration.hours = 0;
+                duration.days = 0;
+                duration.years = 0;
+                break;
+            case 'seconds':
+                duration.seconds += (((duration.years * 365 + duration.days) * 24 + duration.hours) * 60 + duration.minutes) * 60;
+                duration.minutes = 0;
+                duration.hours = 0;
+                duration.days = 0;
+                duration.years = 0;
+                break;
+        }
     }
 
     if (style === 'raw') {
@@ -50,9 +78,9 @@ export const FormatDuration = (seconds, style = 'narrow') => {
     return new Intl.DurationFormat('en', { style: style }).format(duration);
 }
 
-export const FormatDurationNumberFlow = (seconds, spacing = true) => {
+export const FormatDurationNumberFlow = (seconds, spacing = true, highest_tier = null) => {
     //Format duration with all numeric values in NumberFlow components
-    const duration = FormatDuration(seconds, 'raw');
+    const duration = FormatDuration(seconds, 'raw', highest_tier);
 
     let formatted = <></>;
 
@@ -73,21 +101,21 @@ export const FormatDurationNumberFlow = (seconds, spacing = true) => {
     if (duration.hours > 0) {
         formatted = <>
             {formatted}
-            <NumberFlow value={duration.hours} suffix={spacing ? 'h ' : 'h'} prefix={duration.hours < 10 && duration.days === 0 ? '0' : ''} />
+            <NumberFlow value={duration.hours} suffix={spacing ? 'h ' : 'h'} prefix={duration.hours < 10 && duration.days == 0 ? '0' : ''} />
         </>;
     }
 
     if (duration.minutes > 0) {
         formatted = <>
             {formatted}
-            <NumberFlow value={duration.minutes} suffix={spacing ? 'm ' : 'm'} prefix={duration.minutes < 10 && duration.hours === 0 ? '0' : ''} />
+            <NumberFlow value={duration.minutes} suffix={spacing ? 'm ' : 'm'} prefix={duration.minutes < 10 && duration.hours == 0 ? '0' : ''} />
         </>;
     }
 
     if (duration.seconds > 0 || formatted === <></>) {
         formatted = <>
             {formatted}
-            <NumberFlow value={duration.seconds} suffix={spacing ? 's' : 's'} prefix={duration.seconds < 10 && duration.minutes === 0 ? '0' : ''} />
+            <NumberFlow value={duration.seconds} suffix={spacing ? 's' : 's'} prefix={duration.seconds < 10 && duration.minutes == 0 ? '0' : ''} />
         </>;
     }
 

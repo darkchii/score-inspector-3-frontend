@@ -74,12 +74,18 @@ class SessionCollection {
         this.play_time = 0;
         if (this.length > 0) {
             let pt = 0;
+            this.duration_longest = 0;
             this.sessions.forEach(session => {
                 pt += session.duration;
+                if (session.duration > this.duration_longest) {
+                    this.duration_longest = session.duration;
+                }
             });
             this.play_time = pt;
-            this.duration_longest = Math.max(...this.sessions.map(s => s.duration));
             this.duration_average = this.play_time / this.length;
+        } else {
+            this.duration_longest = 0;
+            this.duration_average = 0;
         }
     }
 

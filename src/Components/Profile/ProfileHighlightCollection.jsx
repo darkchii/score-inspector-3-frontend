@@ -5,9 +5,10 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import NumberFlow from "@number-flow/react";
 import { Icon } from "@iconify/react";
 import { FormatDuration, FormatDurationNumberFlow } from "../../Misc/Helper";
+import { grey } from "@mui/material/colors";
 
 function ProfileHighlightCollection() {
-    const { userLive, activeRuleset, getRulesetStatistics, getRulesetUser } = useProfile();
+    const { userLive, activeRuleset, getRulesetStatistics, getRulesetUser, getApiUser } = useProfile();
 
     return (
         <>
@@ -57,7 +58,7 @@ function ProfileHighlightCollection() {
                 <Grid item key="avg_length" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"Avg Length"}
-                        value={FormatDurationNumberFlow(getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.average_length || 0, false)}
+                        value={FormatDurationNumberFlow(getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.average_length || 0)}
                     />
                 </Grid>
 
@@ -122,17 +123,10 @@ function ProfileHighlightCollection() {
                     />
                 </Grid>
 
-                <Grid item key="playtime" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                <Grid item key="playtime" size={{ xs: 12, sm: 6, md: 6, lg: 1.25 }}>
                     <ProfileHighlight
                         title={"Playtime"}
-                        value={<NumberFlow value={Math.floor((getRulesetUser(activeRuleset)?.play_time || 0) / 3600)} suffix="h" />}
-                    />
-                </Grid>
-
-                <Grid item key="approx_time" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
-                    <ProfileHighlight
-                        title={"Approx Playtime"}
-                        value={<NumberFlow value={Math.floor((getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.play_time || 0) / 3600)} suffix="h" />}
+                        value={FormatDurationNumberFlow(getRulesetUser(activeRuleset)?.play_time || 0, true, 'days')}
                     />
                 </Grid>
 
@@ -146,18 +140,37 @@ function ProfileHighlightCollection() {
                 <Grid item key="longest_session" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"Longest Session"}
-                        value={<NumberFlow value={Math.floor((getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.duration_longest || 0) / 3600)} suffix="h" />}
+                        value={FormatDurationNumberFlow(getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.duration_longest || 0, true, 'days')}
                     />
                 </Grid>
 
                 <Grid item key="average_session" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"Average Session"}
-                        value={<NumberFlow value={Math.floor((getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.duration_average || 0) / 3600)} suffix="h" />}
+                        value={FormatDurationNumberFlow(getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.duration_average || 0, true, 'days')}
                     />
                 </Grid>
 
-                <Grid item key="spacer" size={{ xs: 12, sm: 6, md: 6, lg: 2 }}>
+
+                <Grid item key="daily_challenge" size={{ xs: 12, sm: 6, md: 6, lg: 1.25 }}>
+                    <ProfileHighlight
+                        title={"Daily Challenge"}
+                        value={
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <NumberFlow value={getApiUser()?.daily_challenge_user_stats?.daily_streak_best || 0} />
+                                <div style={{ fontSize: '0.7rem', color: grey[500], lineHeight: '0.6rem'}}>
+                                    best<br />streak
+                                </div>
+                                <NumberFlow value={getApiUser()?.daily_challenge_user_stats?.daily_streak_current || 0} />
+                                <div style={{ fontSize: '0.7rem', color: grey[500], lineHeight: '0.6rem'}}>
+                                    current
+                                </div>
+                            </div>
+                        }
+                    />
+                </Grid>
+
+                <Grid item key="spacer" size={{ xs: 12, sm: 6, md: 6, lg: 1.5 }}>
                     <Box sx={{ backgroundColor: 'red', width: '100%', height: '100%' }}></Box>
                 </Grid>
 

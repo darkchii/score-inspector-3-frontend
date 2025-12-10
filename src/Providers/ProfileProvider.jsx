@@ -38,6 +38,10 @@ export function ProfileProvider({ children }) {
         return userLive.osuAlternative.rulesets[internalId];
     }
 
+    const getApiUser = () => {
+        return userLive?.osuApi || null;
+    }
+
     const getUser = async (_userId) => {
         let _user = await getUserLive(_userId);
         _user = await ProcessUser(_user);
@@ -186,7 +190,7 @@ export function ProfileProvider({ children }) {
     }
 
     return (
-        <ProfileContext.Provider value={{ getUser, userLive, scoresLive, setUserId, fetchFullProfile, errorMessage, fetchLog, isFinished, activeRuleset, setActiveRuleset, getRulesetStatistics, getRulesetUser, availableRulesets }}>
+        <ProfileContext.Provider value={{ getUser, getApiUser, userLive, scoresLive, setUserId, fetchFullProfile, errorMessage, fetchLog, isFinished, activeRuleset, setActiveRuleset, getRulesetStatistics, getRulesetUser, availableRulesets }}>
             {children}
         </ProfileContext.Provider>
     )
