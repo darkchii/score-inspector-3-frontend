@@ -34,6 +34,13 @@ function ProfileHighlightCollection() {
                     />
                 </Grid>
 
+                <Grid item key="total_performance" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                    <ProfileHighlight
+                        title={"Total Performance"}
+                        value={<NumberFlow format={{ maximumFractionDigits: 0 }} value={(getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.total_performance_points || 0)} suffix='pp' />}
+                    />
+                </Grid>
+
                 <Grid item key="performance" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"Performance"}
@@ -90,9 +97,18 @@ function ProfileHighlightCollection() {
                     />
                 </Grid>
 
-                {/* space placeholder to keep track of width, so 'lg' reaches 12 for this row */}
-                <Grid item key="spacer" size={{ xs: 12, sm: 6, md: 6, lg: 3 }}>
-                    <Box sx={{ backgroundColor: 'red', width: '100%', height: '100%' }}></Box>
+                <Grid item key="xp_2_0" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                    <ProfileHighlight
+                        title={"XP 2.0"}
+                        value={<NumberFlow format={{ maximumFractionDigits: 0 }} value={(getRulesetUser(activeRuleset)?.xp_2_0 || 0)} />}
+                    />
+                </Grid>
+
+                <Grid item key="dedi_level" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                    <ProfileHighlight
+                        title={"Level 2.0"}
+                        value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={(getRulesetUser(activeRuleset)?.dedication_level || 0)} />}
+                    />
                 </Grid>
 
                 <Grid item key="score_per_clear" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>

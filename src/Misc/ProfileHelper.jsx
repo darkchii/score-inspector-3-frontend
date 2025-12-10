@@ -76,7 +76,56 @@ export async function ProcessUser(user) {
     //Some manual, theres missing values in total
     user.osuAlternative.rulesets['total'].total_score = ['osu', 'taiko', 'fruits', 'mania'].reduce((acc, ruleset) => { return acc + (user.osuAlternative.rulesets[ruleset]?.total_score || 0); }, 0);
 
+    //calculate xp 2.0 for each ruleset
+    for (const ruleset of ['osu', 'taiko', 'fruits', 'mania', 'total']) {
+        const rsUser = user.osuAlternative.rulesets[ruleset];
+
+        //XP gain per unit:
+        //SS: 200
+        //S: 100
+        //A: 50
+        //Ranked Score: 1/125000
+        //Total Score: 1/250000
+        //Medals: 20000
+        //Hours of playtime: 300
+
+        let xp = 0;
+        xp += ((rsUser.grade_counts_ssh || 0) + (rsUser.grade_counts_ss || 0)) * 200;
+        xp += ((rsUser.grade_counts_sh || 0) + (rsUser.grade_counts_s || 0)) * 100;
+        xp += (rsUser.grade_counts_a || 0) * 50;
+        xp += (rsUser.ranked_score || 0) / 125000;
+        xp += (rsUser.total_score || 0) / 250000;
+        xp += (user.user_achievements?.length || 0) * 20000;
+        xp += ((rsUser.play_time || 0) / 3600) * 300; //play_time is in seconds
+
+        user.osuAlternative.rulesets[ruleset].xp_2_0 = xp;
+
+        let varA = 5;
+        let varB = 80;
+        let varC = 225;
+        let varD = varC - varB - varA;
+
+        let level = getDedicationLevel(varA, varB, varC, varD, xp);
+
+        user.osuAlternative.rulesets[ruleset].dedication_level = level;
+    }
+
+    console.log(user);
+
     return user;
+}
+
+export function getDedicationLevel(a, b, c, d, xp) {
+    let l = 0;
+    let fl = a * l * l * l + b * l * l + c * l + d - xp;
+    let i = 0;
+    while (Math.abs(fl) > 0.001 && i < 50) {
+        let dfl = 3 * a * l * l + 2 * b * l + c;
+        l = l - fl / dfl;
+        fl = a * l * l * l + b * l * l + c * l + d - xp;
+        i++;
+    }
+    return l;
 }
 
 export function ProcessBeatmaps(beatmaps) {
