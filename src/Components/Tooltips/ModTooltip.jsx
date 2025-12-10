@@ -45,6 +45,7 @@ function ModTooltipContent({ mod, data, ruleset }) {
                                 <Table size="small" sx={{
                                     [`& .${tableCellClasses.root}`]: {
                                         borderBottom: "none",
+                                        color: 'white',
                                     }
                                 }}>
                                     <TableBody>
