@@ -151,6 +151,19 @@ function ProfileHighlightCollection() {
                     />
                 </Grid>
 
+                <Grid item key="badges" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
+                    <ProfileHighlight
+                        title={"Badges"}
+                        value={<NumberFlow value={getApiUser()?.badges?.length || 0} />}
+                    />
+                </Grid>
+
+                <Grid item key="medals" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
+                    <ProfileHighlight
+                        title={"Medals"}
+                        value={<NumberFlow value={getApiUser()?.user_achievements?.length || 0} />}
+                    />
+                </Grid>
 
                 <Grid item key="daily_challenge" size={{ xs: 12, sm: 6, md: 6, lg: 1.25 }}>
                     <ProfileHighlight
@@ -158,22 +171,17 @@ function ProfileHighlightCollection() {
                         value={
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <NumberFlow value={getApiUser()?.daily_challenge_user_stats?.daily_streak_best || 0} />
-                                <div style={{ fontSize: '0.7rem', color: grey[500], lineHeight: '0.6rem'}}>
+                                <div style={{ fontSize: '0.7rem', color: grey[500], lineHeight: '0.6rem' }}>
                                     best<br />streak
                                 </div>
                                 <NumberFlow value={getApiUser()?.daily_challenge_user_stats?.daily_streak_current || 0} />
-                                <div style={{ fontSize: '0.7rem', color: grey[500], lineHeight: '0.6rem'}}>
+                                <div style={{ fontSize: '0.7rem', color: grey[500], lineHeight: '0.6rem' }}>
                                     current
                                 </div>
                             </div>
                         }
                     />
                 </Grid>
-
-                <Grid item key="spacer" size={{ xs: 12, sm: 6, md: 6, lg: 1.5 }}>
-                    <Box sx={{ backgroundColor: 'red', width: '100%', height: '100%' }}></Box>
-                </Grid>
-
             </Grid>
         </>
     )

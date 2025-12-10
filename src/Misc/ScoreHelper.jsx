@@ -91,12 +91,18 @@ export function BeatmapApplyModsToDifficulty(ruleset, beatmap, mods) {
     return modifiedAttributes;
 }
 
-export const CalculateRawPerformance = (scores) => {
+export const CalculateRawPerformance = (scores, include_loved = false) => {
+    let subset = scores;
+
+    if(!include_loved) {
+        subset = scores.filter(score => score.beatmap && score.beatmap.status !== 'loved');
+    }
+
     //Sort scores by performance descending
-    scores.sort((a, b) => (b.performance?.base?.pp || b.pp || 0) - (a.performance?.base?.pp || a.pp || 0));
+    subset.sort((a, b) => (b.performance?.base?.pp || b.pp || 0) - (a.performance?.base?.pp || a.pp || 0));
     //Use top 500 scores only
 
-    const topScores = scores.slice(0, 500);
+    const topScores = subset.slice(0, 500);
     let totalPerformance = 0;
     topScores.forEach((score, index) => {
         const weight = Math.pow(0.95, index);
