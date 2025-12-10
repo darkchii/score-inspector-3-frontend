@@ -109,3 +109,29 @@ export const CalculateRawPerformance = (scores) => {
 export const CalculateBonusPerformance = (scoreCount) => {
     return 416.6667 * (1 - Math.pow(0.9995, Math.min(scoreCount, 1000)));
 }
+
+export const DetermineIsScoreFC = (score) => {
+    //just combo = beatmap max combo is not enough, since we recognize slider end misses as full combos too
+    if (score.grade === 'X' || score.grade === 'XH') {
+        return true;
+    }
+
+    if (score.ruleset === 'osu') {
+        if (!score.using_classic_slider_accuracy) {
+            const countSliderEndsDropped = score.beatmap.count_sliders - score.statistics_slider_tail_hit;
+            //if score.combo + dropped slider ends >= max combo, its a full combo
+            return score.combo + countSliderEndsDropped >= (score.diff_attr?.max_combo || score.beatmap?.max_combo || 0);
+        } else {
+            //estimate missed slider ends
+            const countMiss = score.statistics_miss || 0;
+            const count100 = score.statistics_ok || 0;
+            if (countMiss > 0) {
+                return false;
+            }
+
+            return ((score.diff_attr?.max_combo || score.beatmap?.max_combo || 0) - score.combo) <= count100;
+        }
+    }
+
+    return score.combo >= (score.diff_attr?.max_combo || score.beatmap?.max_combo || 0);
+}

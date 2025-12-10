@@ -2,7 +2,7 @@ import { GetRulesetNameFromId } from "./Helper";
 import { ReorderMods } from "./ModHelper";
 import PerformancePoints from "./Performance/PerformancePoints";
 import { ProfileStatistics } from "./ProfileStatistics";
-import { BeatmapApplyModsToDifficulty } from "./ScoreHelper";
+import { BeatmapApplyModsToDifficulty, DetermineIsScoreFC } from "./ScoreHelper";
 
 export async function ProcessUser(user) {
     user.osuAlternative.rulesets = {};
@@ -217,6 +217,8 @@ async function ProcessScore(score) {
     //if mods includes CL, and the mod setting using_classic_slider_accuracy is true or undefined, set using_classic_slider_accuracy to true
     score.using_classic_slider_accuracy = score.mods.some(mod => mod.acronym === 'CL' && (mod.settings?.using_classic_slider_accuracy === true || mod.settings?.using_classic_slider_accuracy === undefined));
 
+    score.is_fc = DetermineIsScoreFC(score);
+
     try {
         score.performance = {
             'base': new PerformancePoints(score),
@@ -234,5 +236,6 @@ async function ProcessScore(score) {
 
 export async function BuildProfileStatistics(scores, beatmaps) {
     const profileStats = new ProfileStatistics(scores, beatmaps);
+    console.log(profileStats);
     return profileStats;
 }
