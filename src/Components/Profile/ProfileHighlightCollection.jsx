@@ -4,6 +4,7 @@ import ProfileHighlight from "./ProfileHighlight";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import NumberFlow from "@number-flow/react";
 import { Icon } from "@iconify/react";
+import { FormatDuration, FormatDurationNumberFlow } from "../../Misc/Helper";
 
 function ProfileHighlightCollection() {
     const { userLive, activeRuleset, getRulesetStatistics, getRulesetUser } = useProfile();
@@ -25,10 +26,52 @@ function ProfileHighlightCollection() {
                     />
                 </Grid>
 
+                <Grid item key="playcount" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                    <ProfileHighlight
+                        title={"Playcount"}
+                        value={<NumberFlow value={getRulesetUser(activeRuleset)?.play_count || 0} />}
+                    />
+                </Grid>
+
                 <Grid item key="performance" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"Performance"}
-                        value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.performance_points || 0} suffix='pp' />}
+                        value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={(getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.performance_points || 0) + (getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.bonus_performance_points || 0)} suffix='pp' />}
+                    />
+                </Grid>
+
+                <Grid item key="avg_performance" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                    <ProfileHighlight
+                        title={"Avg Performance"}
+                        value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={(getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.average_performance || 0)} suffix='pp' />}
+                    />
+                </Grid>
+
+                <Grid item key="avg_accuracy" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                    <ProfileHighlight
+                        title={"Avg Accuracy"}
+                        value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={(getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.average_accuracy || 0) * 100} suffix='%' />}
+                    />
+                </Grid>
+
+                <Grid item key="avg_length" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                    <ProfileHighlight
+                        title={"Avg Length"}
+                        value={FormatDurationNumberFlow(getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.average_length || 0, false)}
+                    />
+                </Grid>
+
+                <Grid item key="avg_stars" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                    <ProfileHighlight
+                        title={"Avg Stars"}
+                        value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.average_stars || 0} suffix='★' />}
+                    />
+                </Grid>
+
+                <Grid item key="fc_rate" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                    <ProfileHighlight
+                        title={"FC Rate"}
+                        value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={(getRulesetStatistics(activeRuleset)?.scores_set?.fc_rate || 0) * 100} suffix='%' />}
                     />
                 </Grid>
 
@@ -85,13 +128,6 @@ function ProfileHighlightCollection() {
                     <ProfileHighlight
                         title={"Average Session"}
                         value={<NumberFlow value={Math.floor((getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.duration_average || 0) / 3600)} suffix="h" />}
-                    />
-                </Grid>
-
-                <Grid item key="playcount" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
-                    <ProfileHighlight
-                        title={"Playcount"}
-                        value={<NumberFlow value={getRulesetUser(activeRuleset)?.play_count || 0} />}
                     />
                 </Grid>
 

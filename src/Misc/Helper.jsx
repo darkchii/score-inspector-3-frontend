@@ -4,6 +4,7 @@ import { TextureDatabase } from '../Assets/Textures/TextureDatabase';
 import { blue, green, pink, purple } from '@mui/material/colors';
 import { HasHiddenMod, HasMod } from './ModHelper';
 import ScoreData from '../Data/ScoreData.json';
+import NumberFlow from '@number-flow/react';
 
 export const ShowNotification = (message, severity) => {
     toast[severity](message, Config.NOTIFICATIONS);
@@ -47,6 +48,50 @@ export const FormatDuration = (seconds, style = 'narrow') => {
     }
 
     return new Intl.DurationFormat('en', { style: style }).format(duration);
+}
+
+export const FormatDurationNumberFlow = (seconds, spacing = true) => {
+    //Format duration with all numeric values in NumberFlow components
+    const duration = FormatDuration(seconds, 'raw');
+
+    let formatted = <></>;
+
+    if (duration.years > 0) {
+        formatted = <>
+            {formatted}
+            <NumberFlow value={duration.years} suffix={spacing ? 'y ' : 'y'} />
+        </>;
+    }
+
+    if (duration.days > 0) {
+        formatted = <>
+            {formatted}
+            <NumberFlow value={duration.days} suffix={spacing ? 'd ' : 'd'} />
+        </>;
+    }
+
+    if (duration.hours > 0) {
+        formatted = <>
+            {formatted}
+            <NumberFlow value={duration.hours} suffix={spacing ? 'h ' : 'h'} prefix={duration.hours < 10 && duration.days === 0 ? '0' : ''} />
+        </>;
+    }
+
+    if (duration.minutes > 0) {
+        formatted = <>
+            {formatted}
+            <NumberFlow value={duration.minutes} suffix={spacing ? 'm ' : 'm'} prefix={duration.minutes < 10 && duration.hours === 0 ? '0' : ''} />
+        </>;
+    }
+
+    if (duration.seconds > 0 || formatted === <></>) {
+        formatted = <>
+            {formatted}
+            <NumberFlow value={duration.seconds} suffix={spacing ? 's' : 's'} prefix={duration.seconds < 10 && duration.minutes === 0 ? '0' : ''} />
+        </>;
+    }
+
+    return formatted;
 }
 
 export const GetRulesetIconFromId = (rulesetId) => {
@@ -156,24 +201,6 @@ export const getContrastColor = (bgColor) => {
     const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
     // Return black for light backgrounds and white for dark backgrounds
     return luminance > 0.5 ? '#000000' : '#FFFFFF';
-}
-
-export const calculateRawPerformance = (scores) => {
-    //Sort scores by performance descending
-    scores.sort((a, b) => b.pp - a.pp);
-    //Use top 500 scores only
-
-    const topScores = scores.slice(0, 500);
-    let totalPerformance = 0;
-    topScores.forEach((score, index) => {
-        const weight = Math.pow(0.95, index);
-        totalPerformance += score.pp * weight;
-    });
-    return totalPerformance;
-}
-
-export const calculateBonusPerformance = (scoreCount) => {
-    return 416.6667 * (1 - Math.pow(0.9995, Math.min(scoreCount, 1000)));
 }
 
 export const TimeAgo = (date, detailed = false) => {
