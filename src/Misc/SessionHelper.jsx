@@ -20,9 +20,9 @@ class Session {
 
         this.grades = {};
 
-        this.cumulative_legacy_total_score = 0;
-        this.average_legacy_total_score = 0;
-        this.max_legacy_total_score = 0;
+        this.cumulative_implied_total_score = 0;
+        this.average_implied_total_score = 0;
+        this.max_implied_total_score = 0;
 
         this.cumulative_lazer_score = 0;
         this.average_lazer_score = 0;
@@ -38,12 +38,12 @@ class Session {
                 this.grades[grade] = 0;
             }
             this.grades[grade] += 1;
-            this.cumulative_legacy_total_score += score.legacy_total_score;
+            this.cumulative_implied_total_score += score.implied_total_score;
             this.cumulative_lazer_score += score.lazer_score;
             this.cumulative_pp += score.pp;
             
-            if (score.legacy_total_score > this.max_legacy_total_score) {
-                this.max_legacy_total_score = score.legacy_total_score;
+            if (score.implied_total_score > this.max_implied_total_score) {
+                this.max_implied_total_score = score.implied_total_score;
             }
 
             if (score.lazer_score > this.max_lazer_score) {
@@ -56,7 +56,7 @@ class Session {
         });
 
         if (this.score_count > 0) {
-            this.average_legacy_total_score = this.cumulative_legacy_total_score / this.score_count;
+            this.average_implied_total_score = this.cumulative_implied_total_score / this.score_count;
             this.average_lazer_score = this.cumulative_lazer_score / this.score_count;
         }
     }

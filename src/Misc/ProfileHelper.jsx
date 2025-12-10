@@ -224,6 +224,7 @@ async function ProcessScore(score) {
     score.total_score = Number(score.total_score);
     score.lazer_score = Number(score.total_score);
     score.legacy_total_score = score.legacy_total_score ? Number(score.legacy_total_score) : null;
+    score.implied_total_score = score.legacy_total_score > 0 ? score.legacy_total_score : score.classic_total_score;
     score.pp = Number(score.pp);
 
     score.total_score = Number(score.total_score);

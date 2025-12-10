@@ -15,7 +15,7 @@ export class ProfileRulesetScoreSet {
 
         this.missing_difficulty = 0; //number of scores with missing beatmap difficulty data (its likely in queue for processing)
 
-        this.legacy_total_score = 0;
+        this.implied_total_score = 0;
         this.score = 0;
 
         this.performance_points = 0;
@@ -59,7 +59,7 @@ export class ProfileRulesetScoreSet {
             }
         }
 
-        if (this.highlighted_scores['top_score'] === null || score.legacy_total_score > this.highlighted_scores['top_score'].legacy_total_score) {
+        if (this.highlighted_scores['top_score'] === null || score.implied_total_score > this.highlighted_scores['top_score'].implied_total_score) {
             this.highlighted_scores['top_score'] = score;
         }
 
@@ -79,7 +79,7 @@ export class ProfileRulesetScoreSet {
         const grade = score.grade;
         this.grades[grade] = (this.grades[grade] || 0) + 1;
 
-        this.legacy_total_score += score.legacy_total_score;
+        this.implied_total_score += score.implied_total_score;
         this.score += score.total_score;
 
         if (score.diff_missing) {
@@ -108,7 +108,7 @@ export class ProfileRulesetScoreSet {
         this.average_length = 0;
         this.average_stars = 0;
         this.average_score = this.scores.length > 0 ? (this.score / this.scores.length) : 0;
-        this.average_legacy_score = this.scores.length > 0 ? (this.legacy_total_score / this.scores.length) : 0;
+        this.average_implied_score = this.scores.length > 0 ? (this.implied_total_score / this.scores.length) : 0;
 
         this.fc_rate = this.clears > 0 ? (this.fc_count / this.clears) : 0;
 

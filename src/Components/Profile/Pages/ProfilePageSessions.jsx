@@ -77,15 +77,15 @@ function SessionDisplay({ session }) {
                             <Grid sx={{ mt: theme.spacing(2), }} />
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Total Score</TableCell>
-                                <TableCell><NumberFlow value={session.cumulative_legacy_total_score} /></TableCell>
+                                <TableCell><NumberFlow value={session.cumulative_implied_total_score} /></TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Average Score</TableCell>
-                                <TableCell><NumberFlow value={session.average_legacy_total_score} /></TableCell>
+                                <TableCell><NumberFlow value={session.average_implied_total_score} /></TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Highest Score</TableCell>
-                                <TableCell><NumberFlow value={session.max_legacy_total_score} /></TableCell>
+                                <TableCell><NumberFlow value={session.max_implied_total_score} /></TableCell>
                             </TableRow>
                             <Grid sx={{ mt: theme.spacing(2), }} />
                             <TableRow>

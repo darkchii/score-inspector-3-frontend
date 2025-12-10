@@ -28,7 +28,7 @@ function ProfilePageMain() {
                     <Grid item size={{ xs: 12, sm: 12, md: 6, lg: 3 }}>
                         <ScoreCard
                             title="Top score"
-                            value={<NumberFlow value={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_score']?.legacy_total_score} />}
+                            value={<NumberFlow value={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_score']?.implied_total_score} />}
                             score={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_score']}
                         />
                     </Grid>

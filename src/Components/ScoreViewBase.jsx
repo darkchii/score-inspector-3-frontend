@@ -40,7 +40,7 @@ function ScoreViewBase({ score }) {
                         <span>{FormatNumber(score.total_score)}</span>
                     </div>
                     <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__subscore']}`}>
-                        <span>{FormatNumber(score.classic_total_score)}</span>
+                        <span>{FormatNumber(score.implied_total_score)}</span>
                     </div>
                     {/* row flex */}
                     <div className={scoreInfoStyles['score-info']} style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
