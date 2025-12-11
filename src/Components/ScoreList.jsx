@@ -131,8 +131,8 @@ function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, t
                                     <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold' }}>
                                         {
                                             score.performance?.base?.pp !== undefined ?
-                                                FormatNumberWithPrecision(score.performance.base.pp || 0, 2) + "pp"
-                                                : <span style={{ color: grey[500] }}>{FormatNumberWithPrecision(score.pp || 0, 2) + "pp"}</span>
+                                                FormatNumberWithPrecision(score.implied_pp, 2) + "pp"
+                                                : <span style={{ color: grey[500] }}>{FormatNumberWithPrecision(score.implied_pp, 2) + "pp"}</span>
 
                                         }
                                     </Typography>

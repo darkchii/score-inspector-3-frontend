@@ -281,6 +281,8 @@ async function ProcessScore(score) {
         // console.error("Error calculating performance:", e);
     }
 
+    score.implied_pp = score.performance?.base?.pp || score.pp || 0;
+
     return score;
 }
 

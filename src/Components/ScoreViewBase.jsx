@@ -58,11 +58,11 @@ function ScoreViewBase({ score }) {
                             <ScoreStat label="Accuracy" value={`${FormatNumberWithPrecision(score.accuracy * 100, 2)}%`} />
                             <ScoreStat label="Max Combo" value={`${FormatNumber(score.combo)}`} limitValue={`${FormatNumber(score.attr_diff?.max_combo || score.beatmap.max_combo)}`} extraValue={score.combo === (score.attr_diff?.max_combo || score.beatmap.max_combo) ? 'Perfect' : null} extraClass={scoreStatsStyles['score-info__stat-row--perfect']} />
                             <ScoreStat label="PP" value={
-                                <BetterTooltip title={`${FormatNumberWithPrecision(score.performance?.base?.pp || score.pp || 0, 3)}pp`} placement="top">
+                                <BetterTooltip title={`${FormatNumberWithPrecision(score.implied_pp, 3)}pp`} placement="top">
                                     {
                                         score.performance?.base?.pp !== undefined ?
-                                            FormatNumberWithPrecision(score.performance.base.pp || 0, 0) + "pp"
-                                            : <span style={{ color: grey[500] }}>{FormatNumberWithPrecision(score.pp || 0, 0) + "pp"}</span>
+                                            FormatNumberWithPrecision(score.implied_pp || 0, 0) + "pp"
+                                            : <span style={{ color: grey[500] }}>{FormatNumberWithPrecision(score.implied_pp || 0, 0) + "pp"}</span>
                                     }
                                 </BetterTooltip>
 

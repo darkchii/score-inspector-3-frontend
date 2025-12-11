@@ -106,7 +106,7 @@ export const CalculateRawPerformance = (scores, include_loved = false) => {
     let totalPerformance = 0;
     topScores.forEach((score, index) => {
         const weight = Math.pow(0.95, index);
-        const pp = score.performance?.base?.pp || score.pp || 0;
+        const pp = score.implied_pp;
         totalPerformance += pp * weight;
     });
     return totalPerformance;

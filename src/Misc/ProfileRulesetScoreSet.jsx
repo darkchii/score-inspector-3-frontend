@@ -28,7 +28,8 @@ export class ProfileRulesetScoreSet {
         this.highlighted_scores = {};
         this.highlighted_scores['top_pp'] = null;
         this.highlighted_scores['top_score'] = null;
-        this.highlighted_scores['top_stars'] = null;
+        this.highlighted_scores['top_stars_fc'] = null;
+        this.highlighted_scores['top_stars_ss'] = null;
         this.highlighted_scores['oldest'] = null;
 
         this.sessions = [];
@@ -54,7 +55,7 @@ export class ProfileRulesetScoreSet {
 
         //ranked/approved only
         if (score.beatmap && (score.beatmap.status === 'ranked' || score.beatmap.status === 'approved')) {
-            if (this.highlighted_scores['top_pp'] === null || (score.performance?.base?.pp || score.pp || 0) > (this.highlighted_scores['top_pp'].performance?.base?.pp || this.highlighted_scores['top_pp'].pp || 0)) {
+            if (this.highlighted_scores['top_pp'] === null || (score.implied_pp) > (this.highlighted_scores['top_pp'].implied_pp)) {
                 this.highlighted_scores['top_pp'] = score;
             }
         }
@@ -64,8 +65,14 @@ export class ProfileRulesetScoreSet {
         }
 
         if (score.is_fc && score.beatmap && (score.beatmap.status === 'ranked' || score.beatmap.status === 'approved')) {
-            if (this.highlighted_scores['top_stars'] === null || (score.attr_diff?.star_rating || score.beatmap?.stars || 0) > (this.highlighted_scores['top_stars'].attr_diff?.star_rating || this.highlighted_scores['top_stars'].beatmap?.stars || 0)) {
-                this.highlighted_scores['top_stars'] = score;
+            if (this.highlighted_scores['top_stars_fc'] === null || (score.attr_diff?.star_rating || score.beatmap?.stars || 0) > (this.highlighted_scores['top_stars_fc'].attr_diff?.star_rating || this.highlighted_scores['top_stars_fc'].beatmap?.stars || 0)) {
+                this.highlighted_scores['top_stars_fc'] = score;
+            }
+        }
+
+        if (score.is_ss && score.beatmap && (score.beatmap.status === 'ranked' || score.beatmap.status === 'approved')) {
+            if (this.highlighted_scores['top_stars_ss'] === null || (score.attr_diff?.star_rating || score.beatmap?.stars || 0) > (this.highlighted_scores['top_stars_ss'].attr_diff?.star_rating || this.highlighted_scores['top_stars_ss'].beatmap?.stars || 0)) {
+                this.highlighted_scores['top_stars_ss'] = score;
             }
         }
 
@@ -100,7 +107,7 @@ export class ProfileRulesetScoreSet {
     calculate() {
         this.performance_points = CalculateRawPerformance(this.scores);
         //sum of all pp from all scores
-        this.total_performance_points = this.scores.reduce((acc, score) => acc + (score.performance?.base?.pp || score.pp || 0), 0);
+        this.total_performance_points = this.scores.reduce((acc, score) => acc + score.implied_pp, 0);
         this.bonus_performance_points = CalculateBonusPerformance(this.scores.length);
         this.average_performance = this.scores.length > 0 ? (this.total_performance_points / this.scores.length) : 0;
 

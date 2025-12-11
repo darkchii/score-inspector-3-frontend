@@ -1,5 +1,7 @@
 import { Box, Collapse, Grid, List, ListItemButton, ListItemText } from "@mui/material";
 import ProfileChartAccuracyDifficulty from "./Charts/ProfileChartAccuracyDifficulty";
+import ProfileChartPerformanceSpread from "./Charts/ProfileChartPerformanceSpread";
+import ProfileChartScoreSpread from "./Charts/ProfileChartScoreSpread";
 import { useState } from "react";
 import ProfileChartPeriodic from "./Charts/ProfileChartPeriodic";
 
@@ -7,6 +9,14 @@ const CHART_PAGES = {
     ['accuracy-difficulty']: {
         name: "Accuracy vs Difficulty",
         component: ProfileChartAccuracyDifficulty,
+    },
+    ['performance-spread']: {
+        name: "Performance Spread",
+        component: ProfileChartPerformanceSpread,
+    },
+    ['score-spread']: {
+        name: "Score Spread",
+        component: ProfileChartScoreSpread,
     },
     ['periodic']: {
         name: "Periodic Charts",

@@ -327,8 +327,8 @@ function differenceBetweenConsecutiveElements(arr) {
     return result;
 }
 
-export function GetGradeFromAccuracy(score, accuracy) {
-    const cutoffs = ScoreData.accuracyCutoffs;
+function GetGradeFromAccuracyBase(accuracy, ruleset = 'osu') {
+    const cutoffs = ScoreData.accuracyCutoffs[ruleset];
     let grade;
 
     if (accuracy >= cutoffs.x) {
@@ -345,27 +345,47 @@ export function GetGradeFromAccuracy(score, accuracy) {
         grade = 'D';
     }
 
+    return grade;
+}
 
-    if (score.ruleset_id === 3) { //mania specific
-        if (grade === "S") {
-            const anyImperfect =
-                score.maximum_statistics_good > 0 ||
-                score.maximum_statistics_ok > 0 ||
-                score.maximum_statistics_meh > 0 ||
-                score.maximum_statistics_miss > 0;
+export function GetGradeFromAccuracy(score, accuracy) {
+    let grade = GetGradeFromAccuracyBase(accuracy);
 
-            grade = anyImperfect ? grade : 'X';
-        }
-    } else {
-        if (grade === 'S' && score.maximum_statistics_miss > 0) {
-            grade = 'A';
-        }
+    switch(score.ruleset) {
+        case 'osu':
+        case 'taiko':
+            switch(grade){
+                case 'S':
+                case 'X':
+                    //if miss > 0, downgrade to A
+                    if(score.statistics_miss > 0) {
+                        grade = 'A';
+                    }
+                    break;
+            }
+            break;
+        case 'fruits':
+            grade = GetGradeFromAccuracyBase(accuracy, 'fruits');
+            break;
+        case 'mania':
+            if (grade === 'S'){
+                const anyImperfect = 
+                    score.statistics_good > 0 ||
+                    score.statistics_ok > 0 ||
+                    score.statistics_meh > 0 ||
+                    score.statistics_miss > 0;
+
+                grade = anyImperfect ? grade : 'X';
+            }
+            break;
     }
 
-    if ((grade === 'X' || grade === 'S') && HasHiddenMod(score.mods)) {
-        grade += 'H';
+    if(grade === 'S' || grade === 'X'){
+        //check for hidden mod
+        if(HasHiddenMod(score.mods)){
+            grade += 'H';
+        }
     }
-
 
     return grade;
 }

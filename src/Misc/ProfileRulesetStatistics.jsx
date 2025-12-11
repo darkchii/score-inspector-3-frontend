@@ -81,6 +81,8 @@ export class ProfileRulesetStatistics {
         this.scores_set_by_score.calculate();
 
         this.calculateAccuracyDifficultyScatterChart();
+        this.calculatePerformanceSpreadChart();
+        this.calculateScoreSpreadChart();
 
         if(this.generate_periodic){
             //sort scores by ended_at ascending
@@ -145,13 +147,12 @@ export class ProfileRulesetStatistics {
         return _set_data;
     }
 
-    calculateAccuracyDifficultyScatterChart() {
+    calculateAccuracyDifficultyScatterChart(limit = LIMIT_CHART_SAMPLE_SIZE) {
         const data = [];
         let scores_sorted = this.scores_set.scores.slice().sort((a, b) => b.implied_total_score - a.implied_total_score);
 
         let i = 0;
         for (const score of scores_sorted) {
-            //only ranked/approved beatmaps
             if (!score.beatmap || (score.beatmap.status !== 'ranked' && score.beatmap.status !== 'approved')) {
                 continue;
             }
@@ -165,11 +166,73 @@ export class ProfileRulesetStatistics {
 
             i++;
 
-            if (i >= LIMIT_CHART_SAMPLE_SIZE) {
+            if (i >= limit) {
                 break;
             }
         }
 
         this.charts.accuracyDifficultyScatter = data;
+    }
+
+    calculatePerformanceSpreadChart(limit = LIMIT_CHART_SAMPLE_SIZE) {
+        const data = [];
+        //sort by score pp
+        let scores_sorted = this.scores_set_by_pp.scores.slice().sort((a, b) => a.implied_pp - b.implied_pp).reverse();
+
+        let i = 0;
+        for (const score of scores_sorted) {
+            //only ranked/approved beatmaps
+            if (!score.beatmap || (score.beatmap.status !== 'ranked' && score.beatmap.status !== 'approved')) {
+                continue;
+            }
+
+            const pp = score.implied_pp;
+
+            if (pp !== null) {
+                data.push({ x: i, y: pp, id: score.id, color: GetGradeColor(score.grade) });
+            }
+
+            i++;
+
+            if (i >= limit) {
+                break;
+            }
+        }
+
+        //reverse data
+        this.charts.performanceSpread = data;
+    }
+
+    calculateScoreSpreadChart(limit = LIMIT_CHART_SAMPLE_SIZE) {
+        const data = [];
+        //sort by score, bit complex, if ruleset = mania (3), we use .total_score, else .implied_total_score
+        let scores_sorted = this.scores_set_by_score.scores.slice().sort((a, b) => {
+            const scoreA = (a.ruleset_id === 3) ? a.total_score : a.implied_total_score;
+            const scoreB = (b.ruleset_id === 3) ? b.total_score : b.implied_total_score;
+            return scoreA - scoreB;
+        }).reverse();
+
+        let i = 0;
+        for (const score of scores_sorted) {
+            //only ranked/approved beatmaps
+            if (!score.beatmap) {
+                continue;
+            }
+
+            const score_value = (score.ruleset_id === 3) ? score.total_score : score.implied_total_score;
+
+            if (score_value !== null) {
+                data.push({ x: i, y: score_value, id: score.id, color: GetGradeColor(score.grade) });
+            }
+
+            i++;
+
+            if (i >= limit) {
+                break;
+            }
+        }
+
+        //reverse data
+        this.charts.scoreSpread = data;
     }
 }
