@@ -1,5 +1,6 @@
 @import '../Style/colors.module.less';
 @import '../Style/variables.module.less';
+@import '../Style/functions.module.less';
 
 @score-view-width: 450px;
 @score-view-extended-width: 700px; //This display more detailed score information
@@ -80,6 +81,21 @@
 
     &__extended {
         width: @score-view-extended-width;
+        height: 100%;
+
+        &__content {
+            padding: 20px;
+
+            width: 100%;
+            height: 100%;
+
+            &__no-data {
+                .center-content();
+                height: 100%;
+                width: 100%;
+                font-style: italic;
+            }
+        }
     }
 
     &__extender-button {

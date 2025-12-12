@@ -66,6 +66,23 @@ function ProfileRulesetSelector() {
                         width: 24,
                         height: 24,
                     }}>
+                        <Fade in={activeRuleset === 'all'} unmountOnExit>
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    bottom: -10,
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    width: 0,
+                                    height: 0,
+                                    borderLeft: '6px solid transparent',
+                                    borderRight: '6px solid transparent',
+                                    borderBottom: `8px solid ${grey[500]}`,
+                                    //glow
+                                    filter: `drop-shadow(0 0 4px ${grey[500]})`,
+                                }}
+                            />
+                        </Fade>
                         <img
                             src={TextureDatabase.RulesetOsuIcon}
                             alt="osu!"
