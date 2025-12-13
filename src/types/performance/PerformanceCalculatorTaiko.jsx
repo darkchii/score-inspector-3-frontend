@@ -27,7 +27,7 @@ class PerformanceCalculatorTaiko extends PerformanceCalculator {
 
         this.totalDifficultHits = this.totalHits * score.attr_diff.consistency_factor;
 
-        let isConvert = score.beatmap.ruleset_id !== 1;
+        let isConvert = score.local_beatmap.ruleset_id !== 1;
         let isClassic = score.mods.some(mod => mod.acronym === 'CL');
 
         this.difficultyValue = this.computeDifficultyValue(score, isConvert, isClassic) * 1.08;

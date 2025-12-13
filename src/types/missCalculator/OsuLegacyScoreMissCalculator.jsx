@@ -59,7 +59,7 @@ class OsuLegacyScoreMissCalculator {
         let countMiss = this.overrides?.statistics_miss ?? this.score.statistics_miss ?? 0;
         let combo = this.overrides?.combo ?? this.score.combo ?? 0;
 
-        if(this.score.beatmap.count_sliders <= 0){
+        if(this.score.local_beatmap.count_sliders <= 0){
             return countMiss;
         }
 
@@ -70,7 +70,7 @@ class OsuLegacyScoreMissCalculator {
 
         let missCount = 0;
 
-        let fullComboThreshold = this.score.attr_diff.max_combo - 0.1 * this.score.beatmap.count_sliders;
+        let fullComboThreshold = this.score.attr_diff.max_combo - 0.1 * this.score.local_beatmap.count_sliders;
 
         if(combo < fullComboThreshold) {
             missCount = Math.pow(fullComboThreshold / Math.max(1.0, combo), 2.5);
@@ -78,7 +78,7 @@ class OsuLegacyScoreMissCalculator {
 
         missCount = Math.min(missCount, totalImperfectHits);
 
-        let maxPossibleSliderBreaks = Math.min(this.score.beatmap.count_sliders, (this.score.attr_diff.max_combo - combo) / 2);
+        let maxPossibleSliderBreaks = Math.min(this.score.local_beatmap.count_sliders, (this.score.attr_diff.max_combo - combo) / 2);
 
         let scoreMissCount = this.overrides?.statistics_miss ?? this.score.statistics_miss ?? 0;
 

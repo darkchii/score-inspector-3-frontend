@@ -7,6 +7,7 @@ import ScoreDifficulty from "./ScoreDifficulty";
 class Score {
     constructor(api_data, beatmap = null, user = null) {
         this.beatmap = beatmap;
+        this.local_beatmap = beatmap.clone(); //this will contain modified data
         this.user = user;
 
         this.id = Number(api_data.id);
@@ -107,38 +108,43 @@ class Score {
         this.is_convert = this.ruleset_id !== this.beatmap?.ruleset_id;
         this.implied_total_score = this.legacy_total_score > 0 ? this.legacy_total_score : this.classic_total_score;
 
-        if (this.beatmap) {
-            this.beatmap.bpm_modded = this.beatmap.bpm;
-            this.beatmap.length_modded = this.beatmap.length;
-            this.beatmap.drain_time_modded = this.beatmap.drain_time;
+        if (this.local_beatmap) {
+            this.local_beatmap.bpm_modded = this.local_beatmap.bpm;
+            this.local_beatmap.length_modded = this.local_beatmap.length;
+            this.local_beatmap.drain_time_modded = this.local_beatmap.drain_time;
             //Recalculate length with speed modifiers
             if (this.mod_speed_change && this.mod_speed_change !== 1.0) {
-                this.beatmap.bpm_modded = this.beatmap.bpm * this.mod_speed_change;
-                this.beatmap.length_modded = this.beatmap.length / this.mod_speed_change;
-                this.beatmap.drain_time_modded = this.beatmap.drain_time / this.mod_speed_change;
+                this.local_beatmap.bpm_modded = this.local_beatmap.bpm * this.mod_speed_change;
+                this.local_beatmap.length_modded = this.local_beatmap.length / this.mod_speed_change;
+                this.local_beatmap.drain_time_modded = this.local_beatmap.drain_time / this.mod_speed_change;
             }
 
             //Calculate the duration of the score
-            this.duration = this.beatmap.drain_time_modded;
+            this.duration = this.local_beatmap.drain_time_modded;
 
             if (this.ended_at && this.started_at) {
                 const startedAt = new Date(this.started_at);
                 const endedAt = new Date(this.ended_at);
                 this.duration = (endedAt - startedAt) / 1000; //duration in seconds
             }
-            
-            this.beatmap_attributes = BeatmapApplyModsToDifficulty(this.ruleset, this.beatmap, this.mods);
+
+            this.beatmap_attributes = BeatmapApplyModsToDifficulty(this.ruleset, this.local_beatmap, this.mods);
+
         }
 
-        
-        if(api_data.attr_diff){
+        if(this.beatmap){
+            this.beatmap.addScore(this);
+        }
+
+
+        if (api_data.attr_diff) {
             this.attr_diff = new ScoreDifficulty(api_data.attr_diff);
         }
         this.attr_recalc = Boolean(api_data.attr_recalc);
-        
+
         //if attr_diff is missing or attr_recalc is true
         this.diff_missing = !api_data.attr_diff || this.attr_recalc;
-        
+
         this.is_fc = DetermineIsScoreFC(this);
 
         try {
@@ -154,10 +160,6 @@ class Score {
         }
 
         this.implied_pp = this.performance?.base?.pp || this.pp || 0;
-
-        if(this.id === 4746396766){ //dev
-            console.log("Score 4746396766 loaded:", this);
-        }
     }
 }
 

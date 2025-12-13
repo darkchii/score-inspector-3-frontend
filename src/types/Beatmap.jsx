@@ -2,7 +2,7 @@ import { GetRulesetNameFromId } from "../util/Helper";
 
 class Beatmap {
     constructor(api_data) {
-        if(api_data === null || api_data === undefined){
+        if (api_data === null || api_data === undefined) {
             throw new Error("Invalid api_data for Beatmap");
         }
 
@@ -47,14 +47,14 @@ class Beatmap {
         this.ranked_date = api_data.ranked_date ? new Date(api_data.ranked_date) : null;
         this.submitted_date = api_data.submitted_date ? new Date(api_data.submitted_date) : null;
         this.last_updated = api_data.last_updated ? new Date(api_data.last_updated) : null;
-        
+
         this.version = api_data.version;
 
         this.title = api_data.title;
         this.artist = api_data.artist;
         this.source = api_data.source;
 
-        if(api_data.tags && typeof api_data.tags === "string"){
+        if (api_data.tags && typeof api_data.tags === "string") {
             this.tags = api_data.tags ? api_data.tags.split(" ") : [];
         } else if (Array.isArray(api_data.tags)) {
             this.tags = api_data.tags;
@@ -67,6 +67,26 @@ class Beatmap {
         this.pack = api_data.pack ? api_data.pack : null;
 
         this.lchg_time = api_data.lchg_time ? new Date(api_data.lchg_time) : null;
+    }
+
+    addScore(score) {
+        if (!this.scores) {
+            this.scores = new Map();
+        }
+
+        if (this.scores && this.scores.has(score.id)) {
+            return;
+        }
+
+        this.scores.set(score.id, score);
+    }
+
+    getScores() {
+        if (!this.scores) {
+            return [];
+        }
+
+        return Array.from(this.scores.values());
     }
 
     clone() {

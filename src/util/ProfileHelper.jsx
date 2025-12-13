@@ -144,7 +144,7 @@ export async function MapScoreBeatmaps(scores, beatmaps) {
     for (const score of scores) {
         const beatmap = beatmapMap.get(Number(score.beatmap_id));
         if (beatmap) {
-            score.beatmap = beatmap.clone();
+            score.beatmap = beatmap;
         } else {
             missingCount++;
             score.beatmap = null; // No matching beatmap found
@@ -163,6 +163,5 @@ export async function ProcessScores(scores, user = null) {
 
 export async function BuildProfileStatistics(scores, beatmaps) {
     const profileStats = new ProfileStatistics(scores, beatmaps);
-    console.log(profileStats);
     return profileStats;
 }

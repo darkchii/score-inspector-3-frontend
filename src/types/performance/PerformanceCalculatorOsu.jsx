@@ -19,7 +19,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
         this.countOk = overrides?.statistics_ok ?? score.statistics_ok ?? 0;
         this.countMiss = overrides?.statistics_miss ?? score.statistics_miss ?? 0;
         this.sliderTailHit = overrides?.statistics_slider_tail_hit ?? score.statistics_slider_tail_hit ?? 0;
-        this.countSliderEndsDropped = score.beatmap.count_sliders - this.sliderTailHit;
+        this.countSliderEndsDropped = score.local_beatmap.count_sliders - this.sliderTailHit;
         this.countSliderTickMiss = overrides?.statistics_large_tick_miss ?? score.statistics_large_tick_miss ?? 0;
         this.effectiveMissCount = this.countMiss;
         this.totalImperfectHits = this.countOk + this.countMeh + this.countMiss;
@@ -63,7 +63,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
 
         //if so
         if (score.mods.some(mod => mod.acronym === 'SO') && this.totalHits > 0) {
-            this.multiplier *= 1.0 - Math.pow(score.beatmap.count_spinners / this.totalHits, 0.85);
+            this.multiplier *= 1.0 - Math.pow(score.local_beatmap.count_spinners / this.totalHits, 0.85);
         }
 
         //if rx
@@ -97,7 +97,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
 
         let aimDifficulty = score.attr_diff.aim_difficulty;
 
-        if (score.beatmap.count_sliders > 0 && score.attr_diff.aim_difficult_slider_count > 0) {
+        if (score.local_beatmap.count_sliders > 0 && score.attr_diff.aim_difficult_slider_count > 0) {
             let estimateImproperlyFollowedDifficultSliders;
 
             if (score.using_classic_slider_accuracy) {
@@ -189,9 +189,9 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
         }
 
         let betterAccuracyPercentage;
-        let amountHitObjectsWithAccuracy = score.beatmap.count_circles;
+        let amountHitObjectsWithAccuracy = score.local_beatmap.count_circles;
         if(!score.using_classic_slider_accuracy || this.usingScoreV2){
-            amountHitObjectsWithAccuracy += score.beatmap.count_sliders;
+            amountHitObjectsWithAccuracy += score.local_beatmap.count_sliders;
         }
 
         if(amountHitObjectsWithAccuracy > 0){
@@ -345,14 +345,14 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
     }
 
     calculateComboBasedEstimatedMissCount(score) {
-        if (score.beatmap.count_sliders <= 0) {
+        if (score.local_beatmap.count_sliders <= 0) {
             return this.countMiss;
         }
 
         let missCount = this.countMiss;
 
         if (score.using_classic_slider_accuracy) {
-            let fullComboThreshold = score.attr_diff.max_combo - 0.1 * score.beatmap.count_sliders;
+            let fullComboThreshold = score.attr_diff.max_combo - 0.1 * score.local_beatmap.count_sliders;
 
             if (this.combo < fullComboThreshold) {
                 missCount = fullComboThreshold / Math.max(1, this.combo);
@@ -360,7 +360,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
 
             missCount = Math.min(missCount, this.totalImperfectHits);
 
-            let maxPossibleSliders = Math.min(score.beatmap.count_sliders, (score.attr_diff.max_combo - this.combo) / 2);
+            let maxPossibleSliders = Math.min(score.local_beatmap.count_sliders, (score.attr_diff.max_combo - this.combo) / 2);
 
             let sliderBreaks = missCount - this.countMiss;
 
