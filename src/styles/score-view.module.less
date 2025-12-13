@@ -3,7 +3,7 @@
 @import '../styles/functions.module.less';
 
 @score-view-width: 450px;
-@score-view-extended-width: 700px; //This display more detailed score information
+@score-view-extended-width: 850px; //This display more detailed score information
 @score-view-radius: 20px;
 @score-view-userdata-height: 80px;
 @username-font-size: @font-size--title-small-3;
@@ -81,13 +81,18 @@
 
     &__extended {
         width: @score-view-extended-width;
-        height: 100%;
+        max-height: 80vh;
+
 
         &__content {
             padding: 20px;
 
-            width: 100%;
-            height: 100%;
+            display: flex;
+            flex-direction: column;
+
+            max-height: 80vh;
+
+            color: white !important;
 
             &__no-data {
                 .center-content();
@@ -95,6 +100,40 @@
                 width: 100%;
                 font-style: italic;
             }
+        }
+
+        &__tabs {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex: 0 0 auto;
+        }
+
+        &__tab {
+            padding: 5px 10px;
+            border-radius: 10px;
+            background-color: @gray-dark;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+
+            &--active {
+                background-color: @gray-darker;
+                color: white;
+            }
+
+            &:hover {
+                background-color: lighten(@gray-dark, 10%);
+                transition: all 0.3s ease;
+            }
+        }
+
+        &__tab-content {
+            flex: 1 1 auto;
+            overflow-y: auto;
         }
     }
 

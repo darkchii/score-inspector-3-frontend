@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import scoreViewStyles from '../styles/score-view.module.less';
-import ScoreViewBase from './scoreView/ScoreViewBase';
+import scoreViewStyles from '../../styles/score-view.module.less';
+import ScoreViewBase from './ScoreViewBase';
 import { Collapse } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import ScoreViewExtended from './scoreView/ScoreViewExtended';
+import ScoreViewExtended from './ScoreViewExtended';
 
 function ScoreView({ score }) {
     const [isExtended, setIsExtended] = useState(false);

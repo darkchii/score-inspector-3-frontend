@@ -18,7 +18,17 @@ const theme = createTheme({
       light: pink[300],
       dark: pink[700],
     },
-  }
+  },
+  //force white text on modals
+  components: {
+    MuiDialogContentText: {
+      styleOverrides: {
+        root: {
+          color: 'white',
+        },
+      },
+    },
+  },
 });
 
 function App() {

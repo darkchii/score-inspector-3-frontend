@@ -1,7 +1,7 @@
 import { Avatar, Box, Grid, Stack, Typography, useTheme } from '@mui/material';
-import scoreViewStyles from '../styles/score-view.module.less';
-import scoreInfoStyles from '../styles/score-info.module.less';
-import scoreStatsStyles from '../styles/score-info.module.less';
+import scoreViewStyles from '../../styles/score-view.module.less';
+import scoreInfoStyles from '../../styles/score-info.module.less';
+import scoreStatsStyles from '../../styles/score-info.module.less';
 import ScoreDial from '../ScoreDial';
 import { DateToString, FormatNumber, FormatNumberWithPrecision, GetRulesetIconFromId } from '../../util/Helper';
 import ModDisplay from '../ModDisplay';
@@ -10,6 +10,7 @@ import { GetHitResultColor, GetStarRating } from '../../util/ScoreHelper';
 import ScoreStat from '../ScoreStat';
 import { grey } from '@mui/material/colors';
 import BetterTooltip from '../tooltips/BetterTooltip';
+import NumberFlow from '@number-flow/react';
 
 function ScoreViewBase({ score }) {
     const theme = useTheme();
@@ -38,10 +39,10 @@ function ScoreViewBase({ score }) {
                         <ScoreDial score={score} />
                     </div>
                     <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__score']}`}>
-                        <span>{FormatNumber(score.total_score)}</span>
+                        <span>{<NumberFlow value={score.total_score} />}</span>
                     </div>
                     <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__subscore']}`}>
-                        <span>{FormatNumber(score.implied_total_score)}</span>
+                        <span>{<NumberFlow value={score.implied_total_score} />}</span>
                     </div>
                     {/* row flex */}
                     <div className={scoreInfoStyles['score-info']} style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
@@ -55,14 +56,14 @@ function ScoreViewBase({ score }) {
                     </div>
                     <div className={`${scoreInfoStyles['score-info__group']} ${scoreInfoStyles['score-info__group--stats']}`}>
                         <div className={scoreStatsStyles['score-info__group-row']}>
-                            <ScoreStat label="Accuracy" value={`${FormatNumberWithPrecision(score.accuracy * 100, 2)}%`} />
-                            <ScoreStat label="Max Combo" value={`${FormatNumber(score.combo)}`} limitValue={`${FormatNumber(score.attr_diff?.max_combo || score.beatmap.max_combo)}`} extraValue={score.combo === (score.attr_diff?.max_combo || score.beatmap.max_combo) ? 'Perfect' : null} extraClass={scoreStatsStyles['score-info__stat-row--perfect']} />
+                            <ScoreStat label="Accuracy" value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={score.accuracy * 100} suffix='%' />} />
+                            <ScoreStat label="Max Combo" value={<NumberFlow value={score.combo} />} limitValue={`${FormatNumber(score.attr_diff?.max_combo || score.beatmap.max_combo)}`} extraValue={score.combo === (score.attr_diff?.max_combo || score.beatmap.max_combo) ? 'Perfect' : null} extraClass={scoreStatsStyles['score-info__stat-row--perfect']} />
                             <ScoreStat label="PP" value={
                                 <BetterTooltip title={`${FormatNumberWithPrecision(score.implied_pp, 3)}pp`} placement="top">
                                     {
                                         score.performance?.base?.pp !== undefined ?
-                                            FormatNumberWithPrecision(score.implied_pp || 0, 0) + "pp"
-                                            : <span style={{ color: grey[500] }}>{FormatNumberWithPrecision(score.implied_pp || 0, 0) + "pp"}</span>
+                                            <NumberFlow format={{ maximumFractionDigits: 0 }} value={score.implied_pp} suffix='pp' />
+                                            : <span style={{ color: grey[500] }}><NumberFlow format={{ maximumFractionDigits: 0 }} value={score.implied_pp} suffix='pp' /></span>
                                     }
                                 </BetterTooltip>
 
@@ -72,63 +73,63 @@ function ScoreViewBase({ score }) {
                         <div className={scoreStatsStyles['score-info__group-row']}>
                             {
                                 (['mania'].includes(score.ruleset)) && (
-                                    <ScoreStat label="Perfect" value={FormatNumber(score.statistics_perfect)} color={GetHitResultColor('perfect')[200]} />
+                                    <ScoreStat label="Perfect" value={<NumberFlow value={score.statistics_perfect} />} color={GetHitResultColor('perfect')[200]} />
                                 )
                             }
                             {
                                 (['osu', 'taiko', 'fruits', 'mania'].includes(score.ruleset)) && (
-                                    <ScoreStat label="Great" value={FormatNumber(score.statistics_great)} color={GetHitResultColor('great')[400]} />
+                                    <ScoreStat label="Great" value={<NumberFlow value={score.statistics_great} />} color={GetHitResultColor('great')[400]} />
                                 )
                             }
                             {
                                 (['mania'].includes(score.ruleset)) && (
-                                    <ScoreStat label="Good" value={FormatNumber(score.statistics_good)} color={GetHitResultColor('good')[400]} />
+                                    <ScoreStat label="Good" value={<NumberFlow value={score.statistics_good} />} color={GetHitResultColor('good')[400]} />
                                 )
                             }
                             {
                                 (['osu', 'taiko', 'mania'].includes(score.ruleset)) && (
-                                    <ScoreStat label="OK" value={FormatNumber(score.statistics_ok)} color={GetHitResultColor('ok')[500]} />
+                                    <ScoreStat label="OK" value={<NumberFlow value={score.statistics_ok} />} color={GetHitResultColor('ok')[500]} />
                                 )
                             }
                             {
                                 (['osu', 'mania'].includes(score.ruleset)) && (
-                                    <ScoreStat label="Meh" value={FormatNumber(score.statistics_meh)} color={GetHitResultColor('meh')[500]} />
+                                    <ScoreStat label="Meh" value={<NumberFlow value={score.statistics_meh} />} color={GetHitResultColor('meh')[500]} />
                                 )
                             }
                             {
                                 (['osu', 'taiko', 'fruits', 'mania'].includes(score.ruleset)) && (
-                                    <ScoreStat label="Miss" value={FormatNumber(score.statistics_miss)} color={GetHitResultColor('miss')[500]} />
+                                    <ScoreStat label="Miss" value={<NumberFlow value={score.statistics_miss} />} color={GetHitResultColor('miss')[500]} />
                                 )
                             }
                         </div>
                         <div className={scoreStatsStyles['score-info__group-row']}>
                             {
                                 (['osu'].includes(score.ruleset)) && (
-                                    <ScoreStat label="Slider Tick" value={FormatNumber(score.statistics_large_tick_hit)} limitValue={FormatNumber(score.maximum_statistics_large_tick_hit)} color={GetHitResultColor('large_tick_hit')[200]} />
+                                    <ScoreStat label="Slider Tick" value={<NumberFlow value={score.statistics_large_tick_hit} />} limitValue={FormatNumber(score.maximum_statistics_large_tick_hit)} color={GetHitResultColor('large_tick_hit')[200]} />
                                 )
                             }
 
                             {
                                 (['osu'].includes(score.ruleset)) && (
-                                    <ScoreStat label="Slider End" value={FormatNumber(score.statistics_small_tick_hit + score.statistics_slider_tail_hit)} limitValue={FormatNumber(score.maximum_statistics_small_tick_hit + score.maximum_statistics_slider_tail_hit)} color={GetHitResultColor('small_tick_hit')[200]} />
+                                    <ScoreStat label="Slider End" value={<NumberFlow value={score.statistics_small_tick_hit + score.statistics_slider_tail_hit} />} limitValue={FormatNumber(score.maximum_statistics_small_tick_hit + score.maximum_statistics_slider_tail_hit)} color={GetHitResultColor('small_tick_hit')[200]} />
                                 )
                             }
 
                             {
                                 (['osu'].includes(score.ruleset)) && (
-                                    <ScoreStat label="Spinner Bonus" value={FormatNumber(score.statistics_large_bonus)} limitValue={FormatNumber(score.maximum_statistics_large_bonus)} color={GetHitResultColor('large_bonus')[100]} />
+                                    <ScoreStat label="Spinner Bonus" value={<NumberFlow value={score.statistics_large_bonus} />} limitValue={FormatNumber(score.maximum_statistics_large_bonus)} color={GetHitResultColor('large_bonus')[100]} />
                                 )
                             }
 
                             {
                                 (['osu'].includes(score.ruleset)) && (
-                                    <ScoreStat label="Spinner Spin" value={FormatNumber(score.statistics_small_bonus)} limitValue={FormatNumber(score.maximum_statistics_small_bonus)} color={GetHitResultColor('small_bonus')[100]} />
+                                    <ScoreStat label="Spinner Spin" value={<NumberFlow value={score.statistics_small_bonus} />} limitValue={FormatNumber(score.maximum_statistics_small_bonus)} color={GetHitResultColor('small_bonus')[100]} />
                                 )
                             }
 
                             {
                                 (['fruits'].includes(score.ruleset)) && (
-                                    <ScoreStat label="Small Droplet" value={FormatNumber(score.statistics_small_tick_hit)} limitValue={FormatNumber(score.maximum_statistics_small_tick_hit)} color={GetHitResultColor('small_tick_hit')[200]} />
+                                    <ScoreStat label="Small Droplet" value={<NumberFlow value={score.statistics_small_tick_hit} />} limitValue={FormatNumber(score.maximum_statistics_small_tick_hit)} color={GetHitResultColor('small_tick_hit')[200]} />
                                 )
                             }
                         </div>
@@ -137,7 +138,7 @@ function ScoreViewBase({ score }) {
                         <span>Played on {DateToString(score.ended_at)}</span>
                     </div>
                     <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__rankdate']}`}>
-                        <span>ID: {score.id}</span>
+                        <span>ID: <NumberFlow format={ { useGrouping: false } } value={score.id} /></span>
                     </div>
                 </Box>
             </div>

@@ -33,6 +33,7 @@ function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, t
                 <Table size="small" sx={{
                     [`& .${tableCellClasses.root}`]: {
                         borderBottom: "none",
+                        color: 'white !important',
                     },
                     borderCollapse: 'separate',
                     borderSpacing: '0 8px',
