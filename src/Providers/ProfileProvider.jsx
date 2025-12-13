@@ -1,11 +1,7 @@
-import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useApi } from "./ApiProvider";
-import { FormatNumber, GetRulesetNameFromId } from "../Misc/Helper";
-import { BuildProfileStatistics, MapScoreBeatmaps, ProcessBeatmaps, ProcessScores, ProcessUser } from "../Misc/ProfileHelper";
-import { useParams } from "react-router";
-import { GenerateSessions } from "../Misc/SessionHelper";
-import { useScoreView } from "./ScoreViewProvider";
+import { FormatNumber, GetRulesetNameFromId } from "../util/Helper";
+import { BuildProfileStatistics, MapScoreBeatmaps, ProcessBeatmaps, ProcessScores, ProcessUser } from "../util/ProfileHelper";
 
 const ProfileContext = createContext();
 

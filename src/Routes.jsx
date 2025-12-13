@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router";
-import RouteIndex from "./Routes/RouteIndex";
+import RouteIndex from "./routes/RouteIndex";
 
 createBrowserRouter([
     {

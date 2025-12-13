@@ -1,11 +1,10 @@
 import { alpha, AppBar, Avatar, Box, Button, IconButton, InputBase, Menu, styled, Toolbar, Typography, useTheme } from "@mui/material";
 import Config from "../Data/Config";
 import { Link } from "react-router";
-import { useAuth } from "../Providers/AuthProvider";
+import { useAuth } from "../providers/AuthProvider";
 import { useState } from "react";
-import { GetOsuAuthUrl } from "../Misc/ApiHelper";
+import { GetOsuAuthUrl } from "../util/ApiHelper";
 import LoadingButton from "./LoadingButton";
-import SearchIcon from '@mui/icons-material/Search';
 import DebouncedTextField from "./DebouncedTextField";
 
 const Search = styled('div')(({ theme }) => ({

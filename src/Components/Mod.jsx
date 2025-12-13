@@ -1,6 +1,6 @@
-import { GetModExtendedContent } from '../Misc/ModHelper';
-import modStyles from '../Style/mod.module.less';
-import ModTooltip from './Tooltips/ModTooltip';
+import { GetModExtendedContent } from '../util/ModHelper';
+import modStyles from '../styles/mod.module.less';
+import ModTooltip from './tooltips/ModTooltip';
 
 function Mod({ mod, data, ruleset }) {
     if (!data) return null;

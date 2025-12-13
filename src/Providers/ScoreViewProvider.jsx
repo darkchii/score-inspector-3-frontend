@@ -1,7 +1,6 @@
 import { Fade, Modal } from "@mui/material";
 import { createContext, useContext, useState } from "react";
-import modalStyles from '../Style/modal.module.less';
-import ScoreView from "../Components/ScoreView";
+import ScoreView from "../components/ScoreView";
 
 const ScoreViewContext = createContext();
 

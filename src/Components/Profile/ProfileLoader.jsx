@@ -1,5 +1,5 @@
 import { Avatar, Box, Card, CircularProgress, Collapse, Divider, Grid, Grow, LinearProgress, List, ListItem, ListItemText, Skeleton, Step, StepLabel, Stepper, Typography } from "@mui/material";
-import { useProfile } from "../../Providers/ProfileProvider";
+import { useProfile } from "../../providers/ProfileProvider";
 import { TransitionGroup } from "react-transition-group";
 import { green, orange, red } from "@mui/material/colors";
 import ErrorIcon from '@mui/icons-material/Error';

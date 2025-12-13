@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import scoreViewStyles from '../Style/score-view.module.less';
+import scoreViewStyles from '../styles/score-view.module.less';
 import ScoreViewBase from './ScoreViewBase';
 import { Collapse } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';

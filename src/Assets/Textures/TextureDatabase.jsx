@@ -1,19 +1,19 @@
 import PageNotFoundKirino from './kirino-oreimo.gif';
 
-import RulesetCatchIcon from './Icons/RulesetCatch.png';
-import RulesetManiaIcon from './Icons/RulesetMania.png';
-import RulesetOsuIcon from './Icons/RulesetOsu.png';
-import RulesetTaikoIcon from './Icons/RulesetTaiko.png';
+import RulesetCatchIcon from './icons/RulesetCatch.png';
+import RulesetManiaIcon from './icons/RulesetMania.png';
+import RulesetOsuIcon from './icons/RulesetOsu.png';
+import RulesetTaikoIcon from './icons/RulesetTaiko.png';
 
-import SVGGradeA from './Grades/GradeSmall-A.svg';
-import SVGGradeB from './Grades/GradeSmall-B.svg';
-import SVGGradeC from './Grades/GradeSmall-C.svg';
-import SVGGradeD from './Grades/GradeSmall-D.svg';
-import SVGGradeF from './Grades/GradeSmall-F.svg';
-import SVGGradeS from './Grades/GradeSmall-S.svg';
-import SVGGradeSH from './Grades/GradeSmall-S-Silver.svg';
-import SVGGradeX from './Grades/GradeSmall-SS.svg';
-import SVGGradeXH from './Grades/GradeSmall-SS-Silver.svg';
+import SVGGradeA from './grades/GradeSmall-A.svg';
+import SVGGradeB from './grades/GradeSmall-B.svg';
+import SVGGradeC from './grades/GradeSmall-C.svg';
+import SVGGradeD from './grades/GradeSmall-D.svg';
+import SVGGradeF from './grades/GradeSmall-F.svg';
+import SVGGradeS from './grades/GradeSmall-S.svg';
+import SVGGradeSH from './grades/GradeSmall-S-Silver.svg';
+import SVGGradeX from './grades/GradeSmall-SS.svg';
+import SVGGradeXH from './grades/GradeSmall-SS-Silver.svg';
 
 //Import EVERYTHING from ./Flags/ (country flags, its not feasible to do manually)
 
@@ -27,8 +27,8 @@ export function getFlagIcon(country_code){
     country_code = country_code.toUpperCase();
     try {
         // const flag = import(`../Assets/Flags/${country_code}.png`);
-        const path = `./Flags/${country_code}.png`;
-        const flag_modules = import.meta.glob('./Flags/*.png', {
+        const path = `./flags/${country_code}.png`;
+        const flag_modules = import.meta.glob('./flags/*.png', {
             eager: true
         });
         return flag_modules[path].default;

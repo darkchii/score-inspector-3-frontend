@@ -1,15 +1,15 @@
 import { Avatar, Box, Grid, Stack, Typography, useTheme } from '@mui/material';
-import scoreViewStyles from '../Style/score-view.module.less';
-import scoreInfoStyles from '../Style/score-info.module.less';
-import scoreStatsStyles from '../Style/score-info.module.less';
+import scoreViewStyles from '../styles/score-view.module.less';
+import scoreInfoStyles from '../styles/score-info.module.less';
+import scoreStatsStyles from '../styles/score-info.module.less';
 import ScoreDial from './ScoreDial';
-import { DateToString, FormatNumber, FormatNumberWithPrecision, GetRulesetIconFromId } from '../Misc/Helper';
+import { DateToString, FormatNumber, FormatNumberWithPrecision, GetRulesetIconFromId } from '../util/Helper';
 import ModDisplay from './ModDisplay';
 import DifficultyBadge from './DifficultyBadge';
-import { GetHitResultColor, GetStarRating } from '../Misc/ScoreHelper';
+import { GetHitResultColor, GetStarRating } from '../util/ScoreHelper';
 import ScoreStat from './ScoreStat';
 import { grey } from '@mui/material/colors';
-import BetterTooltip from './Tooltips/BetterTooltip';
+import BetterTooltip from './tooltips/BetterTooltip';
 
 function ScoreViewBase({ score }) {
     const theme = useTheme();

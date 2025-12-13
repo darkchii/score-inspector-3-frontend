@@ -1,9 +1,9 @@
 import { Avatar, Box, Container, Fade, Typography, useTheme } from "@mui/material";
-import { useProfile } from "../../Providers/ProfileProvider";
+import { useProfile } from "../../providers/ProfileProvider";
 import ProfileRulesetSelector from "./ProfileRulesetSelector";
-import { getFlagIcon } from "../../Assets/Textures/TextureDatabase";
+import { getFlagIcon } from "../../assets/textures/TextureDatabase";
 import NumberFlow from "@number-flow/react";
-import { getContrastColor } from "../../Misc/Helper";
+import { getContrastColor } from "../../util/Helper";
 
 const _profileHeaderImageRatio = 20 / 5; //Width / Height (2000x500)
 

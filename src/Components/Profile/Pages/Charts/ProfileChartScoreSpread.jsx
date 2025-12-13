@@ -1,7 +1,7 @@
 import { ScatterChart } from "@mui/x-charts";
-import { useProfile } from "../../../../Providers/ProfileProvider";
-import { useScoreView } from "../../../../Providers/ScoreViewProvider";
-import { FormatNumberWithPrecision } from "../../../../Misc/Helper";
+import { useProfile } from "../../../../providers/ProfileProvider";
+import { useScoreView } from "../../../../providers/ScoreViewProvider";
+import { FormatNumberWithPrecision } from "../../../../util/Helper";
 import { Alert } from "@mui/material";
 
 function PerformanceChartScoreSpread() {

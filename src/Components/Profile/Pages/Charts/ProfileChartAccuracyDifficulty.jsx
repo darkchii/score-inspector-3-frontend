@@ -1,7 +1,7 @@
 import { ScatterChart } from '@mui/x-charts/ScatterChart';
-import { useProfile } from '../../../../Providers/ProfileProvider';
-import { FormatNumberWithPrecision } from '../../../../Misc/Helper';
-import { useScoreView } from '../../../../Providers/ScoreViewProvider';
+import { useProfile } from '../../../../providers/ProfileProvider';
+import { FormatNumberWithPrecision } from '../../../../util/Helper';
+import { useScoreView } from '../../../../providers/ScoreViewProvider';
 import { Alert } from '@mui/material';
 
 function ProfileChartAccuracyDifficulty() {

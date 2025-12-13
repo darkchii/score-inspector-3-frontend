@@ -1,15 +1,15 @@
 import { useParams } from "react-router";
 import { useProfile } from "../Providers/ProfileProvider";
 import { useEffect, useState } from "react";
-import ProfileLoader from "../Components/Profile/ProfileLoader";
-import ProfileHeader from "../Components/Profile/ProfileHeader";
+import ProfileLoader from "../components/profile/ProfileLoader";
+import ProfileHeader from "../components/profile/ProfileHeader";
 import { Box, Collapse, Fade, Tab, Tabs, useTheme } from "@mui/material";
-import ProfilePageMain from "../Components/Profile/Pages/ProfilePageMain";
-import ProfilePageSessions from "../Components/Profile/Pages/ProfilePageSessions";
-import ProfilePageScores from "../Components/Profile/Pages/ProfilePageScores";
-import ProfilePagePacks from "../Components/Profile/Pages/ProfilePagePacks";
+import ProfilePageMain from "../components/profile/pages/ProfilePageMain";
+import ProfilePageSessions from "../components/profile/pages/ProfilePageSessions";
+import ProfilePageScores from "../components/profile/pages/ProfilePageScores";
+import ProfilePagePacks from "../components/profile/pages/ProfilePagePacks";
 import NumberFlow from "@number-flow/react";
-import ProfilePageCharts from "../Components/Profile/Pages/ProfilePageCharts";
+import ProfilePageCharts from "../components/profile/pages/ProfilePageCharts";
 
 const pageComponents = {
     'main': { component: ProfilePageMain, title: 'Overview' },

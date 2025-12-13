@@ -1,7 +1,7 @@
 import { Box, Container, Grid, Paper, SvgIcon, Tooltip, Typography } from "@mui/material";
-import { useProfile } from "../../Providers/ProfileProvider";
-import { TextureDatabase } from "../../Assets/Textures/TextureDatabase";
-import { FormatNumber } from "../../Misc/Helper";
+import { useProfile } from "../../providers/ProfileProvider";
+import { TextureDatabase } from "../../assets/textures/TextureDatabase";
+import { FormatNumber } from "../../util/Helper";
 import NumberFlow from '@number-flow/react'
 
 function ProfileGrades() {

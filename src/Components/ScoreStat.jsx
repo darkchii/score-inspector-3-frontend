@@ -1,4 +1,4 @@
-import scoreStatsStyles from '../Style/score-info.module.less';
+import scoreStatsStyles from '../styles/score-info.module.less';
 
 function ScoreStat({ label, value, limitValue = null, color = null, extraValue = null, extraClass = null }) {
     return (<div className={scoreStatsStyles['score-info__stat']}>

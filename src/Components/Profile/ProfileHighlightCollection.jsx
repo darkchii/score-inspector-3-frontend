@@ -1,14 +1,12 @@
-import { Box, Grid } from "@mui/material";
-import { useProfile } from "../../Providers/ProfileProvider";
+import { Grid } from "@mui/material";
+import { useProfile } from "../../providers/ProfileProvider";
 import ProfileHighlight from "./ProfileHighlight";
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import NumberFlow from "@number-flow/react";
-import { Icon } from "@iconify/react";
-import { FormatDuration, FormatDurationNumberFlow } from "../../Misc/Helper";
+import { FormatDurationNumberFlow } from "../../util/Helper";
 import { grey } from "@mui/material/colors";
 
 function ProfileHighlightCollection() {
-    const { userLive, activeRuleset, getRulesetStatistics, getRulesetUser, getApiUser } = useProfile();
+    const { activeRuleset, getRulesetStatistics, getRulesetUser, getApiUser } = useProfile();
 
     return (
         <>

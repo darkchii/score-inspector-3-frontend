@@ -6,10 +6,10 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import './main.css';
 import { BrowserRouter } from 'react-router';
-import { AuthProvider } from './Providers/AuthProvider.jsx';
-import { ApiProvider } from './Providers/ApiProvider.jsx';
-import { ProfileProvider } from './Providers/ProfileProvider.jsx';
-import { ScoreViewProvider } from './Providers/ScoreViewProvider.jsx';
+import { AuthProvider } from './providers/AuthProvider.jsx';
+import { ApiProvider } from './providers/ApiProvider.jsx';
+import { ProfileProvider } from './providers/ProfileProvider.jsx';
+import { ScoreViewProvider } from './providers/ScoreViewProvider.jsx';
 
 const _providers = [
   ApiProvider,

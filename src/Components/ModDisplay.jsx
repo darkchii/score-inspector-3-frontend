@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import Mod from "./Mod";
-import { GetModData } from "../Misc/ModHelper";
+import { GetModData } from "../util/ModHelper";
 
 function ModDisplay({ ruleset, mods }) {
     return (

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import scoreViewStyles from '../Style/score-view.module.less';
-import ReplayStorage from '../Misc/Replay/ReplayStorage';
+import scoreViewStyles from '../styles/score-view.module.less';
+import ReplayStorage from '../util/Replay/ReplayStorage';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { ScatterChart } from '@mui/x-charts/ScatterChart';
 import { Typography } from '@mui/material';

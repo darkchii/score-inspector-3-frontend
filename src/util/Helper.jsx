@@ -1,11 +1,10 @@
-import Config from '../Data/Config.json';
+import Config from '../data/Config.json';
 import { toast } from "react-toastify";
-import { TextureDatabase } from '../Assets/Textures/TextureDatabase';
+import { TextureDatabase } from '../assets/textures/TextureDatabase';
 import { blue, green, pink, purple } from '@mui/material/colors';
 import { HasHiddenMod, HasMod } from './ModHelper';
-import ScoreData from '../Data/ScoreData.json';
+import ScoreData from '../data/ScoreData.json';
 import NumberFlow from '@number-flow/react';
-import { LTTB } from 'downsample';
 
 export const ShowNotification = (message, severity) => {
     toast[severity](message, Config.NOTIFICATIONS);

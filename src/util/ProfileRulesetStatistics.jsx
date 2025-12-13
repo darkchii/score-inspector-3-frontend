@@ -1,4 +1,3 @@
-import { ASAP, LTTB } from "downsample";
 import { GetGradeColor, GetRulesetId } from "./Helper";
 import { ProfileRulesetScoreSet } from "./ProfileRulesetScoreSet";
 

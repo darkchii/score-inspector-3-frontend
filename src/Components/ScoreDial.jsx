@@ -1,8 +1,8 @@
 import * as d3 from 'd3';
-import { displayRank, GetGradeFromAccuracy, rankCutoffs } from '../Misc/Helper';
+import { displayRank, GetGradeFromAccuracy, rankCutoffs } from '../util/Helper';
 import { animated, useSpring } from '@react-spring/web';
 import { useState } from 'react';
-import dialStyles from '../Style/dial.module.less';
+import dialStyles from '../styles/dial.module.less';
 
 function ScoreDial({ score }) {
     const arc = d3.arc();

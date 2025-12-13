@@ -1,18 +1,16 @@
 //Basically a Table wrapper, so all columns line up properly
 
 import { Box, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, tableRowClasses, Typography, useTheme } from "@mui/material";
-import { getGradeIcon } from "../Assets/Textures/TextureDatabase";
-import { FormatNumberWithPrecision, GetRulesetIconFromId, GetRulesetNameFromId, TimeAgo } from "../Misc/Helper";
-import NumberFlow from "@number-flow/react";
+import { getGradeIcon } from "../assets/textures/TextureDatabase";
+import { FormatNumberWithPrecision, GetRulesetIconFromId, GetRulesetNameFromId, TimeAgo } from "../util/Helper";
 import ModDisplay from "./ModDisplay";
 import { grey } from "@mui/material/colors";
 import { useEffect, useState } from "react";
-import { useScoreView } from "../Providers/ScoreViewProvider";
+import { useScoreView } from "../providers/ScoreViewProvider";
 import WarningIcon from '@mui/icons-material/Warning';
 import DifficultyBadge from "./DifficultyBadge";
-import { GetStarRating } from "../Misc/ScoreHelper";
-import ClearIcon from '@mui/icons-material/Clear';
-import BetterTooltip from "./Tooltips/BetterTooltip";
+import { GetStarRating } from "../util/ScoreHelper";
+import BetterTooltip from "./tooltips/BetterTooltip";
 
 const truncateStep = 10;
 

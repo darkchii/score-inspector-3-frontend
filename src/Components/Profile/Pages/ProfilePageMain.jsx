@@ -3,9 +3,9 @@ import ProfileGrades from "../ProfileGrades";
 import ProfileHighlightCollection from "../ProfileHighlightCollection";
 import ProfileRecentActivity from "../ProfileRecentActivity";
 import ScoreCard from "../../ScoreCard";
-import { useProfile } from "../../../Providers/ProfileProvider";
+import { useProfile } from "../../../providers/ProfileProvider";
 import NumberFlow from "@number-flow/react";
-import { DateToString } from "../../../Misc/Helper";
+import { DateToString } from "../../../util/Helper";
 import DifficultyBadge from "../../DifficultyBadge";
 
 function ProfilePageMain() {

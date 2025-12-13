@@ -1,6 +1,6 @@
-import { getDiffColour } from '../Misc/DifficultyHelper';
-import { FormatNumberWithPrecision } from '../Misc/Helper';
-import difficultyBadgeStyles from '../Style/difficulty-badge.module.less';
+import { getDiffColour } from '../util/DifficultyHelper';
+import { FormatNumberWithPrecision } from '../util/Helper';
+import difficultyBadgeStyles from '../styles/difficulty-badge.module.less';
 import StarIcon from '@mui/icons-material/Star';
 
 function DifficultyBadge({ difficulty }) {

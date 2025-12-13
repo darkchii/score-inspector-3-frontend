@@ -1,5 +1,5 @@
 import { Box, Pagination, Typography } from "@mui/material";
-import { useProfile } from "../../../Providers/ProfileProvider";
+import { useProfile } from "../../../providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import ScoreList from "../../ScoreList";
 

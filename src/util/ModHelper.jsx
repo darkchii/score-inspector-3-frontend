@@ -1,5 +1,5 @@
 import { green, red } from "@mui/material/colors";
-import ModData from "../Data/Mods.json";
+import ModData from "../data/Mods.json";
 import { FormatNumber, FormatNumberWithPrecision, GetRulesetId } from "./Helper";
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';

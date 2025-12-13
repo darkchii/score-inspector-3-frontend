@@ -1,9 +1,9 @@
 import { Button, Chip, Stack, Typography } from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { GetRulesetIconFromId, TimeAgo } from "../Misc/Helper";
-import { useScoreView } from "../Providers/ScoreViewProvider";
+import { GetRulesetIconFromId, TimeAgo } from "../util/Helper";
+import { useScoreView } from "../providers/ScoreViewProvider";
 import Marquee from "./Marquee";
-import scoreCardStyles from '../Style/score-card.module.less';
+import scoreCardStyles from '../styles/score-card.module.less';
 
 function ScoreCard({ score, title = null, value = null }) {
     const { loadScoreView } = useScoreView();

@@ -1,5 +1,5 @@
 import { Box, List, Stack, Typography } from "@mui/material";
-import { useProfile } from "../../Providers/ProfileProvider";
+import { useProfile } from "../../providers/ProfileProvider";
 import ScoreList from "../ScoreList";
 
 function ProfileRecentActivity() {

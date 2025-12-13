@@ -1,4 +1,4 @@
-import Config from '../Data/Config.json';
+import Config from '../data/Config.json';
 
 function GetApiMode() {
     return Config.DEV_MODE ? 'DEVELOPMENT' : 'PRODUCTION';

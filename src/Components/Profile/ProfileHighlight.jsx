@@ -1,6 +1,4 @@
-import { Box, Divider, Grid, Paper } from "@mui/material";
-import { grey } from "@mui/material/colors";
-import React from "react";
+import { Box, Paper } from "@mui/material";
 
 function ProfileHighlight({ title, value }) {
     return (

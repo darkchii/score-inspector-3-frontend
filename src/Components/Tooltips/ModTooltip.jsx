@@ -1,5 +1,5 @@
 import { Box, List, ListItem, ListItemText, styled, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, Tooltip, Typography, useTheme } from "@mui/material";
-import { GetModSettingForDisplay } from "../../Misc/ModHelper";
+import { GetModSettingForDisplay } from "../../util/ModHelper";
 import ModDisplay from "../ModDisplay";
 
 const LocalStyledTooltip = styled(({ className, ...props }) => (

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { ShowNotification } from "../Misc/Helper";
-import { GetAPI } from "../Misc/ApiHelper";
+import { ShowNotification } from "../util/Helper";
+import { GetAPI } from "../util/ApiHelper";
 import axios from "axios";
 
 const AuthContext = createContext();

@@ -1,11 +1,11 @@
 import { Alert, Box, Divider, Grid, List, ListItemButton, ListItemText, Pagination, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, Typography, useTheme } from "@mui/material";
-import { useProfile } from "../../../Providers/ProfileProvider";
+import { useProfile } from "../../../providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import ScoreList from "../../ScoreList";
-import { TextureDatabase } from "../../../Assets/Textures/TextureDatabase";
+import { TextureDatabase } from "../../../assets/textures/TextureDatabase";
 import NumberFlow from "@number-flow/react";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { FormatDuration } from "../../../Misc/Helper";
+import { FormatDuration } from "../../../util/Helper";
 
 function SessionDisplay({ session }) {
     const theme = useTheme();

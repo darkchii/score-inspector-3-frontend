@@ -1,13 +1,13 @@
 import { Box, CardContent, createTheme, CssBaseline, Paper, ThemeProvider } from "@mui/material"
 import { Route, Routes, useSearchParams } from "react-router";
-import { useAuth } from "./Providers/AuthProvider";
+import { useAuth } from "./providers/AuthProvider";
 import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
-import RouteIndex from "./Routes/RouteIndex";
-import RouteProfile from "./Routes/RouteProfile";
-import Header from "./Components/Header";
-import Footer from "./Components/Footer";
-import Route404 from "./Routes/Route404";
+import RouteIndex from "./routes/RouteIndex";
+import RouteProfile from "./routes/RouteProfile";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import Route404 from "./routes/Route404";
 import { pink } from "@mui/material/colors";
 
 const theme = createTheme({

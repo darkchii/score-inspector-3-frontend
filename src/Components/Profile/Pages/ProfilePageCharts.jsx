@@ -1,9 +1,9 @@
 import { Box, Collapse, Grid, List, ListItemButton, ListItemText } from "@mui/material";
-import ProfileChartAccuracyDifficulty from "./Charts/ProfileChartAccuracyDifficulty";
-import ProfileChartPerformanceSpread from "./Charts/ProfileChartPerformanceSpread";
-import ProfileChartScoreSpread from "./Charts/ProfileChartScoreSpread";
+import ProfileChartAccuracyDifficulty from "./charts/ProfileChartAccuracyDifficulty";
+import ProfileChartPerformanceSpread from "./charts/ProfileChartPerformanceSpread";
+import ProfileChartScoreSpread from "./charts/ProfileChartScoreSpread";
 import { useState } from "react";
-import ProfileChartPeriodic from "./Charts/ProfileChartPeriodic";
+import ProfileChartPeriodic from "./charts/ProfileChartPeriodic";
 
 const CHART_PAGES = {
     ['accuracy-difficulty']: {

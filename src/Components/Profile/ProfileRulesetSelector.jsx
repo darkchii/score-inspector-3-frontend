@@ -1,7 +1,7 @@
 import { Box, Button, Divider, Fade, IconButton, Tooltip, useTheme } from "@mui/material";
-import { useProfile } from "../../Providers/ProfileProvider";
-import { TextureDatabase } from "../../Assets/Textures/TextureDatabase";
-import { GetRulesetColor, GetRulesets } from "../../Misc/Helper";
+import { useProfile } from "../../providers/ProfileProvider";
+import { TextureDatabase } from "../../assets/textures/TextureDatabase";
+import { GetRulesetColor, GetRulesets } from "../../util/Helper";
 import { grey } from "@mui/material/colors";
 
 function ProfileRulesetSelector() {
