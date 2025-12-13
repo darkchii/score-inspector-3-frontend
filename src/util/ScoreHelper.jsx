@@ -117,6 +117,10 @@ export const CalculateBonusPerformance = (scoreCount) => {
 }
 
 export const DetermineIsScoreFC = (score) => {
+    if(!score.beatmap){
+        return false;
+    }
+
     //just combo = beatmap max combo is not enough, since we recognize slider end misses as full combos too
     if (score.grade === 'X' || score.grade === 'XH') {
         return true;

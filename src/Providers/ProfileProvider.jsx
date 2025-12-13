@@ -138,18 +138,18 @@ export function ProfileProvider({ children }) {
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             const [mappedScores, missingCount] = await MapScoreBeatmaps(scores, _beatmaps);
-            setScoresLive(mappedScores);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Mapped beatmaps to scores (${FormatNumber(missingCount)} scores missing beatmaps)`);
             setFetchLog(_fetchLog);
-
+            
             
             _fetchLog.push("%working% Processing scores");
             setFetchLog(_fetchLog);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
-            await ProcessScores(mappedScores, user);
+            let processedScores = await ProcessScores(mappedScores, user);
+            setScoresLive(processedScores);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Processed scores`);
@@ -160,7 +160,7 @@ export function ProfileProvider({ children }) {
             setFetchLog(_fetchLog);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
-            const profileStats = await BuildProfileStatistics(mappedScores, _beatmaps);
+            const profileStats = await BuildProfileStatistics(processedScores, _beatmaps);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Built profile statistics`);
@@ -170,7 +170,7 @@ export function ProfileProvider({ children }) {
             setAvailableRulesets(Object.keys(profileStats.rulesets));
 
             let _scoreMap = {};
-            mappedScores.forEach(score => {
+            processedScores.forEach(score => {
                 _scoreMap[score.id] = score;
             });
             setScoreMap(_scoreMap);

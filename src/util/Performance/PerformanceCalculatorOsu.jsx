@@ -63,7 +63,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
 
         //if so
         if (score.mods.some(mod => mod.acronym === 'SO') && this.totalHits > 0) {
-            this.multiplier *= 1.0 - Math.pow(score.beatmap.count_spinners - this.totalHits, 0.85);
+            this.multiplier *= 1.0 - Math.pow(score.beatmap.count_spinners / this.totalHits, 0.85);
         }
 
         //if rx
@@ -123,7 +123,13 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
             let relevantMissCount = Math.min(this.effectiveMissCount + this.aimEstimatedSliderBreaks, this.totalImperfectHits + this.countSliderTickMiss);
 
             aimValue *= this.calculateMissPenalty(relevantMissCount, score.attr_diff.aim_difficult_strain_count);
+            if(score.id === 4746396766){
+                console.log(`this.aimEstimatedSliderBreaks: ${this.aimEstimatedSliderBreaks}`);
+                console.log(`relevantMissCount: ${relevantMissCount}`);
+                console.log(`aimValue after miss penalty: ${aimValue}`);
+            }
         }
+
 
         if (score.mods.some(mod => mod.acronym === 'BL')) {
             aimValue *= 1.3 + (this.totalHits * (0.0016 / (1 + 2 * this.effectiveMissCount)) * Math.pow(this.accuracy, 16)) * (1 - 0.003 * score.beatmap_attributes.hp * score.beatmap_attributes.hp);
@@ -132,6 +138,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator {
         }
 
         aimValue *= this.accuracy;
+
         return aimValue;
     }
 

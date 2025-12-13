@@ -1,3 +1,5 @@
+import Beatmap from "../types/Beatmap";
+import Score from "../types/Score";
 import { GetRulesetNameFromId } from "./Helper";
 import { ReorderMods } from "./ModHelper";
 import PerformancePoints from "./performance/PerformancePoints";
@@ -129,12 +131,7 @@ export function getDedicationLevel(a, b, c, d, xp) {
 }
 
 export function ProcessBeatmaps(beatmaps) {
-    //Corrects data types
-    for (let i = 0; i < beatmaps.length; i++) {
-        beatmaps[i] = ProcessBeatmap(beatmaps[i]);
-    }
-
-    return beatmaps;
+    return beatmaps.map(beatmap => new Beatmap(beatmap));
 }
 
 function ProcessBeatmap(beatmap) {
@@ -182,8 +179,7 @@ export async function MapScoreBeatmaps(scores, beatmaps) {
     for (const score of scores) {
         const beatmap = beatmapMap.get(Number(score.beatmap_id));
         if (beatmap) {
-            score.beatmap = JSON.parse(JSON.stringify(beatmap)); // Deep copy to avoid reference issues
-            score.beatmap = ProcessBeatmap(score.beatmap); // Ensure beatmap is processed
+            score.beatmap = beatmap.clone();
         } else {
             missingCount++;
             score.beatmap = null; // No matching beatmap found
@@ -197,14 +193,7 @@ export async function MapScoreBeatmaps(scores, beatmaps) {
 }
 
 export async function ProcessScores(scores, user = null) {
-    for (let i = 0; i < scores.length; i++) {
-        scores[i] = await ProcessScore(scores[i]);
-
-        if (user) {
-            scores[i].user = user;
-        }
-    }
-    return scores;
+    return scores.map(score => new Score(score, score.beatmap, user));
 }
 
 async function ProcessScore(score) {
