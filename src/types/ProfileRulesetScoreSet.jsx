@@ -1,5 +1,5 @@
 import { CalculateBonusPerformance, CalculateRawPerformance } from "../util/ScoreHelper";
-import { GenerateSessions } from "../util/SessionHelper";
+import SessionCollection from "./SessionCollection";
 
 export class ProfileRulesetScoreSet {
     constructor() {
@@ -136,7 +136,7 @@ export class ProfileRulesetScoreSet {
         this.reorder('ended_at', true);
         this.recent_scores = this.scores.slice(0, 100);
 
-        this.sessions = GenerateSessions(this.scores);
+        this.sessions = SessionCollection.fromScores(this.scores);
         this.sessions.sessions.sort((a, b) => b.start - a.start);
     }
 
