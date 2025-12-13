@@ -1,5 +1,5 @@
-import { CalculateBonusPerformance, CalculateRawPerformance } from "./ScoreHelper";
-import { GenerateSessions } from "./SessionHelper";
+import { CalculateBonusPerformance, CalculateRawPerformance } from "../util/ScoreHelper";
+import { GenerateSessions } from "../util/SessionHelper";
 
 export class ProfileRulesetScoreSet {
     constructor() {

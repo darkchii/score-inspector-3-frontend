@@ -1,4 +1,4 @@
-import { GetRulesetNameFromId } from "./Helper";
+import { GetRulesetNameFromId } from "../util/Helper";
 import { ProfileRulesetStatistics } from "./ProfileRulesetStatistics";
 
 export class ProfileStatistics {

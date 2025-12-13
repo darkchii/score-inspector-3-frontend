@@ -1,6 +1,6 @@
-import DifficultyCalculationUtils from "../DifficultyCalculationUtils";
-import HitWindowsTaiko from "../HitWindows/HitWindowsTaiko";
-import { CalculateRateWithMods } from "../ModHelper";
+import DifficultyCalculationUtils from "../../util/DifficultyCalculationUtils";
+import HitWindowsTaiko from "../hitWindows/HitWindowsTaiko";
+import { CalculateRateWithMods } from "../../util/ModHelper";
 import PerformanceCalculator from "./PerformanceCalculator";
 
 class PerformanceCalculatorTaiko extends PerformanceCalculator {

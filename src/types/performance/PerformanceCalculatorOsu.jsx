@@ -1,9 +1,9 @@
 import BeatmapDifficultyInfo from "../BeatmapDifficultyInfo";
-import DifficultyCalculationUtils from "../DifficultyCalculationUtils";
-import HitWindowsOsu from "../HitWindows/HitWindowsOsu";
-import MathHelper from "../MathHelper";
-import { CalculateRateWithMods, CalculateVisibilityBonus } from "../ModHelper";
-import OsuLegacyScoreMissCalculator from "./MissCalculator/OsuLegacyScoreMissCalculator";
+import DifficultyCalculationUtils from "../../util/DifficultyCalculationUtils";
+import HitWindowsOsu from "../hitWindows/HitWindowsOsu";
+import MathHelper from "../../util/MathHelper";
+import { CalculateRateWithMods, CalculateVisibilityBonus } from "../../util/ModHelper";
+import OsuLegacyScoreMissCalculator from "../missCalculator/OsuLegacyScoreMissCalculator";
 import PerformanceCalculator from "./PerformanceCalculator";
 
 class PerformanceCalculatorOsu extends PerformanceCalculator {

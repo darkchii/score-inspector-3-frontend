@@ -1,6 +1,6 @@
 import Beatmap from "../types/Beatmap";
+import { ProfileStatistics } from "../types/ProfileStatistics";
 import Score from "../types/Score";
-import { ProfileStatistics } from "./ProfileStatistics";
 
 export async function ProcessUser(user) {
     user.osuAlternative.rulesets = {};

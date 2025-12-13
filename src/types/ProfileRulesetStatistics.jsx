@@ -1,4 +1,4 @@
-import { GetGradeColor, GetRulesetId } from "./Helper";
+import { GetGradeColor, GetRulesetId } from "../util/Helper";
 import { ProfileRulesetScoreSet } from "./ProfileRulesetScoreSet";
 
 const PERIODIC_SUFFIXES = ['daily', 'monthly'];

@@ -1,6 +1,6 @@
 import { GetRulesetNameFromId } from "../util/Helper";
 import { ReorderMods } from "../util/ModHelper";
-import PerformancePoints from "../util/performance/PerformancePoints";
+import PerformancePoints from "./performance/PerformancePoints";
 import { BeatmapApplyModsToDifficulty, DetermineIsScoreFC } from "../util/ScoreHelper";
 import ScoreDifficulty from "./ScoreDifficulty";
 

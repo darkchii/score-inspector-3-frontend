@@ -1,6 +1,6 @@
 import BeatmapDifficultyInfo from "../BeatmapDifficultyInfo";
-import MathHelper from "../MathHelper";
-import { CalculateRateWithMods } from "../ModHelper";
+import MathHelper from "../../util/MathHelper";
+import { CalculateRateWithMods } from "../../util/ModHelper";
 import PerformanceCalculator from "./PerformanceCalculator";
 
 class PerformanceCalculatorFruits extends PerformanceCalculator {

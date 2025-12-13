@@ -1,5 +1,5 @@
 import axios from "axios";
-import { GetAPI } from "../ApiHelper";
+import { GetAPI } from "../../util/ApiHelper";
 import Replay from "./Replay";
 
 const DOWNLOAD_URL = `${GetAPI()}/replay/{scoreId}`;

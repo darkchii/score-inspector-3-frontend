@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import scoreViewStyles from '../styles/score-view.module.less';
-import ReplayStorage from '../util/Replay/ReplayStorage';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { ScatterChart } from '@mui/x-charts/ScatterChart';
 import { Typography } from '@mui/material';
+import ReplayStorage from '../types/Replay/ReplayStorage';
 
 //Holds the extra data for a score (extra PP breakdown, replay info, etc)
 function ScoreViewExtended({ score }) {
