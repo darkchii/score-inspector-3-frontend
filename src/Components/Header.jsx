@@ -6,6 +6,7 @@ import { useState } from "react";
 import { GetOsuAuthUrl } from "../Misc/ApiHelper";
 import LoadingButton from "./LoadingButton";
 import SearchIcon from '@mui/icons-material/Search';
+import DebouncedTextField from "./DebouncedTextField";
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -75,15 +76,13 @@ function Header() {
                             fontStyle: 'italic',
                         }}>v3</Typography>
                 </Box>
-                <Search>
-                    <SearchIconWrapper>
-                        <SearchIcon />
-                    </SearchIconWrapper>
-                    <StyledInputBase
+                {/* <StyledInputBase
                         placeholder="Search…"
                         inputProps={{ 'aria-label': 'search' }}
-                    />
-                </Search>
+                    /> */}
+                <div style={{margin: '5px'}}>
+                    <DebouncedTextField label="Search..." variant="standard" onDebouncedChange={(value) => console.log(value)} />
+                </div>
                 <Box sx={{ display: { xs: 'none', sm: 'none', md: 'none', lg: 'block', flexGrow: 1 } }}>
                 </Box>
                 <Box sx={{ flexGrow: 0 }}>

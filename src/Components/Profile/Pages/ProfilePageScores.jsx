@@ -14,11 +14,10 @@ function ProfilePageScores() {
     useEffect(() => {
         const profileStatistics = getRulesetStatistics(activeRuleset);
         if (profileStatistics) {
-            const allScores = profileStatistics.scores_set.scores?.slice() || [];
+            let allScores = profileStatistics.scores_set.scores?.slice() || [];
             setScoreCount(allScores.length);
 
-            //sort by pp descending (first check .performance.base.pp, then fallback to score.pp)
-            allScores.sort((a, b) => (b.performance?.base?.pp ?? b.pp) - (a.performance?.base?.pp ?? a.pp));
+            allScores.sort((a, b) => (b.implied_pp) - (a.implied_pp));
 
             //generate all page arrays
             const pages = [];

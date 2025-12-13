@@ -60,15 +60,32 @@ class Replay {
         let graphData = {};
 
         if(replay.ruleset_id === 0){
-            //heatmap (only where keys are pressed)
-            const heatmap = [];
+            //heatmap (dataset per key)
+            //dataset = [{x: n, y: n, color: 'rgba(r,g,b,a)'}]
+            const heatmap = {};
             for(const point of replay.replay_data) {
-                if(point.keys.M1 || point.keys.M2 || point.keys.K1 || point.keys.K2) {
-                    heatmap.push({ x: point.x, y: point.y });
+                if(point.keys_int > 0) {
+                    for(const [key, pressed] of Object.entries(point.keys)) {
+                        if(pressed) {
+                            if(!heatmap[key]) {
+                                heatmap[key] = [];
+                            }
+                            heatmap[key].push({ x: point.x, y: point.y});
+                        }
+                    }
                 }
             }
 
-            graphData.heatmap = heatmap;
+            //Reorder keys to M1, M2, K1, K2, Smoke
+            const orderedHeatmap = {};
+            const keyOrder = ['M1', 'M2', 'K1', 'K2', 'Smoke'];
+            for(const key of keyOrder) {
+                if(heatmap[key]) {
+                    orderedHeatmap[key] = heatmap[key];
+                }
+            }
+
+            graphData.heatmap = orderedHeatmap;
         }
 
         return graphData;

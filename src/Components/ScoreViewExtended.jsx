@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import scoreViewStyles from '../Style/score-view.module.less';
 import ReplayStorage from '../Misc/Replay/ReplayStorage';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { ScatterChart } from '@mui/x-charts/ScatterChart';
+import { Typography } from '@mui/material';
 
 //Holds the extra data for a score (extra PP breakdown, replay info, etc)
 function ScoreViewExtended({ score }) {
@@ -29,12 +31,13 @@ function ScoreViewExtended({ score }) {
                         <div>Loading replay...</div>
                     ) : replay ? (
                         <div>
-                            <h3>Replay Information</h3>
-                            <p>Player: {replay.username}</p>
-                            <p>Score: {replay.score}</p>
-                            <p>Max Combo: {replay.combo}</p>
-                            <p>300s: {replay.count300}, 100s: {replay.count100}, 50s: {replay.count50}</p>
-                            <p>Misses: {replay.countMiss}</p>
+                            {
+                                score.ruleset_id === 0 ? (
+                                    <ScoreViewExtendedOsuDisplay replay={replay} />
+                                ) : (
+                                    <div>Unsupported ruleset for extended display.</div>
+                                )
+                            }
                         </div>
                     ) : (
                         <div className={scoreViewStyles['score-view__extended__content__no-data']}>
@@ -46,6 +49,75 @@ function ScoreViewExtended({ score }) {
             </div>
         </div>
     )
+}
+
+// Ruleset-specific display components
+function ScoreViewExtendedOsuDisplay({ replay }) {
+    return (
+        <>
+            <Typography variant="h6" gutterBottom>
+                Replay Heatmap
+            </Typography>
+            {/* ratio needs to be EXACTLY 512:384, can be sized up or down maintaining this ratio */}
+            <ScatterChart 
+                sx={{
+                    //chartswrapper force white text
+                    color: 'white !important',
+                }}
+                slotProps={
+                    {
+                        //disable tooltip
+                        tooltip: {
+                            display: 'none',
+                        }
+                    }
+                }
+                skipAnimation={true}
+
+                width={512}
+                height={384}
+
+                series={
+                    [
+                        ...Object.entries(replay.graph_data.heatmap).map(([key, dataset]) => ({
+                            data: dataset,
+                            markerSize: 1,
+                            label: key,
+                        }))
+                    ]
+                }
+
+                //white text on axes
+                xAxis={
+                    [
+                        {
+                            label: 'X',
+                            labelProps: {
+                                fill: 'white',
+                            },
+                            tickProps: {
+                                fill: 'white',
+                            },
+                        }
+                    ]
+                }
+
+                yAxis={
+                    [
+                        {
+                            label: 'Y',
+                            labelProps: {
+                                fill: 'white',
+                            },
+                            tickProps: {
+                                fill: 'white',
+                            },
+                        }
+                    ]
+                }
+            />
+        </>
+    );
 }
 
 export default ScoreViewExtended;
