@@ -6,12 +6,12 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ScoreViewExtended from './ScoreViewExtended';
 
-function ScoreView({ score }) {
+function ScoreView({ score = null }) {
     const [isExtended, setIsExtended] = useState(false);
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [isMobile, setIsMobile] = useState(window?.innerWidth <= 768 || false);
 
     window.addEventListener('resize', () => {
-        setIsMobile(window.innerWidth <= 768);
+        setIsMobile(window?.innerWidth <= 768 || false);
     });
 
     return (

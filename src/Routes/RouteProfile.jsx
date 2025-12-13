@@ -1,5 +1,5 @@
 import { useParams } from "react-router";
-import { useProfile } from "../Providers/ProfileProvider";
+import { useProfile } from "../providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import ProfileLoader from "../components/profile/ProfileLoader";
 import ProfileHeader from "../components/profile/ProfileHeader";

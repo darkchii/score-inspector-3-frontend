@@ -12,8 +12,115 @@ import DifficultyBadge from "./DifficultyBadge";
 import { GetStarRating } from "../util/ScoreHelper";
 import BetterTooltip from "./tooltips/BetterTooltip";
 
-const truncateStep = 10;
+function ScoreListRow({ score, index, showIndex = true, startIndex = 0, loadScoreView }) {
+    const theme = useTheme();
+    
+    return (
+        <TableRow
+            key={score.id}
+            data-id={score.id}
+            onClick={() => loadScoreView(score)}
+            sx={{
+                cursor: 'pointer',
+                //content should be vertically centered and horizontally aligned to the left
+                '& > *': {
+                    zIndex: 1,
+                    alignItems: 'center',
+                    verticalAlign: 'middle',
+                },
+                backgroundImage: `url(https://assets.ppy.sh/beatmaps/${score.beatmap.beatmapset_id}/covers/cover.jpg)`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundBlendMode: 'overlay',
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    transform: 'scale(0.98)',
+                    boxShadow: theme.shadows[4],
+                },
+            }}
+        >
+            {showIndex &&
+                <TableCell width={40}>
+                    <Typography sx={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{startIndex + index + 1}</Typography>
+                </TableCell>
+            }
+            {/* Ruleset Icon */}
+            <TableCell width={20}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
+                    <img src={GetRulesetIconFromId(score.ruleset_id)} alt={score.grade} width={20} height={20} />
+                </Box>
+            </TableCell>
+            {/* Grade, should be as small as possible */}
+            <TableCell width={30}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
+                    <img src={getGradeIcon(score.grade)} alt={score.grade} width={30} height={20} />
+                </Box>
+            </TableCell>
+            <TableCell>
+                <Box sx={{
+                    height: '100%',
+                    alignItems: 'center',
+                    maxWidth: '100%',
+                }}>
+                    <Typography noWrap sx={{ fontSize: '0.8rem', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {score.beatmap.artist} - {score.beatmap.title}
+                    </Typography>
+                    <Typography noWrap sx={{ fontSize: '0.7rem', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <span style={{ color: '#ea0' }}>{score.beatmap.version}</span> <span style={{ opacity: '0.7' }}>{TimeAgo(score.ended_at)}</span>
+                    </Typography>
+                </Box>
+            </TableCell>
+            <TableCell sx={{ maxWidth: '100px' }}>
+                <Typography sx={{ fontSize: '0.85rem', fontWeight: 'bold' }}>{score.total_score.toLocaleString()}</Typography>
+                <Typography sx={{ fontSize: '0.75rem', color: grey[300] }}>{score.implied_total_score.toLocaleString()}</Typography>
+            </TableCell>
+            <TableCell>
+                <Typography sx={{
+                    fontSize: '0.85rem',
+                    ...(
+                        score.combo === (score.attr_diff?.max_combo || score.beatmap.max_combo)
+                            ? { color: '#4caf50', fontWeight: 'bold' }
+                            : {}
+                    )
+                }}>{score.combo.toLocaleString()}/{(score.attr_diff?.max_combo || score.beatmap.max_combo).toLocaleString()}x</Typography>
+            </TableCell>
+            <TableCell>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <DifficultyBadge difficulty={GetStarRating(score)} />
+                </div>
+            </TableCell>
+            <TableCell sx={{ maxWidth: '250px' }}>
+                <ModDisplay ruleset={GetRulesetNameFromId(score.ruleset_id)} mods={score.mods} />
+            </TableCell>
+            <TableCell sx={{ width: '80px' }}>
+                <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold', color: 'rgba(238, 170, 0, 1)' }}>{FormatNumberWithPrecision(score.accuracy * 100, 2)}%</Typography>
+            </TableCell>
+            <TableCell sx={{ width: '100px', textAlign: 'right', backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
+                <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold' }}>
+                    {
+                        score.performance?.base?.pp !== undefined ?
+                            FormatNumberWithPrecision(score.implied_pp, 2) + "pp"
+                            : <span style={{ color: grey[500] }}>{FormatNumberWithPrecision(score.implied_pp, 2) + "pp"}</span>
 
+                    }
+                </Typography>
+            </TableCell>
+            <TableCell sx={{ width: '40px', textAlign: 'right', backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
+                {
+                    score.diff_missing ?
+                        <BetterTooltip title="This score is missing difficulty attributes, data is likely incorrect.">
+                            <WarningIcon sx={{ color: theme.palette.warning.main, fontSize: '1.2rem' }} />
+                        </BetterTooltip>
+                        : null
+                }
+            </TableCell>
+        </TableRow>
+    )
+}
+
+const truncateStep = 10;
 function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, truncate = false, truncateStartStep = truncateStep }) {
     const { loadScoreView } = useScoreView();
     const theme = useTheme();
@@ -34,6 +141,12 @@ function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, t
                     [`& .${tableCellClasses.root}`]: {
                         borderBottom: "none",
                         color: 'white !important',
+                        //reduce all padding
+                        paddingLeft: theme.spacing(1),
+                        paddingRight: theme.spacing(1),
+                    },
+                    [`& .${tableRowClasses.root}`]: {
+                        borderBottom: "none",
                     },
                     borderCollapse: 'separate',
                     borderSpacing: '0 8px',
@@ -45,107 +158,7 @@ function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, t
                         },
                     }}>
                         {scores?.slice(0, displayCount).map((score, index) => (
-                            <TableRow
-                                key={score.id}
-                                data-id={score.id}
-                                onClick={() => loadScoreView(score)}
-                                sx={{
-                                    cursor: 'pointer',
-                                    //content should be vertically centered and horizontally aligned to the left
-                                    '& > *': {
-                                        zIndex: 1,
-                                        alignItems: 'center',
-                                        verticalAlign: 'middle',
-                                    },
-                                    backgroundImage: `url(https://assets.ppy.sh/beatmaps/${score.beatmap.beatmapset_id}/covers/cover.jpg)`,
-                                    backgroundSize: 'cover',
-                                    backgroundPosition: 'center',
-                                    backgroundBlendMode: 'overlay',
-                                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                                    transition: 'all 0.3s ease',
-                                    '&:hover': {
-                                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                        transform: 'scale(0.98)',
-                                        boxShadow: theme.shadows[4],
-                                    },
-                                }}
-                            >
-                                {showIndex &&
-                                    <TableCell width={40}>
-                                        <Typography sx={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{startIndex + index + 1}</Typography>
-                                    </TableCell>
-                                }
-                                {/* Ruleset Icon */}
-                                <TableCell width={25}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
-                                        <img src={GetRulesetIconFromId(score.ruleset_id)} alt={score.grade} width={20} height={20} />
-                                    </Box>
-                                </TableCell>
-                                {/* Grade, should be as small as possible */}
-                                <TableCell width={30}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
-                                        <img src={getGradeIcon(score.grade)} alt={score.grade} width={40} height={30} />
-                                    </Box>
-                                </TableCell>
-                                <TableCell>
-                                    <Box sx={{
-                                        height: '100%',
-                                        alignItems: 'center',
-                                        maxWidth: '100%',
-                                    }}>
-                                        <Typography noWrap sx={{ fontSize: '0.8rem', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                            {score.beatmap.artist} - {score.beatmap.title}
-                                        </Typography>
-                                        <Typography noWrap sx={{ fontSize: '0.7rem', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                            <span style={{ color: '#ea0' }}>{score.beatmap.version}</span> <span style={{ opacity: '0.7' }}>{TimeAgo(score.ended_at)}</span>
-                                        </Typography>
-                                    </Box>
-                                </TableCell>
-                                <TableCell sx={{ maxWidth: '100px' }}>
-                                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 'bold' }}>{score.total_score.toLocaleString()}</Typography>
-                                    <Typography sx={{ fontSize: '0.75rem', color: grey[300] }}>{score.implied_total_score.toLocaleString()}</Typography>
-                                </TableCell>
-                                <TableCell>
-                                    <Typography sx={{
-                                        fontSize: '0.85rem',
-                                        ...(
-                                            score.combo === (score.attr_diff?.max_combo || score.beatmap.max_combo)
-                                                ? { color: '#4caf50', fontWeight: 'bold' }
-                                                : {}
-                                        )
-                                    }}>{score.combo.toLocaleString()}/{(score.attr_diff?.max_combo || score.beatmap.max_combo).toLocaleString()}x</Typography>
-                                </TableCell>
-                                <TableCell>
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <DifficultyBadge difficulty={GetStarRating(score)} />
-                                    </div>
-                                </TableCell>
-                                <TableCell sx={{ maxWidth: '250px' }}>
-                                    <ModDisplay ruleset={GetRulesetNameFromId(score.ruleset_id)} mods={score.mods} />
-                                </TableCell>
-                                <TableCell sx={{ width: '80px' }}>
-                                    <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold', color: 'rgba(238, 170, 0, 1)' }}>{FormatNumberWithPrecision(score.accuracy * 100, 2)}%</Typography>
-                                </TableCell>
-                                <TableCell sx={{ width: '100px', textAlign: 'right', backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
-                                    <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold' }}>
-                                        {
-                                            score.performance?.base?.pp !== undefined ?
-                                                FormatNumberWithPrecision(score.implied_pp, 2) + "pp"
-                                                : <span style={{ color: grey[500] }}>{FormatNumberWithPrecision(score.implied_pp, 2) + "pp"}</span>
-
-                                        }
-                                    </Typography>
-                                </TableCell>
-                                <TableCell sx={{ width: '40px', textAlign: 'right', backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
-                                    {
-                                        score.diff_missing ?
-                                            <BetterTooltip title="This score is missing difficulty attributes, data is likely incorrect.">
-                                                <WarningIcon sx={{ color: theme.palette.warning.main, fontSize: '1.2rem' }} />
-                                            </BetterTooltip>
-                                            : null
-                                    }
-                                </TableCell>
-                            </TableRow>
+                            <ScoreListRow key={score.id} score={score} index={index} showIndex={showIndex} startIndex={startIndex} loadScoreView={loadScoreView} />
                         ))}
                     </TableBody>
                 </Table>
