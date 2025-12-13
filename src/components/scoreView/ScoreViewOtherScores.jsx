@@ -1,13 +1,19 @@
 import { Typography } from "@mui/material";
 import ScoreList from "../ScoreList";
+import React from "react";
+import NumberFlow from "@number-flow/react";
 
 function ScoreViewOtherScores({ score }) {
     return (
-        <div style={{
-        }}>
+        <div>
             {
                 score.beatmap?.getScores().length > 0 ? (
-                    <ScoreList scores={score.beatmap.getScores()} />
+                    <React.Fragment>
+                        <Typography variant="body2" align="center" style={{ marginBottom: '1em' }}>
+                            <NumberFlow value={score.beatmap.getScores().length} /> score{score.beatmap.getScores().length !== 1 ? 's' : ''} for this beatmap.
+                        </Typography>
+                        <ScoreList scores={score.beatmap.getScores('implied_pp')} isCompact={true} />
+                    </React.Fragment>
                 ) : (
                     <Typography
                         variant="body1"

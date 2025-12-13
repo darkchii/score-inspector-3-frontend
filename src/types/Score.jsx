@@ -161,6 +161,13 @@ class Score {
 
         this.implied_pp = this.performance?.base?.pp || this.pp || 0;
     }
+
+    // Gives an array of other scores on the same beatmap
+    getOtherScores() {
+        if (!this.beatmap) return [];
+
+        return this.beatmap.getScores().filter(s => s.id !== this.id);
+    }
 }
 
 export default Score;

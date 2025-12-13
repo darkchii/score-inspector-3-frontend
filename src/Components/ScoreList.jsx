@@ -5,16 +5,16 @@ import { getGradeIcon } from "../assets/textures/TextureDatabase";
 import { FormatNumberWithPrecision, GetRulesetIconFromId, GetRulesetNameFromId, TimeAgo } from "../util/Helper";
 import ModDisplay from "./ModDisplay";
 import { grey } from "@mui/material/colors";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useScoreView } from "../providers/ScoreViewProvider";
 import WarningIcon from '@mui/icons-material/Warning';
 import DifficultyBadge from "./DifficultyBadge";
 import { GetStarRating } from "../util/ScoreHelper";
 import BetterTooltip from "./tooltips/BetterTooltip";
 
-function ScoreListRow({ score, index, showIndex = true, startIndex = 0, loadScoreView }) {
+function ScoreListRow({ score, index, isCompact = false, showIndex = true, startIndex = 0, loadScoreView = null }) {
     const theme = useTheme();
-    
+
     return (
         <TableRow
             key={score.id}
@@ -47,22 +47,33 @@ function ScoreListRow({ score, index, showIndex = true, startIndex = 0, loadScor
                 </TableCell>
             }
             {/* Ruleset Icon */}
-            <TableCell width={20}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
-                    <img src={GetRulesetIconFromId(score.ruleset_id)} alt={score.grade} width={20} height={20} />
-                </Box>
-            </TableCell>
-            {/* Grade, should be as small as possible */}
-            <TableCell width={30}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
-                    <img src={getGradeIcon(score.grade)} alt={score.grade} width={30} height={20} />
-                </Box>
-            </TableCell>
+            {
+                isCompact ? <TableCell>
+                    {/* show ruleset icon and grade under each other */}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                        <img src={GetRulesetIconFromId(score.ruleset_id)} alt={score.grade} width={20} height={20} />
+                        <img src={getGradeIcon(score.grade)} alt={score.grade} width={30} height={20} />
+                    </Box>
+                </TableCell> :
+                <React.Fragment>
+                    <TableCell width={20}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
+                            <img src={GetRulesetIconFromId(score.ruleset_id)} alt={score.grade} width={20} height={20} />
+                        </Box>
+                    </TableCell>
+                    {/* Grade, should be as small as possible */}
+                    <TableCell width={30}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
+                            <img src={getGradeIcon(score.grade)} alt={score.grade} width={30} height={20} />
+                        </Box>
+                    </TableCell>
+                </React.Fragment>
+            }
             <TableCell>
                 <Box sx={{
                     height: '100%',
                     alignItems: 'center',
-                    maxWidth: '100%',
+                    maxWidth: isCompact ? '230px' : '100%',
                 }}>
                     <Typography noWrap sx={{ fontSize: '0.8rem', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {score.beatmap.artist} - {score.beatmap.title}
@@ -70,6 +81,10 @@ function ScoreListRow({ score, index, showIndex = true, startIndex = 0, loadScor
                     <Typography noWrap sx={{ fontSize: '0.7rem', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         <span style={{ color: '#ea0' }}>{score.beatmap.version}</span> <span style={{ opacity: '0.7' }}>{TimeAgo(score.ended_at)}</span>
                     </Typography>
+                    {
+                        isCompact &&
+                        <ModDisplay ruleset={GetRulesetNameFromId(score.ruleset_id)} mods={score.mods} />
+                    }
                 </Box>
             </TableCell>
             <TableCell sx={{ maxWidth: '100px' }}>
@@ -91,9 +106,12 @@ function ScoreListRow({ score, index, showIndex = true, startIndex = 0, loadScor
                     <DifficultyBadge difficulty={GetStarRating(score)} />
                 </div>
             </TableCell>
-            <TableCell sx={{ maxWidth: '250px' }}>
-                <ModDisplay ruleset={GetRulesetNameFromId(score.ruleset_id)} mods={score.mods} />
-            </TableCell>
+            {
+                !isCompact &&
+                <TableCell sx={{ maxWidth: '250px' }}>
+                    <ModDisplay ruleset={GetRulesetNameFromId(score.ruleset_id)} mods={score.mods} />
+                </TableCell>
+            }
             <TableCell sx={{ width: '80px' }}>
                 <Typography sx={{ fontSize: '0.95rem', fontWeight: 'bold', color: 'rgba(238, 170, 0, 1)' }}>{FormatNumberWithPrecision(score.accuracy * 100, 2)}%</Typography>
             </TableCell>
@@ -121,7 +139,7 @@ function ScoreListRow({ score, index, showIndex = true, startIndex = 0, loadScor
 }
 
 const truncateStep = 10;
-function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, truncate = false, truncateStartStep = truncateStep }) {
+function ScoreList({ startIndex = 0, showIndex = false, scores, isCompact = false, truncate = false, truncateStartStep = truncateStep }) {
     const { loadScoreView } = useScoreView();
     const theme = useTheme();
     const [displayCount, setDisplayCount] = useState(truncate ? truncateStartStep : scores?.length || 0);
@@ -158,7 +176,7 @@ function ScoreList({ startIndex = 0, showIndex = false, scores, onSelectScore, t
                         },
                     }}>
                         {scores?.slice(0, displayCount).map((score, index) => (
-                            <ScoreListRow key={score.id} score={score} index={index} showIndex={showIndex} startIndex={startIndex} loadScoreView={loadScoreView} />
+                            <ScoreListRow key={score.id} score={score} index={index} showIndex={showIndex} startIndex={startIndex} loadScoreView={loadScoreView} isCompact={isCompact} />
                         ))}
                     </TableBody>
                 </Table>

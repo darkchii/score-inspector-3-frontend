@@ -81,12 +81,22 @@ class Beatmap {
         this.scores.set(score.id, score);
     }
 
-    getScores() {
+    getScores(sort = null, direction = 'desc') {
         if (!this.scores) {
             return [];
         }
 
-        return Array.from(this.scores.values());
+        let scoresArray = Array.from(this.scores.values());
+
+        if (sort) {
+            scoresArray.sort((a, b) => {
+                if (a[sort] < b[sort]) return direction === 'asc' ? -1 : 1;
+                if (a[sort] > b[sort]) return direction === 'asc' ? 1 : -1;
+                return 0;
+            }); 
+        }
+
+        return scoresArray;
     }
 
     clone() {
