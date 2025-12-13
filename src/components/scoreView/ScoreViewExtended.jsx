@@ -3,7 +3,7 @@ import scoreViewStyles from '../styles/score-view.module.less';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { ScatterChart } from '@mui/x-charts/ScatterChart';
 import { Typography } from '@mui/material';
-import ReplayStorage from '../types/Replay/ReplayStorage';
+import ReplayStorage from '../../types/Replay/ReplayStorage';
 
 //Holds the extra data for a score (extra PP breakdown, replay info, etc)
 function ScoreViewExtended({ score }) {
