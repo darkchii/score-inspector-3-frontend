@@ -2,6 +2,7 @@ import { blue, green, grey, lightBlue, lightGreen, red, yellow } from "@mui/mate
 import axios from "axios";
 import { GetAPI } from "./ApiHelper";
 import Score from "../types/Score";
+import ScoreDifficulty from "../types/ScoreDifficulty";
 
 //Helper functions for score data
 export function GetStarRating(score) {
@@ -97,7 +98,7 @@ export function BeatmapApplyModsToDifficulty(ruleset, beatmap, mods) {
 export const CalculateRawPerformance = (scores, include_loved = false) => {
     let subset = scores;
 
-    if(!include_loved) {
+    if (!include_loved) {
         subset = scores.filter(score => score.beatmap && score.beatmap.status !== 'loved');
     }
 
@@ -120,7 +121,7 @@ export const CalculateBonusPerformance = (scoreCount) => {
 }
 
 export const DetermineIsScoreFC = (score) => {
-    if(!score.beatmap){
+    if (!score.beatmap) {
         return false;
     }
 
@@ -152,39 +153,36 @@ export const DetermineIsScoreFC = (score) => {
 const _localScoreCache = new Map();
 //Only for singular score fetching like /score/:scoreId
 export const GetScoreFromId = async (scoreId) => {
-    if(_localScoreCache.has(scoreId)){
+    if (_localScoreCache.has(scoreId)) {
         return _localScoreCache.get(scoreId);
     }
 
-    try{
-        let score, beatmap, user;
+    try {
+        let score, beatmap, user, difficulty_nomod;
 
-        let response = await axios.get(`${GetAPI()}/score/${scoreId}`);
+        let response = await axios.get(`${GetAPI()}/score/${scoreId}?fullData=true`);
 
         if (response.data) {
-            score = response.data;
+            score = response.data.score;
+            beatmap = response.data.beatmap;
+            difficulty_nomod = response.data.difficulty_nomod;
 
-            response = await axios.get(`${GetAPI()}/beatmap/${score.beatmap_id}`);
+            response = await axios.get(`${GetAPI()}/user/${score.user_id}/profile`);
 
             if (response.data) {
-                beatmap = response.data;
-
-                response = await axios.get(`${GetAPI()}/user/${score.user_id}/profile`);
-
-                if (response.data) {
-                    user = response.data;
-                }
+                user = response.data;
             }
         }
 
-        if(!score || !beatmap || !user){
+        if (!score || !beatmap || !user) {
             throw new Error("Incomplete data fetched for score.");
         }
 
         const result = new Score(score, beatmap, user);
+        result.beatmap.diff_attr = new ScoreDifficulty(difficulty_nomod);
         _localScoreCache.set(scoreId, result);
         return result;
-    }catch(error){
+    } catch (error) {
         console.error("Error fetching score:", error);
         return null;
     }

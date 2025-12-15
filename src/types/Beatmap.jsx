@@ -68,6 +68,8 @@ class Beatmap {
         this.pack = api_data.pack ? api_data.pack : null;
 
         this.lchg_time = api_data.lchg_time ? new Date(api_data.lchg_time) : null;
+
+        this.diff_attr = null;
     }
 
     addScore(score) {
