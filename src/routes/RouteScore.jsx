@@ -5,9 +5,11 @@ import { GetScoreFromId } from '../util/ScoreHelper';
 import ScoreView from '../components/scoreView/ScoreView';
 import { GetRulesetIconFromId } from '../util/Helper';
 import DifficultyBadge from '../components/DifficultyBadge';
+import RawBeatmap from '../types/RawBeatmap';
 function RouteScore() {
     const { scoreId } = useParams();
     const [score, setScore] = useState(null);
+    const [rawBeatmap, setRawBeatmap] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
 
@@ -20,6 +22,10 @@ function RouteScore() {
                 console.log(score);
                 if (score) {
                     setScore(score);
+
+                    const _rawBeatmap = await RawBeatmap.fetchFromApi(score.beatmap.beatmap_id);
+                    setRawBeatmap(_rawBeatmap);
+
                     setIsLoading(false);
                 } else {
                     setErrorMessage("Score not found.");

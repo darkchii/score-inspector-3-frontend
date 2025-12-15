@@ -179,7 +179,7 @@ export const GetScoreFromId = async (scoreId) => {
         }
 
         const result = new Score(score, beatmap, user);
-        result.beatmap.diff_attr = new ScoreDifficulty(difficulty_nomod);
+        result.beatmap.attr_diff = new ScoreDifficulty(difficulty_nomod);
         _localScoreCache.set(scoreId, result);
         return result;
     } catch (error) {
