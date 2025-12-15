@@ -1,4 +1,7 @@
 import { blue, green, grey, lightBlue, lightGreen, red, yellow } from "@mui/material/colors";
+import axios from "axios";
+import { GetAPI } from "./ApiHelper";
+import Score from "../types/Score";
 
 //Helper functions for score data
 export function GetStarRating(score) {
@@ -144,4 +147,45 @@ export const DetermineIsScoreFC = (score) => {
     }
 
     return score.combo >= (score.diff_attr?.max_combo || score.beatmap?.max_combo || 0);
+}
+
+const _localScoreCache = new Map();
+//Only for singular score fetching like /score/:scoreId
+export const GetScoreFromId = async (scoreId) => {
+    if(_localScoreCache.has(scoreId)){
+        return _localScoreCache.get(scoreId);
+    }
+
+    try{
+        let score, beatmap, user;
+
+        let response = await axios.get(`${GetAPI()}/score/${scoreId}`);
+
+        if (response.data) {
+            score = response.data;
+
+            response = await axios.get(`${GetAPI()}/beatmap/${score.beatmap_id}`);
+
+            if (response.data) {
+                beatmap = response.data;
+
+                response = await axios.get(`${GetAPI()}/user/${score.user_id}/profile`);
+
+                if (response.data) {
+                    user = response.data;
+                }
+            }
+        }
+
+        if(!score || !beatmap || !user){
+            throw new Error("Incomplete data fetched for score.");
+        }
+
+        const result = new Score(score, beatmap, user);
+        _localScoreCache.set(scoreId, result);
+        return result;
+    }catch(error){
+        console.error("Error fetching score:", error);
+        return null;
+    }
 }

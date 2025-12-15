@@ -55,8 +55,8 @@ export function ReorderMods(ruleset, mods) {
     });
 }
 
-export function GetModExtendedContent(mod, data) {
-    if (!mod || !data) return null;
+export function GetModExtendedContent(mod) {
+    if (!mod) return null;
 
     switch (mod.acronym) {
         case 'DT':
@@ -65,9 +65,48 @@ export function GetModExtendedContent(mod, data) {
         case 'DC':
             {
                 if (!mod.settings || !mod.settings.speed_change) return null;
-                const speedChange = mod.settings.speed_change;
-                return `${FormatNumberWithPrecision(mod.settings.speed_change)}x`
+                return `${FormatNumberWithPrecision(mod.settings.speed_change, 2)}x`
             }
+        case 'DA':
+            const displayCandidates = {
+                approach_rate: {
+                    acronym: 'AR'
+                },
+                circle_size: {
+                    acronym: 'CS'
+                },
+                drain_rate: {
+                    acronym: 'HP'
+                },
+                overall_difficulty: {
+                    acronym: 'OD'
+                },
+                scroll_speed: {
+                    acronym: 'SS',
+                    significantDigits: 2
+                }
+            }
+
+            let displayCandidate;
+            let displayValue;
+
+            for(const [key, setting] of Object.entries(displayCandidates)) {
+                const settingValue = mod.settings?.[key];
+                if(typeof settingValue === 'number') {
+                    if(displayCandidate !== undefined) {
+                        return null;
+                    }
+
+                    displayValue = settingValue;
+                    displayCandidate = setting;
+                }
+            }
+
+            if(displayCandidate != null && displayValue != null) {
+                return `${displayCandidate.acronym} ${FormatNumberWithPrecision(displayValue, displayCandidate.significantDigits || 1)}`;
+            }
+
+            return null;
         default:
             return null;
     }

@@ -61,7 +61,7 @@ function RouteProfile() {
         }
     }, [page]);
 
-    if (isWorking) {
+    if (isWorking || errorMessage) {
         return (<>
             <ProfileLoader />
         </>)

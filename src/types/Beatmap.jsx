@@ -9,7 +9,8 @@ class Beatmap {
         this.beatmap_id = Number(api_data.beatmap_id);
         this.beatmapset_id = Number(api_data.beatmapset_id);
 
-        this.user_id = Number(api_data.user_id);
+        this.mapper_id = Number(api_data.mapper_id);
+        this.mapper = api_data.mapper;
 
         //its either .ruleset_id or .mode, test both
         this.ruleset_id = api_data.ruleset_id !== undefined ? Number(api_data.ruleset_id) : Number(api_data.mode);

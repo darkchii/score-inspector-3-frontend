@@ -3,11 +3,14 @@ import { ReorderMods } from "../util/ModHelper";
 import PerformancePoints from "./performance/PerformancePoints";
 import { BeatmapApplyModsToDifficulty, DetermineIsScoreFC } from "../util/ScoreHelper";
 import ScoreDifficulty from "./ScoreDifficulty";
+import Beatmap from "./Beatmap";
 
 class Score {
     constructor(api_data, beatmap = null, user = null) {
-        this.beatmap = beatmap;
-        this.local_beatmap = beatmap.clone(); //this will contain modified data
+        // this.beatmap = beatmap;
+        //if beatmap is not of type Beatmap, create it, otherwise use as is
+        this.beatmap = (beatmap instanceof Beatmap) ? beatmap : (beatmap ? new Beatmap(beatmap) : null);
+        this.local_beatmap = this.beatmap ? this.beatmap.clone() : null; //this will contain modified data
         this.user = user;
 
         this.id = Number(api_data.id);
@@ -146,6 +149,8 @@ class Score {
         this.diff_missing = !api_data.attr_diff || this.attr_recalc;
 
         this.is_fc = DetermineIsScoreFC(this);
+
+        this.star_rating = this.attr_diff?.star_rating ?? (this.beatmap ? this.beatmap.stars : null);
 
         try {
             this.performance = {

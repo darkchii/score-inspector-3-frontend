@@ -11,8 +11,10 @@ import ScoreStat from '../ScoreStat';
 import { grey } from '@mui/material/colors';
 import BetterTooltip from '../tooltips/BetterTooltip';
 import NumberFlow from '@number-flow/react';
+import React from 'react';
+import { Link } from "react-router";
 
-function ScoreViewBase({ score }) {
+function ScoreViewBase({ score, noBackground = false, compact = false }) {
     const theme = useTheme();
 
     return (
@@ -25,16 +27,20 @@ function ScoreViewBase({ score }) {
             </div>
             <div className={scoreViewStyles['score-view__base__content']}>
                 <div className={scoreViewStyles['score-view__base__background']} style={{
-                    backgroundImage: `url(https://assets.ppy.sh/beatmaps/${score.beatmap.beatmapset_id}/covers/fullsize.jpg)`,
+                    backgroundImage: noBackground ? undefined : `url(https://assets.ppy.sh/beatmaps/${score.beatmap.beatmapset_id}/covers/fullsize.jpg)`,
                 }} />
                 <div className={scoreViewStyles['score-view__base__background__overlay']} />
                 <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__title']}`}>
-                        <span>{score.beatmap.title}</span>
-                    </div>
-                    <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__artist']}`}>
-                        <span>{score.beatmap.artist}</span>
-                    </div>
+                    {!compact &&
+                        <React.Fragment>
+                            <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__title']}`}>
+                                <span>{score.beatmap.title}</span>
+                            </div>
+                            <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__artist']}`}>
+                                <span>{score.beatmap.artist}</span>
+                            </div>
+                        </React.Fragment>
+                    }
                     <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__dial']}`}>
                         <ScoreDial score={score} />
                     </div>
@@ -50,10 +56,12 @@ function ScoreViewBase({ score }) {
                         <img src={GetRulesetIconFromId(score.ruleset_id)} alt="Ruleset Icon" style={{ width: '24px', height: '24px' }} />
                         <ModDisplay ruleset={score.ruleset} mods={score.mods} />
                     </div>
-                    <div className={`${scoreInfoStyles['score-info']}`}>
-                        <span className={scoreInfoStyles['score-info__version']}>{score.beatmap.version}</span>
-                        <span>mapped by <span style={{ fontWeight: 'bold' }}>{score.beatmap.mapper || 'N/A'}</span></span>
-                    </div>
+                    {!compact &&
+                        <div className={`${scoreInfoStyles['score-info']}`}>
+                            <span className={scoreInfoStyles['score-info__version']}>{score.beatmap.version}</span>
+                            <span>mapped by <span style={{ fontWeight: 'bold' }}>{score.beatmap.mapper || 'N/A'}</span></span>
+                        </div>
+                    }
                     <div className={`${scoreInfoStyles['score-info__group']} ${scoreInfoStyles['score-info__group--stats']}`}>
                         <div className={scoreStatsStyles['score-info__group-row']}>
                             <ScoreStat label="Accuracy" value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={score.accuracy * 100} suffix='%' />} />
@@ -138,7 +146,7 @@ function ScoreViewBase({ score }) {
                         <span>Played on {DateToString(score.ended_at)}</span>
                     </div>
                     <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__rankdate']}`}>
-                        <span>ID: <NumberFlow format={ { useGrouping: false } } value={score.id} /></span>
+                        <Link className={`${scoreViewStyles['score-view__base__link']}`} to={`/score/${score.id}`} target="_blank">ID: {score.id}</Link>
                     </div>
                 </Box>
             </div>

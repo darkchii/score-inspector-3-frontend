@@ -9,6 +9,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Route404 from "./routes/Route404";
 import { pink } from "@mui/material/colors";
+import RouteScore from "./routes/RouteScore";
 
 const theme = createTheme({
   palette: {
@@ -44,7 +45,7 @@ function App() {
     { path: "*", element: <Route404 /> },
     { path: "/", element: <RouteIndex /> },
     { path: "/user/:userId/:ruleset?/:page?", element: <RouteProfile /> },
-
+    { path: "/score/:scoreId", element: <RouteScore /> },
   ];
 
   const getRoute = (obj, is_child = false) => {

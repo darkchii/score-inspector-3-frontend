@@ -1,0 +1,76 @@
+@import '../styles/variables.module.less';
+@import '../styles/colors.module.less';
+
+.score-page {
+    position: relative;
+    min-height: 1vh;
+
+    &__header {
+        position: relative;
+        height: 90px;
+        background-color: @gray-dark;
+        margin-bottom: 20px;
+        font-weight: 300;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        &__title {
+            font-size: @font-size--title;
+            color: white;
+        }
+
+        &__details {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+
+            &__mapper {
+                font-size: @font-size--normal;
+                color: @osu-colour-green-2;
+            }
+        }
+    }
+
+    &__content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: row;
+        padding: 20px;
+        gap: 20px;
+
+        &__score-view {
+            //left side
+            margin-right: 20px;
+            //add top padding due to avatar overlap
+            padding-top: 40px;
+        }
+
+        &__score-details {
+            //right side (fill remaining space)
+            flex: 1;
+            background-color: fade(@gray-dark, 80%);
+            padding: 20px;
+            border-radius: 15px;
+        }
+    }
+
+    &__background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0.4;
+        //var defined in JS
+        background-image: var(--background-image);
+    }
+}
