@@ -105,6 +105,7 @@ function ProfilePageDaily() {
     )
 }
 
+const ABSOLUTE_RANGE_LIMIT = 100;
 function DateGrid({ year, data, activeDate = null, onDateSelected = null }) {
     const theme = useTheme();
 
@@ -114,6 +115,7 @@ function DateGrid({ year, data, activeDate = null, onDateSelected = null }) {
     const [gridData, setGridData] = useState(null);
     const [isLeapYear, setIsLeapYear] = useState(false);
     const [dayOffset, setDayOffset] = useState(0);
+    const [maxClears, setMaxClears] = useState(0);
 
     useEffect(() => {
         //check if year is leap year
@@ -132,9 +134,16 @@ function DateGrid({ year, data, activeDate = null, onDateSelected = null }) {
         //reformats it so more easily accessible
         let temp = {};
         if (data) {
+            let _maxClears = 0;
             for (const dateString in data) {
                 temp[dateString] = data[dateString];
+
+                //find the max clears for color scaling
+                if (data[dateString].clears > _maxClears) {
+                    _maxClears = data[dateString].clears;
+                }
             }
+            setMaxClears(_maxClears);
             setGridData(temp);
         } else {
             setGridData(null);
@@ -188,9 +197,11 @@ function DateGrid({ year, data, activeDate = null, onDateSelected = null }) {
                                         const dateKey = `${year}-${monthString}-${dayString}`;
                                         const dayData = gridData[dateKey];
                                         const clears = dayData ? dayData.clears : 0;
+                                        const adjustedClears = Math.min(clears, ABSOLUTE_RANGE_LIMIT);
 
-                                        //based on clears 0-100, interpolate from #1a1a1a to theme.palette.primary.main
-                                        let progress = Math.min(clears, 100) / 100;
+                                        //based on clears 0-maxClears/limit, interpolate from #1a1a1a to theme.palette.primary.main
+                                        let progress = maxClears > ABSOLUTE_RANGE_LIMIT ? adjustedClears / ABSOLUTE_RANGE_LIMIT : (maxClears === 0 ? 0 : adjustedClears / maxClears);
+                                        // let progress = Math.min(adjustedClears, 100) / 100;
                                         let color = `rgb(${Math.round(startSquareColor[0] + (endSquareColor[0] - startSquareColor[0]) * progress)}, ${Math.round(startSquareColor[1] + (endSquareColor[1] - startSquareColor[1]) * progress)}, ${Math.round(startSquareColor[2] + (endSquareColor[2] - startSquareColor[2]) * progress)})`;
 
                                         squares.push(
@@ -248,7 +259,7 @@ function DateGrid({ year, data, activeDate = null, onDateSelected = null }) {
                             borderRadius: '2px',
                         }}
                     />
-                    <p>100+</p>
+                    <p>{maxClears > ABSOLUTE_RANGE_LIMIT ? `${ABSOLUTE_RANGE_LIMIT}+` : maxClears}</p>
                 </div>
             </Box>
         </>
