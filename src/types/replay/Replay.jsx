@@ -51,6 +51,19 @@ class Replay {
         replay.replay_length = response.replay_length;
         replay.replay_data = ReplayDataPoint.fromArrayString(response.replay_data);
 
+        replay.key_counts = {};
+
+        for(const point of replay.replay_data) {
+            for(const [key, pressed] of Object.entries(point.keys)) {
+                if(pressed) {
+                    if(!replay.key_counts[key]) {
+                        replay.key_counts[key] = 0;
+                    }
+                    replay.key_counts[key] += 1;
+                }
+            }
+        }
+
         replay.graph_data = Replay.generateGraphData(replay);
 
         return replay;

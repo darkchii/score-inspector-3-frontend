@@ -1,11 +1,11 @@
 import { useParams } from 'react-router';
 import scorePageStyles from '../styles/score-page.module.less';
 import { useEffect, useState } from 'react';
-import { GetScoreFromId } from '../util/ScoreHelper';
+import { GetExtraData, GetScoreFromId } from '../util/ScoreHelper';
 import ScoreView from '../components/scoreView/ScoreView';
 import { GetRulesetIconFromId } from '../util/Helper';
 import DifficultyBadge from '../components/DifficultyBadge';
-import RawBeatmap from '../types/RawBeatmap';
+
 function RouteScore() {
     const { scoreId } = useParams();
     const [score, setScore] = useState(null);
@@ -19,13 +19,11 @@ function RouteScore() {
         (async () => {
             try {
                 const score = await GetScoreFromId(scoreId);
-                console.log(score);
                 if (score) {
-                    setScore(score);
-
-                    const _rawBeatmap = await RawBeatmap.fetchFromApi(score.beatmap.beatmap_id);
+                    const _rawBeatmap = await GetExtraData(score.beatmap_id, score.ruleset, score.mods);
+                    console.log(_rawBeatmap);
                     setRawBeatmap(_rawBeatmap);
-
+                    setScore(score);
                     setIsLoading(false);
                 } else {
                     setErrorMessage("Score not found.");
@@ -90,8 +88,6 @@ function RouteScore() {
                     <ScoreView score={score} noBackground={true} compact={true} />
                 </div>
                 <div className={scorePageStyles['score-page__content__score-details']}>
-                    {/* additional score details can go here */}
-                    <div>Hello world</div>
                 </div>
             </div>
         </div>

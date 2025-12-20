@@ -3,7 +3,7 @@ import { ReorderMods } from "../util/ModHelper";
 import PerformancePoints from "./performance/PerformancePoints";
 import { BeatmapApplyModsToDifficulty, DetermineIsScoreFC } from "../util/ScoreHelper";
 import ScoreDifficulty from "./ScoreDifficulty";
-import Beatmap from "./Beatmap";
+import Beatmap from "./beatmaps/Beatmap";
 
 class Score {
     constructor(api_data, beatmap = null, user = null) {

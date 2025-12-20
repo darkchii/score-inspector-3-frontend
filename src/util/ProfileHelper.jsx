@@ -1,4 +1,4 @@
-import Beatmap from "../types/Beatmap";
+import Beatmap from "../types/beatmaps/Beatmap";
 import { ProfileStatistics } from "../types/ProfileStatistics";
 import Score from "../types/Score";
 

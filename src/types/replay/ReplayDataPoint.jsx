@@ -1,10 +1,4 @@
-const KeysBitmask = {
-    M1: 1,
-    M2: 2,
-    K1: 4,
-    K2: 8,
-    Smoke: 16
-}
+import { KeysBitmask } from "./ReplayKeys";
 
 class ReplayDataPoint {
     constructor(delta, time, x, y, keys) {
@@ -20,6 +14,7 @@ class ReplayDataPoint {
             K2: (keys & KeysBitmask.K2) !== 0,
             Smoke: (keys & KeysBitmask.Smoke) !== 0,
         };
+        this.isStart = 0; //if the previous point,
     }
 
     static fromArrayString(obj) {

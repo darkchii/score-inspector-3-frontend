@@ -3,6 +3,7 @@ import axios from "axios";
 import { GetAPI } from "./ApiHelper";
 import Score from "../types/Score";
 import ScoreDifficulty from "../types/ScoreDifficulty";
+import RawBeatmap from "../types/beatmaps/RawBeatmap";
 
 //Helper functions for score data
 export function GetStarRating(score) {
@@ -184,6 +185,24 @@ export const GetScoreFromId = async (scoreId) => {
         return result;
     } catch (error) {
         console.error("Error fetching score:", error);
+        return null;
+    }
+}
+
+export const GetExtraData = async (beatmapId, ruleset, mods, scoreId = null) => {
+    try {
+        const response = await axios.post(`${GetAPI()}/difficulty/${ruleset}/${beatmapId}/detailed`, {
+            mods: mods
+        });
+
+        if (response.data) {
+            const beatmap = new RawBeatmap(response.data.beatmap);
+            return beatmap;
+        }
+
+        return null;
+    } catch (error) {
+        console.error("Error fetching extra difficulty data:", error);
         return null;
     }
 }
