@@ -1,10 +1,11 @@
-import { Box, Button, ButtonGroup, Grid, useTheme } from "@mui/material";
+import { Box, Button, ButtonGroup, Collapse, Grid, useTheme } from "@mui/material";
 import { useProfile } from "../../../providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import dateGridStyles from '../../../styles/date-grid.module.less';
 import colorStyles from '../../../styles/colors.module.less';
 import BetterTooltip from "../../tooltips/BetterTooltip";
 import { HexToRgb } from "../../../util/Helper";
+import GradesDisplay from "../../GradesDisplay";
 
 //uses periodic_by_year from the ProfileRulesetStatistics type
 function ProfilePageDaily() {
@@ -15,6 +16,10 @@ function ProfilePageDaily() {
 
     const [activeYearData, setActiveYearData] = useState(null);
     const [activeDate, setActiveDate] = useState(null);
+
+    useEffect(() => {
+        console.log(activeYearData?.[activeDate]); //debug
+    }, [activeDate])
 
     useEffect(() => {
         setActiveDate(null);
@@ -84,9 +89,15 @@ function ProfilePageDaily() {
                 {
                     //if activeDate is set, and it exists in activeYearData, show details
                     activeDate && activeYearData && activeYearData[activeDate] ? (
-                        <p>Todo</p>
+                        <Collapse in={activeYearData?.[activeDate] != null} unmountOnExit>
+                            <div>
+                                <GradesDisplay grades={activeYearData[activeDate].grades} />
+                            </div>
+                        </Collapse>
                     ) : (
-                        <p>Select a date to see details.</p>
+                        <Collapse in={activeYearData?.[activeDate] == null} unmountOnExit>
+                            <p>Select a date to see details.</p>
+                        </Collapse>
                     )
                 }
             </div>
@@ -211,27 +222,30 @@ function DateGrid({ year, data, activeDate = null, onDateSelected = null }) {
                     <p>0</p>
                     <div
                         style={{
-                            width: '20px',
-                            height: '20px',
+                            width: '14px',
+                            height: '14px',
                             backgroundColor: `rgb(${startSquareColor[0]}, ${startSquareColor[1]}, ${startSquareColor[2]})`,
                             marginRight: '4px',
                             marginLeft: '4px',
+                            borderRadius: '2px',
                         }}
                     />
                     <div
                         style={{
-                            width: '100px',
-                            height: '20px',
+                            width: '80px',
+                            height: '14px',
                             background: `linear-gradient(to right, rgb(${startSquareColor[0]}, ${startSquareColor[1]}, ${startSquareColor[2]}), ${theme.palette.primary.main})`,
                             marginRight: '4px',
+                            borderRadius: '2px',
                         }}
                     />
                     <div
                         style={{
-                            width: '20px',
-                            height: '20px',
+                            width: '14px',
+                            height: '14px',
                             backgroundColor: `rgb(${endSquareColor[0]}, ${endSquareColor[1]}, ${endSquareColor[2]})`,
                             marginRight: '4px',
+                            borderRadius: '2px',
                         }}
                     />
                     <p>100+</p>

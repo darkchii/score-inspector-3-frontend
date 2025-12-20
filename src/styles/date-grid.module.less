@@ -68,6 +68,7 @@
         height: var(--square-size);
         margin: 2px;
         background-color: var(--target-color, @gray-dark);
+        transition: all 0.2s ease-in-out;
 
         &--clickable {
             &:hover {
@@ -84,6 +85,7 @@
 
         &--active {
             border: 2px solid @osu-colour-blue-2;
+            transition: all 0.2s ease-in-out;
         }
     }
 }
