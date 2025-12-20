@@ -1,0 +1,36 @@
+import { Box, Grid, Typography } from "@mui/material";
+import { TextureDatabase } from "../assets/textures/TextureDatabase";
+import { FormatNumber } from "../util/Helper";
+import BetterTooltip from "./tooltips/BetterTooltip";
+import NumberFlow from "@number-flow/react";
+
+function _SingularGradeDisplay({ grade, count, overrideCount }) {
+    //only tooltip if overrideCount is given (even if 0)
+    return (
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start', gap: 1 }}>
+            <img src={TextureDatabase[`SVGGrade${grade}`]} alt={grade} width={48} height={48} />
+            <BetterTooltip title={overrideCount !== undefined ? `Including overrides: ${FormatNumber(overrideCount)} total` : ''}>
+                <Typography variant="h6"><NumberFlow value={count} /></Typography>
+            </BetterTooltip>
+        </Box>
+    )
+}
+
+function GradesDisplay({ grades }) {
+    //assume grades is an object like { XH: 10, XH_override: 2, X: 20, X_override: 5, ... }
+
+    return (
+        <Grid container spacing={{ xs: 0, sm: 2 }} justifyContent="center" alignItems="center">
+            <_SingularGradeDisplay grade="XH" count={grades.XH || 0} overrideCount={grades.XH_override} />
+            <_SingularGradeDisplay grade="X" count={grades.X || 0} overrideCount={grades.X_override} />
+            <_SingularGradeDisplay grade="SH" count={grades.SH || 0} overrideCount={grades.SH_override} />
+            <_SingularGradeDisplay grade="S" count={grades.S || 0} overrideCount={grades.S_override} />
+            <_SingularGradeDisplay grade="A" count={grades.A || 0} overrideCount={grades.A_override} />
+            <_SingularGradeDisplay grade="B" count={grades.B || 0} overrideCount={grades.B_override} />
+            <_SingularGradeDisplay grade="C" count={grades.C || 0} overrideCount={grades.C_override} />
+            <_SingularGradeDisplay grade="D" count={grades.D || 0} overrideCount={grades.D_override} />
+        </Grid>
+    )
+}
+
+export default GradesDisplay;

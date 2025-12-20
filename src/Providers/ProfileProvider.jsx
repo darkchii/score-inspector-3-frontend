@@ -175,6 +175,8 @@ export function ProfileProvider({ children }) {
             });
             setScoreMap(_scoreMap);
 
+            console.log(profileStats);
+
             //If available rulesets only has 'total', throw error (user has no scores)
             if (Object.keys(profileStats.rulesets).length === 1 && profileStats.rulesets['total']) {
                 throw new Error("User has no scores available.");

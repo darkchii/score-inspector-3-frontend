@@ -50,6 +50,7 @@ export class ProfileRulesetStatistics {
             //these are also of type ProfileRulesetScoreSet, but with subset of scores given
             //this is based on UTC, not local time, so the values are the same for everyone
             this.periodic = {};
+            this.periodic_by_year = {}; //same as periodic but grouped by year
         }
 
         this.charts = {};
@@ -89,6 +90,22 @@ export class ProfileRulesetStatistics {
 
             for(const interval of PERIODIC_SUFFIXES){
                 this.periodic[interval] = this.calculatePeriodic(sorted_scores, interval);
+            }
+
+            //apply yearly grouping for every periodic interval
+            //ie this.periodic_by_year['2023'] = { 'monthly': {...}, 'daily': {...} }
+            //each interval starts with YYYY-, so we can easily group them
+            for(const interval of PERIODIC_SUFFIXES){
+                for(const date_string in this.periodic[interval]){
+                    const year = date_string.split('-')[0];
+                    if(!this.periodic_by_year[year]){
+                        this.periodic_by_year[year] = {};
+                    }
+                    if(!this.periodic_by_year[year][interval]){
+                        this.periodic_by_year[year][interval] = {};
+                    }
+                    this.periodic_by_year[year][interval][date_string] = this.periodic[interval][date_string];
+                }
             }
         }
     }
