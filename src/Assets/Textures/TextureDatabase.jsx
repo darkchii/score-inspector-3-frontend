@@ -15,6 +15,12 @@ import SVGGradeSH from './grades/GradeSmall-S-Silver.svg';
 import SVGGradeX from './grades/GradeSmall-SS.svg';
 import SVGGradeXH from './grades/GradeSmall-SS-Silver.svg';
 
+import CompletionistStandard from './completionists/standard.png';
+import CompletionistTaiko from './completionists/taiko.png';
+import CompletionistCatch from './completionists/catch.png';
+import CompletionistMania from './completionists/mania.png';
+import { GetRulesetNameFromId } from '../../util/Helper';
+
 //Import EVERYTHING from ./Flags/ (country flags, its not feasible to do manually)
 
 //do it here
@@ -63,6 +69,22 @@ export function getGradeIcon(grade){
     }
 }
 
+export function getCompletionistBadge(ruleset){
+    let normalized = GetRulesetNameFromId(ruleset).toLowerCase();
+    switch(normalized){
+        case 'osu':
+            return CompletionistStandard;
+        case 'taiko':
+            return CompletionistTaiko;
+        case 'fruits':
+            return CompletionistCatch;
+        case 'mania':
+            return CompletionistMania;
+        default:
+            return null;
+    }
+}
+
 export const TextureDatabase = {
     PageNotFoundKirino,
     RulesetCatchIcon,
@@ -78,4 +100,8 @@ export const TextureDatabase = {
     SVGGradeSH,
     SVGGradeX,
     SVGGradeXH,
+    CompletionistStandard,
+    CompletionistTaiko,
+    CompletionistCatch,
+    CompletionistMania,
 };

@@ -16,6 +16,7 @@ import {
     TimeScale
 } from 'chart.js';
 import PlayerLink from "../components/PlayerLink";
+import { getCompletionistBadge, TextureDatabase } from "../assets/textures/TextureDatabase";
 
 ChartJS.register(
     CategoryScale,
@@ -238,8 +239,17 @@ function RouteCompletionists() {
                                 Object.keys(data).map(mode => (
                                     <Grid item key={mode} size={{ xs: 12, md: 3 }}>
                                         <Paper elevation={3} sx={{ padding: 1 }}>
-                                            <Typography variant="h6">{GetRulesetPrettyNameFromId(mode)}</Typography>
-                                            <Typography variant="body2" color="textSecondary"> Completionists: {data[mode].length} </Typography>
+                                            <div style={{
+                                                display: 'flex',
+                                                //space between
+                                                justifyContent: 'space-between',
+                                            }}>
+                                                <div>
+                                                    <Typography variant="h6">{GetRulesetPrettyNameFromId(mode)}</Typography>
+                                                    <Typography variant="body2" color="textSecondary"> Completionists: {data[mode].length} </Typography>
+                                                </div>
+                                                <img src={getCompletionistBadge(mode)} alt="Completionist Badge" style={{ marginLeft: 'auto', height: 40 }} />
+                                            </div>
                                             <TableContainer sx={{
                                                 mt: 2,
                                             }}>
