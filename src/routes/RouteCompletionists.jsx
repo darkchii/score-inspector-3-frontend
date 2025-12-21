@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useApi } from "../providers/ApiProvider";
 import { FormatNumber, GetRulesetColor, GetRulesetNameFromId, GetRulesetPrettyNameFromId, ShowNotification } from "../util/Helper";
-import { Alert, Grid, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Alert, Divider, Grid, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { Line } from "react-chartjs-2";
 import 'chartjs-adapter-moment';
 import {
@@ -260,16 +260,42 @@ function RouteCompletionists() {
                                                     <TableBody>
                                                         {
                                                             data[mode].map(item => (
-                                                                <TableRow key={item.osu_id}>
-                                                                    <TableCell>
-                                                                        {
-                                                                            !item.user?.username ? <>{item.osu_id} (restricted?)</> :
-                                                                                <PlayerLink data={item} />
-                                                                        }
-                                                                    </TableCell>
-                                                                    <TableCell>{new Date(item.completion_date).toLocaleDateString()}</TableCell>
-                                                                    <TableCell>{FormatNumber(item.scores)}</TableCell>
-                                                                </TableRow>
+                                                                <React.Fragment key={item.osu_id}>
+                                                                    {/* if the year changes, add a little marker for that */}
+                                                                    {
+                                                                        (() => {
+                                                                            let year = null;
+                                                                            const index = data[mode].indexOf(item);
+                                                                            if (index === 0) {
+                                                                                year = new Date(item.completion_date).getFullYear();
+                                                                            }else{
+                                                                                const prevItem = data[mode][index - 1];
+                                                                                const prevYear = new Date(prevItem.completion_date).getFullYear();
+                                                                                const currYear = new Date(item.completion_date).getFullYear();
+                                                                                year = prevYear !== currYear ? currYear : null;
+                                                                            }
+                                                                            if (year) {
+                                                                                return (
+                                                                                    <TableRow>
+                                                                                        <TableCell colSpan={3}>
+                                                                                            <Divider>{year}</Divider>
+                                                                                        </TableCell>
+                                                                                    </TableRow>
+                                                                                );
+                                                                            }
+                                                                        })()
+                                                                    }
+                                                                    <TableRow key={item.osu_id}>
+                                                                        <TableCell>
+                                                                            {
+                                                                                !item.user?.username ? <>{item.osu_id} (restricted?)</> :
+                                                                                    <PlayerLink data={item} />
+                                                                            }
+                                                                        </TableCell>
+                                                                        <TableCell>{new Date(item.completion_date).toLocaleDateString()}</TableCell>
+                                                                        <TableCell>{FormatNumber(item.scores)}</TableCell>
+                                                                    </TableRow>
+                                                                </React.Fragment>
                                                             ))
                                                         }
                                                     </TableBody>
