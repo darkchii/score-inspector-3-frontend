@@ -43,7 +43,7 @@ function PlayerLink({ data }) {
             bgcolor: `${isSelf ? theme.palette.primary.main : '#ffffff'}22`,
             textDecoration: 'none',
             color: '#fff',
-            p: 0.25,
+            p: 0.15,
             pr: 1,
             width: 'fit-content',
             alignItems: 'center',
@@ -62,7 +62,7 @@ function PlayerLink({ data }) {
                 alt={username}
                 sx={{ width: 24, height: 24, mr: 0.5 }}
             />
-            <Typography>
+            <Typography variant="body2" sx={{ fontWeight: isSelf ? 'bold' : 'normal' }}>
                 {/* {
                     props.team && <>
                         <span style={{ color: props.team.color, fontWeight: 'bold' }}>[{props.team.short_name}] </span>

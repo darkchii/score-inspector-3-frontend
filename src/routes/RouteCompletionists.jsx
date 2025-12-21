@@ -263,8 +263,14 @@ function RouteCompletionists() {
                                                     <TableHead>
                                                         <TableRow>
                                                             <TableCell>User</TableCell>
-                                                            <TableCell>Date</TableCell>
                                                             <TableCell>Scores</TableCell>
+                                                            <TableCell>Date</TableCell>
+                                                            <TableCell>
+                                                                <Typography variant="body2" color="textSecondary">Elapsed</Typography>
+                                                                <Typography variant="body2" color="textSecondary">
+                                                                    (days)
+                                                                </Typography>
+                                                            </TableCell> {/* how many days from previous completionist */}
                                                         </TableRow>
                                                     </TableHead>
                                                     <TableBody>
@@ -278,7 +284,7 @@ function RouteCompletionists() {
                                                                             const index = data[mode].indexOf(item);
                                                                             if (index === 0) {
                                                                                 year = new Date(item.completion_date).getFullYear();
-                                                                            }else{
+                                                                            } else {
                                                                                 const prevItem = data[mode][index - 1];
                                                                                 const prevYear = new Date(prevItem.completion_date).getFullYear();
                                                                                 const currYear = new Date(item.completion_date).getFullYear();
@@ -287,8 +293,12 @@ function RouteCompletionists() {
                                                                             if (year) {
                                                                                 return (
                                                                                     <TableRow>
-                                                                                        <TableCell colSpan={3}>
-                                                                                            <Divider>{year}</Divider>
+                                                                                        <TableCell colSpan={4}>
+                                                                                            <Divider>
+                                                                                                <Typography variant="subtitle2" color="textSecondary">
+                                                                                                    {year}
+                                                                                                </Typography>
+                                                                                            </Divider>
                                                                                         </TableCell>
                                                                                     </TableRow>
                                                                                 );
@@ -302,8 +312,30 @@ function RouteCompletionists() {
                                                                                     <PlayerLink data={item} />
                                                                             }
                                                                         </TableCell>
-                                                                        <TableCell>{new Date(item.completion_date).toLocaleDateString()}</TableCell>
                                                                         <TableCell>{FormatNumber(item.scores)}</TableCell>
+                                                                        <TableCell>{new Date(item.completion_date).toLocaleDateString()}</TableCell>
+                                                                        <TableCell>
+                                                                            {/* small text */}
+                                                                            <Typography variant="body2" color="textSecondary">
+                                                                                {
+                                                                                    (() => {
+                                                                                        const index = data[mode].indexOf(item);
+                                                                                        if (index === 0) {
+                                                                                            return '-';
+                                                                                        } else {
+                                                                                            const prevItem = data[mode][index - 1];
+                                                                                            const diffTime = Math.abs(new Date(item.completion_date) - new Date(prevItem.completion_date));
+                                                                                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                                                                            if (diffDays === 0) {
+                                                                                                return '-';
+                                                                                            } else {
+                                                                                                return `+${diffDays}`;
+                                                                                            }
+                                                                                        }
+                                                                                    })()
+                                                                                }
+                                                                            </Typography>
+                                                                        </TableCell>
                                                                     </TableRow>
                                                                 </React.Fragment>
                                                             ))
