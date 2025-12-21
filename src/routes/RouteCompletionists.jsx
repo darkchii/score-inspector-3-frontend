@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../providers/ApiProvider";
 import { FormatNumber, GetRulesetColor, GetRulesetNameFromId, GetRulesetPrettyNameFromId, ShowNotification } from "../util/Helper";
-import { Alert, Grid, Paper, Typography } from "@mui/material";
+import { Alert, Grid, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { Line } from "react-chartjs-2";
 import 'chartjs-adapter-moment';
 import {
@@ -15,6 +15,7 @@ import {
     Legend,
     TimeScale
 } from 'chart.js';
+import PlayerLink from "../components/PlayerLink";
 
 ChartJS.register(
     CategoryScale,
@@ -239,6 +240,42 @@ function RouteCompletionists() {
                                         <Paper elevation={3} sx={{ padding: 1 }}>
                                             <Typography variant="h6">{GetRulesetPrettyNameFromId(mode)}</Typography>
                                             <Typography variant="body2" color="textSecondary"> Completionists: {data[mode].length} </Typography>
+                                            <TableContainer sx={{
+                                                mt: 2,
+                                            }}>
+                                                <Table
+                                                    size="small"
+                                                    sx={{
+                                                        [`& .${tableCellClasses.root}`]: {
+                                                            borderBottom: "none"
+                                                        }
+                                                    }}>
+                                                    <TableHead>
+                                                        <TableRow>
+                                                            <TableCell>User</TableCell>
+                                                            <TableCell>Date</TableCell>
+                                                            <TableCell>Scores</TableCell>
+                                                        </TableRow>
+                                                    </TableHead>
+                                                    <TableBody>
+                                                        {
+                                                            data[mode].map(item => (
+                                                                <TableRow key={item.osu_id}>
+                                                                    <TableCell>
+                                                                        {
+                                                                            !item.user?.username ? <>{item.osu_id} (restricted?)</> :
+                                                                                <PlayerLink data={item} />
+                                                                        }
+                                                                    </TableCell>
+                                                                    <TableCell>{new Date(item.completion_date).toLocaleDateString()}</TableCell>
+                                                                    <TableCell>{FormatNumber(item.scores)}</TableCell>
+                                                                </TableRow>
+                                                            ))
+                                                        }
+                                                    </TableBody>
+                                                </Table>
+
+                                            </TableContainer>
                                         </Paper>
                                     </Grid>
                                 ))
