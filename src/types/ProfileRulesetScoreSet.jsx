@@ -33,6 +33,8 @@ export class ProfileRulesetScoreSet {
         this.highlighted_scores['oldest'] = null;
 
         this.sessions = [];
+
+        this.scores_reordered = {};
     }
 
     addScore(score) {
@@ -135,6 +137,7 @@ export class ProfileRulesetScoreSet {
 
         this.reorder('ended_at', true);
         this.recent_scores = this.scores.slice(0, 100);
+        this.scores_reordered['date'] = this.recent_scores;
 
         this.sessions = SessionCollection.fromScores(this.scores);
         this.sessions.sessions.sort((a, b) => b.start - a.start);

@@ -6,15 +6,20 @@ import colorStyles from '../../../styles/colors.module.less';
 import BetterTooltip from "../../tooltips/BetterTooltip";
 import { HexToRgb } from "../../../util/Helper";
 import GradesDisplay from "../../GradesDisplay";
+import NumberFlow from "@number-flow/react";
+import ScoreList from "../../ScoreList";
 
 //uses periodic_by_year from the ProfileRulesetStatistics type
 function ProfilePageDaily() {
     const { getRulesetStatistics, activeRuleset } = useProfile();
 
+    const [statDatabase, setStatDatabase] = useState(null);
     const [yearRange, setYearRange] = useState(5);
     const [activeDisplayYear, setActiveDisplayYear] = useState(new Date().getUTCFullYear());
 
     const [activeYearData, setActiveYearData] = useState(null);
+
+    //These 2 are to make sure the selection persists when switching display years
     const [activeDate, setActiveDate] = useState(null);
 
     useEffect(() => {
@@ -22,11 +27,9 @@ function ProfilePageDaily() {
     }, [activeDate])
 
     useEffect(() => {
-        setActiveDate(null);
-
-        //get the lowest year key from getRulesetStatistics(activeRuleset).periodic_by_year
         const profileStatistics = getRulesetStatistics(activeRuleset);
         if (profileStatistics) {
+            setStatDatabase(profileStatistics);
             const years = Object.keys(profileStatistics.periodic_by_year).map(y => parseInt(y)).sort((a, b) => a - b);
             if (years.length > 0) {
                 setActiveDisplayYear(years[years.length - 1]);
@@ -37,6 +40,15 @@ function ProfilePageDaily() {
                 setYearRange(years[years.length - 1] - years[0] + 1);
             } else {
                 setYearRange(1);
+            }
+
+            //find newest entry in .periodic['daily'] to set active date to
+            const dailyData = profileStatistics.periodic?.['daily'];
+            if (dailyData) {
+                const dailyDates = Object.keys(dailyData).sort((a, b) => new Date(b) - new Date(a));
+                if (dailyDates.length > 0) {
+                    setActiveDate(dailyDates[0]);
+                }
             }
         }
     }, [activeRuleset]);
@@ -88,14 +100,17 @@ function ProfilePageDaily() {
             <div>
                 {
                     //if activeDate is set, and it exists in activeYearData, show details
-                    activeDate && activeYearData && activeYearData[activeDate] ? (
-                        <Collapse in={activeYearData?.[activeDate] != null} unmountOnExit>
+                    activeDate && activeYearData && statDatabase?.periodic?.['daily']?.[activeDate] ? (
+                        <Collapse in={statDatabase?.periodic?.['daily']?.[activeDate] != null} unmountOnExit>
                             <div>
-                                <GradesDisplay grades={activeYearData[activeDate].grades} />
+                                <GradesDisplay grades={statDatabase?.periodic?.['daily']?.[activeDate].grades} />
+                                <ScoreList 
+                                    scores={statDatabase?.periodic?.['daily']?.[activeDate].scores_reordered?.['date']} truncate={true}
+                                />
                             </div>
                         </Collapse>
                     ) : (
-                        <Collapse in={activeYearData?.[activeDate] == null} unmountOnExit>
+                        <Collapse in={statDatabase?.periodic?.['daily']?.[activeDate] == null} unmountOnExit>
                             <p>Select a date to see details.</p>
                         </Collapse>
                     )
@@ -259,7 +274,8 @@ function DateGrid({ year, data, activeDate = null, onDateSelected = null }) {
                             borderRadius: '2px',
                         }}
                     />
-                    <p>{maxClears > ABSOLUTE_RANGE_LIMIT ? `${ABSOLUTE_RANGE_LIMIT}+` : maxClears}</p>
+                    {/* <p>{maxClears > ABSOLUTE_RANGE_LIMIT ? `${ABSOLUTE_RANGE_LIMIT}+` : maxClears}</p> */}
+                    <p><NumberFlow value={maxClears > ABSOLUTE_RANGE_LIMIT ? ABSOLUTE_RANGE_LIMIT : maxClears} suffix={maxClears > ABSOLUTE_RANGE_LIMIT ? '+' : ''} /></p>
                 </div>
             </Box>
         </>
