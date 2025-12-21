@@ -10,6 +10,7 @@ import Footer from "./components/Footer";
 import Route404 from "./routes/Route404";
 import { pink } from "@mui/material/colors";
 import RouteScore from "./routes/RouteScore";
+import RouteCompletionists from "./routes/RouteCompletionists";
 
 const theme = createTheme({
   palette: {
@@ -46,6 +47,7 @@ function App() {
     { path: "/", element: <RouteIndex /> },
     { path: "/user/:userId/:ruleset?/:page?", element: <RouteProfile /> },
     { path: "/score/:scoreId", element: <RouteScore /> },
+    { path: "/completionists", element: <RouteCompletionists /> },
   ];
 
   const getRoute = (obj, is_child = false) => {

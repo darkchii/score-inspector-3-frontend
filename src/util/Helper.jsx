@@ -177,6 +177,31 @@ export const GetRulesetNameFromId = (rulesetId) => {
     }
 }
 
+export const GetRulesetPrettyNameFromId = (rulesetId) => {
+    switch (rulesetId) {
+        default:
+        case 0:
+        case '0':
+        case 'osu':
+            return 'osu!standard';
+        case 1:
+        case '1':
+        case 'taiko':
+            return 'osu!taiko';
+        case 2:
+        case '2':
+        case 'fruits':
+            return 'osu!catch';
+        case 3:
+        case '3':
+        case 'mania':
+            return 'osu!mania';
+        case 'all':
+        case 'total':
+            return 'total';
+    }
+}
+
 export const GetRulesetId = (rulesetName) => {
     switch (rulesetName) {
         default:
@@ -350,14 +375,14 @@ function GetGradeFromAccuracyBase(accuracy, ruleset = 'osu') {
 export function GetGradeFromAccuracy(score, accuracy) {
     let grade = GetGradeFromAccuracyBase(accuracy);
 
-    switch(score.ruleset) {
+    switch (score.ruleset) {
         case 'osu':
         case 'taiko':
-            switch(grade){
+            switch (grade) {
                 case 'S':
                 case 'X':
                     //if miss > 0, downgrade to A
-                    if(score.statistics_miss > 0) {
+                    if (score.statistics_miss > 0) {
                         grade = 'A';
                     }
                     break;
@@ -367,8 +392,8 @@ export function GetGradeFromAccuracy(score, accuracy) {
             grade = GetGradeFromAccuracyBase(accuracy, 'fruits');
             break;
         case 'mania':
-            if (grade === 'S'){
-                const anyImperfect = 
+            if (grade === 'S') {
+                const anyImperfect =
                     score.statistics_good > 0 ||
                     score.statistics_ok > 0 ||
                     score.statistics_meh > 0 ||
@@ -379,9 +404,9 @@ export function GetGradeFromAccuracy(score, accuracy) {
             break;
     }
 
-    if(grade === 'S' || grade === 'X'){
+    if (grade === 'S' || grade === 'X') {
         //check for hidden mod
-        if(HasHiddenMod(score.mods)){
+        if (HasHiddenMod(score.mods)) {
             grade += 'H';
         }
     }

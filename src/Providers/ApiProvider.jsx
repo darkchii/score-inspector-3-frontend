@@ -53,8 +53,13 @@ export function ApiProvider({ children }) {
         return response;
     }
 
+    const getCompletionists = async () => {
+        const response = await apiGet(`user/completionists`);
+        return response;
+    }
+
     return (
-        <ApiContext.Provider value={{ getUserLive, getScoresLive, getBeatmapsLive }}>
+        <ApiContext.Provider value={{ getUserLive, getScoresLive, getBeatmapsLive, getCompletionists }}>
             {children}
         </ApiContext.Provider>
     )
