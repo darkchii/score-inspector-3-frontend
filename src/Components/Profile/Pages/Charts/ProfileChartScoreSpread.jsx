@@ -3,6 +3,7 @@ import { useProfile } from "../../../../providers/ProfileProvider";
 import { useScoreView } from "../../../../providers/ScoreViewProvider";
 import { FormatNumberWithPrecision } from "../../../../util/Helper";
 import { Alert } from "@mui/material";
+import { Scatter } from "react-chartjs-2";
 
 function PerformanceChartScoreSpread() {
     const { getRulesetStatistics, activeRuleset, getScoreById } = useProfile();
@@ -10,7 +11,7 @@ function PerformanceChartScoreSpread() {
 
     return (
         <>
-            <ScatterChart
+            {/* <ScatterChart
                 slotProps={
                     {
                         //disable tooltip
@@ -57,7 +58,75 @@ function PerformanceChartScoreSpread() {
                         }
                     ]
                 }
-            />
+            /> */}
+            <div style={{ height: 400 }}>
+                <Scatter
+                    data={{
+                        datasets: [
+                            {
+                                label: 'Scores',
+                                data: getRulesetStatistics(activeRuleset)?.charts?.scoreSpread.map(item => ({ x: item.x, y: item.y, id: item.id })) || [],
+                                pointBackgroundColor: getRulesetStatistics(activeRuleset)?.charts?.scoreSpread.map(item => item.color) || [],
+                                pointRadius: 2,
+                            }
+                        ]
+                    }}
+
+                    options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: '#',
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return `#${Number(value).toLocaleString()}`;
+                                    }
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Score',
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return `${FormatNumberWithPrecision(value, 0)}`;
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const score = getScoreById(context.raw.id);
+                                        if (score && score.beatmap) {
+                                            return `${score.beatmap.artist} - ${score.beatmap.title} [${score.beatmap.version}]\nRank: #${context.raw.x.toLocaleString()}\nScore: ${FormatNumberWithPrecision(context.raw.y, 0)}`;
+                                        }
+                                        else {
+                                            return `Score ID: ${context.raw.id}\nRank: #${context.raw.x.toLocaleString()}\nScore: ${FormatNumberWithPrecision(context.raw.y, 0)}`;
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        onClick: (evt, elements) => {
+                            if (elements.length > 0) {
+                                const index = elements[0].index;
+                                const datasetIndex = elements[0].datasetIndex;
+                                const scoreId = getRulesetStatistics(activeRuleset)?.charts?.scoreSpread[index]?.id;
+                                if (scoreId) {
+                                    loadScoreView(scoreId);
+                                }
+                            }
+                        }
+                    }}
+                />
+            </div>
             {
                 getRulesetStatistics(activeRuleset)?.scores_set?.clears > 10000 &&
                 <Alert severity="info" sx={{ mt: 2 }}>

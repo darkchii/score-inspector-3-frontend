@@ -1,4 +1,4 @@
-import { ScatterChart } from "@mui/x-charts";
+import { Scatter } from "react-chartjs-2";
 import { useProfile } from "../../../../providers/ProfileProvider";
 import { useScoreView } from "../../../../providers/ScoreViewProvider";
 import { FormatNumberWithPrecision } from "../../../../util/Helper";
@@ -10,54 +10,74 @@ function PerformanceChartPerformanceSpread() {
 
     return (
         <>
-            <ScatterChart
-                slotProps={
-                    {
-                        //disable tooltip
-                        tooltip: {
-                            display: 'none',
-                        }
-                    }
-                }
-                skipAnimation={true}
-                height={400}
-                series={
-                    [
-                        {
-                            markerSize: 2,
-                            data: getRulesetStatistics(activeRuleset)?.charts?.performanceSpread || [],
-                            //color based on x,y value
-                            colorGetter: (data) => {
-                                return data.value.color;
+            <div style={{ height: 400 }}>
+                <Scatter 
+                    data={{
+                        datasets: [
+                            {
+                                label: 'Scores',
+                                data: getRulesetStatistics(activeRuleset)?.charts?.performanceSpread.map(item => ({ x: item.x, y: item.y, id: item.id })) || [],
+                                pointBackgroundColor: getRulesetStatistics(activeRuleset)?.charts?.performanceSpread.map(item => item.color) || [],
+                                pointRadius: 2,
+                            }
+                        ]
+                    }}
+
+                    options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: '#',
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return `#${Number(value).toLocaleString()}`;
+                                    }
+                                }
                             },
-                            valueFormatter: (value) => {
-                                const score = getScoreById(value.id);
-                                if (score && score.beatmap) {
-                                    return `${score.beatmap.artist} - ${score.beatmap.title} [${score.beatmap.version}]\n${FormatNumberWithPrecision(value.y, 2)}pp`;
-                                } else {
-                                    return `Score ID: ${value.id}\n${FormatNumberWithPrecision(value.y, 2)}pp`;
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Performance',
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return `${FormatNumberWithPrecision(value, 2)}pp`;
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const score = getScoreById(context.raw.id);
+                                        if (score && score.beatmap) {
+                                            return `${score.beatmap.artist} - ${score.beatmap.title} [${score.beatmap.version}]\nRank: #${context.raw.x.toLocaleString()}\nPP: ${FormatNumberWithPrecision(context.raw.y, 2)}pp`;
+                                        }
+                                        else {
+                                            return `Score ID: ${context.raw.id}\nRank: #${context.raw.x.toLocaleString()}\nPP: ${FormatNumberWithPrecision(context.raw.y, 2)}pp`;
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        onClick: (evt, elements) => {
+                            if (elements.length > 0) {
+                                const index = elements[0].index;
+                                const datasetIndex = elements[0].datasetIndex;
+                                const scoreId = getRulesetStatistics(activeRuleset)?.charts?.performanceSpread[index]?.id;
+                                if (scoreId) {
+                                    loadScoreView(scoreId);
                                 }
                             }
                         }
-                    ]
-                }
-
-                onItemClick={(event, scatterItemIdentifier) => {
-                    const score = getScoreById(getRulesetStatistics(activeRuleset)?.charts?.performanceSpread[scatterItemIdentifier.dataIndex].id);
-                    if (score) {
-                        loadScoreView(score);
-                    }
-                }}
-
-                yAxis={
-                    [
-                        {
-                            valueFormatter: (value) => `${FormatNumberWithPrecision(value, 2)}pp`,
-                            width: 80,
-                        }
-                    ]
-                }
-            />
+                    }}
+                />
+            </div>
             {
                 getRulesetStatistics(activeRuleset)?.scores_set?.clears > 10000 &&
                 <Alert severity="info" sx={{ mt: 2 }}>
