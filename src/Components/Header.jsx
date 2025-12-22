@@ -7,6 +7,8 @@ import { GetOsuAuthUrl } from "../util/ApiHelper";
 import LoadingButton from "./LoadingButton";
 import DebouncedTextField from "./DebouncedTextField";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import PersonIcon from '@mui/icons-material/Person';
+import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -53,10 +55,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const HEADER_NAV_ITEMS = [
     {
         label: 'People',
+        icon: <PersonIcon />,
         dropdown: [
             {
                 label: 'Completionists',
                 to: '/completionists',
+                icon: <MilitaryTechIcon />
             }
         ]
     }
@@ -143,6 +147,7 @@ function Header() {
                         key={index}
                         component={item.to ? Link : 'button'}
                         to={item.to || '#'}
+                        startIcon={item.icon || null}
                         onClick={() => {
                             handleHeaderMenuClose();
                             if (item.onClick) {
@@ -152,7 +157,6 @@ function Header() {
                         sx={{
                             textAlign: 'left',
                             width: '100%',
-                            padding: theme.spacing(1, 2),
                             color: 'inherit',
                             textDecoration: 'none',
                             '&:hover': {
@@ -205,6 +209,7 @@ function Header() {
                                                     component={item.to ? Link : 'button'}
                                                     to={item.to || '#'}
                                                     onClick={item.onClick}
+                                                    startIcon={item.icon || null}
                                                 >
                                                     {item.label}
                                                 </Button>

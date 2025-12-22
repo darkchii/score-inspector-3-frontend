@@ -183,6 +183,7 @@ function RouteCompletionists() {
                                                     backgroundColor: GetRulesetColor(GetRulesetNameFromId(mode))[500],
                                                     pointRadius: 4,
                                                     pointHoverRadius: 6,
+                                                    stepped: true,
                                                 }))
                                             }}
                                             options={{
