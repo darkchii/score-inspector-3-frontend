@@ -172,19 +172,36 @@ function RouteCompletionists() {
                                         {/* line chart per mode, y = .scores, x = .completion_date */}
                                         <Line
                                             data={{
-                                                datasets: Object.keys(data).map(mode => ({
-                                                    label: GetRulesetPrettyNameFromId(mode),
-                                                    data: data[mode].map(item => ({
-                                                        x: new Date(item.completion_date).getTime(),
-                                                        //count of completionists up to current item
-                                                        y: data[mode].filter(i => new Date(i.completion_date) <= new Date(item.completion_date)).length
+                                                datasets: [
+                                                    ...Object.keys(data).map(mode => ({
+                                                        label: GetRulesetPrettyNameFromId(mode),
+                                                        data: data[mode].map(item => ({
+                                                            x: new Date(item.completion_date).getTime(),
+                                                            //count of completionists up to current item
+                                                            y: data[mode].filter(i => new Date(i.completion_date) <= new Date(item.completion_date)).length
+                                                        })),
+                                                        borderColor: GetRulesetColor(GetRulesetNameFromId(mode))[500],
+                                                        backgroundColor: GetRulesetColor(GetRulesetNameFromId(mode))[500],
+                                                        pointRadius: 4,
+                                                        pointHoverRadius: 6,
+                                                        stepped: true,
                                                     })),
-                                                    borderColor: GetRulesetColor(GetRulesetNameFromId(mode))[500],
-                                                    backgroundColor: GetRulesetColor(GetRulesetNameFromId(mode))[500],
-                                                    pointRadius: 4,
-                                                    pointHoverRadius: 6,
-                                                    stepped: true,
-                                                }))
+                                                    //combined dataset
+                                                    {
+                                                        label: 'Combined',
+                                                        //order all items by date as well, otherwise the line will jump around
+                                                        data: Object.values(data).flat().sort((a, b) => new Date(a.completion_date) - new Date(b.completion_date)).map((item, index, arr) => ({
+                                                            x: new Date(item.completion_date).getTime(),
+                                                            y: arr.filter(i => new Date(i.completion_date) <= new Date(item.completion_date)).length
+                                                        })),
+                                                        //50% opacity gray
+                                                        borderColor: 'rgba(128,128,128,0.5)',
+                                                        backgroundColor: 'rgba(128,128,128,0.5)',
+                                                        pointRadius: 4,
+                                                        pointHoverRadius: 6,
+                                                        stepped: true,
+                                                    }
+                                                ]
                                             }}
                                             options={{
                                                 responsive: true,
