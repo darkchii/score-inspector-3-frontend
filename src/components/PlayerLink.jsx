@@ -22,7 +22,8 @@ function PlayerLink({ data }) {
         } else if (data.osuApi) {
             api_user = data.osuApi;
         } else {
-            isValid = false;
+            setIsValid(false);
+            return;
         }
 
         if (api_user) {

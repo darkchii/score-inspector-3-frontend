@@ -55,19 +55,6 @@ function RouteCompletionists() {
                     groupedData[mode].sort((a, b) => new Date(a.completion_date) - new Date(b.completion_date));
                 }
 
-                //pregenerate image elements for avatars to speed up chart rendering
-                for (const mode in groupedData) {
-                    groupedData[mode].forEach(item => {
-                        if (item.user && item.user.avatar_url) {
-                            // image object, with size 28x28, circular
-                            const img = new Image(28, 28);
-                            img.src = item.user.avatar_url;
-                            img.style.backgroundColor = GetRulesetColor(GetRulesetNameFromId(mode))[100];
-                            item.user.avatar_image = img;
-                        }
-                    });
-                }
-
                 setData(groupedData);
             } catch (e) {
                 ShowNotification("Failed to load completionists data.", "error");
@@ -105,9 +92,6 @@ function RouteCompletionists() {
                                                         })),
                                                         borderColor: GetRulesetColor(GetRulesetNameFromId(mode))[500],
                                                         backgroundColor: GetRulesetColor(GetRulesetNameFromId(mode))[500],
-                                                        pointStyle: (ctx) => {
-                                                            return ctx.raw.data.user?.avatar_image || 'circle';
-                                                        },
                                                         pointRadius: 4,
                                                         pointHoverRadius: 6,
                                                     })),
@@ -197,6 +181,8 @@ function RouteCompletionists() {
                                                     })),
                                                     borderColor: GetRulesetColor(GetRulesetNameFromId(mode))[500],
                                                     backgroundColor: GetRulesetColor(GetRulesetNameFromId(mode))[500],
+                                                    pointRadius: 4,
+                                                    pointHoverRadius: 6,
                                                 }))
                                             }}
                                             options={{
