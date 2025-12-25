@@ -169,6 +169,7 @@ function Header() {
                                                     to={item.to || '#'}
                                                     onClick={item.onClick}
                                                     startIcon={item.icon || null}
+                                                    disabled={!item.onClick && !item.to}
                                                 >
                                                     {item.label || ''}
                                                 </Button>

@@ -1,13 +1,19 @@
-import { Fade, Paper, ThemeProvider, useTheme } from '@mui/material';
+import { Collapse, Fade, Grid, Modal, Paper, ThemeProvider, useTheme } from '@mui/material';
 import searchStyles from '../styles/search.module.less';
 import React, { createContext, useContext, useEffect, useState } from "react";
 import DebouncedTextField from '../components/DebouncedTextField';
+import { useApi } from './ApiProvider';
+import PlayerCard from '../components/PlayerCard';
 
 const SearchContext = createContext();
 
 export function SearchProvider({ children }) {
+    const { getUserSearch } = useApi();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
+    const [query, setQuery] = useState('');
+
+    const [searchResults, setSearchResults] = useState([]);
 
     const openSearch = () => {
         setIsSearchOpen(true);
@@ -18,10 +24,26 @@ export function SearchProvider({ children }) {
     }
 
     const search = async (query) => {
-        //for a test, simulate a search delay
+        if (isSearching) {
+            return;
+        }
+
+        if (!query || query.length < 2) {
+            setSearchResults([]);
+            return;
+        }
+
+        setQuery(query);
+
         setIsSearching(true);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setIsSearching(false);
+        try {
+            const results = await getUserSearch(query);
+            setSearchResults(results);
+        } catch (error) {
+            console.error("Error during search:", error);
+        } finally {
+            setIsSearching(false);
+        }
     }
 
     //when pressing escape key, close the search modal
@@ -40,33 +62,59 @@ export function SearchProvider({ children }) {
     return (
         <SearchContext.Provider value={{ openSearch, closeSearch, isSearchOpen }}>
             <React.Fragment>
-                <SearchModal working={isSearching} open={isSearchOpen} onClose={closeSearch} onSearch={search} />
+                <SearchModal query={query} working={isSearching} open={isSearchOpen} results={searchResults} onClose={closeSearch} onSearch={search} />
                 {children}
             </React.Fragment>
         </SearchContext.Provider>
     )
 }
 
-function SearchModal({ open = false, working = false, onClose = () => { }, onSearch = (query) => { } }) {
+function SearchModal({ query = '', open = false, working = false, results = [], onClose = () => { }, onSearch = (query) => { } }) {
     return (
-        <Fade in={open} unmountOnExit>
+        <Modal open={open} onClose={onClose} closeAfterTransition disableEnforceFocus disableRestoreFocus>
             <div className={searchStyles['search-modal']}>
                 <div className={searchStyles['search-modal__backdrop']} onClick={onClose} />
                 <div className={searchStyles['search-modal__content']}>
-                    <Paper elevation={3}>
+                    <Paper elevation={3} sx={{ padding: 2, width: '100%' }}>
                         <DebouncedTextField
                             size='large'
                             label="Search..."
                             variant="outlined"
                             onDebouncedChange={(value) => onSearch(value)}
-                            autoFocus
                             fullWidth
+                            autoFocus
                             disabled={working}
+                            defaultValue={query}
                         />
+                        {
+                            working ?
+                                <div className={searchStyles['search-modal__loading']}>
+                                    Searching...
+                                </div>
+                                :
+                                <div className={searchStyles['search-modal__results']}>
+                                    {
+                                        results.length === 0 ?
+                                            <div className={searchStyles['search-modal__no-results']}>
+                                                No results
+                                            </div>
+                                            :
+                                            <Collapse in={results.length > 0}>
+                                                <Grid container spacing={2}>
+                                                    {results.map((result, index) => (
+                                                        <Grid size={{ xs: 12, md: 4 }} key={index}>
+                                                            <PlayerCard data={result} onClick={() => onClose()} />
+                                                        </Grid>
+                                                    ))}
+                                                </Grid>
+                                            </Collapse>
+                                    }
+                                </div>
+                        }
                     </Paper>
                 </div>
             </div>
-        </Fade>
+        </Modal>
     )
 }
 

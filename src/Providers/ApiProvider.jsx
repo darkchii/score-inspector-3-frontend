@@ -58,8 +58,13 @@ export function ApiProvider({ children }) {
         return response;
     }
 
+    const getUserSearch = async (query, progressEvent = null) => {
+        const response = await apiGet(`user/search/${encodeURIComponent(query)}`, progressEvent);
+        return response;
+    }
+
     return (
-        <ApiContext.Provider value={{ getUserLive, getScoresLive, getBeatmapsLive, getCompletionists }}>
+        <ApiContext.Provider value={{ getUserLive, getScoresLive, getBeatmapsLive, getCompletionists, getUserSearch }}>
             {children}
         </ApiContext.Provider>
     )
