@@ -10,6 +10,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import PersonIcon from '@mui/icons-material/Person';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import SearchIcon from '@mui/icons-material/Search';
+import { useSearch } from "../providers/SearchProvider";
 
 const HeaderButtonMenu = styled((props) => (
     <Menu
@@ -57,6 +58,7 @@ const HeaderButtonMenu = styled((props) => (
 function Header() {
     const [showMenu, setShowMenu] = useState(null);
     const { user, loading } = useAuth();
+    const { openSearch } = useSearch();
     const theme = useTheme();
 
     //dropdown data
@@ -68,7 +70,7 @@ function Header() {
         {
             label: 'Search',
             icon: <SearchIcon />,
-            onClick: () => { console.log('search') }
+            onClick: () => { openSearch(); }
         },
         {
             label: 'People',

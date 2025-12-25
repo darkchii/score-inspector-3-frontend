@@ -1,37 +1,15 @@
-import { Box, CardContent, createTheme, CssBaseline, Paper, ThemeProvider } from "@mui/material"
+import { Box } from "@mui/material"
 import { Route, Routes, useSearchParams } from "react-router";
 import { useAuth } from "./providers/AuthProvider";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import RouteIndex from "./routes/RouteIndex";
 import RouteProfile from "./routes/RouteProfile";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Route404 from "./routes/Route404";
-import { pink } from "@mui/material/colors";
 import RouteScore from "./routes/RouteScore";
 import RouteCompletionists from "./routes/RouteCompletionists";
-
-const theme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: pink[500],
-      light: pink[300],
-      dark: pink[700],
-    },
-  },
-  //force white text on modals
-  components: {
-    MuiDialogContentText: {
-      styleOverrides: {
-        root: {
-          color: 'white',
-        },
-      },
-    },
-  },
-});
 
 function App() {
   const [title, setTitle] = useState(null);
@@ -91,8 +69,7 @@ function App() {
   }, [searchParams]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <React.Fragment>
       <ToastContainer />
       <Box>
         <Header />
@@ -103,7 +80,7 @@ function App() {
         }
       </Routes>
       <Footer />
-    </ThemeProvider>
+    </React.Fragment>
   )
 }
 
