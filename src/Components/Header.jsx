@@ -9,62 +9,7 @@ import DebouncedTextField from "./DebouncedTextField";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import PersonIcon from '@mui/icons-material/Person';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
-
-const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    transition: 'background-color 0.3s ease',
-    '&:hover': {
-        backgroundColor: alpha(theme.palette.common.white, 0.25),
-        transition: 'background-color 0.3s ease',
-    },
-    marginRight: theme.spacing(2),
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-        marginLeft: theme.spacing(3),
-        width: 'auto',
-    },
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    '& .MuiInputBase-input': {
-        padding: theme.spacing(1, 1, 1, 0),
-        // vertical padding + font size from searchIcon
-        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('md')]: {
-            width: '20ch',
-        },
-    },
-}));
-
-const HEADER_NAV_ITEMS = [
-    {
-        label: 'People',
-        icon: <PersonIcon />,
-        dropdown: [
-            {
-                label: 'Completionists',
-                to: '/completionists',
-                icon: <MilitaryTechIcon />
-            }
-        ]
-    }
-]
+import SearchIcon from '@mui/icons-material/Search';
 
 const HeaderButtonMenu = styled((props) => (
     <Menu
@@ -118,6 +63,25 @@ function Header() {
     const [activeDropdownIndex, setActiveDropdownIndex] = useState(null);
     const [showDropdown, setShowDropdown] = useState(false);
     const [anchorElDropdown, setAnchorElDropdown] = useState(null);
+
+    const HEADER_NAV_ITEMS = [
+        {
+            label: 'Search',
+            icon: <SearchIcon />,
+            onClick: () => { console.log('search') }
+        },
+        {
+            label: 'People',
+            icon: <PersonIcon />,
+            dropdown: [
+                {
+                    label: 'Completionists',
+                    to: '/completionists',
+                    icon: <MilitaryTechIcon />
+                }
+            ]
+        }
+    ];
 
     const handleHeaderMenuOpen = (event, index) => {
         setActiveDropdownIndex(index);
@@ -190,13 +154,6 @@ function Header() {
                                 fontStyle: 'italic',
                             }}>v3</Typography>
                     </Box>
-                    {/* <StyledInputBase
-                        placeholder="Search…"
-                        inputProps={{ 'aria-label': 'search' }}
-                    /> */}
-                    <div style={{ margin: '5px' }}>
-                        <DebouncedTextField size='small' label="Search..." variant="standard" onDebouncedChange={(value) => console.log(value)} />
-                    </div>
                     <Box sx={{ display: { xs: 'none', sm: 'none', md: 'none', lg: 'block', flexGrow: 1 } }}>
                         <Stack direction={'row'} spacing={2}>
                             {
@@ -211,7 +168,7 @@ function Header() {
                                                     onClick={item.onClick}
                                                     startIcon={item.icon || null}
                                                 >
-                                                    {item.label}
+                                                    {item.label || ''}
                                                 </Button>
                                                 {
                                                     item.dropdown && item.dropdown.length > 0 && (

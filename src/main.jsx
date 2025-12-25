@@ -10,12 +10,14 @@ import { AuthProvider } from './providers/AuthProvider.jsx';
 import { ApiProvider } from './providers/ApiProvider.jsx';
 import { ProfileProvider } from './providers/ProfileProvider.jsx';
 import { ScoreViewProvider } from './providers/ScoreViewProvider.jsx';
+import { SearchProvider } from './providers/SearchProvider.jsx';
 
 const _providers = [
   ApiProvider,
   AuthProvider,
   ProfileProvider,
-  ScoreViewProvider
+  ScoreViewProvider,
+  SearchProvider
 ]
 
 const _wrapWithProviders = (children) => {
