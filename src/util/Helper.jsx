@@ -5,6 +5,7 @@ import { blue, green, pink, purple } from '@mui/material/colors';
 import { HasHiddenMod, HasMod } from './ModHelper';
 import ScoreData from '../data/ScoreData.json';
 import NumberFlow from '@number-flow/react';
+import * as Muicon from "@mui/icons-material";
 
 export const ShowNotification = (message, severity) => {
     toast[severity](message, Config.NOTIFICATIONS);
@@ -450,4 +451,10 @@ export function HexToRgb(hex) {
         parseInt(result[2], 16),
         parseInt(result[3], 16)
     ] : null;
+}
+
+//gets any icon from mui icon by its name
+export function GetIconFromLabel(label) {
+    const IconComponent = Muicon[label];
+    return IconComponent ? <IconComponent /> : null;
 }

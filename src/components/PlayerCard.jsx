@@ -4,6 +4,7 @@ import playerCardStyles from '../styles/player-card.module.less';
 import { getFlagIcon } from "../assets/textures/TextureDatabase";
 import BetterTooltip from "./tooltips/BetterTooltip";
 import { useNavigate } from "react-router";
+import { GetIconFromLabel } from "../util/Helper";
 
 function PlayerCard({ data, onClick = null }) {
     const theme = useTheme();
@@ -12,6 +13,7 @@ function PlayerCard({ data, onClick = null }) {
     const [apiUser, setApiUser] = useState(null);
     const [id, setId] = useState(null);
     const [team, setTeam] = useState(null);
+    const [roles, setRoles] = useState(null);
     const [isValid, setIsValid] = useState(true);
 
     useEffect(() => {
@@ -41,6 +43,7 @@ function PlayerCard({ data, onClick = null }) {
             setApiUser(api_user);
             setId(_id);
             setTeam(team_data);
+            setRoles(data.roles || null);
             console.log(api_user);
         }
     }, [data]);
@@ -98,6 +101,31 @@ function PlayerCard({ data, onClick = null }) {
                                 null
                         }
                         {username || "Unknown"}
+                    </div>
+                    <div className={playerCardStyles['player-card__roles']}>
+                        {
+                            roles ?
+                                roles.map((role, index) => {
+                                    if (!role.is_visible) return null;
+                                    return (
+                                        <span
+                                            key={index}
+                                            className={playerCardStyles['player-card__role']}
+                                        >
+                                            <span
+                                                className={playerCardStyles['player-card__role__icon']}
+                                                style={{color: `#${role.color}`}}
+                                            >
+                                                <BetterTooltip title={role.title}>
+                                                    {GetIconFromLabel(role.icon) || role.title}
+                                                </BetterTooltip>
+                                            </span>
+                                        </span>
+                                    );
+                                })
+                                :
+                                null
+                        }
                     </div>
                 </div>
             </div>
