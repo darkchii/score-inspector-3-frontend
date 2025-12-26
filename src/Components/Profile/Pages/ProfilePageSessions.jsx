@@ -71,34 +71,34 @@ function SessionDisplay({ session }) {
                             </TableRow>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Scores</TableCell>
-                                <TableCell><NumberFlow value={session.score_count} /></TableCell>
+                                <TableCell><NumberFlow format={{ maximumFractionDigits: 0 }} value={session.score_count} /></TableCell>
                             </TableRow>
                             {/* Empty row for spacing */}
                             <Grid sx={{ mt: theme.spacing(2), }} />
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Total Score</TableCell>
-                                <TableCell><NumberFlow value={session.cumulative_implied_total_score} /></TableCell>
+                                <TableCell><NumberFlow format={{ maximumFractionDigits: 0 }}value={session.cumulative_implied_total_score} /></TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Average Score</TableCell>
-                                <TableCell><NumberFlow value={session.average_implied_total_score} /></TableCell>
+                                <TableCell><NumberFlow format={{ maximumFractionDigits: 0 }}value={session.average_implied_total_score} /></TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Highest Score</TableCell>
-                                <TableCell><NumberFlow value={session.max_implied_total_score} /></TableCell>
+                                <TableCell><NumberFlow format={{ maximumFractionDigits: 0 }} value={session.max_implied_total_score} /></TableCell>
                             </TableRow>
                             <Grid sx={{ mt: theme.spacing(2), }} />
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Lazer Score</TableCell>
-                                <TableCell><NumberFlow value={session.cumulative_lazer_score} /></TableCell>
+                                <TableCell><NumberFlow format={{ maximumFractionDigits: 0 }} value={session.cumulative_lazer_score} /></TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Average Lazer Score</TableCell>
-                                <TableCell><NumberFlow value={session.average_lazer_score} /></TableCell>
+                                <TableCell><NumberFlow format={{ maximumFractionDigits: 0 }} value={session.average_lazer_score} /></TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Highest Lazer Score</TableCell>
-                                <TableCell><NumberFlow value={session.max_lazer_score} /></TableCell>
+                                <TableCell><NumberFlow format={{ maximumFractionDigits: 0 }} value={session.max_lazer_score} /></TableCell>
                             </TableRow>
                             <Grid sx={{ mt: theme.spacing(2), }} />
                             <TableRow>

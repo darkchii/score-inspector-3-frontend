@@ -36,25 +36,26 @@ class Session {
             }
             this.grades[grade] += 1;
             this.cumulative_implied_total_score += score.implied_total_score;
-            this.cumulative_lazer_score += score.lazer_score;
-            this.cumulative_pp += score.pp;
+            this.cumulative_lazer_score += score.total_score;
+            this.cumulative_pp += score.implied_pp;
             
             if (score.implied_total_score > this.max_implied_total_score) {
                 this.max_implied_total_score = score.implied_total_score;
             }
 
-            if (score.lazer_score > this.max_lazer_score) {
-                this.max_lazer_score = score.lazer_score;
+            if (score.total_score > this.max_lazer_score) {
+                this.max_lazer_score = score.total_score;
             }
             
-            if (score.pp > this.max_pp) {
-                this.max_pp = score.pp;
+            if (score.implied_pp > this.max_pp) {
+                this.max_pp = score.implied_pp;
             }
         });
 
         if (this.score_count > 0) {
             this.average_implied_total_score = this.cumulative_implied_total_score / this.score_count;
             this.average_lazer_score = this.cumulative_lazer_score / this.score_count;
+            this.average_pp = this.cumulative_pp / this.score_count;
         }
     }
 }
