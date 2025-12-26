@@ -13,6 +13,10 @@ import { ScoreViewProvider } from './providers/ScoreViewProvider.jsx';
 import { SearchProvider } from './providers/SearchProvider.jsx';
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import { pink } from '@mui/material/colors';
+import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers"
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"
+import React from 'react';
+
 
 const theme = createTheme({
   palette: {
@@ -35,25 +39,50 @@ const theme = createTheme({
   },
 });
 
+// const _providers = [
+//   ApiProvider,
+//   AuthProvider,
+//   ProfileProvider,
+//   ScoreViewProvider,
+//   SearchProvider
+// ]
 const _providers = [
-  ApiProvider,
-  AuthProvider,
-  ProfileProvider,
-  ScoreViewProvider,
-  SearchProvider
+  {
+    Provider: ThemeProvider,
+    props: { theme: theme },
+  },
+  {
+    Provider: ApiProvider,
+  },
+  {
+    Provider: AuthProvider,
+  },
+  {
+    Provider: ProfileProvider,
+  },
+  {
+    Provider: ScoreViewProvider,
+  },
+  {
+    Provider: SearchProvider,
+  },
+  {
+    Provider: LocalizationProvider,
+    props: { dateAdapter: AdapterMoment },
+  }
 ]
 
 const _wrapWithProviders = (children) => {
-  return _providers.reduceRight((acc, Provider) => {
-    return <Provider>{acc}</Provider>
+  return _providers.reduceRight((acc, { Provider, props }) => {
+    return <Provider {...props}>{acc}</Provider>
   }, children);
 }
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter basename='/'>
-    <ThemeProvider theme={theme}>
+    {_wrapWithProviders(<React.Fragment>
       <CssBaseline />
-      {_wrapWithProviders(<App />)}
-    </ThemeProvider>
+      <App />
+    </React.Fragment>)}
   </BrowserRouter>,
 )
