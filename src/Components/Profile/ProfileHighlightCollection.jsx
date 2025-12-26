@@ -112,7 +112,7 @@ function ProfileHighlightCollection() {
                 <Grid item key="score_per_clear" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"Score per Clear"}
-                        value={<NumberFlow format={{ maximumFractionDigits: 0 }} value={getRulesetStatistics(activeRuleset)?.scores_set_by_score?.average_legacy_score || 0} />}
+                        value={<NumberFlow format={{ maximumFractionDigits: 0 }} value={getRulesetStatistics(activeRuleset)?.scores_set_by_score?.average_implied_score || 0} />}
                     />
                 </Grid>
 
