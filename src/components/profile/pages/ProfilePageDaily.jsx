@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Collapse, Grid, useTheme } from "@mui/material";
+import { Box, Button, ButtonGroup, Collapse, Divider, Grid, useTheme } from "@mui/material";
 import { useProfile } from "../../../providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import dateGridStyles from '../../../styles/date-grid.module.less';
@@ -8,25 +8,26 @@ import { HexToRgb } from "../../../util/Helper";
 import GradesDisplay from "../../GradesDisplay";
 import NumberFlow from "@number-flow/react";
 import ScoreList from "../../ScoreList";
+import ProfileDailyChart from "./daily/ProfileDailyChart";
 
-const chartDefinitions = [
-    { value: 'pp', nesting: ['implied_pp'], label: 'Performance', yFormat: (y) => y.toFixed(2) + 'pp' },
-    { value: 'score', nesting: ['implied_score'], label: 'Score', yFormat: (y) => y.toLocaleString('en-US') },
-    { value: 'acc', nesting: ['accuracy'], label: 'Accuracy', yFormat: (y) => y.toFixed(2) + '%' },
-    { value: 'combo', nesting: ['combo'], label: 'Combo', yFormat: (y) => y.toLocaleString('en-US') + 'x' },
-    // { value: 'length', nesting: ['beatmap', 'length'], label: 'Length', yFormat: (y) => moment.utc(y * 1000).format('mm:ss') },
-    // { value: 'sr', nesting: ['beatmap', 'difficulty_data', 'star_rating'], label: 'Stars', yFormat: (y) => y.toFixed(2) + '★' },
+const chartDefinitions = {
+    pp: { value: 'pp', nesting: ['implied_pp'], label: 'Performance', yFormat: (y) => y.toFixed(2) + 'pp' },
+    score: { value: 'score', nesting: ['implied_total_score'], label: 'Score', yFormat: (y) => y.toLocaleString('en-US') },
+    accuracy: { value: 'accuracy', nesting: ['accuracy'], label: 'Accuracy', yFormat: (y) => (y * 100).toFixed(2) + '%' },
+    combo: { value: 'combo', nesting: ['combo'], label: 'Combo', yFormat: (y) => y.toLocaleString('en-US') + 'x' },
+    length: { value: 'length', nesting: ['local_beatmap', 'length_modded'], label: 'Length', yFormat: (y) => `${Math.floor(y / 60)}:${(y % 60).toString().padStart(2, '0')}` },
+    sr: { value: 'sr', nesting: ['attr_diff', 'star_rating'], label: 'Stars', yFormat: (y) => y.toFixed(2) + '★' },
     // { value: 'cs', nesting: ['beatmap', 'difficulty_data', 'modded_cs'], label: 'CS', yFormat: (y) => y.toFixed(2) },
     // { value: 'ar', nesting: ['beatmap', 'difficulty_data', 'modded_ar'], label: 'AR', yFormat: (y) => y.toFixed(2) },
     // { value: 'od', nesting: ['beatmap', 'difficulty_data', 'modded_od'], label: 'OD', yFormat: (y) => y.toFixed(2) },
     // { value: 'hp', nesting: ['beatmap', 'difficulty_data', 'modded_hp'], label: 'HP', yFormat: (y) => y.toFixed(2) },
-]
+};
 
 //uses periodic_by_year from the ProfileRulesetStatistics type
 function ProfilePageDaily() {
     const { getRulesetStatistics, activeRuleset } = useProfile();
 
-    const [activeDisplayChart, setActiveDisplayChart] = useState(chartDefinitions[0].value);
+    const [activeDisplayChart, setActiveDisplayChart] = useState(chartDefinitions.pp.value);
 
     const [statDatabase, setStatDatabase] = useState(null);
     const [yearRange, setYearRange] = useState(5);
@@ -124,18 +125,21 @@ function ProfilePageDaily() {
                             }}>
                                 <ButtonGroup sx={{ mb: 2 }}>
                                     {
-                                        chartDefinitions.map(def => (
+                                        Object.values(chartDefinitions).map((chartDef) => (
                                             <Button
-                                                key={def.value}
-                                                onClick={() => setActiveDisplayChart(def.value)}
-                                                disabled={activeDisplayChart === def.value}
+                                                key={chartDef.value}
+                                                onClick={() => setActiveDisplayChart(chartDef.value)}
+                                                disabled={activeDisplayChart === chartDef.value}
                                             >
-                                                {def.label}
+                                                {chartDef.label}
                                             </Button>
                                         ))
                                     }
                                 </ButtonGroup>
+                                <ProfileDailyChart scores={statDatabase?.periodic?.['daily']?.[activeDate].scores} date={activeDate} chartData={chartDefinitions[activeDisplayChart]} />
+                                <Divider sx={{ width: '100%', my: 2 }} />
                                 <GradesDisplay grades={statDatabase?.periodic?.['daily']?.[activeDate].grades} />
+                                <Divider sx={{ width: '100%', my: 2 }} />
                                 <ScoreList
                                     scores={statDatabase?.periodic?.['daily']?.[activeDate].scores_reordered?.['date']} truncate={true}
                                 />

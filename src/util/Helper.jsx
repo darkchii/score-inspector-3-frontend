@@ -458,3 +458,10 @@ export function GetIconFromLabel(label) {
     const IconComponent = Muicon[label];
     return IconComponent ? <IconComponent /> : null;
 }
+
+//like keyPath = ['beatmap', 'difficulty_data', 'star_rating']
+export function GetNestedValue(obj, keyPath) {
+    return keyPath.reduce((accumulator, currentKey) => {
+        return accumulator ? accumulator[currentKey] : null;
+    }, obj);
+}
