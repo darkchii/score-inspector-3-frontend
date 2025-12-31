@@ -9,9 +9,24 @@ import GradesDisplay from "../../GradesDisplay";
 import NumberFlow from "@number-flow/react";
 import ScoreList from "../../ScoreList";
 
+const chartDefinitions = [
+    { value: 'pp', nesting: ['implied_pp'], label: 'Performance', yFormat: (y) => y.toFixed(2) + 'pp' },
+    { value: 'score', nesting: ['implied_score'], label: 'Score', yFormat: (y) => y.toLocaleString('en-US') },
+    { value: 'acc', nesting: ['accuracy'], label: 'Accuracy', yFormat: (y) => y.toFixed(2) + '%' },
+    { value: 'combo', nesting: ['combo'], label: 'Combo', yFormat: (y) => y.toLocaleString('en-US') + 'x' },
+    // { value: 'length', nesting: ['beatmap', 'length'], label: 'Length', yFormat: (y) => moment.utc(y * 1000).format('mm:ss') },
+    // { value: 'sr', nesting: ['beatmap', 'difficulty_data', 'star_rating'], label: 'Stars', yFormat: (y) => y.toFixed(2) + '★' },
+    // { value: 'cs', nesting: ['beatmap', 'difficulty_data', 'modded_cs'], label: 'CS', yFormat: (y) => y.toFixed(2) },
+    // { value: 'ar', nesting: ['beatmap', 'difficulty_data', 'modded_ar'], label: 'AR', yFormat: (y) => y.toFixed(2) },
+    // { value: 'od', nesting: ['beatmap', 'difficulty_data', 'modded_od'], label: 'OD', yFormat: (y) => y.toFixed(2) },
+    // { value: 'hp', nesting: ['beatmap', 'difficulty_data', 'modded_hp'], label: 'HP', yFormat: (y) => y.toFixed(2) },
+]
+
 //uses periodic_by_year from the ProfileRulesetStatistics type
 function ProfilePageDaily() {
     const { getRulesetStatistics, activeRuleset } = useProfile();
+
+    const [activeDisplayChart, setActiveDisplayChart] = useState(chartDefinitions[0].value);
 
     const [statDatabase, setStatDatabase] = useState(null);
     const [yearRange, setYearRange] = useState(5);
@@ -102,9 +117,26 @@ function ProfilePageDaily() {
                     //if activeDate is set, and it exists in activeYearData, show details
                     activeDate && activeYearData && statDatabase?.periodic?.['daily']?.[activeDate] ? (
                         <Collapse in={statDatabase?.periodic?.['daily']?.[activeDate] != null} unmountOnExit>
-                            <div>
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                            }}>
+                                <ButtonGroup sx={{ mb: 2 }}>
+                                    {
+                                        chartDefinitions.map(def => (
+                                            <Button
+                                                key={def.value}
+                                                onClick={() => setActiveDisplayChart(def.value)}
+                                                disabled={activeDisplayChart === def.value}
+                                            >
+                                                {def.label}
+                                            </Button>
+                                        ))
+                                    }
+                                </ButtonGroup>
                                 <GradesDisplay grades={statDatabase?.periodic?.['daily']?.[activeDate].grades} />
-                                <ScoreList 
+                                <ScoreList
                                     scores={statDatabase?.periodic?.['daily']?.[activeDate].scores_reordered?.['date']} truncate={true}
                                 />
                             </div>
