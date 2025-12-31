@@ -136,7 +136,7 @@ function ProfilePageDaily() {
                                         ))
                                     }
                                 </ButtonGroup>
-                                <ProfileDailyChart scores={statDatabase?.periodic?.['daily']?.[activeDate].scores} date={activeDate} chartData={chartDefinitions[activeDisplayChart]} />
+                                <ProfileDailyChart sessions={statDatabase?.periodic?.['daily']?.[activeDate].sessions} scores={statDatabase?.periodic?.['daily']?.[activeDate].scores} date={activeDate} chartData={chartDefinitions[activeDisplayChart]} />
                                 <Divider sx={{ width: '100%', my: 2 }} />
                                 <GradesDisplay grades={statDatabase?.periodic?.['daily']?.[activeDate].grades} />
                                 <Divider sx={{ width: '100%', my: 2 }} />
