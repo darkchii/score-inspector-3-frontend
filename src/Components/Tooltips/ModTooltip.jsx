@@ -14,6 +14,8 @@ const LocalStyledTooltip = styled(({ className, ...props }) => (
 function ModTooltipContent({ mod, data, ruleset }) {
     const theme = useTheme();
 
+    if(!mod) return null;
+
     return (
         <Box sx={{
             backgroundColor: '#293d2a',

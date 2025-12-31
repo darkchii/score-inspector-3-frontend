@@ -1,4 +1,4 @@
-import { Box, Grid, Pagination, Typography } from "@mui/material";
+import { Alert, Box, Grid, Pagination, Typography } from "@mui/material";
 import { useProfile } from "../../../providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import ScoreList from "../../ScoreList";
@@ -14,6 +14,10 @@ function ProfilePageScores() {
 
     const applyFilteredScores = (filteredScores) => {
         setScoreCount(filteredScores.length);
+        console.log("Filtered scores count:", filteredScores.length);
+
+        //temporary: sort by .implied_pp desc
+        filteredScores.sort((a, b) => b.implied_pp - a.implied_pp);
 
         //generate all page arrays
         const pages = [];
@@ -31,13 +35,14 @@ function ProfilePageScores() {
     return (
         <Box sx={{ padding: 2 }}>
             <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 2.5 }}>
+                {/* <Grid size={{ xs: 12, md: 2.5 }}>
                     <ScoreFilter
                         data={getRulesetStatistics(activeRuleset)?.scores_set.scores || []}
                         onFiltered={applyFilteredScores}
+                        currentRuleset={activeRuleset}
                     />
-                </Grid>
-                <Grid size={{ xs: 12, md: 9.5 }}>
+                </Grid> */}
+                <Grid size={{ xs: 12, md: 12 }}>
                     {
                         displayedScoreDatabase.length === 0 ?
                             <Typography variant="h6" sx={{ mt: 4 }}>
@@ -51,6 +56,9 @@ function ProfilePageScores() {
                                     onChange={(_, value) => setPage(value - 1)}
                                     sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}
                                 />
+                                <Alert severity="info" sx={{ mb: 2 }}>
+                                    Filtering and sorting will be added in the future.
+                                </Alert>
                                 <ScoreList showIndex startIndex={page * _scoresPerPage} scores={displayedScoreDatabase[page] || []} onSelectScore={(score) => {
                                     console.log("Selected score:", score);
                                 }} />
