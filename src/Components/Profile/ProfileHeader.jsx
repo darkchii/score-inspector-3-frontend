@@ -30,7 +30,7 @@ function ProfileHeader() {
                     left: 0,
                     width: '100%',
                     height: '100%',
-                    backgroundImage: `url(${userLive.osuApi.cover_url})`,
+                    backgroundImage: `url(${userLive.osuApi.cover.url})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     zIndex: 0,
