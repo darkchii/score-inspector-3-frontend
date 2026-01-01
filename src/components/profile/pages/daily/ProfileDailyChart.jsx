@@ -5,6 +5,7 @@ import { useScoreView } from "../../../../providers/ScoreViewProvider";
 import { Chart } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { useEffect, useState } from "react";
+import { getDiffColour } from "../../../../util/DifficultyHelper";
 
 Chart.register(annotationPlugin);
 
@@ -89,7 +90,7 @@ function ProfileDailyChart({ scores, sessions, date, chartData }) {
                             position: 'bottom',
                             title: {
                                 display: true,
-                                text: 'Time (UTC)',
+                                text: 'Time',
                             },
                             ticks: {
                                 callback: function (value) {
@@ -136,11 +137,11 @@ function ProfileDailyChart({ scores, sessions, date, chartData }) {
                                     type: 'line',
                                     xMin: new Date(`${date}T00:00:00Z`).getTime() / 1000,
                                     xMax: new Date(`${date}T00:00:00Z`).getTime() / 1000,
-                                    borderColor: 'rgba(0,0,0,0.5)',
+                                    borderColor: 'rgba(255,255,255,0.5)',
                                     borderWidth: 1,
                                     label: {
                                         display: true,
-                                        content: 'Start of Day',
+                                        content: 'Start (UTC)',
                                         position: 'end',
                                     }
                                 },
@@ -148,24 +149,24 @@ function ProfileDailyChart({ scores, sessions, date, chartData }) {
                                     type: 'line',
                                     xMin: new Date(`${date}T23:59:59Z`).getTime() / 1000,
                                     xMax: new Date(`${date}T23:59:59Z`).getTime() / 1000,
-                                    borderColor: 'rgba(0,0,0,0.5)',
+                                    borderColor: 'rgba(255,255,255,0.5)',
                                     borderWidth: 1,
                                     label: {
                                         display: true,
-                                        content: 'End of Day',
+                                        content: 'End (UTC)',
                                         position: 'end',
                                     }
                                 },
-                                ...(sessionAnnotations || {}),
+                                ...(sessionAnnotations || {})
                             }
                         }
                     },
                     onClick: (evt, elements) => {
                         if (elements.length > 0) {
                             const index = elements[0].index;
-                            const scoreId = chartData?.scores?.[index]?.id;
-                            if (scoreId) {
-                                loadScoreView(scoreId);
+                            const score = scores?.[index];
+                            if (score) {
+                                loadScoreView(score);
                             }
                         }
                     }
