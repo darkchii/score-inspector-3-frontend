@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Collapse, Divider, Grid, useTheme } from "@mui/material";
+import { Box, Button, ButtonGroup, Collapse, Divider, Grid, Typography, useTheme } from "@mui/material";
 import { useProfile } from "../../../providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import dateGridStyles from '../../../styles/date-grid.module.less';
@@ -9,6 +9,8 @@ import GradesDisplay from "../../GradesDisplay";
 import NumberFlow from "@number-flow/react";
 import ScoreList from "../../ScoreList";
 import ProfileDailyChart from "./daily/ProfileDailyChart";
+import InteractiveBox from "../../InteractiveBox";
+import { ProfileRulesetScoreSet } from "../../../types/ProfileRulesetScoreSet";
 
 const chartDefinitions = {
     pp: { value: 'pp', nesting: ['implied_pp'], label: 'Performance', yFormat: (y) => y.toFixed(2) + 'pp' },
@@ -36,11 +38,13 @@ function ProfilePageDaily() {
     const [activeYearData, setActiveYearData] = useState(null);
 
     //These 2 are to make sure the selection persists when switching display years
-    const [activeDate, setActiveDate] = useState(null);
+    const [activeDateStart, setActiveDateStart] = useState(null);
+    const [activeDateEnd, setActiveDateEnd] = useState(null);
+    const [activeScoreSet, setActiveScoreSet] = useState(null);
 
     useEffect(() => {
-        console.log(activeYearData?.[activeDate]); //debug
-    }, [activeDate])
+        console.log(activeYearData?.[activeDateStart]); //debug
+    }, [activeDateStart])
 
     useEffect(() => {
         const profileStatistics = getRulesetStatistics(activeRuleset);
@@ -63,7 +67,8 @@ function ProfilePageDaily() {
             if (dailyData) {
                 const dailyDates = Object.keys(dailyData).sort((a, b) => new Date(b) - new Date(a));
                 if (dailyDates.length > 0) {
-                    setActiveDate(dailyDates[0]);
+                    setActiveDateStart(dailyDates[0]);
+                    setActiveDateEnd(null);
                 }
             }
         }
@@ -80,8 +85,61 @@ function ProfilePageDaily() {
         }
     }, [activeDisplayYear, activeRuleset]);
 
+    useEffect(() => {
+        // if (activeDateStart && statDatabase?.periodic?.['daily']?.[activeDateStart]) {
+        //     setActiveScoreSet(statDatabase?.periodic?.['daily']?.[activeDateStart]);
+        // } else {
+        //     setActiveScoreSet(null);
+        // }
+
+        //first just make an array of periodic sets that are within the range
+        let scoreSetsInRange = [];
+        if (activeDateStart && statDatabase?.periodic?.['daily']) {
+            const dailyData = statDatabase?.periodic?.['daily'];
+            const startDate = new Date(activeDateStart);
+            const endDate = activeDateEnd ? new Date(activeDateEnd) : startDate;
+            for (const dateKey in dailyData) {
+                const currentDate = new Date(dateKey);
+                if (currentDate >= startDate && currentDate <= endDate) {
+                    scoreSetsInRange.push(dailyData[dateKey]);
+                }
+            }
+        }
+
+        //merge them
+        if (scoreSetsInRange.length > 0) {
+            const mergedSet = ProfileRulesetScoreSet.merge(scoreSetsInRange);
+            setActiveScoreSet(mergedSet);
+        } else {
+            setActiveScoreSet(null);
+        }
+    }, [activeDateStart, activeDateEnd, activeRuleset]);
+
     if (!getRulesetStatistics(activeRuleset)) {
         return <div>No data available.</div>
+    }
+
+    const onDateSelected = (dateKey, isSecondary = false) => {
+        console.log('date selected', dateKey, isSecondary);
+        if (!isSecondary || !activeDateStart) {
+            setActiveDateStart(dateKey);
+            setActiveDateEnd(null);
+        } else {
+            //if new dateKey is after activeDateStart, set as activeDateEnd
+            const startDate = new Date(activeDateStart);
+            const selectedDate = new Date(dateKey);
+            //if same, do nothing
+            if (selectedDate.getTime() === startDate.getTime()) {
+                return;
+            }
+            if (selectedDate >= startDate) {
+                setActiveDateEnd(dateKey);
+            } else {
+                //else, set as new activeDateStart and clear activeDateEnd
+                setActiveDateStart(dateKey);
+                setActiveDateEnd(null);
+            }
+        }
     }
 
     return (
@@ -111,18 +169,29 @@ function ProfilePageDaily() {
                 </ButtonGroup>
             </div>
             <div>
-                <DateGrid year={activeDisplayYear} data={activeYearData} activeDate={activeDate} onDateSelected={setActiveDate} />
+                <DateGrid
+                    year={activeDisplayYear}
+                    data={activeYearData}
+                    activeDateStart={activeDateStart}
+                    onDateSelected={onDateSelected}
+
+                    activeDateEnd={activeDateEnd}
+                    onDateSecondarySelected={(dateKey) => onDateSelected(dateKey, true)}
+                />
             </div>
             <div>
                 {
                     //if activeDate is set, and it exists in activeYearData, show details
-                    activeDate && activeYearData && statDatabase?.periodic?.['daily']?.[activeDate] ? (
-                        <Collapse in={statDatabase?.periodic?.['daily']?.[activeDate] != null} unmountOnExit>
+                    activeDateStart && activeYearData && activeScoreSet ? (
+                        <Collapse in={activeScoreSet != null} unmountOnExit>
                             <div style={{
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
                             }}>
+                                <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
+                                    Viewing {activeDateStart} {activeDateEnd ? `- ${activeDateEnd}` : ''}
+                                </Typography>
                                 <ButtonGroup sx={{ mb: 2 }}>
                                     {
                                         Object.values(chartDefinitions).map((chartDef) => (
@@ -136,17 +205,23 @@ function ProfilePageDaily() {
                                         ))
                                     }
                                 </ButtonGroup>
-                                <ProfileDailyChart sessions={statDatabase?.periodic?.['daily']?.[activeDate].sessions} scores={statDatabase?.periodic?.['daily']?.[activeDate].scores} date={activeDate} chartData={chartDefinitions[activeDisplayChart]} />
+                                <ProfileDailyChart
+                                    sessions={activeScoreSet.sessions}
+                                    scores={activeScoreSet.scores}
+                                    dateStart={activeDateStart}
+                                    dateEnd={activeDateEnd}
+                                    chartData={chartDefinitions[activeDisplayChart]}
+                                />
                                 <Divider sx={{ width: '100%', my: 2 }} />
-                                <GradesDisplay grades={statDatabase?.periodic?.['daily']?.[activeDate].grades} />
+                                <GradesDisplay grades={activeScoreSet.grades} />
                                 <Divider sx={{ width: '100%', my: 2 }} />
                                 <ScoreList
-                                    scores={statDatabase?.periodic?.['daily']?.[activeDate].scores_reordered?.['date']} truncate={true}
+                                    scores={activeScoreSet.scores_reordered?.['date']} truncate={true}
                                 />
                             </div>
                         </Collapse>
                     ) : (
-                        <Collapse in={statDatabase?.periodic?.['daily']?.[activeDate] == null} unmountOnExit>
+                        <Collapse in={activeScoreSet == null} unmountOnExit>
                             <p>Select a date to see details.</p>
                         </Collapse>
                     )
@@ -157,7 +232,7 @@ function ProfilePageDaily() {
 }
 
 const ABSOLUTE_RANGE_LIMIT = 100;
-function DateGrid({ year, data, activeDate = null, onDateSelected = null }) {
+function DateGrid({ year, data, activeDateStart = null, activeDateEnd = null, onDateSelected = null, onDateSecondarySelected = null }) {
     const theme = useTheme();
 
     const startSquareColor = HexToRgb('#1a1a1a');
@@ -255,18 +330,36 @@ function DateGrid({ year, data, activeDate = null, onDateSelected = null }) {
                                         // let progress = Math.min(adjustedClears, 100) / 100;
                                         let color = `rgb(${Math.round(startSquareColor[0] + (endSquareColor[0] - startSquareColor[0]) * progress)}, ${Math.round(startSquareColor[1] + (endSquareColor[1] - startSquareColor[1]) * progress)}, ${Math.round(startSquareColor[2] + (endSquareColor[2] - startSquareColor[2]) * progress)})`;
 
+                                        let isSelected = false;
+                                        //if between activeDateStart and activeDateEnd, or equals either
+                                        if (activeDateStart && !activeDateEnd && dateKey === activeDateStart) {
+                                            isSelected = true;
+                                        } else if (activeDateStart && activeDateEnd) {
+                                            const startDate = new Date(activeDateStart);
+                                            const endDate = new Date(activeDateEnd);
+                                            const currentDate = new Date(dateKey);
+                                            if (currentDate >= startDate && currentDate <= endDate) {
+                                                isSelected = true;
+                                            }
+                                        }
+
                                         squares.push(
                                             <BetterTooltip key={dateKey} title={`${dateKey}: ${clears} clears`} placement='top' disableInteractive={true}>
-                                                <div
+                                                <InteractiveBox
                                                     style={{
                                                         '--target-color': color,
                                                         //if no clears, reset hover
                                                         '&:hover': { cursor: clears > 0 ? 'pointer' : 'default' }
                                                     }}
                                                     // className={`${dateGridStyles['date-grid__square']} ${clears > 0 ? dateGridStyles['date-grid__square--clickable'] : dateGridStyles['date-grid__square--empty']}`}
-                                                    className={`${dateGridStyles['date-grid__square']} ${clears > 0 ? dateGridStyles['date-grid__square--clickable'] : dateGridStyles['date-grid__square--empty']} ${activeDate === dateKey ? dateGridStyles['date-grid__square--active'] : ''}`}
+                                                    className={`${dateGridStyles['date-grid__square']} ${clears > 0 ? dateGridStyles['date-grid__square--clickable'] : dateGridStyles['date-grid__square--empty']} ${isSelected ? dateGridStyles['date-grid__square--active'] : ''}`}
                                                     //clickable if clears > 0
-                                                    onClick={() => { clears > 0 && onDateSelected && onDateSelected(dateKey); }}
+                                                    onClick={() => {
+                                                        clears > 0 && onDateSelected && onDateSelected(dateKey);
+                                                    }}
+                                                    onLongPress={() => {
+                                                        clears > 0 && onDateSecondarySelected && onDateSecondarySelected(dateKey);
+                                                    }}
                                                 />
                                             </BetterTooltip>
                                         );

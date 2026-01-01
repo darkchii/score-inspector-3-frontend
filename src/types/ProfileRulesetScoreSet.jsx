@@ -37,6 +37,18 @@ export class ProfileRulesetScoreSet {
         this.scores_reordered = {};
     }
 
+    static merge(sets) {
+        const mergedSet = new ProfileRulesetScoreSet();
+        sets.forEach(set => {
+            set.scores.forEach(score => {
+                mergedSet.addScore(score);
+            });
+        });
+        //calculate
+        mergedSet.calculate();
+        return mergedSet;
+    }
+
     addScore(score) {
         this.scores.push(score);
 

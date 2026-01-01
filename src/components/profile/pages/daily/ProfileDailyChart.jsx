@@ -10,7 +10,7 @@ import { getDiffColour } from "../../../../util/DifficultyHelper";
 Chart.register(annotationPlugin);
 
 
-function ProfileDailyChart({ scores, sessions, date, chartData }) {
+function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, chartData }) {
     const { getScoreById } = useProfile();
     const { loadScoreView } = useScoreView();
 
@@ -100,8 +100,8 @@ function ProfileDailyChart({ scores, sessions, date, chartData }) {
                                     const date = new Date(value * 1000);
                                     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                                 },
-                                min: new Date(`${date}T00:00:00Z`).getTime() / 1000,
-                                max: new Date(`${date}T23:59:59Z`).getTime() / 1000,
+                                min: new Date(`${dateStart}T00:00:00Z`).getTime() / 1000,
+                                max: new Date(`${dateEnd || dateStart}T23:59:59Z`).getTime() / 1000,
                             }
                         },
                         y: {
@@ -135,8 +135,8 @@ function ProfileDailyChart({ scores, sessions, date, chartData }) {
                             annotations: {
                                 startLine: {
                                     type: 'line',
-                                    xMin: new Date(`${date}T00:00:00Z`).getTime() / 1000,
-                                    xMax: new Date(`${date}T00:00:00Z`).getTime() / 1000,
+                                    xMin: new Date(`${dateStart}T00:00:00Z`).getTime() / 1000,
+                                    xMax: new Date(`${dateStart}T00:00:00Z`).getTime() / 1000,
                                     borderColor: 'rgba(255,255,255,0.5)',
                                     borderWidth: 1,
                                     label: {
@@ -147,8 +147,8 @@ function ProfileDailyChart({ scores, sessions, date, chartData }) {
                                 },
                                 endLine: {
                                     type: 'line',
-                                    xMin: new Date(`${date}T23:59:59Z`).getTime() / 1000,
-                                    xMax: new Date(`${date}T23:59:59Z`).getTime() / 1000,
+                                    xMin: new Date(`${dateEnd || dateStart}T23:59:59Z`).getTime() / 1000,
+                                    xMax: new Date(`${dateEnd || dateStart}T23:59:59Z`).getTime() / 1000,
                                     borderColor: 'rgba(255,255,255,0.5)',
                                     borderWidth: 1,
                                     label: {
@@ -157,6 +157,36 @@ function ProfileDailyChart({ scores, sessions, date, chartData }) {
                                         position: 'end',
                                     }
                                 },
+                                //extra lines for each day if dateEnd is set and > 1 day
+                                ...(
+                                    dateEnd && dateEnd !== dateStart ?
+                                        (() => {
+                                            const extraAnnotations = {};
+                                            const startDate = new Date(dateStart);
+                                            const endDate = new Date(dateEnd);
+                                            const dayCount = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                                            for (let i = 1; i < dayCount + 1; i++) {
+                                                const currentDate = new Date(startDate);
+                                                currentDate.setDate(startDate.getDate() + i);
+                                                const dateStr = currentDate.toISOString().substr(0, 10);
+                                                extraAnnotations[`extraLine${i}`] = {
+                                                    type: 'line',
+                                                    xMin: new Date(`${dateStr}T00:00:00Z`).getTime() / 1000,
+                                                    xMax: new Date(`${dateStr}T00:00:00Z`).getTime() / 1000,
+                                                    borderColor: 'rgba(255,255,255,0.2)',
+                                                    borderWidth: 1,
+                                                    //very faint label if dayCount < 10
+                                                    label: {
+                                                        display: dayCount <= 10,
+                                                        content: `Day ${i + 1}`,
+                                                        position: 'end',
+                                                    }
+                                                };
+                                            }
+                                            return extraAnnotations;
+                                        })()
+                                        : {}
+                                ),
                                 ...(sessionAnnotations || {})
                             }
                         }
