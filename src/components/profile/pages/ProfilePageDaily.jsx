@@ -37,14 +37,10 @@ function ProfilePageDaily() {
 
     const [activeYearData, setActiveYearData] = useState(null);
 
-    //These 2 are to make sure the selection persists when switching display years
+    //this is what determines what statistics are actually shown
     const [activeDateStart, setActiveDateStart] = useState(null);
     const [activeDateEnd, setActiveDateEnd] = useState(null);
     const [activeScoreSet, setActiveScoreSet] = useState(null);
-
-    useEffect(() => {
-        console.log(activeYearData?.[activeDateStart]); //debug
-    }, [activeDateStart])
 
     useEffect(() => {
         const profileStatistics = getRulesetStatistics(activeRuleset);
@@ -121,7 +117,7 @@ function ProfilePageDaily() {
 
     const onDateSelected = (dateKey, isSecondary = false) => {
         console.log('date selected', dateKey, isSecondary);
-        if (!isSecondary || !activeDateStart) {
+        if (!isSecondary || (!activeDateStart && !activeDateEnd)) {
             setActiveDateStart(dateKey);
             setActiveDateEnd(null);
         } else {
@@ -135,9 +131,9 @@ function ProfilePageDaily() {
             if (selectedDate >= startDate) {
                 setActiveDateEnd(dateKey);
             } else {
-                //else, set as new activeDateStart and clear activeDateEnd
+                let cacheStart = activeDateStart;
                 setActiveDateStart(dateKey);
-                setActiveDateEnd(null);
+                setActiveDateEnd(cacheStart);
             }
         }
     }

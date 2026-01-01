@@ -6,6 +6,7 @@ import { Chart } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { useEffect, useState } from "react";
 import { getDiffColour } from "../../../../util/DifficultyHelper";
+import { toggleAnnotationLabel } from "../../../../util/ChartUtils";
 
 Chart.register(annotationPlugin);
 
@@ -34,7 +35,7 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, chartData }) 
                 };
 
                 //breaks
-                if(session.breaks && session.breaks.length > 0){
+                if (session.breaks && session.breaks.length > 0) {
                     session.breaks.forEach((brk, brkIndex) => {
                         const breakStart = brk.start.getTime() / 1000;
                         const breakEnd = brk.end.getTime() / 1000;
@@ -44,7 +45,7 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, chartData }) 
                             xMax: breakEnd,
                             backgroundColor: 'rgba(255, 0, 0, 0.1)',
                             borderColor: 'rgba(255, 0, 0, 0.5)',
-                            borderWidth: 1,
+                            borderWidth: 1
                         };
                     });
                 }
