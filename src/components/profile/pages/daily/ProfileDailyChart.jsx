@@ -5,8 +5,6 @@ import { useScoreView } from "../../../../providers/ScoreViewProvider";
 import { Chart } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { useEffect, useState } from "react";
-import { getDiffColour } from "../../../../util/DifficultyHelper";
-import { toggleAnnotationLabel } from "../../../../util/ChartUtils";
 import { Button, ButtonGroup } from "@mui/material";
 
 Chart.register(annotationPlugin);
@@ -14,14 +12,14 @@ Chart.register(annotationPlugin);
 const chartDefinitions = {
     pp: { value: 'pp', nesting: ['implied_pp'], label: 'Performance', yFormat: (y) => y.toFixed(2) + 'pp' },
     score: { value: 'score', nesting: ['implied_total_score'], label: 'Score', yFormat: (y) => y.toLocaleString('en-US') },
-    accuracy: { value: 'accuracy', nesting: ['accuracy'], label: 'Accuracy', yFormat: (y) => (y * 100).toFixed(2) + '%'},
+    accuracy: { value: 'accuracy', nesting: ['accuracy'], label: 'Accuracy', yFormat: (y) => (y * 100).toFixed(2) + '%', max: 1},
     combo: { value: 'combo', nesting: ['combo'], label: 'Combo', yFormat: (y) => y.toLocaleString('en-US') + 'x' },
     length: { value: 'length', nesting: ['local_beatmap', 'length_modded'], label: 'Length', yFormat: (y) => `${Math.floor(y / 60)}:${(y % 60).toString().padStart(2, '0')}` },
     sr: { value: 'sr', nesting: ['star_rating'], label: 'Stars', yFormat: (y) => y.toFixed(2) + '★' },
-    // { value: 'cs', nesting: ['beatmap', 'difficulty_data', 'modded_cs'], label: 'CS', yFormat: (y) => y.toFixed(2) },
-    // { value: 'ar', nesting: ['beatmap', 'difficulty_data', 'modded_ar'], label: 'AR', yFormat: (y) => y.toFixed(2) },
-    // { value: 'od', nesting: ['beatmap', 'difficulty_data', 'modded_od'], label: 'OD', yFormat: (y) => y.toFixed(2) },
-    // { value: 'hp', nesting: ['beatmap', 'difficulty_data', 'modded_hp'], label: 'HP', yFormat: (y) => y.toFixed(2) },
+    cs: { value: 'cs', nesting: ['beatmap_attributes', 'cs'], label: 'CS', yFormat: (y) => y.toFixed(2) },
+    ar: { value: 'ar', nesting: ['beatmap_attributes', 'ar'], label: 'AR', yFormat: (y) => y.toFixed(2) },
+    od: { value: 'od', nesting: ['beatmap_attributes', 'od'], label: 'OD', yFormat: (y) => y.toFixed(2) },
+    hp: { value: 'hp', nesting: ['beatmap_attributes', 'hp'], label: 'HP', yFormat: (y) => y.toFixed(2) }
 };
 
 function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartEnd = true }) {
@@ -143,7 +141,10 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartE
                                 ticks: {
                                     callback: function (value) {
                                         return chartDefinitions[activeDisplayChart].yFormat ? chartDefinitions[activeDisplayChart].yFormat(value) : value;
-                                    }
+                                    },
+                                    max: chartDefinitions[activeDisplayChart].max || undefined,
+                                    //put min at lowest data point
+                                    min: Math.min(...(scores?.map(item => GetNestedValue(item, chartDefinitions[activeDisplayChart].nesting)) || [])) * 0.9,
                                 },
                             }
                         },
