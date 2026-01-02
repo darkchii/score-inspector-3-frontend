@@ -112,25 +112,25 @@ function ScoreViewBase({ score, noBackground = false, compact = false }) {
                         </div>
                         <div className={scoreStatsStyles['score-info__group-row']}>
                             {
-                                (['osu'].includes(score.ruleset)) && (
+                                (['osu'].includes(score.ruleset) && score.is_lazer) && (
                                     <ScoreStat label="Slider Tick" value={<NumberFlow value={score.statistics_large_tick_hit} />} limitValue={FormatNumber(score.maximum_statistics_large_tick_hit)} color={GetHitResultColor('large_tick_hit')[200]} />
                                 )
                             }
 
                             {
-                                (['osu'].includes(score.ruleset)) && (
+                                (['osu'].includes(score.ruleset) && score.is_lazer) && (
                                     <ScoreStat label="Slider End" value={<NumberFlow value={score.statistics_small_tick_hit + score.statistics_slider_tail_hit} />} limitValue={FormatNumber(score.maximum_statistics_small_tick_hit + score.maximum_statistics_slider_tail_hit)} color={GetHitResultColor('small_tick_hit')[200]} />
                                 )
                             }
 
                             {
-                                (['osu'].includes(score.ruleset)) && (
+                                (['osu'].includes(score.ruleset) && score.is_lazer) && (
                                     <ScoreStat label="Spinner Bonus" value={<NumberFlow value={score.statistics_large_bonus} />} limitValue={FormatNumber(score.maximum_statistics_large_bonus)} color={GetHitResultColor('large_bonus')[100]} />
                                 )
                             }
 
                             {
-                                (['osu'].includes(score.ruleset)) && (
+                                (['osu'].includes(score.ruleset) && score.is_lazer) && (
                                     <ScoreStat label="Spinner Spin" value={<NumberFlow value={score.statistics_small_bonus} />} limitValue={FormatNumber(score.maximum_statistics_small_bonus)} color={GetHitResultColor('small_bonus')[100]} />
                                 )
                             }
@@ -140,6 +140,12 @@ function ScoreViewBase({ score, noBackground = false, compact = false }) {
                                     <ScoreStat label="Small Droplet" value={<NumberFlow value={score.statistics_small_tick_hit} />} limitValue={FormatNumber(score.maximum_statistics_small_tick_hit)} color={GetHitResultColor('small_tick_hit')[200]} />
                                 )
                             }
+                        </div>
+                        <div className={scoreStatsStyles['score-info__group-row']}>
+                            <ScoreStat label="CS" value={<NumberFlow value={score.beatmap_attributes.cs} />} />
+                            <ScoreStat label="OD" value={<NumberFlow value={score.beatmap_attributes.od} />} />
+                            <ScoreStat label="HP" value={<NumberFlow value={score.beatmap_attributes.hp} />} />
+                            <ScoreStat label="AR" value={<NumberFlow value={score.beatmap_attributes.ar} />} />
                         </div>
                     </div>
                     <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__rankdate']}`}>
