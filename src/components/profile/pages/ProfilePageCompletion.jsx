@@ -3,10 +3,10 @@ import { Box, Grid } from "@mui/system";
 import { useProfile } from "../../../providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import { FormatNumber, FormatNumberWithPrecision } from "../../../util/Helper";
-import NumberFlow from "@number-flow/react";
 import { Bar } from "react-chartjs-2";
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from "chart.js";
 import { GetColorInterpolation } from "../../../util/ColorUtils";
+import BetterTooltip from "../../tooltips/BetterTooltip";
 
 ChartJS.register(
     CategoryScale,
@@ -22,6 +22,7 @@ const COMPLETION_DATA = {
         title: 'CS Completion',
         key: 'cs',
         description: 'Completion by Circle Size (CS)',
+        extra_info: 'For mania, this represents key count',
         key_formatter: (key) => `CS ${key}`,
     },
     'ar': {
@@ -57,7 +58,7 @@ const COMPLETION_DATA = {
     'length': {
         title: 'Length Completion',
         key: 'length',
-        description: 'Completion by length brackets (in seconds)',
+        description: 'Completion by length brackets',
         key_formatter: (key) => {
             //if ends with +, show as is
             if (key.endsWith('+')) {
@@ -153,7 +154,11 @@ function ProfilePageCompletion() {
                                         {
                                             completionStats[dataInfo.key] ? Object.entries(completionStats[dataInfo.key]).map(([key, stats]) => (
                                                 <TableRow key={`completion-${dataKey}-${key}`}>
-                                                    <TableCell>{dataInfo.key_formatter(key)}</TableCell>
+                                                    <TableCell>
+                                                        <BetterTooltip title={dataInfo.description + (dataInfo.extra_info ? ` (${dataInfo.extra_info})` : '')} arrow>
+                                                            <span>{dataInfo.key_formatter(key)}</span>
+                                                        </BetterTooltip>
+                                                    </TableCell>
                                                     <TableCell align="right" sx={{ p: 0 }}>{FormatNumber(stats.cleared)}</TableCell>
                                                     <TableCell align="center" sx={{ p: 0 }}>/</TableCell>
                                                     <TableCell align="left" sx={{ p: 0 }}>{FormatNumber(stats.total)}</TableCell>
