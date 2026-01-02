@@ -12,24 +12,9 @@ import ProfileDailyChart from "./daily/ProfileDailyChart";
 import InteractiveBox from "../../InteractiveBox";
 import { ProfileRulesetScoreSet } from "../../../types/ProfileRulesetScoreSet";
 
-const chartDefinitions = {
-    pp: { value: 'pp', nesting: ['implied_pp'], label: 'Performance', yFormat: (y) => y.toFixed(2) + 'pp' },
-    score: { value: 'score', nesting: ['implied_total_score'], label: 'Score', yFormat: (y) => y.toLocaleString('en-US') },
-    accuracy: { value: 'accuracy', nesting: ['accuracy'], label: 'Accuracy', yFormat: (y) => (y * 100).toFixed(2) + '%' },
-    combo: { value: 'combo', nesting: ['combo'], label: 'Combo', yFormat: (y) => y.toLocaleString('en-US') + 'x' },
-    length: { value: 'length', nesting: ['local_beatmap', 'length_modded'], label: 'Length', yFormat: (y) => `${Math.floor(y / 60)}:${(y % 60).toString().padStart(2, '0')}` },
-    sr: { value: 'sr', nesting: ['star_rating'], label: 'Stars', yFormat: (y) => y.toFixed(2) + '★' },
-    // { value: 'cs', nesting: ['beatmap', 'difficulty_data', 'modded_cs'], label: 'CS', yFormat: (y) => y.toFixed(2) },
-    // { value: 'ar', nesting: ['beatmap', 'difficulty_data', 'modded_ar'], label: 'AR', yFormat: (y) => y.toFixed(2) },
-    // { value: 'od', nesting: ['beatmap', 'difficulty_data', 'modded_od'], label: 'OD', yFormat: (y) => y.toFixed(2) },
-    // { value: 'hp', nesting: ['beatmap', 'difficulty_data', 'modded_hp'], label: 'HP', yFormat: (y) => y.toFixed(2) },
-};
-
 //uses periodic_by_year from the ProfileRulesetStatistics type
 function ProfilePageDaily() {
     const { getRulesetStatistics, activeRuleset } = useProfile();
-
-    const [activeDisplayChart, setActiveDisplayChart] = useState(chartDefinitions.pp.value);
 
     const [statDatabase, setStatDatabase] = useState(null);
     const [yearRange, setYearRange] = useState(5);
@@ -188,25 +173,11 @@ function ProfilePageDaily() {
                                 <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
                                     Viewing {activeDateStart} {activeDateEnd ? `- ${activeDateEnd}` : ''}
                                 </Typography>
-                                <ButtonGroup sx={{ mb: 2 }}>
-                                    {
-                                        Object.values(chartDefinitions).map((chartDef) => (
-                                            <Button
-                                                key={chartDef.value}
-                                                onClick={() => setActiveDisplayChart(chartDef.value)}
-                                                disabled={activeDisplayChart === chartDef.value}
-                                            >
-                                                {chartDef.label}
-                                            </Button>
-                                        ))
-                                    }
-                                </ButtonGroup>
                                 <ProfileDailyChart
                                     sessions={activeScoreSet.sessions}
                                     scores={activeScoreSet.scores}
                                     dateStart={activeDateStart}
                                     dateEnd={activeDateEnd}
-                                    chartData={chartDefinitions[activeDisplayChart]}
                                 />
                                 <Divider sx={{ width: '100%', my: 2 }} />
                                 <GradesDisplay grades={activeScoreSet.grades} />

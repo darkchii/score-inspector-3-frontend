@@ -6,6 +6,7 @@ import { TextureDatabase } from "../../../assets/textures/TextureDatabase";
 import NumberFlow from "@number-flow/react";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { FormatDuration, FormatNumber, FormatNumberWithPrecision } from "../../../util/Helper";
+import ProfileDailyChart from "./daily/ProfileDailyChart";
 
 const SESSION_SORT_FIELDS = [
     { label: 'Date', field: 'start', format: (value) => new Date(value).toLocaleString() },
@@ -150,6 +151,14 @@ function SessionDisplay({ session }) {
                 </TableContainer>
             </Paper>
             <Divider sx={{ my: 2 }} />
+            <ProfileDailyChart
+                sessions={{ sessions: [session] }}
+                scores={session.scores}
+                dateStart={session.start.toISOString().split('T')[0]}
+                dateEnd={null}
+                displayStartEnd={false}
+            />
+            <Divider sx={{ my: 2 }} />
             <Typography variant="h6">Scores</Typography>
             <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
                 {
@@ -210,7 +219,7 @@ function ProfilePageSessions() {
         const sessions = getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.get();
         if (sessions) {
             setSessionArray(sessions);
-        }else{
+        } else {
             setSessionArray(null);
         }
         const count = sessions?.length || 0;

@@ -7,19 +7,32 @@ import annotationPlugin from 'chartjs-plugin-annotation';
 import { useEffect, useState } from "react";
 import { getDiffColour } from "../../../../util/DifficultyHelper";
 import { toggleAnnotationLabel } from "../../../../util/ChartUtils";
+import { Button, ButtonGroup } from "@mui/material";
 
 Chart.register(annotationPlugin);
 
+const chartDefinitions = {
+    pp: { value: 'pp', nesting: ['implied_pp'], label: 'Performance', yFormat: (y) => y.toFixed(2) + 'pp' },
+    score: { value: 'score', nesting: ['implied_total_score'], label: 'Score', yFormat: (y) => y.toLocaleString('en-US') },
+    accuracy: { value: 'accuracy', nesting: ['accuracy'], label: 'Accuracy', yFormat: (y) => (y * 100).toFixed(2) + '%' },
+    combo: { value: 'combo', nesting: ['combo'], label: 'Combo', yFormat: (y) => y.toLocaleString('en-US') + 'x' },
+    length: { value: 'length', nesting: ['local_beatmap', 'length_modded'], label: 'Length', yFormat: (y) => `${Math.floor(y / 60)}:${(y % 60).toString().padStart(2, '0')}` },
+    sr: { value: 'sr', nesting: ['star_rating'], label: 'Stars', yFormat: (y) => y.toFixed(2) + '★' },
+    // { value: 'cs', nesting: ['beatmap', 'difficulty_data', 'modded_cs'], label: 'CS', yFormat: (y) => y.toFixed(2) },
+    // { value: 'ar', nesting: ['beatmap', 'difficulty_data', 'modded_ar'], label: 'AR', yFormat: (y) => y.toFixed(2) },
+    // { value: 'od', nesting: ['beatmap', 'difficulty_data', 'modded_od'], label: 'OD', yFormat: (y) => y.toFixed(2) },
+    // { value: 'hp', nesting: ['beatmap', 'difficulty_data', 'modded_hp'], label: 'HP', yFormat: (y) => y.toFixed(2) },
+};
 
-function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, chartData }) {
+function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartEnd = true }) {
     const { getScoreById } = useProfile();
     const { loadScoreView } = useScoreView();
 
     const [sessionAnnotations, setSessionAnnotations] = useState([]);
+    const [activeDisplayChart, setActiveDisplayChart] = useState(chartDefinitions.pp.value);
 
     useEffect(() => {
         const annotations = {};
-        console.log('sessions for daily chart', sessions);
         if (sessions && sessions?.sessions?.length > 0) {
             sessions.sessions.forEach((session, index) => {
                 const startTime = session.start.getTime() / 1000;
@@ -54,155 +67,174 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, chartData }) 
         setSessionAnnotations(annotations);
     }, [scores]);
 
-    if (!chartData) {
+    if (!chartDefinitions[activeDisplayChart]) {
         return null; //there is always one selected, but it may be delayed on load
     }
     //X is ALWAYS time (starting from 00:00 to 23:59 UTC, so local time can be different for everyone)
     return (
-        <div style={{ height: 300, width: '100%' }}>
-            <Scatter
-                data={{
-                    datasets: [
-                        {
-                            label: chartData.label,
-                            data: scores?.map(item => {
-                                return {
-                                    x: item.ended_at.getTime() / 1000,
-                                    y: GetNestedValue(item, chartData.nesting),
-                                    id: item.id,
-                                };
-                            }) || [],
-                            //grade color
-                            pointBackgroundColor: scores?.map(item => {
-                                const score = getScoreById(item.id);
-                                return score ? GetGradeColor(score.grade) : '#888888';
-                            }) || [],
-                            pointRadius: 4,
-                        }
-                    ]
-                }}
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <ButtonGroup sx={{ mb: 2 }}>
+                {
+                    Object.values(chartDefinitions).map((chartDef) => (
+                        <Button
+                            key={chartDef.value}
+                            onClick={() => setActiveDisplayChart(chartDef.value)}
+                            disabled={activeDisplayChart === chartDef.value}
+                        >
+                            {chartDef.label}
+                        </Button>
+                    ))
+                }
+            </ButtonGroup>
+            <div style={{ height: 300, width: '100%' }}>
+                <Scatter
+                    data={{
+                        datasets: [
+                            {
+                                label: chartDefinitions[activeDisplayChart].label,
+                                data: scores?.map(item => {
+                                    return {
+                                        x: item.ended_at.getTime() / 1000,
+                                        y: GetNestedValue(item, chartDefinitions[activeDisplayChart].nesting),
+                                        id: item.id,
+                                    };
+                                }) || [],
+                                //grade color
+                                pointBackgroundColor: scores?.map(item => {
+                                    const score = getScoreById(item.id);
+                                    return score ? GetGradeColor(score.grade) : '#888888';
+                                }) || [],
+                                pointRadius: 4,
+                            }
+                        ]
+                    }}
 
-                options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            type: 'linear',
-                            position: 'bottom',
-                            title: {
-                                display: true,
-                                text: 'Time',
-                            },
-                            ticks: {
-                                callback: function (value) {
-                                    // const date = new Date(value * 1000);
-                                    // return date.toISOString().substr(11, 5); //HH:MM
-                                    //show as local time
-                                    const date = new Date(value * 1000);
-                                    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: {
+                                    display: true,
+                                    text: 'Time',
                                 },
-                                min: new Date(`${dateStart}T00:00:00Z`).getTime() / 1000,
-                                max: new Date(`${dateEnd || dateStart}T23:59:59Z`).getTime() / 1000,
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: chartData.label,
-                            },
-                            ticks: {
-                                callback: function (value) {
-                                    return chartData.yFormat ? chartData.yFormat(value) : value;
+                                ticks: {
+                                    callback: function (value) {
+                                        // const date = new Date(value * 1000);
+                                        // return date.toISOString().substr(11, 5); //HH:MM
+                                        //show as local time
+                                        const date = new Date(value * 1000);
+                                        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                    },
+                                    min: new Date(`${dateStart}T00:00:00Z`).getTime() / 1000,
+                                    max: new Date(`${dateEnd || dateStart}T23:59:59Z`).getTime() / 1000,
                                 }
                             },
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    const score = getScoreById(context.raw.id);
-                                    if (score && score.beatmap) {
-                                        return `${score.beatmap.artist} - ${score.beatmap.title} [${score.beatmap.version}]\nTime: ${new Date(context.raw.x * 1000).toISOString().substr(11, 5)}\n${chartData.label}: ${chartData.yFormat ? chartData.yFormat(context.raw.y) : context.raw.y}`;
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: chartDefinitions[activeDisplayChart].label,
+                                },
+                                ticks: {
+                                    callback: function (value) {
+                                        return chartDefinitions[activeDisplayChart].yFormat ? chartDefinitions[activeDisplayChart].yFormat(value) : value;
                                     }
-                                    else {
-                                        return `Score ID: ${context.raw.id}\nTime: ${new Date(context.raw.x * 1000).toISOString().substr(11, 5)}\n${chartData.label}: ${chartData.yFormat ? chartData.yFormat(context.raw.y) : context.raw.y}`;
-                                    }
-                                }
+                                },
                             }
                         },
-                        annotation: {
-                            //vertical line at start and end of day
-                            annotations: {
-                                startLine: {
-                                    type: 'line',
-                                    xMin: new Date(`${dateStart}T00:00:00Z`).getTime() / 1000,
-                                    xMax: new Date(`${dateStart}T00:00:00Z`).getTime() / 1000,
-                                    borderColor: 'rgba(255,255,255,0.5)',
-                                    borderWidth: 1,
-                                    label: {
-                                        display: true,
-                                        content: 'Start (UTC)',
-                                        position: 'end',
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        const score = getScoreById(context.raw.id);
+                                        if (score && score.beatmap) {
+                                            return `${score.beatmap.artist} - ${score.beatmap.title} [${score.beatmap.version}]\nTime: ${new Date(context.raw.x * 1000).toISOString().substr(11, 5)}\n${chartDefinitions[activeDisplayChart].label}: ${chartDefinitions[activeDisplayChart].yFormat ? chartDefinitions[activeDisplayChart].yFormat(context.raw.y) : context.raw.y}`;
+                                        }
+                                        else {
+                                            return `Score ID: ${context.raw.id}\nTime: ${new Date(context.raw.x * 1000).toISOString().substr(11, 5)}\n${chartDefinitions[activeDisplayChart].label}: ${chartDefinitions[activeDisplayChart].yFormat ? chartDefinitions[activeDisplayChart].yFormat(context.raw.y) : context.raw.y}`;
+                                        }
                                     }
-                                },
-                                endLine: {
-                                    type: 'line',
-                                    xMin: new Date(`${dateEnd || dateStart}T23:59:59Z`).getTime() / 1000,
-                                    xMax: new Date(`${dateEnd || dateStart}T23:59:59Z`).getTime() / 1000,
-                                    borderColor: 'rgba(255,255,255,0.5)',
-                                    borderWidth: 1,
-                                    label: {
-                                        display: true,
-                                        content: 'End (UTC)',
-                                        position: 'end',
-                                    }
-                                },
-                                //extra lines for each day if dateEnd is set and > 1 day
-                                ...(
-                                    dateEnd && dateEnd !== dateStart ?
-                                        (() => {
-                                            const extraAnnotations = {};
-                                            const startDate = new Date(dateStart);
-                                            const endDate = new Date(dateEnd);
-                                            const dayCount = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-                                            for (let i = 1; i < dayCount + 1; i++) {
-                                                const currentDate = new Date(startDate);
-                                                currentDate.setDate(startDate.getDate() + i);
-                                                const dateStr = currentDate.toISOString().substr(0, 10);
-                                                extraAnnotations[`extraLine${i}`] = {
-                                                    type: 'line',
-                                                    xMin: new Date(`${dateStr}T00:00:00Z`).getTime() / 1000,
-                                                    xMax: new Date(`${dateStr}T00:00:00Z`).getTime() / 1000,
-                                                    borderColor: 'rgba(255,255,255,0.2)',
-                                                    borderWidth: 1,
-                                                    //very faint label if dayCount < 10
-                                                    label: {
-                                                        display: dayCount <= 10,
-                                                        content: `Day ${i + 1}`,
-                                                        position: 'end',
-                                                    }
-                                                };
+                                }
+                            },
+                            annotation: {
+                                //vertical line at start and end of day
+                                annotations: {
+                                    ...(displayStartEnd ? {
+                                        startLine: {
+                                            type: 'line',
+                                            xMin: new Date(`${dateStart}T00:00:00Z`).getTime() / 1000,
+                                            xMax: new Date(`${dateStart}T00:00:00Z`).getTime() / 1000,
+                                            borderColor: 'rgba(255,255,255,0.5)',
+                                            borderWidth: 1,
+                                            label: {
+                                                display: true,
+                                                content: 'Start (UTC)',
+                                                position: 'end',
                                             }
-                                            return extraAnnotations;
-                                        })()
-                                        : {}
-                                ),
-                                ...(sessionAnnotations || {})
+                                        }
+                                    } : {}),
+                                    ...(displayStartEnd ? {
+                                        endLine: {
+                                            type: 'line',
+                                            xMin: new Date(`${dateEnd || dateStart}T23:59:59Z`).getTime() / 1000,
+                                            xMax: new Date(`${dateEnd || dateStart}T23:59:59Z`).getTime() / 1000,
+                                            borderColor: 'rgba(255,255,255,0.5)',
+                                            borderWidth: 1,
+                                            label: {
+                                                display: true,
+                                                content: 'End (UTC)',
+                                                position: 'end',
+                                            }
+                                        }
+                                    } : {}),
+                                    //extra lines for each day if dateEnd is set and > 1 day
+                                    ...(
+                                        dateEnd && dateEnd !== dateStart ?
+                                            (() => {
+                                                const extraAnnotations = {};
+                                                const startDate = new Date(dateStart);
+                                                const endDate = new Date(dateEnd);
+                                                const dayCount = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                                                for (let i = 1; i < dayCount + 1; i++) {
+                                                    const currentDate = new Date(startDate);
+                                                    currentDate.setDate(startDate.getDate() + i);
+                                                    const dateStr = currentDate.toISOString().substr(0, 10);
+                                                    extraAnnotations[`extraLine${i}`] = {
+                                                        type: 'line',
+                                                        xMin: new Date(`${dateStr}T00:00:00Z`).getTime() / 1000,
+                                                        xMax: new Date(`${dateStr}T00:00:00Z`).getTime() / 1000,
+                                                        borderColor: 'rgba(255,255,255,0.2)',
+                                                        borderWidth: 1,
+                                                        //very faint label if dayCount < 10
+                                                        label: {
+                                                            display: dayCount <= 10,
+                                                            content: `Day ${i + 1}`,
+                                                            position: 'end',
+                                                        }
+                                                    };
+                                                }
+                                                return extraAnnotations;
+                                            })()
+                                            : {}
+                                    ),
+                                    ...(sessionAnnotations || {})
+                                }
+                            }
+                        },
+                        onClick: (evt, elements) => {
+                            if (elements.length > 0) {
+                                const index = elements[0].index;
+                                const score = scores?.[index];
+                                if (score) {
+                                    loadScoreView(score);
+                                }
                             }
                         }
-                    },
-                    onClick: (evt, elements) => {
-                        if (elements.length > 0) {
-                            const index = elements[0].index;
-                            const score = scores?.[index];
-                            if (score) {
-                                loadScoreView(score);
-                            }
-                        }
-                    }
-                }}
-            />
+                    }}
+                />
+            </div>
         </div>
     )
 }
