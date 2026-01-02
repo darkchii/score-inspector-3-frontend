@@ -42,6 +42,8 @@ export class ProfileRulesetStatistics {
         this.completion = 0;
         this.completion_with_converts = 0;
 
+        this.completion_statistics = {};
+
         this.implied_playtime_seconds = 0;
 
         if(generate_periodic){
@@ -83,6 +85,8 @@ export class ProfileRulesetStatistics {
         this.calculateAccuracyDifficultyScatterChart();
         this.calculatePerformanceSpreadChart();
         this.calculateScoreSpreadChart();
+
+        this.calculateCompletionStatistics();
 
         if(this.generate_periodic){
             //sort scores by ended_at ascending
@@ -161,6 +165,156 @@ export class ProfileRulesetStatistics {
         _set_data = Object.fromEntries(Object.entries(_set_data).sort((a, b) => a[0].localeCompare(b[0])));
 
         return _set_data;
+    }
+
+    calculateCompletionStatistics() {
+        //temporary map of beatmap_id = [...scores]
+        const beatmapScoreMap = {};
+
+        for (const score of this.scores_set.scores) {
+            if (!beatmapScoreMap[score.beatmap_id]) {
+                beatmapScoreMap[score.beatmap_id] = [];
+            }
+            beatmapScoreMap[score.beatmap_id].push(score);
+        }
+
+        this.completion_statistics.year = {};
+        for (const beatmap of this.beatmaps) {
+            if (!beatmap.is_ranked) {
+                continue;
+            }
+
+            const year = beatmap.ranked_date ? beatmap.ranked_date.getUTCFullYear() : null;
+            if (!year) {
+                continue;
+            }
+
+            if (!this.completion_statistics.year[year]) {
+                this.completion_statistics.year[year] = {
+                    total: 0,
+                    cleared: 0,
+                };
+            }
+
+            this.completion_statistics.year[year].total += 1;
+            if(beatmapScoreMap[beatmap.beatmap_id] && beatmapScoreMap[beatmap.beatmap_id].length > 0){
+                this.completion_statistics.year[year].cleared += 1;
+            }
+        }
+
+        this.completion_statistics.star_rating = {};
+        const starRatingBuckets = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        for (const bucket of starRatingBuckets) {
+            this.completion_statistics.star_rating[bucket] = {
+                total: 0,
+                cleared: 0,
+            };
+        }
+
+        for (const beatmap of this.beatmaps) {
+            if (!beatmap.is_ranked) {
+                continue;
+            }
+            const stars = Math.floor(beatmap.stars);
+            const bucket = starRatingBuckets.includes(stars) ? stars : 10;
+            this.completion_statistics.star_rating[bucket].total += 1;
+            if(beatmapScoreMap[beatmap.beatmap_id] && beatmapScoreMap[beatmap.beatmap_id].length > 0){
+                this.completion_statistics.star_rating[bucket].cleared += 1;
+            }
+        }
+
+        //do CS, AR, OD and HP (same system so can be done at once)
+        ['cs', 'ar', 'od', 'hp'].forEach(statType => {
+            this.completion_statistics[statType] = {};
+            // const statBuckets = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+            // for (const bucket of statBuckets) {
+            //     this.completion_statistics[statType][bucket] = {
+            //         total: 0,
+            //         cleared: 0,
+            //     };
+            // }
+            for (const beatmap of this.beatmaps) {
+                if (!beatmap.is_ranked) {
+                    continue;
+                }
+
+                const statValue = Math.floor(beatmap[statType]);
+                
+                if(!this.completion_statistics[statType][statValue]){
+                    this.completion_statistics[statType][statValue] = {
+                        total: 0,
+                        cleared: 0,
+                    };
+                }
+                
+                this.completion_statistics[statType][statValue].total += 1;
+                if(beatmapScoreMap[beatmap.beatmap_id] && beatmapScoreMap[beatmap.beatmap_id].length > 0){
+                    this.completion_statistics[statType][statValue].cleared += 1;
+                }
+            }
+
+            //fill in missing buckets
+            let low = 0;
+            let high = Object.keys(this.completion_statistics[statType]).reduce((a, b) => Math.max(a, b), 0);
+            for(let i = low; i <= high; i++){
+                if(!this.completion_statistics[statType][i]){
+                    this.completion_statistics[statType][i] = {
+                        total: 0,
+                        cleared: 0,
+                    };
+                }
+            }
+        });
+
+        //length duration per minute buckets (until 10 minutes, then 10+)
+        this.completion_statistics.length = {};
+        for (const beatmap of this.beatmaps) {
+            if (!beatmap.is_ranked) {
+                continue;
+            }
+
+            const lengthMinutes = Math.floor(beatmap.length / 60);
+            const bucket = lengthMinutes >= 10 ? '10+' : lengthMinutes;
+            if (!this.completion_statistics.length[bucket]) {
+                this.completion_statistics.length[bucket] = {
+                    total: 0,
+                    cleared: 0,
+                };
+            }
+
+            this.completion_statistics.length[bucket].total += 1;
+            if(beatmapScoreMap[beatmap.beatmap_id] && beatmapScoreMap[beatmap.beatmap_id].length > 0){
+                this.completion_statistics.length[bucket].cleared += 1;
+            }
+        }
+
+        this.completion_statistics.combo = {}; //per 100 combo, until 1000+
+        for (const beatmap of this.beatmaps) {
+            if (!beatmap.is_ranked) {
+                continue;
+            }
+            const comboHundreds = Math.floor(beatmap.max_combo / 100);
+            const bucket = comboHundreds >= 10 ? '1000+' : comboHundreds * 100;
+            if (!this.completion_statistics.combo[bucket]) {
+                this.completion_statistics.combo[bucket] = {
+                    total: 0,
+                    cleared: 0,
+                };
+            }
+            this.completion_statistics.combo[bucket].total += 1;
+            if(beatmapScoreMap[beatmap.beatmap_id] && beatmapScoreMap[beatmap.beatmap_id].length > 0){
+                this.completion_statistics.combo[bucket].cleared += 1;
+            }
+        }
+
+        console.log(this.completion_statistics);
+        //for each stat type calculate completion %
+        for (const statType in this.completion_statistics) {
+            for (const key in this.completion_statistics[statType]) {
+                const stats = this.completion_statistics[statType][key];
+                stats.completion = stats.total > 0 ? (stats.cleared / stats.total) : 0;
+            }
+        }
     }
 
     calculateAccuracyDifficultyScatterChart(limit = LIMIT_CHART_SAMPLE_SIZE) {

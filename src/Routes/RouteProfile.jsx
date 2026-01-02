@@ -11,6 +11,7 @@ import ProfilePagePacks from "../components/profile/pages/ProfilePagePacks";
 import NumberFlow from "@number-flow/react";
 import ProfilePageCharts from "../components/profile/pages/ProfilePageCharts";
 import ProfilePageDaily from "../components/profile/pages/ProfilePageDaily";
+import ProfilePageCompletion from "../components/profile/pages/ProfilePageCompletion";
 
 const pageComponents = {
     'main': { component: ProfilePageMain, title: 'Overview' },
@@ -18,6 +19,7 @@ const pageComponents = {
     'sessions': { component: ProfilePageSessions, title: 'Sessions' },
     'scores': { component: ProfilePageScores, title: 'Scores' },
     'charts': { component: ProfilePageCharts, title: 'Charts' },
+    'completion': { component: ProfilePageCompletion, title: 'Completion' },
     'packs': { component: ProfilePagePacks, title: 'Packs' },
 };
 

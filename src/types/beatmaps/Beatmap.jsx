@@ -17,6 +17,7 @@ class Beatmap {
         this.ruleset = GetRulesetNameFromId(this.ruleset_id);
 
         this.status = api_data.status;
+        this.is_ranked = this.status === 'ranked' || this.status === 'approved';
 
         this.stars = Number(api_data.stars);
 
