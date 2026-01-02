@@ -196,9 +196,9 @@ function ProfilePageSessions() {
         return getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.getById(selectedSessionId);
     };
 
-    const onSessionSortChange = (field, direction) => {
-        if (!sessionArray) return;
-        const sortedSessions = [...sessionArray];
+    const onSessionSortChange = (field, direction, sessions = null) => {
+        if (!sessionArray && !sessions) return;
+        const sortedSessions = [...(sessions || sessionArray)];
         sortedSessions.sort((a, b) => {
             if (direction === 'asc') {
                 if (a[field] < b[field]) return -1;
@@ -217,16 +217,11 @@ function ProfilePageSessions() {
 
     useEffect(() => {
         const sessions = getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.get();
-        if (sessions) {
-            setSessionArray(sessions);
-        } else {
-            setSessionArray(null);
-        }
         const count = sessions?.length || 0;
         setSessionCount(count);
         setSelectedSessionId(null);
         setSessionSelectorPage(0);
-        onSessionSortChange('start', 'desc');
+        onSessionSortChange('start', 'desc', sessions || []);
     }, [getRulesetStatistics, activeRuleset]);
 
     useEffect(() => {

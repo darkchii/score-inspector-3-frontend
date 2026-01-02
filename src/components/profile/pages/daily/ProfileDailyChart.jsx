@@ -14,7 +14,7 @@ Chart.register(annotationPlugin);
 const chartDefinitions = {
     pp: { value: 'pp', nesting: ['implied_pp'], label: 'Performance', yFormat: (y) => y.toFixed(2) + 'pp' },
     score: { value: 'score', nesting: ['implied_total_score'], label: 'Score', yFormat: (y) => y.toLocaleString('en-US') },
-    accuracy: { value: 'accuracy', nesting: ['accuracy'], label: 'Accuracy', yFormat: (y) => (y * 100).toFixed(2) + '%' },
+    accuracy: { value: 'accuracy', nesting: ['accuracy'], label: 'Accuracy', yFormat: (y) => (y * 100).toFixed(2) + '%'},
     combo: { value: 'combo', nesting: ['combo'], label: 'Combo', yFormat: (y) => y.toLocaleString('en-US') + 'x' },
     length: { value: 'length', nesting: ['local_beatmap', 'length_modded'], label: 'Length', yFormat: (y) => `${Math.floor(y / 60)}:${(y % 60).toString().padStart(2, '0')}` },
     sr: { value: 'sr', nesting: ['star_rating'], label: 'Stars', yFormat: (y) => y.toFixed(2) + '★' },
@@ -105,6 +105,9 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartE
                                     return score ? GetGradeColor(score.grade) : '#888888';
                                 }) || [],
                                 pointRadius: 4,
+                                pointHoverRadius: 6,
+                                showLine: false,
+                                borderWidth: 1,
                             }
                         ]
                     }}
