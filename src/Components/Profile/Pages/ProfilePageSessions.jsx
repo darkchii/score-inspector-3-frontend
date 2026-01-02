@@ -1,11 +1,21 @@
-import { Alert, Box, Divider, Grid, List, ListItemButton, ListItemText, Pagination, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, Typography, useTheme } from "@mui/material";
+import { Alert, Box, Divider, Grid, List, ListItemButton, ListItemText, MenuItem, Pagination, Paper, Select, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, Typography, useTheme } from "@mui/material";
 import { useProfile } from "../../../providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import ScoreList from "../../ScoreList";
 import { TextureDatabase } from "../../../assets/textures/TextureDatabase";
 import NumberFlow from "@number-flow/react";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { FormatDuration } from "../../../util/Helper";
+import { FormatDuration, FormatNumber, FormatNumberWithPrecision } from "../../../util/Helper";
+
+const SESSION_SORT_FIELDS = [
+    { label: 'Date', field: 'start', format: (value) => new Date(value).toLocaleString() },
+    { label: 'Duration', field: 'duration', format: (value) => FormatDuration(value) },
+    { label: 'Scores', field: 'score_count', format: (value) => FormatNumber(value) },
+    { label: 'Performance', field: 'cumulative_pp', format: (value) => FormatNumberWithPrecision(value, 2) + ' pp' },
+    { label: 'Score', field: 'cumulative_implied_total_score', format: (value) => FormatNumber(value) },
+    { label: 'Lazer Score', field: 'cumulative_lazer_score', format: (value) => FormatNumber(value) },
+
+]
 
 function SessionDisplay({ session }) {
     const theme = useTheme();
@@ -77,11 +87,11 @@ function SessionDisplay({ session }) {
                             <Grid sx={{ mt: theme.spacing(2), }} />
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Total Score</TableCell>
-                                <TableCell><NumberFlow format={{ maximumFractionDigits: 0 }}value={session.cumulative_implied_total_score} /></TableCell>
+                                <TableCell><NumberFlow format={{ maximumFractionDigits: 0 }} value={session.cumulative_implied_total_score} /></TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Average Score</TableCell>
-                                <TableCell><NumberFlow format={{ maximumFractionDigits: 0 }}value={session.average_implied_total_score} /></TableCell>
+                                <TableCell><NumberFlow format={{ maximumFractionDigits: 0 }} value={session.average_implied_total_score} /></TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Highest Score</TableCell>
@@ -162,20 +172,53 @@ function ProfilePageSessions() {
 
     const [sessionCount, setSessionCount] = useState(0);
     const [sessionSelectorPage, setSessionSelectorPage] = useState(0);
+    const [sessionArray, setSessionArray] = useState(null);
+    const [sessionSorting, setSessionSorting] = useState('start');
+    const [sessionSortingDirection, setSessionSortingDirection] = useState('desc'); //true = descending
 
-    useEffect(() => {
-        const count = getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.length || 0;
-        setSessionCount(count);
-
-        //reset selection
-        setSelectedSessionId(null);
-        setSessionSelectorPage(0);
-    }, [getRulesetStatistics, activeRuleset]);
+    //use session_sort_fields, expanding to add asc and desc options
+    const ADJUSTED_SORT_FIELDS = SESSION_SORT_FIELDS.flatMap(field => ([
+        { label: field.label, field: field.field, direction: 'desc' },
+        { label: field.label, field: field.field, direction: 'asc' },
+    ]));
 
     const getSession = () => {
         if (!selectedSessionId) return null;
         return getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.getById(selectedSessionId);
+    };
+
+    const onSessionSortChange = (field, direction) => {
+        if (!sessionArray) return;
+        const sortedSessions = [...sessionArray];
+        sortedSessions.sort((a, b) => {
+            if (direction === 'asc') {
+                if (a[field] < b[field]) return -1;
+                if (a[field] > b[field]) return 1;
+                return 0;
+            } else {
+                if (a[field] > b[field]) return -1;
+                if (a[field] < b[field]) return 1;
+                return 0;
+            }
+        });
+        setSessionSorting(field);
+        setSessionSortingDirection(direction);
+        setSessionArray(sortedSessions);
     }
+
+    useEffect(() => {
+        const sessions = getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.get();
+        if (sessions) {
+            setSessionArray(sessions);
+        }else{
+            setSessionArray(null);
+        }
+        const count = sessions?.length || 0;
+        setSessionCount(count);
+        setSelectedSessionId(null);
+        setSessionSelectorPage(0);
+        onSessionSortChange('start', 'desc');
+    }, [getRulesetStatistics, activeRuleset]);
 
     useEffect(() => {
         setDisplaySessionData(getSession());
@@ -192,6 +235,30 @@ function ProfilePageSessions() {
                                 <Typography>No sessions available.</Typography>
                             ) : (
                                 <>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 2 }}>
+                                        {/* sorting control (dropdown menu, each field gets two options: ascending and descending) */}
+                                        <Typography>Sort by:</Typography>
+                                        <Select
+                                            sx={{
+                                                flexGrow: 1,
+                                            }}
+                                            size="small"
+                                            value={`${sessionSorting}-${sessionSortingDirection}`}
+                                            onChange={(e) => {
+                                                const [field, order] = e.target.value.split('-');
+                                                onSessionSortChange(field, order);
+                                            }}
+                                        >
+                                            {ADJUSTED_SORT_FIELDS.map((option) => (
+                                                <MenuItem
+                                                    key={`${option.field}-${option.direction}`}
+                                                    value={`${option.field}-${option.direction}`}
+                                                >
+                                                    {option.label} {option.direction === 'desc' ? '↓' : '↑'}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
                                         <Pagination
                                             count={Math.ceil(sessionCount / _sessionsPerPage)}
@@ -201,7 +268,7 @@ function ProfilePageSessions() {
                                         />
                                     </Box>
                                     <List>
-                                        {getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.get().slice(sessionSelectorPage * _sessionsPerPage, (sessionSelectorPage + 1) * _sessionsPerPage).map((session) => (
+                                        {sessionArray?.slice(sessionSelectorPage * _sessionsPerPage, (sessionSelectorPage + 1) * _sessionsPerPage).map((session) => (
                                             <ListItemButton
                                                 key={session.id}
                                                 selected={selectedSessionId === session.id}
@@ -209,7 +276,8 @@ function ProfilePageSessions() {
                                             >
                                                 <ListItemText
                                                     primary={`${session.start.toLocaleString()}`}
-                                                    secondary={`Duration: ${FormatDuration(session.duration)}, Scores: ${session.score_count}`} />
+                                                    // secondary={`Duration: ${FormatDuration(session.duration)}, Scores: ${session.score_count}`} />
+                                                    secondary={`${SESSION_SORT_FIELDS.find(f => f.field === sessionSorting)?.label || ''}: ${SESSION_SORT_FIELDS.find(f => f.field === sessionSorting)?.format ? SESSION_SORT_FIELDS.find(f => f.field === sessionSorting).format(session[sessionSorting]) : session[sessionSorting]}`} />
                                             </ListItemButton>
                                         ))}
                                     </List>
