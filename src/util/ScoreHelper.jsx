@@ -93,6 +93,17 @@ export function BeatmapApplyModsToDifficulty(ruleset, beatmap, mods) {
         }
     }
 
+    //if mania, and xK mod is applied, set cs to key count
+    if (ruleset === 'mania') {
+        const keyMod = mods.find(mod => mod.acronym.endsWith('K'));
+        if (keyMod) {
+            const keyCount = parseInt(keyMod.acronym.slice(0, -1));
+            if (!isNaN(keyCount)) {
+                modifiedAttributes.cs = keyCount;
+            }
+        }
+    }
+
     return modifiedAttributes;
 }
 

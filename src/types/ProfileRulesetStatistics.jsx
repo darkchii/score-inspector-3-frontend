@@ -223,16 +223,8 @@ export class ProfileRulesetStatistics {
             }
         }
 
-        //do CS, AR, OD and HP (same system so can be done at once)
         ['cs', 'ar', 'od', 'hp'].forEach(statType => {
             this.completion_statistics[statType] = {};
-            // const statBuckets = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
-            // for (const bucket of statBuckets) {
-            //     this.completion_statistics[statType][bucket] = {
-            //         total: 0,
-            //         cleared: 0,
-            //     };
-            // }
             for (const beatmap of this.beatmaps) {
                 if (!beatmap.is_ranked) {
                     continue;
@@ -253,7 +245,6 @@ export class ProfileRulesetStatistics {
                 }
             }
 
-            //fill in missing buckets
             let low = 0;
             let high = Object.keys(this.completion_statistics[statType]).reduce((a, b) => Math.max(a, b), 0);
             for(let i = low; i <= high; i++){
@@ -266,7 +257,6 @@ export class ProfileRulesetStatistics {
             }
         });
 
-        //length duration per minute buckets (until 10 minutes, then 10+)
         this.completion_statistics.length = {};
         for (const beatmap of this.beatmaps) {
             if (!beatmap.is_ranked) {
@@ -288,7 +278,7 @@ export class ProfileRulesetStatistics {
             }
         }
 
-        this.completion_statistics.combo = {}; //per 100 combo, until 1000+
+        this.completion_statistics.combo = {};
         for (const beatmap of this.beatmaps) {
             if (!beatmap.is_ranked) {
                 continue;
@@ -307,8 +297,6 @@ export class ProfileRulesetStatistics {
             }
         }
 
-        console.log(this.completion_statistics);
-        //for each stat type calculate completion %
         for (const statType in this.completion_statistics) {
             for (const key in this.completion_statistics[statType]) {
                 const stats = this.completion_statistics[statType][key];

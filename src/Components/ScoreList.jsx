@@ -11,6 +11,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import DifficultyBadge from "./DifficultyBadge";
 import { GetStarRating } from "../util/ScoreHelper";
 import BetterTooltip from "./tooltips/BetterTooltip";
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 function ScoreListRow({ score, index, isCompact = false, showIndex = true, startIndex = 0, loadScoreView = null }) {
     const theme = useTheme();
@@ -24,7 +25,7 @@ function ScoreListRow({ score, index, isCompact = false, showIndex = true, start
                 cursor: 'pointer',
                 //content should be vertically centered and horizontally aligned to the left
                 '& > *': {
-                    zIndex: 1,
+                    zIndex: 2,
                     alignItems: 'center',
                     verticalAlign: 'middle',
                 },
@@ -39,6 +40,7 @@ function ScoreListRow({ score, index, isCompact = false, showIndex = true, start
                     transform: 'scale(0.98)',
                     boxShadow: theme.shadows[4],
                 },
+                position: 'relative',
             }}
         >
             {showIndex &&
@@ -102,8 +104,14 @@ function ScoreListRow({ score, index, isCompact = false, showIndex = true, start
                 }}>{score.combo.toLocaleString()}/{(score.attr_diff?.max_combo || score.beatmap.max_combo).toLocaleString()}x</Typography>
             </TableCell>
             <TableCell>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'left' }}>
                     <DifficultyBadge difficulty={GetStarRating(score)} />
+                    {
+                        score.beatmap.status === 'loved' &&
+                        <BetterTooltip title="Loved">
+                            <FavoriteIcon sx={{ color: theme.palette.error.main, fontSize: '1rem', marginLeft: '4px' }} />
+                        </BetterTooltip>
+                    }
                 </div>
             </TableCell>
             {

@@ -13,6 +13,7 @@ import BetterTooltip from '../tooltips/BetterTooltip';
 import NumberFlow from '@number-flow/react';
 import React from 'react';
 import { Link } from "react-router";
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 function ScoreViewBase({ score, noBackground = false, compact = false }) {
     const theme = useTheme();
@@ -53,6 +54,12 @@ function ScoreViewBase({ score, noBackground = false, compact = false }) {
                     {/* row flex */}
                     <div className={scoreInfoStyles['score-info']} style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
                         <DifficultyBadge difficulty={GetStarRating(score)} />
+                        {
+                            score.beatmap.status === 'loved' &&
+                            <BetterTooltip title="Loved">
+                                <FavoriteIcon sx={{ color: theme.palette.error.main, fontSize: '1.5rem' }} />
+                            </BetterTooltip>
+                        }
                         <img src={GetRulesetIconFromId(score.ruleset_id)} alt="Ruleset Icon" style={{ width: '24px', height: '24px' }} />
                         <ModDisplay ruleset={score.ruleset} mods={score.mods} />
                     </div>
@@ -142,7 +149,7 @@ function ScoreViewBase({ score, noBackground = false, compact = false }) {
                             }
                         </div>
                         <div className={scoreStatsStyles['score-info__group-row']}>
-                            <ScoreStat label="CS" value={<NumberFlow value={score.beatmap_attributes.cs} />} />
+                            <ScoreStat label={score.ruleset === 'mania' ? "Keys" : "CS"} value={<NumberFlow value={score.beatmap_attributes.cs} />} />
                             <ScoreStat label="OD" value={<NumberFlow value={score.beatmap_attributes.od} />} />
                             <ScoreStat label="HP" value={<NumberFlow value={score.beatmap_attributes.hp} />} />
                             <ScoreStat label="AR" value={<NumberFlow value={score.beatmap_attributes.ar} />} />
