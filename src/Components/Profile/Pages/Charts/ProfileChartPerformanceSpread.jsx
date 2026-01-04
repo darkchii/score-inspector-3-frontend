@@ -68,10 +68,9 @@ function PerformanceChartPerformanceSpread() {
                         onClick: (evt, elements) => {
                             if (elements.length > 0) {
                                 const index = elements[0].index;
-                                const datasetIndex = elements[0].datasetIndex;
-                                const scoreId = getRulesetStatistics(activeRuleset)?.charts?.performanceSpread[index]?.id;
-                                if (scoreId) {
-                                    loadScoreView(scoreId);
+                                const score = getScoreById(getRulesetStatistics(activeRuleset)?.charts?.performanceSpread[index]?.id);
+                                if (score) {
+                                    loadScoreView(score);
                                 }
                             }
                         }

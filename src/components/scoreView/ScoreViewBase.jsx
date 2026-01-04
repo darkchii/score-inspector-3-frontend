@@ -18,12 +18,22 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 function ScoreViewBase({ score, noBackground = false, compact = false }) {
     const theme = useTheme();
 
+    if (!score.beatmap || !score.user) {
+        return (
+            <div className={scoreViewStyles['score-view__base']}>
+                <div className={scoreViewStyles['score-view__base__user-data']}>
+                    <Typography variant="h6">Score data is incomplete for some unknown reason.</Typography>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={scoreViewStyles['score-view__base']}>
             <div className={scoreViewStyles['score-view__base__user-data']}>
                 <Avatar src={`https://a.ppy.sh/${score.user_id}`} alt="User Avatar" sx={{ width: 96, height: 96 }} variant='rounded' />
                 <div className={scoreViewStyles['score-view__base__user-data__username']}>
-                    <span>{score.user.osuApi.username}</span>
+                    <span>{score.user?.osuApi?.username || 'Unknown User'}</span>
                 </div>
             </div>
             <div className={scoreViewStyles['score-view__base__content']}>
