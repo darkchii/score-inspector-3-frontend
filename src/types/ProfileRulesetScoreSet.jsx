@@ -16,7 +16,10 @@ export class ProfileRulesetScoreSet {
         this.missing_difficulty = 0; //number of scores with missing beatmap difficulty data (its likely in queue for processing)
 
         this.implied_total_score = 0;
+        this.implied_total_score_ss = 0;
+
         this.score = 0;
+        this.score_ss = 0;
 
         this.performance_points = 0;
         this.bonus_performance_points = 0;
@@ -24,6 +27,7 @@ export class ProfileRulesetScoreSet {
         this.duration_seconds = 0;
 
         this.recent_scores = [];
+        this.top_scores = [];
 
         this.highlighted_scores = {};
         this.highlighted_scores['top_pp'] = null;
@@ -103,6 +107,9 @@ export class ProfileRulesetScoreSet {
         this.implied_total_score += score.implied_total_score;
         this.score += score.total_score;
 
+        this.implied_total_score_ss += score.is_ss ? score.implied_total_score : 0;
+        this.score_ss += score.is_ss ? score.total_score : 0;
+
         if (score.diff_missing) {
             this.missing_difficulty += 1;
         }
@@ -150,6 +157,10 @@ export class ProfileRulesetScoreSet {
         this.reorder('ended_at', true);
         this.recent_scores = this.scores.slice(0, 100);
         this.scores_reordered['date'] = this.recent_scores;
+
+        this.reorder('implied_pp', true);
+        this.top_scores = this.scores.slice(0, 200);
+        this.scores_reordered['pp'] = this.top_scores;
 
         this.sessions = SessionCollection.fromScores(this.scores);
         this.sessions.sessions.sort((a, b) => b.start - a.start);

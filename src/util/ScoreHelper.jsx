@@ -107,15 +107,18 @@ export function BeatmapApplyModsToDifficulty(ruleset, beatmap, mods) {
     return modifiedAttributes;
 }
 
-export const CalculateRawPerformance = (scores, include_loved = false) => {
+export const CalculateRawPerformance = (scores, include_loved = false, sort = true) => {
     let subset = scores;
 
     if (!include_loved) {
         subset = scores.filter(score => score.beatmap && score.beatmap.status !== 'loved');
     }
 
-    //Sort scores by performance descending
-    subset.sort((a, b) => (b.performance?.base?.pp || b.pp || 0) - (a.performance?.base?.pp || a.pp || 0));
+    //Sometimes we do not want to sort scores by pp, e.g., when calculating cumulative pp over time (ITS SLOW)
+    if (sort) {
+        //Sort scores by performance descending
+        subset.sort((a, b) => (b.implied_pp || 0) - (a.implied_pp || 0));
+    }
     //Use top 500 scores only
 
     const topScores = subset.slice(0, 500);

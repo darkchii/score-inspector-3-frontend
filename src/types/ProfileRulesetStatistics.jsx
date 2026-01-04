@@ -1,5 +1,7 @@
 import { GetGradeColor, GetRulesetId } from "../util/Helper";
+import { CalculateBonusPerformance, CalculateRawPerformance } from "../util/ScoreHelper";
 import { ProfileRulesetScoreSet } from "./ProfileRulesetScoreSet";
+import SessionCollection from "./SessionCollection";
 
 const PERIODIC_SUFFIXES = ['daily', 'monthly'];
 const LIMIT_CHART_SAMPLE_SIZE = 10000;
@@ -46,12 +48,15 @@ export class ProfileRulesetStatistics {
 
         this.implied_playtime_seconds = 0;
 
-        if(generate_periodic){
+        if (generate_periodic) {
             this.generate_periodic = true;
 
             //these are also of type ProfileRulesetScoreSet, but with subset of scores given
             //this is based on UTC, not local time, so the values are the same for everyone
             this.periodic = {};
+            this.periodic_by_pp = {};
+            this.periodic_by_score = {};
+            this.periodic_graph_data = {};
             this.periodic_by_year = {}; //same as periodic but grouped by year
         }
 
@@ -88,28 +93,269 @@ export class ProfileRulesetStatistics {
 
         this.calculateCompletionStatistics();
 
-        if(this.generate_periodic){
+        if (this.generate_periodic) {
             //sort scores by ended_at ascending
             const sorted_scores = this.scores_set.scores.slice().sort((a, b) => a.ended_at - b.ended_at);
+            const sorted_scores_by_pp = this.scores_set_by_pp.scores.slice().sort((a, b) => a.ended_at - b.ended_at);
+            const sorted_scores_by_score = this.scores_set_by_score.scores.slice().sort((a, b) => a.ended_at - b.ended_at);
 
-            for(const interval of PERIODIC_SUFFIXES){
+            for (const interval of PERIODIC_SUFFIXES) {
                 this.periodic[interval] = this.calculatePeriodic(sorted_scores, interval);
+                this.periodic_by_pp[interval] = this.calculatePeriodic(sorted_scores_by_pp, interval);
+                this.periodic_by_score[interval] = this.calculatePeriodic(sorted_scores_by_score, interval);
             }
+
+            this.calculatePeriodicGraphData();
 
             //apply yearly grouping for every periodic interval
             //ie this.periodic_by_year['2023'] = { 'monthly': {...}, 'daily': {...} }
             //each interval starts with YYYY-, so we can easily group them
-            for(const interval of PERIODIC_SUFFIXES){
-                for(const date_string in this.periodic[interval]){
+            for (const interval of PERIODIC_SUFFIXES) {
+                for (const date_string in this.periodic[interval]) {
                     const year = date_string.split('-')[0];
-                    if(!this.periodic_by_year[year]){
+                    if (!this.periodic_by_year[year]) {
                         this.periodic_by_year[year] = {};
                     }
-                    if(!this.periodic_by_year[year][interval]){
+                    if (!this.periodic_by_year[year][interval]) {
                         this.periodic_by_year[year][interval] = {};
                     }
                     this.periodic_by_year[year][interval][date_string] = this.periodic[interval][date_string];
                 }
+            }
+        }
+    }
+
+    calculatePeriodicGraphData() {
+        //stores only raw number data, so no ProfileRulesetScoreSet (it's too heavy)
+
+        //ordered by date string (use Date objects to actually sort it)
+        let ordered_dates = {};
+        for (const interval of PERIODIC_SUFFIXES) {
+            ordered_dates[interval] = Object.keys(this.periodic[interval]).sort().map(date_string => {
+                return {
+                    date_string: date_string,
+                    set: this.periodic[interval][date_string],
+                    set_by_pp: this.periodic_by_pp[interval][date_string],
+                    set_by_score: this.periodic_by_score[interval][date_string],
+                };
+            });
+        }
+
+        //same structure
+        //this.periodic_graph_data[interval]['incremental'][date] = { clears, scores, ...} (incremental and cumulative)
+        for (const interval of PERIODIC_SUFFIXES) {
+            this.periodic_graph_data[interval] = {
+                incremental: {},
+                cumulative: {},
+                average: {},
+                highest: {},
+                median: {},
+            }
+
+            //first and second pass: incremental, cumulative
+            let cumulative_clears = 0;
+            let cumulative_scores = 0;
+            let cumulative_implied_score = 0;
+            let cumulative_implied_score_ss = 0;
+            let cumulative_lazer_score = 0;
+            let cumulative_lazer_score_ss = 0;
+
+            let cumulative_pp = 0;
+            let cumulative_raw_pp = 0;
+
+            let cumulative_length_seconds = 0;
+            let cumulative_sessions = [];
+
+            let cumulative_grades_xh = 0;
+            let cumulative_grades_x = 0;
+            let cumulative_grades_sh = 0;
+            let cumulative_grades_s = 0;
+            let cumulative_grades_a = 0;
+            let cumulative_grades_b = 0;
+            let cumulative_grades_c = 0;
+            let cumulative_grades_d = 0;
+            let temp_scores = [];
+            for (const entry of ordered_dates[interval]) {
+                let sessions = SessionCollection.fromScores(entry.set?.scores || []);
+                this.periodic_graph_data[interval].incremental[entry.date_string] = {
+                    clears: entry.set_by_pp?.clears || 0,
+                    scores: entry.set?.clears || 0,
+                    implied_score: entry.set?.implied_total_score || 0,
+                    implied_score_ss: entry.set?.implied_total_score_ss || 0,
+                    lazer_score: entry.set?.score || 0,
+                    lazer_score_ss: entry.set?.score_ss || 0,
+                    pp: entry.set_by_pp?.performance_points || 0,
+                    raw_pp: CalculateRawPerformance(entry.set_by_pp?.top_scores || [], false, false) + CalculateBonusPerformance(entry.set_by_pp?.scores.length || 0),
+
+                    length_seconds: entry.set?.scores.reduce((acc, score) => acc + (score.duration || 0), 0) || 0,
+
+                    sessions: sessions.length,
+                    sessions_length_seconds: sessions.play_time,
+
+                    grades_xh: entry.set?.grades['XH'] || 0,
+                    grades_x: entry.set?.grades['X'] || 0,
+                    grades_sh: entry.set?.grades['SH'] || 0,
+                    grades_s: entry.set?.grades['S'] || 0,
+                    grades_a: entry.set?.grades['A'] || 0,
+                    grades_b: entry.set?.grades['B'] || 0,
+                    grades_c: entry.set?.grades['C'] || 0,
+                    grades_d: entry.set?.grades['D'] || 0,
+                };
+
+                cumulative_clears += entry.set_by_pp?.clears || 0;
+                cumulative_scores += entry.set?.clears || 0;
+                cumulative_implied_score += entry.set?.implied_total_score || 0;
+                cumulative_implied_score_ss += entry.set?.implied_total_score_ss || 0;
+                cumulative_lazer_score += entry.set?.score || 0;
+                cumulative_lazer_score_ss += entry.set?.score_ss || 0;
+                cumulative_pp += entry.set_by_pp?.performance_points || 0;
+                temp_scores = temp_scores.concat(entry.set_by_pp?.top_scores || []);
+                temp_scores.sort((a, b) => (b.implied_pp || 0) - (a.implied_pp || 0));
+                temp_scores = temp_scores.slice(0, 250);
+                cumulative_raw_pp = CalculateRawPerformance(temp_scores || [], false, false) + CalculateBonusPerformance(cumulative_scores);
+                cumulative_length_seconds += entry.set?.scores.reduce((acc, score) => acc + (score.duration || 0), 0) || 0;
+                cumulative_sessions.push(...sessions.get());
+
+                cumulative_grades_xh += entry.set?.grades['XH'] || 0;
+                cumulative_grades_x += entry.set?.grades['X'] || 0;
+                cumulative_grades_sh += entry.set?.grades['SH'] || 0;
+                cumulative_grades_s += entry.set?.grades['S'] || 0;
+                cumulative_grades_a += entry.set?.grades['A'] || 0;
+                cumulative_grades_b += entry.set?.grades['B'] || 0;
+                cumulative_grades_c += entry.set?.grades['C'] || 0;
+                cumulative_grades_d += entry.set?.grades['D'] || 0;
+
+                this.periodic_graph_data[interval].cumulative[entry.date_string] = {
+                    clears: cumulative_clears,
+                    scores: cumulative_scores,
+                    implied_score: cumulative_implied_score,
+                    implied_score_ss: cumulative_implied_score_ss,
+                    lazer_score: cumulative_lazer_score,
+                    lazer_score_ss: cumulative_lazer_score_ss,
+                    pp: cumulative_pp,
+                    raw_pp: cumulative_raw_pp,
+                    length_seconds: cumulative_length_seconds,
+
+                    sessions: cumulative_sessions.length,
+                    sessions_length_seconds: cumulative_sessions.reduce((acc, session) => acc + session.duration, 0),
+
+                    grades_xh: cumulative_grades_xh,
+                    grades_x: cumulative_grades_x,
+                    grades_sh: cumulative_grades_sh,
+                    grades_s: cumulative_grades_s,
+                    grades_a: cumulative_grades_a,
+                    grades_b: cumulative_grades_b,
+                    grades_c: cumulative_grades_c,
+                    grades_d: cumulative_grades_d,
+                };
+            }
+
+            //third pass: average
+            for (const entry of ordered_dates[interval]) {
+                this.periodic_graph_data[interval].average[entry.date_string] = {
+                    clears: 0, //incompatible
+                    scores: 0, //incompatible
+                    implied_score: entry.set?.implied_total_score / entry.set?.scores.length || 0,
+                    implied_score_ss: entry.set?.implied_total_score_ss / entry.set?.scores.length || 0,
+                    lazer_score: entry.set?.score / entry.set?.scores.length || 0,
+                    lazer_score_ss: entry.set?.score_ss / entry.set?.scores.length || 0,
+                    pp: entry.set_by_pp?.performance_points / entry.set?.scores.length || 0,
+                    raw_pp: 0, //incompatible
+                    length_seconds: entry.set?.scores.length > 0 ? (entry.set?.scores.reduce((acc, score) => acc + (score.duration || 0), 0) || 0) / entry.set?.scores.length : 0,
+                    sessions: 0, //incompatible
+                    sessions_length_seconds: 0, //incompatible
+                    grades_xh: 0, //incompatible
+                    grades_x: 0, //incompatible
+                    grades_sh: 0, //incompatible
+                    grades_s: 0, //incompatible
+                    grades_a: 0, //incompatible
+                    grades_b: 0, //incompatible
+                    grades_c: 0, //incompatible
+                    grades_d: 0, //incompatible
+                };
+            }
+
+            //fourth pass: highest (of that date, not cumulative)
+            for (const entry of ordered_dates[interval]) {
+                this.periodic_graph_data[interval].highest[entry.date_string] = {
+                    clears: 0, //incompatible
+                    scores: 0, //incompatible
+                    implied_score: entry.set?.scores.length > 0 ? Math.max(...entry.set.scores.map(s => s.implied_total_score)) : 0,
+                    implied_score_ss: entry.set?.scores.length > 0 ? Math.max(...entry.set.scores.map(s => s.is_ss ? s.implied_total_score : 0)) : 0,
+                    lazer_score: entry.set?.scores.length > 0 ? Math.max(...entry.set.scores.map(s => s.total_score)) : 0,
+                    lazer_score_ss: entry.set?.scores.length > 0 ? Math.max(...entry.set.scores.map(s => s.is_ss ? s.total_score : 0)) : 0,
+                    pp: entry.set_by_pp?.scores.length > 0 ? Math.max(...entry.set_by_pp.scores.map(s => s.implied_pp)) : 0,
+                    raw_pp: 0, //incompatible
+                    length_seconds: entry.set?.scores.length > 0 ? Math.max(...entry.set.scores.map(s => s.duration || 0)) : 0,
+                    sessions: 0, //incompatible
+                    sessions_length_seconds: 0, //incompatible
+                    grades_xh: entry.set.grades['XH'] || 0, //incompatible
+                    grades_x: entry.set.grades['X'] || 0, //incompatible
+                    grades_sh: entry.set.grades['SH'] || 0, //incompatible
+                    grades_s: entry.set.grades['S'] || 0, //incompatible
+                    grades_a: entry.set.grades['A'] || 0, //incompatible
+                    grades_b: entry.set.grades['B'] || 0, //incompatible
+                    grades_c: entry.set.grades['C'] || 0, //incompatible
+                    grades_d: entry.set.grades['D'] || 0, //incompatible
+                };
+            }
+
+            //fifth pass: median
+            for (const entry of ordered_dates[interval]) {
+                let median_implied_score = 0;
+                let median_implied_score_ss = 0;
+                let median_lazer_score = 0;
+                let median_lazer_score_ss = 0;
+                let median_pp = 0;
+                if (entry.set?.scores.length > 0) {
+                    const sorted_implied_scores = entry.set.scores.map(s => s.implied_total_score).sort((a, b) => a - b);
+                    const sorted_implied_scores_ss = entry.set.scores.filter(s => s.is_ss).map(s => s.implied_total_score).sort((a, b) => a - b);
+                    const sorted_lazer_scores = entry.set.scores.map(s => s.total_score).sort((a, b) => a - b);
+                    const sorted_lazer_scores_ss = entry.set.scores.filter(s => s.is_ss).map(s => s.total_score).sort((a, b) => a - b);
+                    const sorted_pp = entry.set_by_pp.scores.map(s => s.implied_pp).sort((a, b) => a - b);
+                    const mid = Math.floor(entry.set.scores.length / 2);
+                    if (entry.set.scores.length % 2 === 0) {
+                        median_implied_score = (sorted_implied_scores[mid - 1] + sorted_implied_scores[mid]) / 2;
+                        median_lazer_score = (sorted_lazer_scores[mid - 1] + sorted_lazer_scores[mid]) / 2;
+                        median_pp = (sorted_pp[mid - 1] + sorted_pp[mid]) / 2;
+                    } else {
+                        median_implied_score = sorted_implied_scores[mid];
+                        median_lazer_score = sorted_lazer_scores[mid];
+                        median_pp = sorted_pp[mid];
+                    }
+                    if (sorted_implied_scores_ss.length > 0) {
+                        const mid_ss = Math.floor(sorted_implied_scores_ss.length / 2);
+                        if (sorted_implied_scores_ss.length % 2 === 0) {
+                            median_implied_score_ss = (sorted_implied_scores_ss[mid_ss - 1] + sorted_implied_scores_ss[mid_ss]) / 2;
+                            median_lazer_score_ss = (sorted_lazer_scores_ss[mid_ss - 1] + sorted_lazer_scores_ss[mid_ss]) / 2;
+                        }
+                        else {
+                            median_implied_score_ss = sorted_implied_scores_ss[mid_ss];
+                            median_lazer_score_ss = sorted_lazer_scores_ss[mid_ss];
+                        }
+                    }
+                }
+                this.periodic_graph_data[interval].median[entry.date_string] = {
+                    clears: 0, //incompatible
+                    scores: 0, //incompatible
+                    implied_score: median_implied_score,
+                    implied_score_ss: median_implied_score_ss,
+                    lazer_score: median_lazer_score,
+                    lazer_score_ss: median_lazer_score_ss,
+                    pp: median_pp,
+                    raw_pp: 0, //incompatible
+                    length_seconds: 0, //incompatible
+                    sessions: 0, //incompatible
+                    sessions_length_seconds: 0, //incompatible
+                    grades_xh: 0, //incompatible
+                    grades_x: 0, //incompatible
+                    grades_sh: 0, //incompatible
+                    grades_s: 0, //incompatible
+                    grades_a: 0, //incompatible
+                    grades_b: 0, //incompatible
+                    grades_c: 0, //incompatible
+                    grades_d: 0, //incompatible
+                };
             }
         }
     }
@@ -121,14 +367,14 @@ export class ProfileRulesetStatistics {
 
         let _set_data = {};
 
-        if(sorted_scores.length === 0){
+        if (sorted_scores.length === 0) {
             return _set_data;
         }
 
         for (const score of sorted_scores) {
             const date_string = getUTCDateString(score.ended_at, interval);
 
-            if(!_set_data[date_string]){
+            if (!_set_data[date_string]) {
                 _set_data[date_string] = new ProfileRulesetScoreSet();
             }
 
@@ -136,7 +382,7 @@ export class ProfileRulesetStatistics {
         }
 
         //calculate all sets
-        for(const date_string in _set_data){
+        for (const date_string in _set_data) {
             _set_data[date_string].calculate();
         }
 
@@ -197,7 +443,7 @@ export class ProfileRulesetStatistics {
             }
 
             this.completion_statistics.year[year].total += 1;
-            if(beatmapScoreMap[beatmap.beatmap_id] && beatmapScoreMap[beatmap.beatmap_id].length > 0){
+            if (beatmapScoreMap[beatmap.beatmap_id] && beatmapScoreMap[beatmap.beatmap_id].length > 0) {
                 this.completion_statistics.year[year].cleared += 1;
             }
         }
@@ -218,7 +464,7 @@ export class ProfileRulesetStatistics {
             const stars = Math.floor(beatmap.stars);
             const bucket = starRatingBuckets.includes(stars) ? stars : 10;
             this.completion_statistics.star_rating[bucket].total += 1;
-            if(beatmapScoreMap[beatmap.beatmap_id] && beatmapScoreMap[beatmap.beatmap_id].length > 0){
+            if (beatmapScoreMap[beatmap.beatmap_id] && beatmapScoreMap[beatmap.beatmap_id].length > 0) {
                 this.completion_statistics.star_rating[bucket].cleared += 1;
             }
         }
@@ -231,24 +477,24 @@ export class ProfileRulesetStatistics {
                 }
 
                 const statValue = Math.floor(beatmap[statType]);
-                
-                if(!this.completion_statistics[statType][statValue]){
+
+                if (!this.completion_statistics[statType][statValue]) {
                     this.completion_statistics[statType][statValue] = {
                         total: 0,
                         cleared: 0,
                     };
                 }
-                
+
                 this.completion_statistics[statType][statValue].total += 1;
-                if(beatmapScoreMap[beatmap.beatmap_id] && beatmapScoreMap[beatmap.beatmap_id].length > 0){
+                if (beatmapScoreMap[beatmap.beatmap_id] && beatmapScoreMap[beatmap.beatmap_id].length > 0) {
                     this.completion_statistics[statType][statValue].cleared += 1;
                 }
             }
 
             let low = 0;
             let high = Object.keys(this.completion_statistics[statType]).reduce((a, b) => Math.max(a, b), 0);
-            for(let i = low; i <= high; i++){
-                if(!this.completion_statistics[statType][i]){
+            for (let i = low; i <= high; i++) {
+                if (!this.completion_statistics[statType][i]) {
                     this.completion_statistics[statType][i] = {
                         total: 0,
                         cleared: 0,
@@ -273,7 +519,7 @@ export class ProfileRulesetStatistics {
             }
 
             this.completion_statistics.length[bucket].total += 1;
-            if(beatmapScoreMap[beatmap.beatmap_id] && beatmapScoreMap[beatmap.beatmap_id].length > 0){
+            if (beatmapScoreMap[beatmap.beatmap_id] && beatmapScoreMap[beatmap.beatmap_id].length > 0) {
                 this.completion_statistics.length[bucket].cleared += 1;
             }
         }
@@ -292,7 +538,7 @@ export class ProfileRulesetStatistics {
                 };
             }
             this.completion_statistics.combo[bucket].total += 1;
-            if(beatmapScoreMap[beatmap.beatmap_id] && beatmapScoreMap[beatmap.beatmap_id].length > 0){
+            if (beatmapScoreMap[beatmap.beatmap_id] && beatmapScoreMap[beatmap.beatmap_id].length > 0) {
                 this.completion_statistics.combo[bucket].cleared += 1;
             }
         }
