@@ -3,19 +3,27 @@ import { CalculateBonusPerformance, CalculateRawPerformance } from "../util/Scor
 import { ProfileRulesetScoreSet } from "./ProfileRulesetScoreSet";
 import SessionCollection from "./SessionCollection";
 
-const PERIODIC_SUFFIXES = ['daily', 'monthly'];
+const PERIODIC_SUFFIXES = ['daily', 'monthly', 'yearly'];
+const PERIODIC_SUFFIXES_CHARTS = ['monthly', 'yearly'];
 const LIMIT_CHART_SAMPLE_SIZE = 10000;
 
+const DATE_ISO_FORMAT_SLICES = {
+    'daily': 10,
+    'monthly': 7,
+    'yearly': 4,
+}
+
+const DATE_ISO_FORMAT_STR = {
+    'daily': "YYYY-MM-DD",
+    'monthly': "YYYY-MM",
+    'yearly': "YYYY",
+}
+
 const getUTCDateString = (date, interval) => {
-    const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    if (interval === 'daily') {
-        return `${year}-${month}-${day}`;
-    } else if (interval === 'monthly') {
-        return `${year}-${month}`;
+    if (!DATE_ISO_FORMAT_SLICES[interval]) {
+        throw new Error(`Invalid interval for date string: ${interval}`);
     }
-    throw new Error(`Invalid interval: ${interval}`);
+    return date.toISOString().slice(0, DATE_ISO_FORMAT_SLICES[interval]);
 }
 
 export class ProfileRulesetStatistics {
@@ -130,7 +138,7 @@ export class ProfileRulesetStatistics {
 
         //ordered by date string (use Date objects to actually sort it)
         let ordered_dates = {};
-        for (const interval of PERIODIC_SUFFIXES) {
+        for (const interval of PERIODIC_SUFFIXES_CHARTS) {
             ordered_dates[interval] = Object.keys(this.periodic[interval]).sort().map(date_string => {
                 return {
                     date_string: date_string,
@@ -143,7 +151,7 @@ export class ProfileRulesetStatistics {
 
         //same structure
         //this.periodic_graph_data[interval]['incremental'][date] = { clears, scores, ...} (incremental and cumulative)
-        for (const interval of PERIODIC_SUFFIXES) {
+        for (const interval of PERIODIC_SUFFIXES_CHARTS) {
             this.periodic_graph_data[interval] = {
                 incremental: {},
                 cumulative: {},
@@ -152,116 +160,180 @@ export class ProfileRulesetStatistics {
                 median: {},
             }
 
-            //first and second pass: incremental, cumulative
-            let cumulative_clears = 0;
-            let cumulative_scores = 0;
-            let cumulative_implied_score = 0;
-            let cumulative_implied_score_ss = 0;
-            let cumulative_lazer_score = 0;
-            let cumulative_lazer_score_ss = 0;
-
-            let cumulative_pp = 0;
-            let cumulative_raw_pp = 0;
-
-            let cumulative_length_seconds = 0;
-            let cumulative_sessions = [];
-
-            let cumulative_grades_xh = 0;
-            let cumulative_grades_x = 0;
-            let cumulative_grades_sh = 0;
-            let cumulative_grades_s = 0;
-            let cumulative_grades_a = 0;
-            let cumulative_grades_b = 0;
-            let cumulative_grades_c = 0;
-            let cumulative_grades_d = 0;
-            let temp_scores = [];
             for (const entry of ordered_dates[interval]) {
-                let sessions = SessionCollection.fromScores(entry.set?.scores || []);
+                let _incremental_implied_score = 0;
+                let _incremental_implied_score_ss = 0;
+                let _incremental_lazer_score = 0;
+                let _incremental_lazer_score_ss = 0;
+                let _incremental_pp = 0;
+                let _incremental_length_seconds = 0;
+                let _incremental_grades = {
+                    'XH': 0,
+                    'X': 0,
+                    'SH': 0,
+                    'S': 0,
+                    'A': 0,
+                    'B': 0,
+                    'C': 0,
+                    'D': 0,
+                }
+                for (const score of entry.set || []) {
+                    if (!score.beatmap) {
+                        return;
+                    }
+
+                    _incremental_implied_score += score.implied_total_score || 0;
+                    _incremental_lazer_score += score.total_score || 0;
+                    if (score.is_ss) {
+                        _incremental_implied_score_ss += score.implied_total_score || 0;
+                        _incremental_lazer_score_ss += score.total_score || 0;
+                    }
+                    _incremental_pp += score.implied_pp || 0;
+                    _incremental_length_seconds += score.duration || 0;
+
+                    const grade = score.grade;
+                    _incremental_grades[grade] = (_incremental_grades[grade] || 0) + 1;
+                }
                 this.periodic_graph_data[interval].incremental[entry.date_string] = {
-                    clears: entry.set_by_pp?.clears || 0,
-                    scores: entry.set?.clears || 0,
-                    implied_score: entry.set?.implied_total_score || 0,
-                    implied_score_ss: entry.set?.implied_total_score_ss || 0,
-                    lazer_score: entry.set?.score || 0,
-                    lazer_score_ss: entry.set?.score_ss || 0,
-                    pp: entry.set_by_pp?.performance_points || 0,
-                    raw_pp: CalculateRawPerformance(entry.set_by_pp?.top_scores || [], false, false) + CalculateBonusPerformance(entry.set_by_pp?.scores.length || 0),
+                    clears: entry.set_by_pp?.length || 0,
+                    scores: entry.set?.length || 0,
+                    implied_score: _incremental_implied_score || 0,
+                    implied_score_ss: _incremental_implied_score_ss || 0,
+                    lazer_score: _incremental_lazer_score || 0,
+                    lazer_score_ss: _incremental_lazer_score_ss || 0,
+                    pp: _incremental_pp || 0,
 
-                    length_seconds: entry.set?.scores.reduce((acc, score) => acc + (score.duration || 0), 0) || 0,
+                    length_seconds: _incremental_length_seconds || 0,
 
-                    sessions: sessions.length,
-                    sessions_length_seconds: sessions.play_time,
-
-                    grades_xh: entry.set?.grades['XH'] || 0,
-                    grades_x: entry.set?.grades['X'] || 0,
-                    grades_sh: entry.set?.grades['SH'] || 0,
-                    grades_s: entry.set?.grades['S'] || 0,
-                    grades_a: entry.set?.grades['A'] || 0,
-                    grades_b: entry.set?.grades['B'] || 0,
-                    grades_c: entry.set?.grades['C'] || 0,
-                    grades_d: entry.set?.grades['D'] || 0,
-                };
-
-                cumulative_clears += entry.set_by_pp?.clears || 0;
-                cumulative_scores += entry.set?.clears || 0;
-                cumulative_implied_score += entry.set?.implied_total_score || 0;
-                cumulative_implied_score_ss += entry.set?.implied_total_score_ss || 0;
-                cumulative_lazer_score += entry.set?.score || 0;
-                cumulative_lazer_score_ss += entry.set?.score_ss || 0;
-                cumulative_pp += entry.set_by_pp?.performance_points || 0;
-                temp_scores = temp_scores.concat(entry.set_by_pp?.top_scores || []);
-                temp_scores.sort((a, b) => (b.implied_pp || 0) - (a.implied_pp || 0));
-                temp_scores = temp_scores.slice(0, 250);
-                cumulative_raw_pp = CalculateRawPerformance(temp_scores || [], false, false) + CalculateBonusPerformance(cumulative_scores);
-                cumulative_length_seconds += entry.set?.scores.reduce((acc, score) => acc + (score.duration || 0), 0) || 0;
-                cumulative_sessions.push(...sessions.get());
-
-                cumulative_grades_xh += entry.set?.grades['XH'] || 0;
-                cumulative_grades_x += entry.set?.grades['X'] || 0;
-                cumulative_grades_sh += entry.set?.grades['SH'] || 0;
-                cumulative_grades_s += entry.set?.grades['S'] || 0;
-                cumulative_grades_a += entry.set?.grades['A'] || 0;
-                cumulative_grades_b += entry.set?.grades['B'] || 0;
-                cumulative_grades_c += entry.set?.grades['C'] || 0;
-                cumulative_grades_d += entry.set?.grades['D'] || 0;
-
-                this.periodic_graph_data[interval].cumulative[entry.date_string] = {
-                    clears: cumulative_clears,
-                    scores: cumulative_scores,
-                    implied_score: cumulative_implied_score,
-                    implied_score_ss: cumulative_implied_score_ss,
-                    lazer_score: cumulative_lazer_score,
-                    lazer_score_ss: cumulative_lazer_score_ss,
-                    pp: cumulative_pp,
-                    raw_pp: cumulative_raw_pp,
-                    length_seconds: cumulative_length_seconds,
-
-                    sessions: cumulative_sessions.length,
-                    sessions_length_seconds: cumulative_sessions.reduce((acc, session) => acc + session.duration, 0),
-
-                    grades_xh: cumulative_grades_xh,
-                    grades_x: cumulative_grades_x,
-                    grades_sh: cumulative_grades_sh,
-                    grades_s: cumulative_grades_s,
-                    grades_a: cumulative_grades_a,
-                    grades_b: cumulative_grades_b,
-                    grades_c: cumulative_grades_c,
-                    grades_d: cumulative_grades_d,
+                    grades_xh: _incremental_grades['XH'] || 0,
+                    grades_x: _incremental_grades['X'] || 0,
+                    grades_sh: _incremental_grades['SH'] || 0,
+                    grades_s: _incremental_grades['S'] || 0,
+                    grades_a: _incremental_grades['A'] || 0,
+                    grades_b: _incremental_grades['B'] || 0,
+                    grades_c: _incremental_grades['C'] || 0,
+                    grades_d: _incremental_grades['D'] || 0,
                 };
             }
 
-            //third pass: average
+            let _cumulative_scores = [];
             for (const entry of ordered_dates[interval]) {
+                let _current_scores = entry.set || [];
+                _cumulative_scores = _cumulative_scores.concat(_current_scores);
+
+                //this system makes sure that overwritten scores still count at the time they were achieved,
+                //but not anymore if overwritten later (this can show scores that were fixed later for better grade or something)
+                //get all scores unique by beatmap_id where implied_pp is highest
+                let _current_scores_by_pp_map = {};
+                let _current_scores_by_score_map = {};
+
+                for (const score of _cumulative_scores) {
+                    if (!score.beatmap) {
+                        return;
+                    }
+
+                    const beatmap_id = score.beatmap_id;
+
+                    if (!_current_scores_by_pp_map[beatmap_id]) {
+                        _current_scores_by_pp_map[beatmap_id] = score;
+                    } else {
+                        let existing = _current_scores_by_pp_map[beatmap_id];
+                        if ((score.implied_pp || 0) > (existing.implied_pp || 0)) { _current_scores_by_pp_map[beatmap_id] = score; }
+                    }
+
+                    if (!_current_scores_by_score_map[beatmap_id]) {
+                        _current_scores_by_score_map[beatmap_id] = score;
+                    } else {
+                        let existing = _current_scores_by_score_map[beatmap_id];
+                        if ((score.implied_total_score || 0) > (existing.implied_total_score || 0)) { _current_scores_by_score_map[beatmap_id] = score; }
+                    }
+                };
+
+                let _cumulative_clears = Object.keys(_current_scores_by_pp_map).length;
+                let _cumulative_scores_count = _cumulative_scores.length;
+                let _cumulative_implied_score = 0;
+                let _cumulative_implied_score_ss = 0;
+                let _cumulative_lazer_score = 0;
+                let _cumulative_lazer_score_ss = 0;
+                let _cumulative_pp = 0;
+                let _cumulative_length_seconds = 0;
+                let _cumulative_grades = { 'XH': 0, 'X': 0, 'SH': 0, 'S': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0 }
+
+                for (const score of _cumulative_scores) {
+                    if (!score.beatmap) {
+                        return;
+                    }
+
+                    _cumulative_length_seconds += score.duration || 0;
+                }
+
+                const _current_scores_by_pp = Object.values(_current_scores_by_pp_map);
+                for (const score of _current_scores_by_pp) {
+                    _cumulative_pp += score.implied_pp || 0;
+                }
+
+                const _current_scores_by_score = Object.values(_current_scores_by_score_map);
+                for (const score of _current_scores_by_score) {
+                    const grade = score.grade;
+                    _cumulative_grades[grade] = (_cumulative_grades[grade] || 0) + 1;
+
+                    _cumulative_implied_score += score.implied_total_score || 0;
+                    _cumulative_lazer_score += score.total_score || 0;
+                    if (score.is_ss) {
+                        _cumulative_implied_score_ss += score.implied_total_score || 0;
+                        _cumulative_lazer_score_ss += score.total_score || 0;
+                    }
+                };
+
+                this.periodic_graph_data[interval].cumulative[entry.date_string] = {
+                    clears: _cumulative_clears,
+                    scores: _cumulative_scores_count,
+                    implied_score: _cumulative_implied_score,
+                    implied_score_ss: _cumulative_implied_score_ss,
+                    lazer_score: _cumulative_lazer_score,
+                    lazer_score_ss: _cumulative_lazer_score_ss,
+                    pp: _cumulative_pp,
+                    length_seconds: _cumulative_length_seconds,
+                    grades_xh: _cumulative_grades['XH'],
+                    grades_x: _cumulative_grades['X'],
+                    grades_sh: _cumulative_grades['SH'],
+                    grades_s: _cumulative_grades['S'],
+                    grades_a: _cumulative_grades['A'],
+                    grades_b: _cumulative_grades['B'],
+                    grades_c: _cumulative_grades['C'],
+                    grades_d: _cumulative_grades['D'],
+                }
+
                 this.periodic_graph_data[interval].average[entry.date_string] = {
                     clears: 0, //incompatible
                     scores: 0, //incompatible
-                    implied_score: entry.set?.implied_total_score / entry.set?.scores.length || 0,
-                    implied_score_ss: entry.set?.implied_total_score_ss / entry.set?.scores.length || 0,
-                    lazer_score: entry.set?.score / entry.set?.scores.length || 0,
-                    lazer_score_ss: entry.set?.score_ss / entry.set?.scores.length || 0,
-                    pp: entry.set_by_pp?.performance_points / entry.set?.scores.length || 0,
+                    implied_score: this.periodic_graph_data[interval].incremental[entry.date_string].implied_score / (entry.set?.length || 1),
+                    implied_score_ss: this.periodic_graph_data[interval].incremental[entry.date_string].implied_score_ss / (entry.set?.length || 1),
+                    lazer_score: this.periodic_graph_data[interval].incremental[entry.date_string].lazer_score / (entry.set?.length || 1),
+                    lazer_score_ss: this.periodic_graph_data[interval].incremental[entry.date_string].lazer_score_ss / (entry.set?.length || 1),
+                    pp: this.periodic_graph_data[interval].incremental[entry.date_string].pp / (entry.set?.length || 1),
                     raw_pp: 0, //incompatible
-                    length_seconds: entry.set?.scores.length > 0 ? (entry.set?.scores.reduce((acc, score) => acc + (score.duration || 0), 0) || 0) / entry.set?.scores.length : 0,
+                    length_seconds: entry.set?.length > 0 ? (entry.set?.reduce((acc, score) => acc + (score.duration || 0), 0) || 0) / entry.set?.length : 0,
+                    grades_xh: 0, //incompatible
+                    grades_x: 0, //incompatible
+                    grades_sh: 0, //incompatible
+                    grades_s: 0, //incompatible
+                    grades_a: 0, //incompatible
+                    grades_b: 0, //incompatible
+                    grades_c: 0, //incompatible
+                    grades_d: 0, //incompatible
+                }
+
+                this.periodic_graph_data[interval].highest[entry.date_string] = {
+                    clears: 0, //incompatible
+                    scores: 0, //incompatible
+                    implied_score: entry.set?.length > 0 ? Math.max(...entry.set.map(s => s.implied_total_score)) : 0,
+                    implied_score_ss: entry.set?.length > 0 ? Math.max(...entry.set.map(s => s.is_ss ? s.implied_total_score : 0)) : 0,
+                    lazer_score: entry.set?.length > 0 ? Math.max(...entry.set.map(s => s.total_score)) : 0,
+                    lazer_score_ss: entry.set?.length > 0 ? Math.max(...entry.set.map(s => s.is_ss ? s.total_score : 0)) : 0,
+                    pp: entry.set_by_pp?.length > 0 ? Math.max(...entry.set_by_pp.map(s => s.implied_pp)) : 0,
+                    raw_pp: 0, //incompatible
+                    length_seconds: entry.set?.length > 0 ? Math.max(...entry.set.map(s => s.duration || 0)) : 0,
                     sessions: 0, //incompatible
                     sessions_length_seconds: 0, //incompatible
                     grades_xh: 0, //incompatible
@@ -272,77 +344,53 @@ export class ProfileRulesetStatistics {
                     grades_b: 0, //incompatible
                     grades_c: 0, //incompatible
                     grades_d: 0, //incompatible
-                };
-            }
+                }
 
-            //fourth pass: highest (of that date, not cumulative)
-            for (const entry of ordered_dates[interval]) {
-                this.periodic_graph_data[interval].highest[entry.date_string] = {
-                    clears: 0, //incompatible
-                    scores: 0, //incompatible
-                    implied_score: entry.set?.scores.length > 0 ? Math.max(...entry.set.scores.map(s => s.implied_total_score)) : 0,
-                    implied_score_ss: entry.set?.scores.length > 0 ? Math.max(...entry.set.scores.map(s => s.is_ss ? s.implied_total_score : 0)) : 0,
-                    lazer_score: entry.set?.scores.length > 0 ? Math.max(...entry.set.scores.map(s => s.total_score)) : 0,
-                    lazer_score_ss: entry.set?.scores.length > 0 ? Math.max(...entry.set.scores.map(s => s.is_ss ? s.total_score : 0)) : 0,
-                    pp: entry.set_by_pp?.scores.length > 0 ? Math.max(...entry.set_by_pp.scores.map(s => s.implied_pp)) : 0,
-                    raw_pp: 0, //incompatible
-                    length_seconds: entry.set?.scores.length > 0 ? Math.max(...entry.set.scores.map(s => s.duration || 0)) : 0,
-                    sessions: 0, //incompatible
-                    sessions_length_seconds: 0, //incompatible
-                    grades_xh: entry.set.grades['XH'] || 0, //incompatible
-                    grades_x: entry.set.grades['X'] || 0, //incompatible
-                    grades_sh: entry.set.grades['SH'] || 0, //incompatible
-                    grades_s: entry.set.grades['S'] || 0, //incompatible
-                    grades_a: entry.set.grades['A'] || 0, //incompatible
-                    grades_b: entry.set.grades['B'] || 0, //incompatible
-                    grades_c: entry.set.grades['C'] || 0, //incompatible
-                    grades_d: entry.set.grades['D'] || 0, //incompatible
-                };
-            }
+                let _median_implied_score = 0;
+                let _median_implied_score_ss = 0;
+                let _median_lazer_score = 0;
+                let _median_lazer_score_ss = 0;
+                let _median_pp = 0;
 
-            //fifth pass: median
-            for (const entry of ordered_dates[interval]) {
-                let median_implied_score = 0;
-                let median_implied_score_ss = 0;
-                let median_lazer_score = 0;
-                let median_lazer_score_ss = 0;
-                let median_pp = 0;
-                if (entry.set?.scores.length > 0) {
-                    const sorted_implied_scores = entry.set.scores.map(s => s.implied_total_score).sort((a, b) => a - b);
-                    const sorted_implied_scores_ss = entry.set.scores.filter(s => s.is_ss).map(s => s.implied_total_score).sort((a, b) => a - b);
-                    const sorted_lazer_scores = entry.set.scores.map(s => s.total_score).sort((a, b) => a - b);
-                    const sorted_lazer_scores_ss = entry.set.scores.filter(s => s.is_ss).map(s => s.total_score).sort((a, b) => a - b);
-                    const sorted_pp = entry.set_by_pp.scores.map(s => s.implied_pp).sort((a, b) => a - b);
-                    const mid = Math.floor(entry.set.scores.length / 2);
-                    if (entry.set.scores.length % 2 === 0) {
-                        median_implied_score = (sorted_implied_scores[mid - 1] + sorted_implied_scores[mid]) / 2;
-                        median_lazer_score = (sorted_lazer_scores[mid - 1] + sorted_lazer_scores[mid]) / 2;
-                        median_pp = (sorted_pp[mid - 1] + sorted_pp[mid]) / 2;
+                if (entry.set?.length > 0) {
+                    const sorted_implied_scores = entry.set.map(s => s.implied_total_score).sort((a, b) => a - b);
+                    const sorted_implied_scores_ss = entry.set.filter(s => s.is_ss).map(s => s.implied_total_score).sort((a, b) => a - b);
+                    const sorted_lazer_scores = entry.set.map(s => s.total_score).sort((a, b) => a - b);
+                    const sorted_lazer_scores_ss = entry.set.filter(s => s.is_ss).map(s => s.total_score).sort((a, b) => a - b);
+                    const sorted_pp = entry.set_by_pp?.map(s => s.implied_pp).sort((a, b) => a - b) || [];
+
+                    const mid = Math.floor(entry.set.length / 2);
+
+                    if (entry.set.length % 2 === 0) {
+                        _median_implied_score = (sorted_implied_scores[mid - 1] + sorted_implied_scores[mid]) / 2;
+                        _median_lazer_score = (sorted_lazer_scores[mid - 1] + sorted_lazer_scores[mid]) / 2;
+                        _median_pp = sorted_pp.length > 0 ? (sorted_pp[mid - 1] + sorted_pp[mid]) / 2 : 0;
                     } else {
-                        median_implied_score = sorted_implied_scores[mid];
-                        median_lazer_score = sorted_lazer_scores[mid];
-                        median_pp = sorted_pp[mid];
+                        _median_implied_score = sorted_implied_scores[mid];
+                        _median_lazer_score = sorted_lazer_scores[mid];
+                        _median_pp = sorted_pp.length > 0 ? sorted_pp[mid] : 0;
                     }
                     if (sorted_implied_scores_ss.length > 0) {
                         const mid_ss = Math.floor(sorted_implied_scores_ss.length / 2);
                         if (sorted_implied_scores_ss.length % 2 === 0) {
-                            median_implied_score_ss = (sorted_implied_scores_ss[mid_ss - 1] + sorted_implied_scores_ss[mid_ss]) / 2;
-                            median_lazer_score_ss = (sorted_lazer_scores_ss[mid_ss - 1] + sorted_lazer_scores_ss[mid_ss]) / 2;
+                            _median_implied_score_ss = (sorted_implied_scores_ss[mid_ss - 1] + sorted_implied_scores_ss[mid_ss]) / 2;
+                            _median_lazer_score_ss = (sorted_lazer_scores_ss[mid_ss - 1] + sorted_lazer_scores_ss[mid_ss]) / 2;
                         }
                         else {
-                            median_implied_score_ss = sorted_implied_scores_ss[mid_ss];
-                            median_lazer_score_ss = sorted_lazer_scores_ss[mid_ss];
+                            _median_implied_score_ss = sorted_implied_scores_ss[mid_ss];
+                            _median_lazer_score_ss = sorted_lazer_scores_ss[mid_ss];
                         }
                     }
                 }
+
                 this.periodic_graph_data[interval].median[entry.date_string] = {
                     clears: 0, //incompatible
                     scores: 0, //incompatible
-                    implied_score: median_implied_score,
-                    implied_score_ss: median_implied_score_ss,
-                    lazer_score: median_lazer_score,
-                    lazer_score_ss: median_lazer_score_ss,
-                    pp: median_pp,
+                    implied_score: _median_implied_score,
+                    implied_score_ss: _median_implied_score_ss,
+                    lazer_score: _median_lazer_score,
+                    lazer_score_ss: _median_lazer_score_ss,
+                    pp: _median_pp,
                     raw_pp: 0, //incompatible
                     length_seconds: 0, //incompatible
                     sessions: 0, //incompatible
@@ -365,6 +413,8 @@ export class ProfileRulesetStatistics {
             throw new Error(`Invalid periodic interval: ${interval}`);
         }
 
+        console.log(`Calculating periodic data sets for interval: ${interval} for ruleset ${this.ruleset}`);
+
         let _set_data = {};
 
         if (sorted_scores.length === 0) {
@@ -372,38 +422,48 @@ export class ProfileRulesetStatistics {
         }
 
         for (const score of sorted_scores) {
-            const date_string = getUTCDateString(score.ended_at, interval);
+            // const date_string = getUTCDateString(score.ended_at, interval);
+            const date_string = score.ended_at_str[DATE_ISO_FORMAT_STR[interval]];
 
             if (!_set_data[date_string]) {
-                _set_data[date_string] = new ProfileRulesetScoreSet();
+                _set_data[date_string] = [];
             }
 
-            _set_data[date_string].addScore(score);
-        }
-
-        //calculate all sets
-        for (const date_string in _set_data) {
-            _set_data[date_string].calculate();
+            _set_data[date_string].push(score);
         }
 
         const firstDate = new Date(Date.UTC(sorted_scores[0].ended_at.getUTCFullYear(), sorted_scores[0].ended_at.getUTCMonth(), interval === 'daily' ? sorted_scores[0].ended_at.getUTCDate() : 1));
-        const lastDate = getUTCDateString(sorted_scores[sorted_scores.length - 1].ended_at, interval);
+        const lastDate = sorted_scores[sorted_scores.length - 1].ended_at_str[DATE_ISO_FORMAT_STR[interval]];
+
+        //the above has small chance of infinite loop if date manipulation fails for some reason, we need to calculate steps needed and loop on that
+        let steps = 0;
+        let firstYear = firstDate.getUTCFullYear();
+        let lastYear = lastDate.slice(0, 4);
+        //calculate number of steps between firstDate and lastDate
+        if (interval === 'daily') {
+            const diffTime = new Date(lastDate) - firstDate;
+            steps = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        } else if (interval === 'monthly') {
+            let firstMonth = firstDate.getUTCMonth();
+            let lastMonth = lastDate.length >= 7 ? parseInt(lastDate.slice(5, 7)) - 1 : 0;
+            steps = (lastYear - firstYear) * 12 + (lastMonth - firstMonth);
+        } else if (interval === 'yearly') {
+            steps = lastYear - firstYear;
+        }
 
         let currentDate = firstDate;
-        while (true) {
+        for (let i = 0; i <= steps; i++) {
             const date_string = getUTCDateString(currentDate, interval);
-            if (date_string > lastDate) {
-                break;
-            }
             if (!_set_data[date_string]) {
-                _set_data[date_string] = new ProfileRulesetScoreSet();
-                _set_data[date_string].calculate(); //not really needed but creates the properties
+                _set_data[date_string] = [];
             }
             //increment date
             if (interval === 'daily') {
                 currentDate.setUTCDate(currentDate.getUTCDate() + 1);
             } else if (interval === 'monthly') {
                 currentDate.setUTCMonth(currentDate.getUTCMonth() + 1);
+            } else if (interval === 'yearly') {
+                currentDate.setUTCFullYear(currentDate.getUTCFullYear() + 1);
             }
         }
 

@@ -68,6 +68,16 @@ class Score {
         this.started_at = api_data.started_at ? new Date(api_data.started_at) : null;
         this.lchg_time = api_data.lchg_time ? new Date(api_data.lchg_time) : null;
 
+        this.ended_at_seconds = this.ended_at ? Math.floor(this.ended_at.getTime() / 1000) : null;
+
+        let ended_at_iso = this.ended_at ? this.ended_at.toISOString() : null;
+        this.ended_at_str = {};
+        if (ended_at_iso) {
+            this.ended_at_str['YYYY-MM-DD'] = ended_at_iso.slice(0, 10);
+            this.ended_at_str['YYYY-MM'] = ended_at_iso.slice(0, 7);
+            this.ended_at_str['YYYY'] = ended_at_iso.slice(0, 4);
+        }
+
         this.statistics_perfect = api_data.statistics_perfect ? Number(api_data.statistics_perfect) : 0;
         this.statistics_great = api_data.statistics_great ? Number(api_data.statistics_great) : 0;
         this.statistics_good = api_data.statistics_good ? Number(api_data.statistics_good) : 0;

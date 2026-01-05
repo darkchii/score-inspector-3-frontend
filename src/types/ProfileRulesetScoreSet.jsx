@@ -116,17 +116,27 @@ export class ProfileRulesetScoreSet {
     }
 
     reorder(param, descending = true) {
-        this.scores.sort((a, b) => {
+        // this.scores.sort((a, b) => {
+        //     if (descending) {
+        //         return b[param] - a[param];
+        //     } else {
+        //         return a[param] - b[param];
+        //     }
+        // });
+
+        //needs to be faster sort for large arrays
+        this.scores = this.scores.slice().sort((a, b) => {
+            const aValue = a[param] || 0;
+            const bValue = b[param] || 0;
             if (descending) {
-                return b[param] - a[param];
+                return bValue - aValue;
             } else {
-                return a[param] - b[param];
+                return aValue - bValue;
             }
         });
     }
 
     calculate() {
-        this.performance_points = CalculateRawPerformance(this.scores);
         //sum of all pp from all scores
         this.total_performance_points = this.scores.reduce((acc, score) => acc + score.implied_pp, 0);
         this.bonus_performance_points = CalculateBonusPerformance(this.scores.length);
@@ -154,13 +164,14 @@ export class ProfileRulesetScoreSet {
             this.average_stars = totalStars / this.scores.length;
         }
 
-        this.reorder('ended_at', true);
+        this.reorder('ended_at_seconds', true);
         this.recent_scores = this.scores.slice(0, 100);
         this.scores_reordered['date'] = this.recent_scores;
 
         this.reorder('implied_pp', true);
         this.top_scores = this.scores.slice(0, 200);
         this.scores_reordered['pp'] = this.top_scores;
+        this.performance_points = CalculateRawPerformance(this.scores, false, false);
 
         this.sessions = SessionCollection.fromScores(this.scores);
         this.sessions.sessions.sort((a, b) => b.start - a.start);

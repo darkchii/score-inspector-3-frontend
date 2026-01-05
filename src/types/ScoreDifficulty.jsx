@@ -20,6 +20,7 @@ class ScoreDifficulty {
         this.aim_top_weighted_slider_factor = api_data.aim_top_weighted_slider_factor ? Number(api_data.aim_top_weighted_slider_factor) : 0;
         this.speed_top_weighted_slider_factor = api_data.speed_top_weighted_slider_factor ? Number(api_data.speed_top_weighted_slider_factor) : 0;
         this.legacy_score_base_multiplier = api_data.legacy_score_base_multiplier ? Number(api_data.legacy_score_base_multiplier) : 0;
+        this.flashlight_difficulty = api_data.flashlight_difficulty ? Number(api_data.flashlight_difficulty) : 0;
     
         //taiko
         this.rhythm_difficulty = api_data.rhythm_difficulty ? Number(api_data.rhythm_difficulty) : 0;

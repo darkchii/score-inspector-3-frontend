@@ -39,7 +39,7 @@ class SessionCollection {
     }
 
     static fromScores(scores) {
-        scores.sort((a, b) => a.ended_at - b.ended_at);
+        scores.sort((a, b) => a.ended_at_seconds - b.ended_at_seconds);
 
         let activities = [];
         let currentActivity = {

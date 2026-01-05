@@ -67,14 +67,7 @@ function ProfilePageDaily() {
     }, [activeDisplayYear, activeRuleset]);
 
     useEffect(() => {
-        // if (activeDateStart && statDatabase?.periodic?.['daily']?.[activeDateStart]) {
-        //     setActiveScoreSet(statDatabase?.periodic?.['daily']?.[activeDateStart]);
-        // } else {
-        //     setActiveScoreSet(null);
-        // }
-
-        //first just make an array of periodic sets that are within the range
-        let scoreSetsInRange = [];
+        let _scores_arr = [];
         if (activeDateStart && statDatabase?.periodic?.['daily']) {
             const dailyData = statDatabase?.periodic?.['daily'];
             const startDate = new Date(activeDateStart);
@@ -82,14 +75,20 @@ function ProfilePageDaily() {
             for (const dateKey in dailyData) {
                 const currentDate = new Date(dateKey);
                 if (currentDate >= startDate && currentDate <= endDate) {
-                    scoreSetsInRange.push(dailyData[dateKey]);
+                    //dailyData[dateKey] IS the array of scores, merge them into _scores_arr
+                    _scores_arr = _scores_arr.concat(dailyData[dateKey] || []);
                 }
             }
         }
 
         //merge them
-        if (scoreSetsInRange.length > 0) {
-            const mergedSet = ProfileRulesetScoreSet.merge(scoreSetsInRange);
+        if (_scores_arr.length > 0) {
+            const set = new ProfileRulesetScoreSet();
+            _scores_arr.forEach(score => {
+                set.addScore(score);
+            });
+            set.calculate();
+            const mergedSet = set;
             setActiveScoreSet(mergedSet);
         } else {
             setActiveScoreSet(null);
@@ -232,8 +231,8 @@ function DateGrid({ year, data, activeDateStart = null, activeDateEnd = null, on
                 temp[dateString] = data[dateString];
 
                 //find the max clears for color scaling
-                if (data[dateString].clears > _maxClears) {
-                    _maxClears = data[dateString].clears;
+                if (data[dateString].length > _maxClears) {
+                    _maxClears = data[dateString].length;
                 }
             }
             setMaxClears(_maxClears);
@@ -289,7 +288,7 @@ function DateGrid({ year, data, activeDateStart = null, activeDateEnd = null, on
                                         const dayString = day.toString().padStart(2, '0');
                                         const dateKey = `${year}-${monthString}-${dayString}`;
                                         const dayData = gridData[dateKey];
-                                        const clears = dayData ? dayData.clears : 0;
+                                        const clears = dayData ? dayData.length : 0;
                                         const adjustedClears = Math.min(clears, ABSOLUTE_RANGE_LIMIT);
 
                                         //based on clears 0-maxClears/limit, interpolate from #1a1a1a to theme.palette.primary.main

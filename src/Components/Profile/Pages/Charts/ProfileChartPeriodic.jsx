@@ -57,12 +57,6 @@ const INCR_CUMUL_CHART_TYPES = {
         keys: ['pp'],
         formatter: (value) => FormatNumberWithPrecision(value, 2) + 'pp',
     },
-    'raw_pp': {
-        name: 'raw_pp',
-        labels: ['Raw PP'],
-        keys: ['raw_pp'],
-        formatter: (value) => FormatNumberWithPrecision(value, 2) + 'pp',
-    },
     'length': {
         name: 'length',
         labels: ['Length'],
@@ -74,27 +68,7 @@ const INCR_CUMUL_CHART_TYPES = {
             const seconds = Math.floor(value % 60);
             return `${hours}h ${minutes}m ${seconds}s`;
         }
-    },
-    'sessions': {
-        name: 'sessions',
-        labels: ['Sessions'],
-        keys: ['sessions'],
-        invalid_aggregations: ['average', 'highest', 'median'],
-        formatter: (value) => FormatNumber(value),
-    },
-    'sessions_length': {
-        name: 'sessions_length',
-        labels: ['Sessions Length'],
-        keys: ['sessions_length_seconds'],
-        invalid_aggregations: ['average', 'highest', 'median'],
-        formatter: (value) => {
-            //value is in seconds
-            const hours = Math.floor(value / 3600);
-            const minutes = Math.floor((value % 3600) / 60);
-            const seconds = Math.floor(value % 60);
-            return `${hours}h ${minutes}m ${seconds}s`;
-        }
-    },
+    }
 };
 
 function ProfileChartPeriodic() {
