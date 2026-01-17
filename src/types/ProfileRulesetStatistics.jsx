@@ -103,10 +103,17 @@ export class ProfileRulesetStatistics {
         //process is_played for beatmaps
         //first get the map
         const beatmapMap = this.getBeatmapsMap();
-        for (const score of this.scores_set.scores) {
+        for (const score of this.scores_set_by_score.scores) {
             const beatmap = beatmapMap[score.beatmap_id];
             if (beatmap) {
+                //very basic score data only, primarily for pack info
                 beatmap.is_played = true;
+                beatmap.score_data = {
+                    grade: score.grade,
+                    is_fc: score.is_fc,
+                    is_pfc: score.combo === score.max_combo,
+                    score_id: score.id,
+                }
             }
         }
 

@@ -161,6 +161,7 @@ class Score {
         this.is_fc = DetermineIsScoreFC(this);
 
         this.star_rating = this.attr_diff?.star_rating ?? (this.beatmap ? this.beatmap.stars : null);
+        this.max_combo = this.attr_diff?.max_combo ?? (this.beatmap ? this.beatmap.max_combo : null);
 
         try {
             this.performance = {

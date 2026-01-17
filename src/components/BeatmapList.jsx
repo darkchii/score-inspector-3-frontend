@@ -1,11 +1,17 @@
-import { Box, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, tableRowClasses, Typography, useTheme } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Box, Button, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, tableRowClasses, Typography, useTheme } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { GetRulesetIconFromId, TimeAgo } from "../util/Helper";
 import DoneIcon from '@mui/icons-material/Done';
 import CloseIcon from '@mui/icons-material/Close';
 import { green, red } from "@mui/material/colors";
+import { getGradeIcon } from "../assets/textures/TextureDatabase";
+import { useProfile } from "../providers/ProfileProvider";
+import { useScoreView } from "../providers/ScoreViewProvider";
+import LaunchIcon from '@mui/icons-material/Launch';
 
 function BeatmapListRow({ beatmap, index, isCompact, isPlayed }) {
+    const { getScoreById } = useProfile();
+    const { loadScoreView } = useScoreView();
     const theme = useTheme();
 
     return (
@@ -13,12 +19,7 @@ function BeatmapListRow({ beatmap, index, isCompact, isPlayed }) {
             key={beatmap.id}
             data-id={beatmap.id}
             // onClick={() => loadScoreView(score)}
-            onClick={() => {
-                //open in new tab
-                window.open(`https://osu.ppy.sh/beatmaps/${beatmap.beatmap_id}`, '_blank');
-            }}
             sx={{
-                cursor: 'pointer',
                 //content should be vertically centered and horizontally aligned to the left
                 '& > *': {
                     zIndex: 2,
@@ -41,11 +42,26 @@ function BeatmapListRow({ beatmap, index, isCompact, isPlayed }) {
         >
             {
                 isPlayed !== undefined && (
-                    <TableCell width={40}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
-                            {isPlayed ? <DoneIcon style={{ color: green[500], fontSize: '1.2rem' }} /> : <CloseIcon style={{ color: red[500], fontSize: '1.2rem' }} />}
-                        </Box>
-                    </TableCell>
+                    <React.Fragment>
+                        <TableCell width={40}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
+                                {isPlayed ? <DoneIcon style={{ color: green[500], fontSize: '1.2rem' }} /> : <CloseIcon style={{ color: red[500], fontSize: '1.2rem' }} />}
+                            </Box>
+                        </TableCell>
+                        <TableCell width={30}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'left' }}>
+                                {
+                                    isPlayed && (
+                                        <>
+                                            <img src={getGradeIcon(beatmap.score_data.grade)} alt={beatmap.score_data.grade} width={30} height={20} />
+                                            {beatmap.score_data.is_pfc && <span style={{ marginLeft: 4, color: '#ffd700', fontWeight: 'bold' }}>PFC</span>}
+                                            {(beatmap.score_data.is_fc && !beatmap.score_data.is_pfc) && <span style={{ marginLeft: 4, color: '#ffd700', fontWeight: 'bold' }}>FC</span>}
+                                        </>
+                                    )
+                                }
+                            </Box>
+                        </TableCell>
+                    </React.Fragment>
                 )
 
             }
@@ -67,6 +83,33 @@ function BeatmapListRow({ beatmap, index, isCompact, isPlayed }) {
                         <span style={{ color: '#ea0' }}>{beatmap.version}</span> <span style={{ opacity: '0.7' }}>{TimeAgo(beatmap.ranked_date)}</span>
                     </Typography>
                 </Box>
+            </TableCell>
+            <TableCell align="right">
+                {
+                    isPlayed ? (
+                        <Button
+                            variant="contained"
+                            size="small"
+                            onClick={() => {
+                                const score = getScoreById(beatmap.score_data.score_id);
+                                if (score) {
+                                    loadScoreView(score);
+                                }
+                            }}
+                        >
+                            View
+                        </Button>
+                    ) : null
+                }
+                <Button
+                    variant="text"
+                    size="small"
+                    onClick={() => {
+                        window.open(`https://osu.ppy.sh/beatmaps/${beatmap.beatmap_id}`, '_blank');
+                    }}
+                >
+                    <LaunchIcon fontSize="small" />
+                </Button>
             </TableCell>
         </TableRow>
     )

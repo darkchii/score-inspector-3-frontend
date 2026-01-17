@@ -3,7 +3,7 @@ import BetterTooltip from "../../tooltips/BetterTooltip";
 import dateGridStyles from '../../../styles/date-grid.module.less';
 import { useProfile } from "../../../providers/ProfileProvider";
 import { FormatNumber, HexToRgb } from "../../../util/Helper";
-import { Box, Fade, Modal, Paper, useTheme } from "@mui/material";
+import { Box, Button, Fade, Modal, Paper, Typography, useTheme } from "@mui/material";
 import { BeatmapList } from "../../BeatmapList";
 
 //Tag -> Full Name
@@ -106,9 +106,28 @@ function PackModal({ pack, onClose }) {
                         transform: 'translate(-50%, -50%)',
                         outline: 0,
                     }}>
-                        <Paper style={{ padding: '16px', maxWidth: '90vw', minWidth: '40vw' }}>
-                            <Box>
-                                <h2>{pack.name}</h2>
+                        <Paper style={{ padding: '16px', maxWidth: '90vw', minWidth: '50vw' }}>
+                            <Box sx={{
+                                position: 'relative'
+                            }}>
+                                {/* downloading button in top-right corner */}
+                                <Box sx={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    right: 0,
+                                }}>
+                                    <Button 
+                                        variant="contained"
+                                        color="primary"
+                                        size="small"
+                                        href={pack.url} 
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        Download Pack
+                                    </Button>
+                                </Box>
+                                <Typography variant="h6">{pack.name}</Typography>
                                 <div style={{
                                     maxHeight: '70vh',
                                     overflowY: 'auto',
@@ -137,8 +156,28 @@ function ProfilePagePacks() {
 
         //sort by tag ascending
         packs.sort((a, b) => {
-            if (a.tag < b.tag) return -1;
-            if (a.tag > b.tag) return 1;
+            // if (a.tag < b.tag) return -1;
+            // if (a.tag > b.tag) return 1;
+            // return 0;
+
+            //need it smarter, split letters from numbers and sort by both of them separately
+            const tagA = a.tag;
+            const tagB = b.tag;
+
+            const regex = /([a-zA-Z]+)(\d+)/;
+
+            const matchA = tagA.match(regex);
+            const matchB = tagB.match(regex);
+
+            if (matchA && matchB) {
+                const letterA = matchA[1];
+                const numberA = parseInt(matchA[2]);
+                const letterB = matchB[1];
+                const numberB = parseInt(matchB[2]);
+                if (letterA < letterB) return -1;
+                if (letterA > letterB) return 1;
+                return numberA - numberB;
+            }
             return 0;
         });
 

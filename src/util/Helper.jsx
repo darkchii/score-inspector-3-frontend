@@ -6,6 +6,7 @@ import { HasHiddenMod, HasMod } from './ModHelper';
 import ScoreData from '../data/ScoreData.json';
 import NumberFlow from '@number-flow/react';
 import * as Muicon from "@mui/icons-material";
+import axios from 'axios';
 
 export const ShowNotification = (message, severity) => {
     toast[severity](message, Config.NOTIFICATIONS);
