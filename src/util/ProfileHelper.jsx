@@ -161,7 +161,7 @@ export async function ProcessScores(scores, user = null) {
     return scores.map(score => new Score(score, score.beatmap, user));
 }
 
-export async function BuildProfileStatistics(scores, beatmaps) {
-    const profileStats = new ProfileStatistics(scores, beatmaps);
+export async function BuildProfileStatistics(scores, beatmaps, packs) {
+    const profileStats = new ProfileStatistics(scores, beatmaps, packs);
     return profileStats;
 }

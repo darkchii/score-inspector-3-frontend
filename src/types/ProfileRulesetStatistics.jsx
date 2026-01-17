@@ -1,6 +1,7 @@
 import { GetGradeColor, GetRulesetId } from "../util/Helper";
 import { CalculateBonusPerformance, CalculateRawPerformance } from "../util/ScoreHelper";
 import { ProfileRulesetScoreSet } from "./ProfileRulesetScoreSet";
+import { ProfileRulesetStatisticsPacks } from "./ProfileRulesetStatisticsPacks";
 import SessionCollection from "./SessionCollection";
 
 const PERIODIC_SUFFIXES = ['daily', 'monthly', 'yearly'];
@@ -27,7 +28,7 @@ const getUTCDateString = (date, interval) => {
 }
 
 export class ProfileRulesetStatistics {
-    constructor(beatmaps, ruleset = null, generate_periodic = true) {
+    constructor(beatmaps, packs, ruleset = null, generate_periodic = true) {
         //ProfileRulesetScoreSets
         this.beatmaps = beatmaps;
         this.beatmaps_with_converts = beatmaps;
@@ -37,6 +38,16 @@ export class ProfileRulesetStatistics {
             this.beatmaps_with_converts = beatmaps.filter(b => b.ruleset_id === GetRulesetId(ruleset) || b.ruleset_id === 0);
         }
 
+        this.beatmaps_map = {};
+        this.beatmaps_with_converts_map = {};
+
+        for (const beatmap of this.beatmaps) {
+            this.beatmaps_map[beatmap.beatmap_id] = beatmap;
+        }
+
+        for (const beatmap of this.beatmaps_with_converts) {
+            this.beatmaps_with_converts_map[beatmap.beatmap_id] = beatmap;
+        }
 
         this.beatmap_count = this.beatmaps.length;
         this.beatmap_count_with_converts = this.beatmaps_with_converts.length;
@@ -48,6 +59,8 @@ export class ProfileRulesetStatistics {
         this.scores_set = new ProfileRulesetScoreSet();
         this.scores_set_by_pp = new ProfileRulesetScoreSet();
         this.scores_set_by_score = new ProfileRulesetScoreSet();
+
+        this.pack_statistics = new ProfileRulesetStatisticsPacks(this.beatmaps, packs, this.ruleset);
 
         this.completion = 0;
         this.completion_with_converts = 0;
@@ -87,6 +100,19 @@ export class ProfileRulesetStatistics {
     }
 
     calculate() {
+        //process is_played for beatmaps
+        //first get the map
+        const beatmapMap = this.getBeatmapsMap();
+        for (const score of this.scores_set.scores) {
+            const beatmap = beatmapMap[score.beatmap_id];
+            if (beatmap) {
+                beatmap.is_played = true;
+            }
+        }
+
+        //process packs
+        this.pack_statistics.processScores(this.scores_set.scores, this.beatmaps);
+
         //calculate completion
         this.completion = this.scores_set_by_pp.ranked_clears / this.beatmap_count_ranked;
         this.completion_with_converts = this.scores_set_by_pp.ranked_clears / this.beatmap_count_ranked_with_converts;
@@ -698,5 +724,9 @@ export class ProfileRulesetStatistics {
 
         //reverse data
         this.charts.scoreSpread = data;
+    }
+
+    getBeatmapsMap(with_converts = false) {
+        return with_converts ? this.beatmaps_with_converts_map : this.beatmaps_map;
     }
 }

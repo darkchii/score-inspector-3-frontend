@@ -269,7 +269,7 @@ function DateGrid({ year, data, activeDateStart = null, activeDateEnd = null, on
                         <li>Fri</li>
                         <li>Sat</li>
                     </div>
-                    <div className={dateGridStyles['date-grid__squares']}>
+                    <div className={`${dateGridStyles['date-grid__squares']} ${dateGridStyles['date-grid__squares__date-templating']}`}>
                         {
                             gridData && (() => {
                                 let squares = [];

@@ -10,9 +10,10 @@ export function ProfileProvider({ children }) {
     const [userLive, setUserLive] = useState(null);
     const [scoresLive, setScoresLive] = useState(null);
     const [beatmapsLive, setBeatmapsLive] = useState(null);
+    const [beatmapPacks, setBeatmapPacks] = useState(null);
     const [profileStatistics, setProfileStatistics] = useState(null);
     const [errorMessage, setErrorMessage] = useState(false);
-    const { getUserLive, getScoresLive, getBeatmapsLive } = useApi();
+    const { getUserLive, getScoresLive, getBeatmapsLive, getBeatmapPacks } = useApi();
     const [fetchLog, setFetchLog] = useState([]);
     const [isFinished, setIsFinished] = useState(false);
 
@@ -50,16 +51,6 @@ export function ProfileProvider({ children }) {
         setUserLive(_user);
         setUserId(_userId);
         return _user;
-    }
-
-    const getScores = async (_userId) => {
-        const _score = await getScoresLive(_userId);
-        return _score;
-    }
-
-    const getBeatmaps = async () => {
-        const _beatmaps = await getBeatmapsLive();
-        return _beatmaps;
     }
 
     const reset = () => {
@@ -103,7 +94,7 @@ export function ProfileProvider({ children }) {
             setFetchLog(_fetchLog);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
-            const scores = await getScores(_userId);
+            const scores = await getScoresLive(_userId);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched ${FormatNumber(scores.length)} scores`);
@@ -114,11 +105,23 @@ export function ProfileProvider({ children }) {
             setFetchLog(_fetchLog);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
-            const beatmaps = await getBeatmaps();
+            const beatmaps = await getBeatmapsLive();
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched ${FormatNumber(beatmaps.length)} beatmaps`);
             setFetchLog(_fetchLog);
+
+
+            _fetchLog.push("%working% Fetching beatmap packs");
+            setFetchLog(_fetchLog);
+            await new Promise(resolve => setTimeout(resolve, 250));
+            startMs = Date.now();
+            const packs = await getBeatmapPacks();
+            endMs = Date.now();
+            _fetchLog.pop();
+            _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched ${FormatNumber(packs.length)} beatmap packs`);
+            setFetchLog(_fetchLog);
+            setBeatmapPacks(packs);
 
             
             _fetchLog.push("%working% Processing beatmaps");
@@ -160,7 +163,8 @@ export function ProfileProvider({ children }) {
             setFetchLog(_fetchLog);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
-            const profileStats = await BuildProfileStatistics(processedScores, _beatmaps);
+            console.log(packs);
+            const profileStats = await BuildProfileStatistics(processedScores, _beatmaps, packs);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Built profile statistics`);

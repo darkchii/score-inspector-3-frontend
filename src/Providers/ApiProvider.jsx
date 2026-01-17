@@ -43,6 +43,11 @@ export function ApiProvider({ children }) {
         return response;
     }
 
+    const getBeatmapPacks = async (progressEvent = null) => {
+        const response = await apiGet('beatmappack/all', progressEvent);
+        return response;
+    }
+
     const getUserLive = async (userId, progressEvent = null) => {
         const response = await apiGet(`user/${userId}/profile`, progressEvent);
         return response;
@@ -64,7 +69,7 @@ export function ApiProvider({ children }) {
     }
 
     return (
-        <ApiContext.Provider value={{ getUserLive, getScoresLive, getBeatmapsLive, getCompletionists, getUserSearch }}>
+        <ApiContext.Provider value={{ getUserLive, getScoresLive, getBeatmapsLive, getBeatmapPacks, getCompletionists, getUserSearch }}>
             {children}
         </ApiContext.Provider>
     )
