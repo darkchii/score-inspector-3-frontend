@@ -5,6 +5,8 @@ import { useProfile } from "../../../providers/ProfileProvider";
 import { FormatNumber, HexToRgb } from "../../../util/Helper";
 import { Box, Button, Fade, Modal, Paper, Typography, useTheme } from "@mui/material";
 import { BeatmapList } from "../../BeatmapList";
+import NumberFlow from "@number-flow/react";
+import DoneIcon from '@mui/icons-material/Done';
 
 //Tag -> Full Name
 const BeatmappackTypes = {
@@ -41,9 +43,8 @@ const PackSquare = memo(function PackSquare({ pack, onClick }) {
     return (
         <BetterTooltip title={
             <React.Fragment>
-                <div><strong>Pack:</strong> {pack.name}</div>
+                <div><strong>Pack:</strong> ({pack.tag}) {pack.name}</div>
                 <div><strong>Date:</strong> {new Date(pack.pack_date).toLocaleDateString()}</div>
-                <div><strong>Tag:</strong> {pack.tag}</div>
                 <div><strong>Completed:</strong> {FormatNumber(pack.completed)} / {FormatNumber(pack.total)}</div>
             </React.Fragment>
         }>
@@ -51,7 +52,20 @@ const PackSquare = memo(function PackSquare({ pack, onClick }) {
                 className={`${dateGridStyles['date-grid__square']} ${dateGridStyles['date-grid__square--clickable']}`}
                 style={{ backgroundColor: color }}
                 onClick={onClick}
-            />
+            >
+                {
+                    pack.completed_fc === pack.total ? (
+                        <div style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                        }}>
+                            <DoneIcon style={{ color: 'black', fontSize: '1rem' }} />
+                        </div>
+                    ) : null
+                }
+            </div>
         </BetterTooltip>
     )
 });
@@ -73,6 +87,18 @@ function PackModal({ pack, onClose }) {
                     bms.push(bm);
                 }
             }
+
+            //resort by star rating, but keep grouped by beatmapset_id
+            bms.sort((a, b) => {
+                let bma = beatmapsMap[a.beatmap_id];
+                let bmb = beatmapsMap[b.beatmap_id];
+
+                if (bma.beatmapset_id === bmb.beatmapset_id) {
+                    return bma.stars - bmb.stars;
+                }
+                return bma.beatmapset_id - bmb.beatmapset_id;
+            });
+
             setBeatmaps(bms);
             setEnabled(true);
         } else {
@@ -116,18 +142,23 @@ function PackModal({ pack, onClose }) {
                                     top: 0,
                                     right: 0,
                                 }}>
-                                    <Button 
+                                    <Button
                                         variant="contained"
                                         color="primary"
                                         size="small"
-                                        href={pack.url} 
+                                        href={pack.url}
                                         target="_blank"
                                         rel="noreferrer"
                                     >
                                         Download Pack
                                     </Button>
                                 </Box>
-                                <Typography variant="h6">{pack.name}</Typography>
+                                <Typography variant="h6">({pack.tag}) {pack.name}</Typography>
+                                <div style={{ marginBottom: '8px' }}>
+                                    <strong>Date:</strong> {new Date(pack.pack_date).toLocaleDateString()} &nbsp; | &nbsp;
+                                    <strong>Completed:</strong> <NumberFlow value={pack.completed} /> / <NumberFlow value={pack.total} /> &nbsp; | &nbsp;
+                                    <strong>Completion:</strong> <NumberFlow format={{ maximumFractionDigits: 2 }} value={pack.completion} suffix="%" />
+                                </div>
                                 <div style={{
                                     maxHeight: '70vh',
                                     overflowY: 'auto',
@@ -194,18 +225,21 @@ function ProfilePagePacks() {
                     total_packs: 0,
                     total_beatmaps: 0,
                     total_scores: 0,
+                    total_scores_fc: 0,
                 }
             }
             categorized[typeFullName].packs.push(pack);
             categorized[typeFullName].total += 1;
             categorized[typeFullName].total_beatmaps += pack.total;
             categorized[typeFullName].total_scores += pack.completed;
+            categorized[typeFullName].total_scores_fc += pack.completed_fc;
         }
 
         //calculate completion per category
         for (const type in categorized) {
             const category = categorized[type];
             category.completion = category.total_beatmaps > 0 ? (category.total_scores / category.total_beatmaps) : 0;
+            category.completion_fc = category.total_beatmaps > 0 ? (category.total_scores_fc / category.total_beatmaps) : 0;
         }
 
         setCategorizedPacks(categorized);
@@ -226,11 +260,18 @@ function ProfilePagePacks() {
                 {
                     Object.entries(categorizedPacks).map(([type, packs]) => (
                         <div key={type} style={{ marginBottom: '16px' }}>
-                            <h3>{type}</h3>
+                            <Typography variant="h6" gutterBottom>{type}</Typography>
+                            {/* show stats here in-line */}
+                            <div style={{ marginBottom: '8px' }}>
+                                <strong>Packs:</strong> <NumberFlow value={packs.packs.length} /> &nbsp; | &nbsp;
+                                <strong>Beatmaps:</strong> <NumberFlow value={packs.total_beatmaps} /> &nbsp; | &nbsp;
+                                <strong>Completed:</strong> <NumberFlow value={packs.total_scores} /> &nbsp; | &nbsp;
+                                <strong>Completion:</strong> <NumberFlow format={{ maximumFractionDigits: 2 }} value={packs.total_beatmaps > 0 ? (packs.total_scores / packs.total_beatmaps * 100) : 0} suffix="%" />
+                            </div>
                             <div style={{
                                 display: 'inline-flex',
                                 flexWrap: 'wrap',
-                                '--square-size': '15px',
+                                '--square-size': '12px',
                                 '--square-gap': '2px',
                             }}>
                                 {

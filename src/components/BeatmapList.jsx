@@ -8,6 +8,10 @@ import { getGradeIcon } from "../assets/textures/TextureDatabase";
 import { useProfile } from "../providers/ProfileProvider";
 import { useScoreView } from "../providers/ScoreViewProvider";
 import LaunchIcon from '@mui/icons-material/Launch';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import BetterTooltip from "./tooltips/BetterTooltip";
+import { GetStarRating } from "../util/ScoreHelper";
+import DifficultyBadge from "./DifficultyBadge";
 
 function BeatmapListRow({ beatmap, index, isCompact, isPlayed }) {
     const { getScoreById } = useProfile();
@@ -83,6 +87,17 @@ function BeatmapListRow({ beatmap, index, isCompact, isPlayed }) {
                         <span style={{ color: '#ea0' }}>{beatmap.version}</span> <span style={{ opacity: '0.7' }}>{TimeAgo(beatmap.ranked_date)}</span>
                     </Typography>
                 </Box>
+            </TableCell>
+            <TableCell>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'left' }}>
+                    <DifficultyBadge difficulty={beatmap.stars} />
+                    {
+                        beatmap.status === 'loved' &&
+                        <BetterTooltip title="Loved">
+                            <FavoriteIcon sx={{ color: theme.palette.error.main, fontSize: '1rem', marginLeft: '4px' }} />
+                        </BetterTooltip>
+                    }
+                </div>
             </TableCell>
             <TableCell align="right">
                 {

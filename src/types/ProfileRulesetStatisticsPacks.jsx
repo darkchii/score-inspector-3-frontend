@@ -64,16 +64,37 @@ export class ProfileRulesetStatisticsPacks {
             playedBeatmapIds.add(score.beatmap_id);
         }
 
+        const beatmapIdScoreMap = {};
+        for(const score of scores) {
+            if(!beatmapIdScoreMap[score.beatmap_id]) {
+                beatmapIdScoreMap[score.beatmap_id] = [];
+            }
+            beatmapIdScoreMap[score.beatmap_id].push(score);
+        }
+
         //then per pack, calculate % completion
         for(const pack of this.packs) {
             let completedCount = 0;
+            let completedFcCount = 0;
             for(const beatmapId of pack.beatmap_ids) {
                 if(playedBeatmapIds.has(beatmapId)) {
                     completedCount++;
+
+                    //check for FC
+                    if(beatmapIdScoreMap[beatmapId]) {
+                        const scoresForBeatmap = beatmapIdScoreMap[beatmapId];
+                        for(const score of scoresForBeatmap) {
+                            if(score.is_fc) {
+                                completedFcCount++;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
             pack.total = pack.beatmap_ids.length;
             pack.completed = completedCount;
+            pack.completed_fc = completedFcCount;
             pack.completion = (completedCount / pack.beatmap_ids.length) * 100;
             pack.is_completed = (completedCount === pack.beatmap_ids.length);
         }
