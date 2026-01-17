@@ -10,7 +10,6 @@ import { useScoreView } from "../providers/ScoreViewProvider";
 import LaunchIcon from '@mui/icons-material/Launch';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import BetterTooltip from "./tooltips/BetterTooltip";
-import { GetStarRating } from "../util/ScoreHelper";
 import DifficultyBadge from "./DifficultyBadge";
 
 function BeatmapListRow({ beatmap, index, isCompact, isPlayed }) {
@@ -84,7 +83,7 @@ function BeatmapListRow({ beatmap, index, isCompact, isPlayed }) {
                         {beatmap.artist} - {beatmap.title}
                     </Typography>
                     <Typography noWrap sx={{ fontSize: '0.7rem', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        <span style={{ color: '#ea0' }}>{beatmap.version}</span> <span style={{ opacity: '0.7' }}>{TimeAgo(beatmap.ranked_date)}</span>
+                        <span style={{ color: '#ea0' }}>{beatmap.version}</span> <span style={{ opacity: '0.7' }}>{beatmap.status} {TimeAgo(beatmap.ranked_date)}</span>
                     </Typography>
                 </Box>
             </TableCell>

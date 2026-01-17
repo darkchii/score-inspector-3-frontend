@@ -97,6 +97,7 @@ export class ProfileRulesetStatisticsPacks {
             pack.completed_fc = completedFcCount;
             pack.completion = (completedCount / pack.beatmap_ids.length) * 100;
             pack.is_completed = (completedCount === pack.beatmap_ids.length);
+            pack.is_completed_fc = (completedFcCount === pack.beatmap_ids.length);
         }
     }
 }

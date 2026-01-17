@@ -3,10 +3,10 @@ import BetterTooltip from "../../tooltips/BetterTooltip";
 import dateGridStyles from '../../../styles/date-grid.module.less';
 import { useProfile } from "../../../providers/ProfileProvider";
 import { FormatNumber, HexToRgb } from "../../../util/Helper";
-import { Box, Button, Fade, Modal, Paper, Typography, useTheme } from "@mui/material";
+import { Alert, Box, Button, Fade, Modal, Paper, Typography, useTheme } from "@mui/material";
 import { BeatmapList } from "../../BeatmapList";
 import NumberFlow from "@number-flow/react";
-import DoneIcon from '@mui/icons-material/Done';
+import StarIcon from '@mui/icons-material/Star';
 
 //Tag -> Full Name
 const BeatmappackTypes = {
@@ -57,11 +57,11 @@ const PackSquare = memo(function PackSquare({ pack, onClick }) {
                     pack.completed_fc === pack.total ? (
                         <div style={{
                             position: 'absolute',
-                            top: '50%',
+                            top: '45%',
                             left: '50%',
-                            transform: 'translate(-50%, -50%)',
+                            transform: 'translate(-50%, -55%)',
                         }}>
-                            <DoneIcon style={{ color: 'black', fontSize: '1rem' }} />
+                            <StarIcon style={{ color: 'black', fontSize: '0.8rem' }} />
                         </div>
                     ) : null
                 }
@@ -154,6 +154,9 @@ function PackModal({ pack, onClose }) {
                                     </Button>
                                 </Box>
                                 <Typography variant="h6">({pack.tag}) {pack.name}</Typography>
+                                <div>
+                                    by <strong>{pack.author}</strong>
+                                </div>
                                 <div style={{ marginBottom: '8px' }}>
                                     <strong>Date:</strong> {new Date(pack.pack_date).toLocaleDateString()} &nbsp; | &nbsp;
                                     <strong>Completed:</strong> <NumberFlow value={pack.completed} /> / <NumberFlow value={pack.total} /> &nbsp; | &nbsp;
@@ -223,13 +226,17 @@ function ProfilePagePacks() {
                     type: typeFullName,
                     packs: [],
                     total_packs: 0,
+                    total_completed: 0,
+                    total_completed_fc: 0,
                     total_beatmaps: 0,
                     total_scores: 0,
                     total_scores_fc: 0,
                 }
             }
             categorized[typeFullName].packs.push(pack);
-            categorized[typeFullName].total += 1;
+            categorized[typeFullName].total_packs += 1;
+            categorized[typeFullName].total_completed += pack.is_completed ? 1 : 0;
+            categorized[typeFullName].total_completed_fc += pack.is_completed_fc ? 1 : 0;
             categorized[typeFullName].total_beatmaps += pack.total;
             categorized[typeFullName].total_scores += pack.completed;
             categorized[typeFullName].total_scores_fc += pack.completed_fc;
@@ -263,16 +270,17 @@ function ProfilePagePacks() {
                             <Typography variant="h6" gutterBottom>{type}</Typography>
                             {/* show stats here in-line */}
                             <div style={{ marginBottom: '8px' }}>
-                                <strong>Packs:</strong> <NumberFlow value={packs.packs.length} /> &nbsp; | &nbsp;
-                                <strong>Beatmaps:</strong> <NumberFlow value={packs.total_beatmaps} /> &nbsp; | &nbsp;
-                                <strong>Completed:</strong> <NumberFlow value={packs.total_scores} /> &nbsp; | &nbsp;
-                                <strong>Completion:</strong> <NumberFlow format={{ maximumFractionDigits: 2 }} value={packs.total_beatmaps > 0 ? (packs.total_scores / packs.total_beatmaps * 100) : 0} suffix="%" />
+                                <strong>Packs:</strong> <NumberFlow value={packs.total_packs} /> &nbsp; | &nbsp;
+                                <strong>Completed:</strong> <NumberFlow value={packs.total_completed} /> (<NumberFlow value={packs.total_completed_fc} /> full combo'd) &nbsp; | &nbsp;
+                                <BetterTooltip title="By pack count, not beatmap count">
+                                    <strong>Completion:</strong> <NumberFlow format={{ maximumFractionDigits: 2 }} value={packs.total_packs > 0 ? (packs.total_completed / packs.total_packs * 100) : 0} suffix="%" />
+                                </BetterTooltip>
                             </div>
                             <div style={{
                                 display: 'inline-flex',
                                 flexWrap: 'wrap',
-                                '--square-size': '12px',
-                                '--square-gap': '2px',
+                                '--square-size': '14px',
+                                '--square-gap': '1px',
                             }}>
                                 {
                                     packs.packs.map(pack => (
@@ -284,6 +292,10 @@ function ProfilePagePacks() {
                                     ))
                                 }
                             </div>
+                            <Alert severity="info" style={{ marginTop: '8px' }}>
+                                All packs shown here have beatmaps for the currently selected ruleset ({activeRuleset}). Even if the pack was designed for another ruleset, some sets may include beatmaps for multiple rulesets.<br />
+                                Unless if you are viewing the "All"/combined ruleset, the non-{activeRuleset} beatmaps in these packs are filtered out.
+                            </Alert>
                         </div>
                     ))
                 }
