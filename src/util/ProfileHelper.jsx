@@ -162,6 +162,9 @@ export async function ProcessScores(scores, user = null) {
 }
 
 export async function BuildProfileStatistics(scores, beatmaps, packs) {
-    const profileStats = new ProfileStatistics(scores, beatmaps, packs);
-    return profileStats;
+    // const profileStats = new ProfileStatistics(scores, beatmaps, packs);
+    // return profileStats;
+    const profileStats = new ProfileStatistics(scores, beatmaps, packs, false);
+    const profileStatsWithoutLoved = new ProfileStatistics(scores, beatmaps, packs, false);
+    return { profileStats, profileStatsWithoutLoved };
 }

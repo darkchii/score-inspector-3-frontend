@@ -27,11 +27,14 @@ export function ProfileProvider({ children }) {
         return scoreMap[scoreId] || null;
     }
 
-    const getRulesetStatistics = (ruleset) => {
+    const getRulesetStatistics = (ruleset, without_loved = false) => {
         if (!profileStatistics) return null;
 
         const internalId = GetRulesetNameFromId(ruleset);
-        return profileStatistics.rulesets[internalId];
+        if (without_loved) {
+            return profileStatistics.without_loved.rulesets[internalId];
+        }
+        return profileStatistics.default.rulesets[internalId];
     }
 
     const getRulesetUser = (ruleset) => {
@@ -164,12 +167,15 @@ export function ProfileProvider({ children }) {
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             console.log(packs);
-            const profileStats = await BuildProfileStatistics(processedScores, _beatmaps, packs);
+            const { profileStats, profileStatsWithoutLoved } = await BuildProfileStatistics(processedScores, _beatmaps, packs);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Built profile statistics`);
             setFetchLog(_fetchLog);
-            setProfileStatistics(profileStats);
+            setProfileStatistics({
+                default: profileStats,
+                without_loved: profileStatsWithoutLoved
+            });
 
             setAvailableRulesets(Object.keys(profileStats.rulesets));
 

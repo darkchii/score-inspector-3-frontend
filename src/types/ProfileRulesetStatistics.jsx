@@ -28,14 +28,21 @@ const getUTCDateString = (date, interval) => {
 }
 
 export class ProfileRulesetStatistics {
-    constructor(beatmaps, packs, ruleset = null, generate_periodic = true) {
+    constructor(beatmaps, packs, ruleset = null, generate_periodic = true, include_loved = true) {
+        this.include_loved = include_loved;
+
         //ProfileRulesetScoreSets
         this.beatmaps = beatmaps;
-        this.beatmaps_with_converts = beatmaps;
+        this.beatmaps_with_converts = [];
         if (ruleset || ruleset === 0) {
             this.ruleset = ruleset;
             this.beatmaps = beatmaps.filter(b => b.ruleset_id === GetRulesetId(ruleset));
             this.beatmaps_with_converts = beatmaps.filter(b => b.ruleset_id === GetRulesetId(ruleset) || b.ruleset_id === 0);
+        }
+
+        if(!include_loved) {
+            this.beatmaps = this.beatmaps.filter(b => b.status !== 'loved');
+            this.beatmaps_with_converts = this.beatmaps_with_converts.filter(b => b.status !== 'loved');
         }
 
         this.beatmaps_map = {};
@@ -86,6 +93,13 @@ export class ProfileRulesetStatistics {
 
     //add score
     addScore(score) {
+        if(!this.include_loved) {
+            const beatmap = this.beatmaps_map[score.beatmap_id];
+            if(!beatmap || beatmap.status === 'loved') {
+                return;
+            }
+        }
+
         this.scores_set.addScore(score);
 
         if (score.highest_pp) {
