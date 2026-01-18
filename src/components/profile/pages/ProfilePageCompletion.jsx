@@ -1,4 +1,4 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useTheme } from "@mui/material";
+import { Checkbox, FormControl, FormControlLabel, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useTheme } from "@mui/material";
 import { Box, Grid } from "@mui/system";
 import { useProfile } from "../../../providers/ProfileProvider";
 import { useEffect, useState } from "react";
@@ -7,6 +7,7 @@ import { Bar } from "react-chartjs-2";
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from "chart.js";
 import { GetColorInterpolation } from "../../../util/ColorUtils";
 import BetterTooltip from "../../tooltips/BetterTooltip";
+import NumberFlow from "@number-flow/react";
 
 ChartJS.register(
     CategoryScale,
@@ -89,14 +90,16 @@ const COMPLETION_DATA = {
 function ProfilePageCompletion() {
     const { getRulesetStatistics, activeRuleset } = useProfile();
     const [completionStats, setCompletionStats] = useState(null);
+    const [withoutLoved, setWithoutLoved] = useState(false);
     const theme = useTheme();
 
     useEffect(() => {
-        const rulesetStats = getRulesetStatistics(activeRuleset);
+        const rulesetStats = getRulesetStatistics(activeRuleset, withoutLoved);
+        console.log(rulesetStats, `Completion stats for ruleset ${activeRuleset} (without loved: ${withoutLoved})`);
         if (rulesetStats) {
             setCompletionStats(rulesetStats.completion_statistics);
         }
-    }, [activeRuleset, getRulesetStatistics]);
+    }, [activeRuleset, getRulesetStatistics, withoutLoved]);
 
     if (!completionStats) {
         return <Typography>Loading completion statistics...</Typography>;
@@ -104,6 +107,17 @@ function ProfilePageCompletion() {
 
     return (
         <Box sx={{ padding: 2 }}>
+            <FormControl sx={{ marginBottom: 2 }}>
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={withoutLoved}
+                            onChange={(e) => setWithoutLoved(e.target.checked)}
+                        />
+                    }
+                    label="Exclude Loved Beatmaps"
+                />
+            </FormControl>
             <Grid container spacing={1}>
                 {Object.entries(COMPLETION_DATA).map(([dataKey, dataInfo]) => (
                     <Grid size={{ xs: 12, md: 3 }} key={`completion-data-${dataKey}`}>
@@ -159,10 +173,10 @@ function ProfilePageCompletion() {
                                                             <span>{dataInfo.key_formatter(key)}</span>
                                                         </BetterTooltip>
                                                     </TableCell>
-                                                    <TableCell align="right" sx={{ p: 0 }}>{FormatNumber(stats.cleared)}</TableCell>
+                                                    <TableCell align="right" sx={{ p: 0 }}><NumberFlow value={stats.cleared} /></TableCell>
                                                     <TableCell align="center" sx={{ p: 0 }}>/</TableCell>
-                                                    <TableCell align="left" sx={{ p: 0 }}>{FormatNumber(stats.total)}</TableCell>
-                                                    <TableCell align="right">{FormatNumberWithPrecision((stats.completion || 0) * 100, 0)}%</TableCell>
+                                                    <TableCell align="left" sx={{ p: 0 }}><NumberFlow value={stats.total} /></TableCell>
+                                                    <TableCell align="right"><NumberFlow format={{ maximumFractionDigits: 0 }} value={((stats.completion || 0) * 100)} suffix="%" /></TableCell>
                                                 </TableRow>
                                             )) : (
                                                 <TableRow>

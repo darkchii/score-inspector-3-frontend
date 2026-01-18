@@ -28,8 +28,8 @@ const getUTCDateString = (date, interval) => {
 }
 
 export class ProfileRulesetStatistics {
-    constructor(beatmaps, packs, ruleset = null, generate_periodic = true, include_loved = true) {
-        this.include_loved = include_loved;
+    constructor(beatmaps, packs, ruleset = null, generate_periodic = true, without_loved = false) {
+        this.without_loved = without_loved;
 
         //ProfileRulesetScoreSets
         this.beatmaps = beatmaps;
@@ -40,7 +40,7 @@ export class ProfileRulesetStatistics {
             this.beatmaps_with_converts = beatmaps.filter(b => b.ruleset_id === GetRulesetId(ruleset) || b.ruleset_id === 0);
         }
 
-        if(!include_loved) {
+        if(this.without_loved) {
             this.beatmaps = this.beatmaps.filter(b => b.status !== 'loved');
             this.beatmaps_with_converts = this.beatmaps_with_converts.filter(b => b.status !== 'loved');
         }
@@ -533,10 +533,6 @@ export class ProfileRulesetStatistics {
 
         this.completion_statistics.year = {};
         for (const beatmap of this.beatmaps) {
-            if (!beatmap.is_ranked) {
-                continue;
-            }
-
             const year = beatmap.ranked_date ? beatmap.ranked_date.getUTCFullYear() : null;
             if (!year) {
                 continue;
@@ -565,9 +561,6 @@ export class ProfileRulesetStatistics {
         }
 
         for (const beatmap of this.beatmaps) {
-            if (!beatmap.is_ranked) {
-                continue;
-            }
             const stars = Math.floor(beatmap.stars);
             const bucket = starRatingBuckets.includes(stars) ? stars : 10;
             this.completion_statistics.star_rating[bucket].total += 1;
@@ -579,10 +572,6 @@ export class ProfileRulesetStatistics {
         ['cs', 'ar', 'od', 'hp'].forEach(statType => {
             this.completion_statistics[statType] = {};
             for (const beatmap of this.beatmaps) {
-                if (!beatmap.is_ranked) {
-                    continue;
-                }
-
                 const statValue = Math.floor(beatmap[statType]);
 
                 if (!this.completion_statistics[statType][statValue]) {
@@ -612,10 +601,6 @@ export class ProfileRulesetStatistics {
 
         this.completion_statistics.length = {};
         for (const beatmap of this.beatmaps) {
-            if (!beatmap.is_ranked) {
-                continue;
-            }
-
             const lengthMinutes = Math.floor(beatmap.length / 60);
             const bucket = lengthMinutes >= 10 ? '10+' : lengthMinutes;
             if (!this.completion_statistics.length[bucket]) {
@@ -633,9 +618,6 @@ export class ProfileRulesetStatistics {
 
         this.completion_statistics.combo = {};
         for (const beatmap of this.beatmaps) {
-            if (!beatmap.is_ranked) {
-                continue;
-            }
             const comboHundreds = Math.floor(beatmap.max_combo / 100);
             const bucket = comboHundreds >= 10 ? '1000+' : comboHundreds * 100;
             if (!this.completion_statistics.combo[bucket]) {

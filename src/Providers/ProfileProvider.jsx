@@ -30,6 +30,8 @@ export function ProfileProvider({ children }) {
     const getRulesetStatistics = (ruleset, without_loved = false) => {
         if (!profileStatistics) return null;
 
+        console.log(profileStatistics, `Getting ruleset statistics for ruleset ${ruleset} (without loved: ${without_loved})`);
+
         const internalId = GetRulesetNameFromId(ruleset);
         if (without_loved) {
             return profileStatistics.without_loved.rulesets[internalId];

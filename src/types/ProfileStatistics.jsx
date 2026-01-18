@@ -2,16 +2,16 @@ import { GetRulesetNameFromId } from "../util/Helper";
 import { ProfileRulesetStatistics } from "./ProfileRulesetStatistics";
 
 export class ProfileStatistics {
-    constructor(scores, beatmaps, packs, include_loved = true) {
+    constructor(scores, beatmaps, packs, without_loved = false) {
         this.rulesets = {
-            'total': new ProfileRulesetStatistics(beatmaps, packs, null, true, include_loved),
+            'total': new ProfileRulesetStatistics(beatmaps, packs, null, true, without_loved),
         };
 
         for (const score of scores) {
             const ruleset = GetRulesetNameFromId(score.ruleset_id);
 
             if (!this.rulesets[ruleset]) {
-                this.rulesets[ruleset] = new ProfileRulesetStatistics(beatmaps, packs, ruleset, true, include_loved);
+                this.rulesets[ruleset] = new ProfileRulesetStatistics(beatmaps, packs, ruleset, true, without_loved);
             }
 
             this.rulesets[ruleset].addScore(score);
