@@ -68,8 +68,13 @@ export function ApiProvider({ children }) {
         return response;
     }
 
+    const getLeaderboard = async (ruleset, statistic, page, sort_direction = "desc", limit = 50, progressEvent = null) => {
+        const response = await apiGet(`leaderboard/${ruleset}/${statistic}/${page}/${sort_direction}/${limit}`, progressEvent);
+        return response;
+    }
+
     return (
-        <ApiContext.Provider value={{ getUserLive, getScoresLive, getBeatmapsLive, getBeatmapPacks, getCompletionists, getUserSearch }}>
+        <ApiContext.Provider value={{ getUserLive, getScoresLive, getBeatmapsLive, getBeatmapPacks, getCompletionists, getUserSearch, getLeaderboard }}>
             {children}
         </ApiContext.Provider>
     )

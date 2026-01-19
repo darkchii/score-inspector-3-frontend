@@ -11,6 +11,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import SearchIcon from '@mui/icons-material/Search';
 import { useSearch } from "../providers/SearchProvider";
+import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 
 const HeaderButtonMenu = styled((props) => (
     <Menu
@@ -82,6 +83,11 @@ function Header() {
                     icon: <MilitaryTechIcon />
                 }
             ]
+        },
+        {
+            label: 'Leaderboards',
+            icon: <LeaderboardIcon />,
+            to: '/leaderboards',
         }
     ];
 
