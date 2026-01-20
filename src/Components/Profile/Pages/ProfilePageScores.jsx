@@ -1,8 +1,8 @@
 import { Alert, Box, Grid, Pagination, Typography } from "@mui/material";
 import { useProfile } from "../../../providers/ProfileProvider";
 import { useEffect, useState } from "react";
-import ScoreList from "../../ScoreList";
-import ScoreFilter from "../../ScoreFilter";
+import ItemList from "../../list/ItemList";
+import ScoreListRow from "../../list/ScoreListRow";
 
 const _scoresPerPage = 50;
 
@@ -59,9 +59,12 @@ function ProfilePageScores() {
                                 <Alert severity="info" sx={{ mb: 2 }}>
                                     Filtering and sorting will be added in the future.
                                 </Alert>
-                                <ScoreList showIndex startIndex={page * _scoresPerPage} scores={displayedScoreDatabase[page] || []} onSelectScore={(score) => {
-                                    console.log("Selected score:", score);
-                                }} />
+                                <ItemList 
+                                    showIndex 
+                                    startIndex={page * _scoresPerPage} 
+                                    items={displayedScoreDatabase[page] || []} 
+                                    ItemListRowType={ScoreListRow}
+                                />
                             </Box>
                     }
                 </Grid>

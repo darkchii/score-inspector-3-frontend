@@ -1,12 +1,13 @@
 import { Alert, Box, Divider, Grid, List, ListItemButton, ListItemText, MenuItem, Pagination, Paper, Select, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, Typography, useTheme } from "@mui/material";
 import { useProfile } from "../../../providers/ProfileProvider";
 import { useEffect, useState } from "react";
-import ScoreList from "../../ScoreList";
 import { TextureDatabase } from "../../../assets/textures/TextureDatabase";
 import NumberFlow from "@number-flow/react";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { FormatDuration, FormatNumber, FormatNumberWithPrecision } from "../../../util/Helper";
 import ProfileDailyChart from "./daily/ProfileDailyChart";
+import ItemList from "../../list/ItemList";
+import ScoreListRow from "../../list/ScoreListRow";
 
 const SESSION_SORT_FIELDS = [
     { label: 'Date', field: 'start', format: (value) => new Date(value).toLocaleString() },
@@ -165,7 +166,11 @@ function SessionDisplay({ session }) {
                     session.scores.length === 0 ? (
                         <Alert severity="info">No scores available for this session.</Alert>
                     ) : (
-                        <ScoreList truncate scores={session.scores} onSelectScore={() => { }} />
+                        <ItemList
+                            truncate
+                            items={session.scores}
+                            ItemListRowType={ScoreListRow}
+                        />
                     )
                 }
             </Box>

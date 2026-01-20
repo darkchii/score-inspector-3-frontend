@@ -4,9 +4,10 @@ import dateGridStyles from '../../../styles/date-grid.module.less';
 import { useProfile } from "../../../providers/ProfileProvider";
 import { FormatNumber, HexToRgb } from "../../../util/Helper";
 import { Alert, Box, Button, Fade, Modal, Paper, Typography, useTheme } from "@mui/material";
-import { BeatmapList } from "../../BeatmapList";
 import NumberFlow from "@number-flow/react";
 import StarIcon from '@mui/icons-material/Star';
+import ItemList from "../../list/ItemList";
+import BeatmapListRow from "../../list/BeatmapListRow";
 
 //Tag -> Full Name
 const BeatmappackTypes = {
@@ -25,13 +26,6 @@ const PackSquare = memo(function PackSquare({ pack, onClick }) {
     const endSquareColor = HexToRgb(theme.palette.primary.main);
 
     const color = useMemo(() => {
-        // if (pack.is_completed) {
-        //     return '#4caf50'; //green
-        // } else if (pack.completed > 0) {
-        //     return '#ff9800'; //orange
-        // } else {
-        //     return '#f44336'; //red
-        // }
         if (pack.is_completed) {
             return 'gold';
         }
@@ -166,7 +160,14 @@ function PackModal({ pack, onClose }) {
                                     maxHeight: '70vh',
                                     overflowY: 'auto',
                                 }}>
-                                    <BeatmapList beatmaps={beatmaps} showPlayed={true} />
+                                    <ItemList
+                                        items={beatmaps}
+                                        // showPlayed={true}
+                                        passthroughProps={{
+                                            showPlayed: true
+                                        }}
+                                        ItemListRowType={BeatmapListRow}
+                                    />
                                 </div>
                             </Box>
                         </Paper>

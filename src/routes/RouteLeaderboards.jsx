@@ -1,9 +1,12 @@
-import { Alert, Box, Collapse, Pagination, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs } from "@mui/material";
+import { Alert, Box, Button, ButtonGroup, Collapse, Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router";
 import RulesetSelector from "../components/RulesetSelector";
 import { useApi } from "../providers/ApiProvider";
-import NumberFlow from "@number-flow/react";
+import { TextureDatabase } from "../assets/textures/TextureDatabase";
+import { FormatNumber } from "../util/Helper";
+import ItemList from "../components/list/ItemList";
+import PlayerListRow from "../components/list/PlayerListRow";
 
 const LIMIT = 50;
 const LEADERBOARDS = {
@@ -15,50 +18,82 @@ const LEADERBOARDS = {
     'ranked_score': {
         title: 'Ranked Score',
         category: 'user',
+        formatter: FormatNumber,
     },
     'total_score': {
         title: 'Total Score',
         category: 'user',
+        formatter: FormatNumber,
     },
     'total_scores_count': {
         title: 'Clears',
         category: 'user',
+        formatter: FormatNumber,
+    },
+    'grade_counts_total_ss': {
+        title: 'Total SS',
+        img: [TextureDatabase.SVGGradeXH, TextureDatabase.SVGGradeX],
+        category: 'grades',
+        formatter: FormatNumber,
     },
     'grade_counts_ssh': {
         title: 'Grade SSH',
+        img: TextureDatabase.SVGGradeXH,
         category: 'grades',
+        formatter: FormatNumber,
     },
     'grade_counts_ss': {
         title: 'Grade SS',
+        img: TextureDatabase.SVGGradeX,
         category: 'grades',
+        formatter: FormatNumber,
+    },
+    'grade_counts_total_s': {
+        title: 'Total S',
+        img: [TextureDatabase.SVGGradeSH, TextureDatabase.SVGGradeS],
+        category: 'grades',
+        formatter: FormatNumber,
     },
     'grade_counts_sh': {
         title: 'Grade SH',
+        img: TextureDatabase.SVGGradeSH,
         category: 'grades',
+        formatter: FormatNumber,
     },
     'grade_counts_s': {
         title: 'Grade S',
+        img: TextureDatabase.SVGGradeS,
         category: 'grades',
+        formatter: FormatNumber,
     },
     'grade_counts_a': {
         title: 'Grade A',
+        img: TextureDatabase.SVGGradeA,
         category: 'grades',
+        formatter: FormatNumber,
     },
     'grade_counts_b': {
         title: 'Grade B',
+        img: TextureDatabase.SVGGradeB,
         category: 'grades',
+        formatter: FormatNumber,
     },
     'grade_counts_c': {
         title: 'Grade C',
+        img: TextureDatabase.SVGGradeC,
         category: 'grades',
+        formatter: FormatNumber,
     },
     'grade_counts_d': {
         title: 'Grade D',
+        img: TextureDatabase.SVGGradeD,
         category: 'grades',
+        formatter: FormatNumber,
     },
     'replays_watched_by_others': {
         title: 'Replays Watched',
         category: 'user',
+        formatter: FormatNumber,
     },
     'play_time': {
         title: 'Play Time',
@@ -73,14 +108,22 @@ const LEADERBOARDS = {
     'play_count': {
         title: 'Play Count',
         category: 'user',
+        formatter: FormatNumber,
     }
 }
+const LEADERBOARDS_CATEGORIES = Object.keys(LEADERBOARDS).reduce((acc, key) => {
+    const category = LEADERBOARDS[key].category;
+    if (!acc.includes(category)) {
+        acc.push(category);
+    }
+    return acc;
+}, []);
 
 function RouteLeaderboards() {
     const params = useParams();
     const { getLeaderboard } = useApi();
     const [ruleset, setRuleset] = useState('osu');
-    const [statistic, setStatistic] = useState(params.statistic || null);
+    const [statistic, setStatistic] = useState(params.statistic || Object.keys(LEADERBOARDS)[0]);
     const [page, setPage] = useState(params.page || 1);
     const [leaderboardResults, setLeaderboardResults] = useState(null);
 
@@ -88,7 +131,7 @@ function RouteLeaderboards() {
     const [isWorking, setIsWorking] = useState(false);
 
     useEffect(() => {
-        setStatistic(params.statistic || null);
+        setStatistic(params.statistic || Object.keys(LEADERBOARDS)[0]);
         setPage(params.page || 1);
         setRuleset(params.ruleset || 'osu');
     }, [params.statistic, params.page, params.ruleset]);
@@ -102,6 +145,15 @@ function RouteLeaderboards() {
             setIsWorking(true);
             try {
                 const data = await getLeaderboard(ruleset, statistic, page, "desc", LIMIT);
+
+                //data.entries[i].value should be moved to data.entries[i].user.osuAlternative.lb_value
+                if (data && data.entries) {
+                    data.entries = data.entries.map(entry => {
+                        entry.user.osuAlternative = entry.user.osuAlternative || {};
+                        entry.user.osuAlternative.lb_value = entry.value;
+                        return entry;
+                    });
+                }
                 console.log(data);
                 setLeaderboardResults(data);
                 setError(null);
@@ -124,70 +176,123 @@ function RouteLeaderboards() {
                 <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 1, justifyContent: 'center' }}>
                     <RulesetSelector activeRuleset={ruleset} onChange={setRuleset} disabled={isWorking} />
                 </Box>
-                <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 1, justifyContent: 'center' }}>
-                    <Tabs aria-label='leaderboards-tabs' value={statistic} textColor="primary" indicatorColor="primary">
-                        {
-                            Object.keys(LEADERBOARDS).map((key) => {
-                                return (
-                                    <Tab
-                                        key={`leaderboards-tab-${key}`}
-                                        label={LEADERBOARDS[key].title}
-                                        value={key}
-                                        onClick={() => setStatistic(key)}
-                                        disabled={statistic === key || isWorking}
-                                    />
-                                );
-                            })
-                        }
-                    </Tabs>
+                <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 2, justifyContent: 'center', flexDirection: 'column', alignItems: 'center' }}>
+                    {/* separate Tabs for each category */}
+                    {
+                        LEADERBOARDS_CATEGORIES.map((category) => {
+                            return (
+                                // <Tabs key={`leaderboards-category-tabs-${category}`} aria-label={`leaderboards-tabs-${category}`} value={statistic} textColor="primary" indicatorColor="primary">
+                                <ButtonGroup size='small' key={`leaderboards-category-tabs-${category}`} variant="outlined" aria-label={`leaderboards-tabs-${category}`}>    
+                                {Object.keys(LEADERBOARDS).filter((key) => LEADERBOARDS[key].category === category).map((key) => {
+                                        return (
+                                            <Button
+                                                variant={statistic === key ? "contained" : "outlined"}
+                                                key={`leaderboard-tab-${key}`}
+                                                value={key}
+                                                onClick={() => setStatistic(key)}
+                                                disabled={statistic === key || isWorking}
+                                            >
+                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                        {
+                                                            LEADERBOARDS[key].img ? (
+                                                                // <Box
+                                                                //     component="img"
+                                                                //     src={LEADERBOARDS[key].img}
+                                                                //     alt={key}
+                                                                // />
+                                                                LEADERBOARDS[key].img instanceof Array ? (
+                                                                    <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                                                                        {LEADERBOARDS[key].img.map((img, index) => (
+                                                                            <Box
+                                                                                key={`leaderboard-tab-img-${key}-${index}`}
+                                                                                component="img"
+                                                                                src={img}
+                                                                                alt={`${key}-${index}`}
+                                                                            />
+                                                                        ))}
+                                                                    </Box>
+                                                                ) : (
+                                                                    <Box
+                                                                        component="img"
+                                                                        src={LEADERBOARDS[key].img}
+                                                                        alt={key}
+                                                                    />
+                                                                )
+                                                            ) : LEADERBOARDS[key].title
+                                                        }
+                                                    </Box>
+                                            </Button>
+                                        );
+                                    })}
+                                </ButtonGroup>
+                            );
+                        })
+                    }
                 </Box>
-                {
-                    error ? (
-                        <Alert severity="error" sx={{ mt: 2 }}>
-                            {error}
-                        </Alert>
-                    ) : null
-                }
-                {
-                    leaderboardResults ? (
-                        <Collapse in={!isWorking}>
-                            <Box sx={{ mt: 2 }}>
-                                <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 1, justifyContent: 'center' }}>
-                                    <Pagination
-                                        count={leaderboardResults.total_pages}
-                                        page={parseInt(page)}
-                                        onChange={(event, value) => setPage(value)}
-                                        color="primary"
-                                        disabled={isWorking}
-                                    />
-                                </Box>
-                                {/* Temporary, just a table */}
-                                <TableContainer>
-                                    <Table>
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell>Rank</TableCell>
-                                                <TableCell>Username</TableCell>
-                                                <TableCell align="right">{LEADERBOARDS[statistic].title}</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {
-                                                leaderboardResults.entries.map((entry) => (
-                                                    <TableRow key={`leaderboard-entry-${entry.rank}`}>
-                                                        <TableCell>#0</TableCell>
-                                                        <TableCell>{entry.user.osuApi?.username || "Unknown"}</TableCell>
-                                                        <TableCell align="right">{LEADERBOARDS[statistic].formatter ? LEADERBOARDS[statistic].formatter(Number(entry.value)) : Number(entry.value)}{LEADERBOARDS[statistic].suffix || null}</TableCell>
-                                                    </TableRow>
-                                                ))
-                                            }
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            </Box>
-                        </Collapse>
-                    ) : null
-                }
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Box sx={{ minWidth: '50vw', mt: 2 }}>
+
+                        {
+                            error ? (
+                                <Alert severity="error" sx={{ mt: 2 }}>
+                                    {error}
+                                </Alert>
+                            ) : null
+                        }
+                        {
+                            leaderboardResults ? (
+                                <Collapse in={!isWorking}>
+                                    <Box sx={{ mt: 2 }}>
+                                        <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 1, justifyContent: 'center' }}>
+                                            <Pagination
+                                                count={leaderboardResults.total_pages}
+                                                page={parseInt(page)}
+                                                onChange={(event, value) => setPage(value)}
+                                                color="primary"
+                                                disabled={isWorking}
+                                            />
+                                        </Box>
+                                        {/* Temporary, just a table */}
+                                        <ItemList
+                                            startIndex={(page - 1) * LIMIT}
+                                            showIndex={true}
+                                            items={leaderboardResults.entries.map(entry => entry.user)}
+                                            isCompact={false}
+                                            truncate={false}
+                                            leaderboardField={'osuAlternative.lb_value'}
+                                            leaderboardFormat={(value) => {
+                                                return `${LEADERBOARDS[statistic].formatter ? LEADERBOARDS[statistic].formatter(Number(value)) : Number(value)}${LEADERBOARDS[statistic].suffix || ''}`;
+                                            }}
+                                            ItemListRowType={PlayerListRow}
+                                        />
+                                        {/* <TableContainer>
+                                        <Table size='small'>
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell>Rank</TableCell>
+                                                    <TableCell>Username</TableCell>
+                                                    <TableCell align="right">{LEADERBOARDS[statistic].title}</TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {
+                                                    leaderboardResults.entries.map((entry) => (
+                                                        <TableRow key={`leaderboard-entry-${entry.rank}`}>
+                                                            <TableCell>#0</TableCell>
+                                                            <TableCell>{entry.user.osuApi?.username || "Unknown"}</TableCell>
+                                                            <TableCell align="right">{LEADERBOARDS[statistic].formatter ? LEADERBOARDS[statistic].formatter(Number(entry.value)) : Number(entry.value)}{LEADERBOARDS[statistic].suffix || null}</TableCell>
+                                                        </TableRow>
+                                                    ))
+                                                }
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer> */}
+                                    </Box>
+                                </Collapse>
+                            ) : null
+                        }
+                    </Box>
+                </Box>
             </div>
         </Box>
     );

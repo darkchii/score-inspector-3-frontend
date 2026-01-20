@@ -2,15 +2,15 @@ import { Box, Button, ButtonGroup, Collapse, Divider, Grid, Typography, useTheme
 import { useProfile } from "../../../providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import dateGridStyles from '../../../styles/date-grid.module.less';
-import colorStyles from '../../../styles/colors.module.less';
 import BetterTooltip from "../../tooltips/BetterTooltip";
 import { HexToRgb } from "../../../util/Helper";
 import GradesDisplay from "../../GradesDisplay";
 import NumberFlow from "@number-flow/react";
-import ScoreList from "../../ScoreList";
 import ProfileDailyChart from "./daily/ProfileDailyChart";
 import InteractiveBox from "../../InteractiveBox";
 import { ProfileRulesetScoreSet } from "../../../types/ProfileRulesetScoreSet";
+import ItemList from "../../list/ItemList";
+import ScoreListRow from "../../list/ScoreListRow";
 
 //uses periodic_by_year from the ProfileRulesetStatistics type
 function ProfilePageDaily() {
@@ -181,8 +181,10 @@ function ProfilePageDaily() {
                                 <Divider sx={{ width: '100%', my: 2 }} />
                                 <GradesDisplay grades={activeScoreSet.grades} />
                                 <Divider sx={{ width: '100%', my: 2 }} />
-                                <ScoreList
-                                    scores={activeScoreSet.scores_reordered?.['date']} truncate={true}
+                                <ItemList
+                                    items={activeScoreSet.scores_reordered?.['date']} 
+                                    truncate={true}
+                                    ItemListRowType={ScoreListRow}
                                 />
                             </div>
                         </Collapse>
