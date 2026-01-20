@@ -182,8 +182,8 @@ function RouteLeaderboards() {
                         LEADERBOARDS_CATEGORIES.map((category) => {
                             return (
                                 // <Tabs key={`leaderboards-category-tabs-${category}`} aria-label={`leaderboards-tabs-${category}`} value={statistic} textColor="primary" indicatorColor="primary">
-                                <ButtonGroup size='small' key={`leaderboards-category-tabs-${category}`} variant="outlined" aria-label={`leaderboards-tabs-${category}`}>    
-                                {Object.keys(LEADERBOARDS).filter((key) => LEADERBOARDS[key].category === category).map((key) => {
+                                <ButtonGroup size='small' key={`leaderboards-category-tabs-${category}`} variant="outlined" aria-label={`leaderboards-tabs-${category}`}>
+                                    {Object.keys(LEADERBOARDS).filter((key) => LEADERBOARDS[key].category === category).map((key) => {
                                         return (
                                             <Button
                                                 variant={statistic === key ? "contained" : "outlined"}
@@ -192,35 +192,35 @@ function RouteLeaderboards() {
                                                 onClick={() => setStatistic(key)}
                                                 disabled={statistic === key || isWorking}
                                             >
-                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                        {
-                                                            LEADERBOARDS[key].img ? (
-                                                                // <Box
-                                                                //     component="img"
-                                                                //     src={LEADERBOARDS[key].img}
-                                                                //     alt={key}
-                                                                // />
-                                                                LEADERBOARDS[key].img instanceof Array ? (
-                                                                    <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-                                                                        {LEADERBOARDS[key].img.map((img, index) => (
-                                                                            <Box
-                                                                                key={`leaderboard-tab-img-${key}-${index}`}
-                                                                                component="img"
-                                                                                src={img}
-                                                                                alt={`${key}-${index}`}
-                                                                            />
-                                                                        ))}
-                                                                    </Box>
-                                                                ) : (
-                                                                    <Box
-                                                                        component="img"
-                                                                        src={LEADERBOARDS[key].img}
-                                                                        alt={key}
-                                                                    />
-                                                                )
-                                                            ) : LEADERBOARDS[key].title
-                                                        }
-                                                    </Box>
+                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                    {
+                                                        LEADERBOARDS[key].img ? (
+                                                            // <Box
+                                                            //     component="img"
+                                                            //     src={LEADERBOARDS[key].img}
+                                                            //     alt={key}
+                                                            // />
+                                                            LEADERBOARDS[key].img instanceof Array ? (
+                                                                <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                                                                    {LEADERBOARDS[key].img.map((img, index) => (
+                                                                        <Box
+                                                                            key={`leaderboard-tab-img-${key}-${index}`}
+                                                                            component="img"
+                                                                            src={img}
+                                                                            alt={`${key}-${index}`}
+                                                                        />
+                                                                    ))}
+                                                                </Box>
+                                                            ) : (
+                                                                <Box
+                                                                    component="img"
+                                                                    src={LEADERBOARDS[key].img}
+                                                                    alt={key}
+                                                                />
+                                                            )
+                                                        ) : LEADERBOARDS[key].title
+                                                    }
+                                                </Box>
                                             </Button>
                                         );
                                     })}
@@ -265,28 +265,15 @@ function RouteLeaderboards() {
                                             }}
                                             ItemListRowType={PlayerListRow}
                                         />
-                                        {/* <TableContainer>
-                                        <Table size='small'>
-                                            <TableHead>
-                                                <TableRow>
-                                                    <TableCell>Rank</TableCell>
-                                                    <TableCell>Username</TableCell>
-                                                    <TableCell align="right">{LEADERBOARDS[statistic].title}</TableCell>
-                                                </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                                {
-                                                    leaderboardResults.entries.map((entry) => (
-                                                        <TableRow key={`leaderboard-entry-${entry.rank}`}>
-                                                            <TableCell>#0</TableCell>
-                                                            <TableCell>{entry.user.osuApi?.username || "Unknown"}</TableCell>
-                                                            <TableCell align="right">{LEADERBOARDS[statistic].formatter ? LEADERBOARDS[statistic].formatter(Number(entry.value)) : Number(entry.value)}{LEADERBOARDS[statistic].suffix || null}</TableCell>
-                                                        </TableRow>
-                                                    ))
-                                                }
-                                            </TableBody>
-                                        </Table>
-                                    </TableContainer> */}
+                                        <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 1, justifyContent: 'center' }}>
+                                            <Pagination
+                                                count={leaderboardResults.total_pages}
+                                                page={parseInt(page)}
+                                                onChange={(event, value) => setPage(value)}
+                                                color="primary"
+                                                disabled={isWorking}
+                                            />
+                                        </Box>
                                     </Box>
                                 </Collapse>
                             ) : null
