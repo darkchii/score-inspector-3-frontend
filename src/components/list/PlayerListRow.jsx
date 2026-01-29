@@ -1,9 +1,11 @@
 import { Avatar, Box, TableCell, TableRow, Typography, useTheme } from "@mui/material";
 import { getContrastColor } from "../../util/Helper";
 import ItemListRowBase from "./ItemListRowBase";
+import { useNavigate } from "react-router";
 
 function PlayerListRow({ item, index, isCompact = false, showIndex = true, startIndex = 0, leaderboardField = null, leaderboardFormat = null }) {
     const theme = useTheme();
+    const navigate = useNavigate();
 
     return (
         <ItemListRowBase
@@ -15,6 +17,7 @@ function PlayerListRow({ item, index, isCompact = false, showIndex = true, start
             leaderboardField={leaderboardField}
             leaderboardFormat={leaderboardFormat}
             item={item}
+            onClick={() => navigate(`/user/${item?.osuAlternative?.user_id || item?.osuApi?.id}`)}
         >
             <TableCell sx={{ maxWidth: '100px' }}>
                 <div style={{

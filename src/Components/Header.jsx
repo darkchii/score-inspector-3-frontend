@@ -12,6 +12,8 @@ import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import SearchIcon from '@mui/icons-material/Search';
 import { useSearch } from "../providers/SearchProvider";
 import LeaderboardIcon from '@mui/icons-material/Leaderboard';
+import GroupsIcon from '@mui/icons-material/Groups';
+import InfoIcon from '@mui/icons-material/Info';
 
 const HeaderButtonMenu = styled((props) => (
     <Menu
@@ -88,6 +90,17 @@ function Header() {
             label: 'Leaderboards',
             icon: <LeaderboardIcon />,
             to: '/leaderboards',
+        },
+        {
+            label: 'Teams',
+            icon: <GroupsIcon />,
+            // to: '/teams',
+            href: Config.TEAMS_URL,
+        },
+        {
+            label: 'Wiki',
+            icon: <InfoIcon />,
+            href: Config.WIKI_URL
         }
     ];
 
@@ -118,7 +131,7 @@ function Header() {
                     <Button
                         key={index}
                         component={item.to ? Link : 'button'}
-                        to={item.to || '#'}
+                        to={item.to || item.href || '#'}
                         startIcon={item.icon || null}
                         onClick={() => {
                             handleHeaderMenuClose();
@@ -171,11 +184,13 @@ function Header() {
                                             <Tooltip title={item.tooltip || ''}>
                                                 <Button
                                                     size='small'
-                                                    component={item.to ? Link : 'button'}
+                                                    component={item.to ? Link : (item.href ? 'a' : 'button')}
                                                     to={item.to || '#'}
+                                                    href={item.href || null}
                                                     onClick={item.onClick}
                                                     startIcon={item.icon || null}
-                                                    disabled={!item.onClick && !item.to}
+                                                    disabled={!item.onClick && !item.to && !item.href}
+                                                    target={item.href ? "_blank" : undefined}
                                                 >
                                                     {item.label || ''}
                                                 </Button>

@@ -13,8 +13,10 @@
             "OSU_CLIENT_ID": 19559
         }
     },
+    "WIKI_URL": "https://osu-wiki.com",
     "NOTIFICATIONS": {
         "position": "top-right",
         "theme": "dark"
-    }
+    },
+    "TEAMS_URL": "https://kirino.sh/teams"
 }
