@@ -1,4 +1,4 @@
-import { Box, Container, Divider, Grid, Paper } from "@mui/material";
+import { Alert, Box, Container, Divider, Grid, Paper, Typography } from "@mui/material";
 import ProfileGrades from "../ProfileGrades";
 import ProfileHighlightCollection from "../ProfileHighlightCollection";
 import ProfileRecentActivity from "../ProfileRecentActivity";
@@ -9,7 +9,7 @@ import { DateToString } from "../../../util/Helper";
 import DifficultyBadge from "../../DifficultyBadge";
 
 function ProfilePageMain() {
-    const { getRulesetStatistics, activeRuleset } = useProfile();
+    const { getRulesetStatistics, activeRuleset, loadDurationMs } = useProfile();
 
     return (
         <>
@@ -59,6 +59,13 @@ function ProfilePageMain() {
                 <Paper elevation={3} sx={{ padding: 2, height: '100%' }}>
                     <ProfileRecentActivity />
                 </Paper>
+                <Divider sx={{ my: 2 }} />
+                <Alert severity="info">
+                    <Typography variant="body1" gutterBottom>
+                        {/* in seconds */}
+                        Time to load profile data: {(loadDurationMs / 1000).toFixed(2)} seconds.
+                    </Typography>
+                </Alert>
             </Box>
         </>
     );

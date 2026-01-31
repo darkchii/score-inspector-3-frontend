@@ -16,6 +16,7 @@ export function ProfileProvider({ children }) {
     const { getUserLive, getScoresLive, getBeatmapsLive, getBeatmapPacks } = useApi();
     const [fetchLog, setFetchLog] = useState([]);
     const [isFinished, setIsFinished] = useState(false);
+    const [loadDurationMs, setLoadDurationMs] = useState(0);
 
     const [activeRuleset, setActiveRuleset] = useState(null);
     const [availableRulesets, setAvailableRulesets] = useState([]);
@@ -29,8 +30,6 @@ export function ProfileProvider({ children }) {
 
     const getRulesetStatistics = (ruleset, without_loved = false) => {
         if (!profileStatistics) return null;
-
-        console.log(profileStatistics, `Getting ruleset statistics for ruleset ${ruleset} (without loved: ${without_loved})`);
 
         const internalId = GetRulesetNameFromId(ruleset);
         if (without_loved) {
@@ -68,6 +67,9 @@ export function ProfileProvider({ children }) {
         setFetchLog([]);
         setIsFinished(false);
         setActiveRuleset(0);
+        setLoadDurationMs(0);
+        setAvailableRulesets([]);
+        setScoreMap({});
     }
 
     const fetchFullProfile = async (_userId) => {
@@ -78,6 +80,7 @@ export function ProfileProvider({ children }) {
 
         reset();
         try {
+            let startMsGlobal = Date.now();
             //This setup is kinda ass but I dont think it matters
             let _fetchLog = [];
 
@@ -126,20 +129,16 @@ export function ProfileProvider({ children }) {
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched ${FormatNumber(packs.length)} beatmap packs`);
             setFetchLog(_fetchLog);
-            setBeatmapPacks(packs);
-
             
             _fetchLog.push("%working% Processing beatmaps");
             setFetchLog(_fetchLog);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             const _beatmaps = ProcessBeatmaps(beatmaps);
-            setBeatmapsLive(_beatmaps);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Processed beatmaps`);
             setFetchLog(_fetchLog);
-
             
             _fetchLog.push("%working% Mapping beatmaps to scores");
             setFetchLog(_fetchLog);
@@ -151,18 +150,15 @@ export function ProfileProvider({ children }) {
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Mapped beatmaps to scores (${FormatNumber(missingCount)} scores missing beatmaps)`);
             setFetchLog(_fetchLog);
             
-            
             _fetchLog.push("%working% Processing scores");
             setFetchLog(_fetchLog);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             let processedScores = await ProcessScores(mappedScores, user);
-            setScoresLive(processedScores);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Processed scores`);
             setFetchLog(_fetchLog);
-
             
             _fetchLog.push("%working% Building profile statistics");
             setFetchLog(_fetchLog);
@@ -174,31 +170,31 @@ export function ProfileProvider({ children }) {
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Built profile statistics`);
             setFetchLog(_fetchLog);
-            setProfileStatistics({
-                default: profileStats,
-                without_loved: profileStatsWithoutLoved
-            });
-
-            setAvailableRulesets(Object.keys(profileStats.rulesets));
-
+            
             let _scoreMap = {};
             processedScores.forEach(score => {
                 _scoreMap[score.id] = score;
             });
-            setScoreMap(_scoreMap);
-
-            console.log(profileStats);
-
+            
             //If available rulesets only has 'total', throw error (user has no scores)
             if (Object.keys(profileStats.rulesets).length === 1 && profileStats.rulesets['total']) {
                 throw new Error("User has no scores available.");
             }
 
-            //If current active ruleset is set to a "non-existent" ruleset, set it to 'all'
+            let endMsGlobal = Date.now();
+            setLoadDurationMs(endMsGlobal - startMsGlobal);
+            setBeatmapPacks(packs);
+            setBeatmapsLive(_beatmaps);
+            setScoresLive(processedScores);
+            setProfileStatistics({
+                default: profileStats,
+                without_loved: profileStatsWithoutLoved
+            });
+            setAvailableRulesets(Object.keys(profileStats.rulesets));
+            setScoreMap(_scoreMap);
             if (!profileStats.rulesets[GetRulesetNameFromId(activeRuleset)]) {
                 setActiveRuleset('all');
             }
-
             setIsFinished(true);
         } catch (error) {
             console.error("Error fetching full profile:", error);
@@ -208,7 +204,7 @@ export function ProfileProvider({ children }) {
     }
 
     return (
-        <ProfileContext.Provider value={{ getUser, getScoreById, getApiUser, userLive, scoresLive, setUserId, fetchFullProfile, errorMessage, fetchLog, isFinished, activeRuleset, setActiveRuleset, getRulesetStatistics, getRulesetUser, availableRulesets }}>
+        <ProfileContext.Provider value={{ getUser, getScoreById, getApiUser, userLive, scoresLive, setUserId, fetchFullProfile, errorMessage, fetchLog, isFinished, activeRuleset, setActiveRuleset, getRulesetStatistics, getRulesetUser, availableRulesets, loadDurationMs }}>
             {children}
         </ProfileContext.Provider>
     )
