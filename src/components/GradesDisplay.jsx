@@ -9,9 +9,25 @@ function _SingularGradeDisplay({ grade, count, overrideCount }) {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start', gap: 1 }}>
             <img src={TextureDatabase[`SVGGrade${grade}`]} alt={grade} width={48} height={48} />
-            <BetterTooltip title={overrideCount !== undefined ? `Including overrides: ${FormatNumber(overrideCount)} total` : ''}>
-                <Typography variant="h6"><NumberFlow value={count} /></Typography>
-            </BetterTooltip>
+            {/* <BetterTooltip title={overrideCount !== undefined ? `Including overrides: ${FormatNumber(overrideCount)} total` : ''}> */}
+            <Box sx={{
+                //reduced spacing between the two values
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
+                lineHeight: '0.1em'
+            }}>
+                <Typography variant="h6" sx={{ lineHeight: '0.1em' }}><NumberFlow style={{ '--number-flow-mask-height': '0.10em' }} value={count} /></Typography>
+                {
+                    overrideCount !== undefined && (
+                        <BetterTooltip title='Including overridden scores'>
+                            <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: '0.1em' }}><NumberFlow style={{ '--number-flow-mask-height': '0.10em' }} value={overrideCount} /></Typography>
+                        </BetterTooltip>
+                    )
+                }
+            </Box>
+            {/* </BetterTooltip> */}
         </Box>
     )
 }
