@@ -1,6 +1,7 @@
 import { Avatar, Box, Typography, useTheme } from "@mui/material";
 import { cloneElement, useEffect, useState } from "react";
 import { useAuth } from "../providers/AuthProvider";
+import { useNavigate } from "react-router";
 
 function PlayerLink({ data, size = 24 }) {
     const theme = useTheme();
@@ -10,6 +11,7 @@ function PlayerLink({ data, size = 24 }) {
     const [team, setTeam] = useState(null);
     const [isSelf, setIsSelf] = useState(false);
     const [isValid, setIsValid] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         //we can received different data structures, so we need to look in several places
@@ -38,27 +40,33 @@ function PlayerLink({ data, size = 24 }) {
 
     return (
         //chip but our own elements
-        <Box sx={{
-            display: 'flex',
-            borderRadius: '1em',
-            bgcolor: `${isSelf ? theme.palette.primary.main : '#ffffff'}22`,
-            textDecoration: 'none',
-            color: '#fff',
-            p: 0.1,
-            pr: 1,
-            width: 'fit-content',
-            alignItems: 'center',
-            justifyContent: 'center',
-            //hover effect
-            '&:hover': {
-                bgcolor: `${isSelf ? theme.palette.primary.main : '#ffffff'}44`,
-                cursor: 'pointer',
-                //animate
+        <Box
+            onClick={() => {
+                if (id) {
+                    navigate(`/user/${id}`);
+                }
+            }}
+            sx={{
+                display: 'flex',
+                borderRadius: '1em',
+                bgcolor: `${isSelf ? theme.palette.primary.main : '#ffffff'}22`,
+                textDecoration: 'none',
+                color: '#fff',
+                p: 0.1,
+                pr: 1,
+                width: 'fit-content',
+                alignItems: 'center',
+                justifyContent: 'center',
+                //hover effect
+                '&:hover': {
+                    bgcolor: `${isSelf ? theme.palette.primary.main : '#ffffff'}44`,
+                    cursor: 'pointer',
+                    //animate
+                    transition: 'background-color 0.2s',
+                },
                 transition: 'background-color 0.2s',
-            },
-            transition: 'background-color 0.2s',
-        }}>
-            <Avatar 
+            }}>
+            <Avatar
                 src={`https://a.ppy.sh/${id}`}
                 alt={username}
                 sx={{ width: size, height: size, mr: 0.5 }}
