@@ -2,7 +2,7 @@ import { Avatar, Box, Typography, useTheme } from "@mui/material";
 import { cloneElement, useEffect, useState } from "react";
 import { useAuth } from "../providers/AuthProvider";
 
-function PlayerLink({ data }) {
+function PlayerLink({ data, size = 24 }) {
     const theme = useTheme();
     const { user } = useAuth();
     const [username, setUsername] = useState(null);
@@ -44,7 +44,7 @@ function PlayerLink({ data }) {
             bgcolor: `${isSelf ? theme.palette.primary.main : '#ffffff'}22`,
             textDecoration: 'none',
             color: '#fff',
-            p: 0.15,
+            p: 0.1,
             pr: 1,
             width: 'fit-content',
             alignItems: 'center',
@@ -61,7 +61,7 @@ function PlayerLink({ data }) {
             <Avatar 
                 src={`https://a.ppy.sh/${id}`}
                 alt={username}
-                sx={{ width: 24, height: 24, mr: 0.5 }}
+                sx={{ width: size, height: size, mr: 0.5 }}
             />
             <Typography variant="body2" sx={{ fontWeight: isSelf ? 'bold' : 'normal' }}>
                 {/* {
