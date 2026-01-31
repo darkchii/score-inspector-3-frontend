@@ -36,6 +36,11 @@ function PlayerLink({ data, size = 24 }) {
             setId(_id);
             setIsSelf(user && _id && (String(user.id) === String(_id)));
         }
+
+        if (data.team) {
+            team_data = data.team;
+        }
+        setTeam(team_data);
     }, [data]);
 
     return (
@@ -72,11 +77,11 @@ function PlayerLink({ data, size = 24 }) {
                 sx={{ width: size, height: size, mr: 0.5 }}
             />
             <Typography variant="body2" sx={{ fontWeight: isSelf ? 'bold' : 'normal' }}>
-                {/* {
-                    props.team && <>
-                        <span style={{ color: props.team.color, fontWeight: 'bold' }}>[{props.team.short_name}] </span>
+                {
+                    team && <>
+                        <span style={{ color: team.color, fontWeight: 'bold' }}>[{team.short_name}] </span>
                     </>
-                } */}
+                }
                 {username}
             </Typography>
         </Box>
