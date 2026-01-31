@@ -12,6 +12,7 @@ import NumberFlow from "@number-flow/react";
 import ProfilePageCharts from "../components/profile/pages/ProfilePageCharts";
 import ProfilePageDaily from "../components/profile/pages/ProfilePageDaily";
 import ProfilePageCompletion from "../components/profile/pages/ProfilePageCompletion";
+import { usePageTitle } from "../providers/TitleProvider";
 
 const pageComponents = {
     'main': { component: ProfilePageMain, title: 'Overview' },
@@ -64,6 +65,8 @@ function RouteProfile() {
             setPage(page || 'main');
         }
     }, [page]);
+
+    usePageTitle(userLive?.osuApi?.username ? `${userLive.osuApi.username}` : "Profile");
 
     if (isWorking || errorMessage) {
         return (<>

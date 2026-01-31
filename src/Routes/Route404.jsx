@@ -1,7 +1,10 @@
 import { Box } from "@mui/material";
 import { TextureDatabase } from "../assets/textures/TextureDatabase";
+import { usePageTitle } from "../providers/TitleProvider";
 
 function Route404() {
+    usePageTitle("404");
+    
     return (
         <Box sx={{p:1}}>
             <div>

@@ -1,7 +1,10 @@
 import IndexTopPlayers from "../components/index/IndexTopPlayers";
 import { Grid } from "@mui/material";
+import { usePageTitle } from "../providers/TitleProvider";
 
 function RouteIndex() {
+    usePageTitle(null); //reset to default title
+
     return (<>
         {/* <IndexTopPlayers /> */}
         <Grid container spacing={2} sx={{

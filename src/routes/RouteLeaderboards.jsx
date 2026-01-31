@@ -7,6 +7,7 @@ import { TextureDatabase } from "../assets/textures/TextureDatabase";
 import { FormatNumber } from "../util/Helper";
 import ItemList from "../components/list/ItemList";
 import PlayerListRow from "../components/list/PlayerListRow";
+import { usePageTitle } from "../providers/TitleProvider";
 
 const LIMIT = 50;
 const LEADERBOARDS = {
@@ -126,15 +127,17 @@ function RouteLeaderboards() {
     const [statistic, setStatistic] = useState(params.statistic || Object.keys(LEADERBOARDS)[0]);
     const [page, setPage] = useState(params.page || 1);
     const [leaderboardResults, setLeaderboardResults] = useState(null);
-
+    
     const [error, setError] = useState(null);
     const [isWorking, setIsWorking] = useState(false);
-
+    
     useEffect(() => {
         setStatistic(params.statistic || Object.keys(LEADERBOARDS)[0]);
         setPage(params.page || 1);
         setRuleset(params.ruleset || 'osu');
     }, [params.statistic, params.page, params.ruleset]);
+
+    usePageTitle(`Leaderboards - ${LEADERBOARDS[statistic] ? LEADERBOARDS[statistic].title : ''}`);
 
     useEffect(() => {
         //change url without reloading

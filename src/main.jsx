@@ -16,6 +16,7 @@ import { pink } from '@mui/material/colors';
 import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers"
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"
 import React from 'react';
+import { TitleProvider } from './providers/TitleProvider.jsx';
 
 
 const theme = createTheme({
@@ -50,6 +51,9 @@ const _providers = [
   {
     Provider: ThemeProvider,
     props: { theme: theme },
+  },
+  {
+    Provider: TitleProvider,
   },
   {
     Provider: ApiProvider,

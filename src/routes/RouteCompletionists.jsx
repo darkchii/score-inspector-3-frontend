@@ -17,6 +17,7 @@ import {
 } from 'chart.js';
 import PlayerLink from "../components/PlayerLink";
 import { getCompletionistBadge, TextureDatabase } from "../assets/textures/TextureDatabase";
+import { usePageTitle } from "../providers/TitleProvider";
 
 ChartJS.register(
     CategoryScale,
@@ -30,6 +31,7 @@ ChartJS.register(
 );
 
 function RouteCompletionists() {
+    usePageTitle("Completionists");
     const { getCompletionists } = useApi();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
