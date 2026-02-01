@@ -78,8 +78,13 @@ export function ApiProvider({ children }) {
         return response;
     }
 
+    const getGlobalStats = async(progressEvent = null) => {
+        const response = await apiGet(`stats/global-stats`, progressEvent);
+        return response;
+    }
+
     return (
-        <ApiContext.Provider value={{ getUserLive, getScoresLive, getBeatmapsLive, getBeatmapPacks, getCompletionists, getUserSearch, getLeaderboard, getTodayTopPlayers }}>
+        <ApiContext.Provider value={{ getUserLive, getScoresLive, getBeatmapsLive, getBeatmapPacks, getCompletionists, getUserSearch, getLeaderboard, getTodayTopPlayers, getGlobalStats }}>
             {children}
         </ApiContext.Provider>
     )

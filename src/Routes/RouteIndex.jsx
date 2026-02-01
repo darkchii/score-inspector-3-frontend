@@ -1,21 +1,24 @@
 import IndexTopPlayers from "../components/index/IndexTopPlayers";
-import { Grid } from "@mui/material";
+import { Grid, Stack } from "@mui/material";
 import { usePageTitle } from "../providers/TitleProvider";
+import IndexLanding from "../components/index/IndexLanding";
 
 function RouteIndex() {
     usePageTitle(null); //reset to default title
 
     return (<>
         {/* <IndexTopPlayers /> */}
-        <Grid container spacing={2} sx={{
-            padding: 2,
-            width: '100%',
-            boxSizing: 'border-box',
-        }}>
-            <Grid item size={{ xs: 12, md: 8 }}>
-                <IndexTopPlayers />
+        <Stack spacing={1} sx={{ width: '100%', boxSizing: 'border-box', padding: 1 }}>
+            <IndexLanding />
+            <Grid container spacing={2} sx={{
+                width: '100%',
+                boxSizing: 'border-box',
+            }}>
+                <Grid item size={{ xs: 12, md: 9 }}>
+                    <IndexTopPlayers />
+                </Grid>
             </Grid>
-        </Grid>
+        </Stack>
     </>)
 }
 
