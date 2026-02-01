@@ -2,6 +2,13 @@ import { Avatar, Box, Typography, useTheme } from "@mui/material";
 import { cloneElement, useEffect, useState } from "react";
 import { useAuth } from "../providers/AuthProvider";
 import { useNavigate } from "react-router";
+import BetterTooltip from "./tooltips/BetterTooltip";
+import * as Muicon from "@mui/icons-material";
+
+function GetRoleIcon({ role, size = 16 }) {
+    const Icon = Muicon[role.icon ?? 'QuestionMark'];
+    return <Icon sx={{ color: `${role.color}`, fontSize: size }} />;
+}
 
 function PlayerLink({ data, size = 24 }) {
     const theme = useTheme();
@@ -9,6 +16,7 @@ function PlayerLink({ data, size = 24 }) {
     const [username, setUsername] = useState(null);
     const [id, setId] = useState(null);
     const [team, setTeam] = useState(null);
+    const [roles, setRoles] = useState([]);
     const [isSelf, setIsSelf] = useState(false);
     const [isValid, setIsValid] = useState(true);
     const navigate = useNavigate();
@@ -41,6 +49,10 @@ function PlayerLink({ data, size = 24 }) {
             team_data = data.team;
         }
         setTeam(team_data);
+
+        if (data.roles) {
+            setRoles(data.roles);
+        }
     }, [data]);
 
     return (
@@ -84,6 +96,29 @@ function PlayerLink({ data, size = 24 }) {
                 }
                 {username}
             </Typography>
+            {
+                roles?.length > 0 && roles.map((role, index) => (
+                    <BetterTooltip title={role.title}>
+                        <Avatar
+                            key={index}
+                            sx={{
+                                width: size * 0.9,
+                                height: size * 0.9,
+                                ml: 0.3,
+                                display: 'inline-flex',
+                                bgcolor: 'transparent',
+                            }}>
+                            <Box sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}>
+                                <GetRoleIcon role={role} size={size * 0.9} />
+                            </Box>
+                        </Avatar>
+                    </BetterTooltip>
+                ))
+            }
         </Box>
     )
 }
