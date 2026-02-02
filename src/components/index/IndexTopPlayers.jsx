@@ -92,7 +92,11 @@ function IndexTopPlayers() {
                                     <Grid container>
                                         {
                                             Object.keys(selectedDataSet).map((key) => (
-                                                <Grid size={{ xs: 12 / Object.keys(selectedDataSet).length }} item key={`topplayers_grid_${key}`} sx={{ padding: 1 }}>
+                                                <Grid size={{ 
+                                                    xs: 12,
+                                                    md: 6,
+                                                    lg: 12 / Object.keys(selectedDataSet).length,
+                                                    }} item key={`topplayers_grid_${key}`} sx={{ padding: 1 }}>
                                                     <Paper key={`topplayers_${key}`} elevation={1} sx={{ padding: 1, marginBottom: 2 }}>
                                                         <Typography variant="subtitle2" gutterBottom>
                                                             {key.replace(/_/g, ' ').toUpperCase()}

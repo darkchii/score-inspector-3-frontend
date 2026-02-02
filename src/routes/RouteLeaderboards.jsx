@@ -127,10 +127,10 @@ function RouteLeaderboards() {
     const [statistic, setStatistic] = useState(params.statistic || Object.keys(LEADERBOARDS)[0]);
     const [page, setPage] = useState(params.page || 1);
     const [leaderboardResults, setLeaderboardResults] = useState(null);
-    
+
     const [error, setError] = useState(null);
     const [isWorking, setIsWorking] = useState(false);
-    
+
     useEffect(() => {
         setStatistic(params.statistic || Object.keys(LEADERBOARDS)[0]);
         setPage(params.page || 1);
@@ -233,7 +233,14 @@ function RouteLeaderboards() {
                     }
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <Box sx={{ minWidth: '50vw', mt: 2 }}>
+                    <Box sx={{
+                        minWidth: '50vw',
+                        mt: 2,
+                        //minWidth 100% on small screens
+                        '@media (max-width: 600px)': {
+                            minWidth: '100vw',
+                        },
+                    }}>
 
                         {
                             error ? (
