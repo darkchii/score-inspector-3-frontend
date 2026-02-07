@@ -50,7 +50,7 @@ const FILTER_OPTIONS = [
     { value: "attr_diff.aim_difficulty", label: "Aim Diff", type: "range", min: 0, max: 10, steps: 0.1, rulesets: ['osu'], description: "Only applicable for osu! mode" },
     { value: "attr_diff.speed_difficulty", label: "Speed Diff", type: "range", min: 0, max: 10, steps: 0.1, rulesets: ['osu'], description: "Only applicable for osu! mode" },
     { value: "attr_diff.rhythm_difficulty", label: "Rhythm Diff", type: "range", min: 0, max: 10, steps: 0.1, rulesets: ['taiko'], description: "Only applicable for Taiko mode" },
-    { value: "mods", label: "Mods", type: "mods" },
+    { value: "mods", label: "Mods", type: "mods", description: "Filters to scores that contain all selected mods" },
 ]
 
 const FilterScores = (scores, filter, order, direction) => {
