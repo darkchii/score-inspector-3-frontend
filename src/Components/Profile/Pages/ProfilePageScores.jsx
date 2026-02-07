@@ -3,6 +3,7 @@ import { useProfile } from "../../../providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import ItemList from "../../list/ItemList";
 import ScoreListRow from "../../list/ScoreListRow";
+import ScoreFilter from "../../ScoreFilter";
 
 const _scoresPerPage = 50;
 
@@ -14,18 +15,12 @@ function ProfilePageScores() {
 
     const applyFilteredScores = (filteredScores) => {
         setScoreCount(filteredScores.length);
-        console.log("Filtered scores count:", filteredScores.length);
-
-        //temporary: sort by .implied_pp desc
-        filteredScores.sort((a, b) => b.implied_pp - a.implied_pp);
-
-        //generate all page arrays
         const pages = [];
         for (let i = 0; i < filteredScores.length; i += _scoresPerPage) {
             pages.push(filteredScores.slice(i, i + _scoresPerPage));
         }
         setDisplayedScoreDatabase(pages);
-        setPage(0); //reset to first page on filter change
+        setPage(0);
     }
 
     useEffect(() => {
@@ -35,14 +30,14 @@ function ProfilePageScores() {
     return (
         <Box sx={{ padding: 2 }}>
             <Grid container spacing={2}>
-                {/* <Grid size={{ xs: 12, md: 2.5 }}>
+                <Grid size={{ xs: 12, md: 2.5 }}>
                     <ScoreFilter
                         data={getRulesetStatistics(activeRuleset)?.scores_set.scores || []}
                         onFiltered={applyFilteredScores}
                         currentRuleset={activeRuleset}
                     />
-                </Grid> */}
-                <Grid size={{ xs: 12, md: 12 }}>
+                </Grid>
+                <Grid size={{ xs: 12, md: 9.5 }}>
                     {
                         displayedScoreDatabase.length === 0 ?
                             <Typography variant="h6" sx={{ mt: 4 }}>
@@ -56,9 +51,6 @@ function ProfilePageScores() {
                                     onChange={(_, value) => setPage(value - 1)}
                                     sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}
                                 />
-                                <Alert severity="info" sx={{ mb: 2 }}>
-                                    Filtering and sorting will be added in the future.
-                                </Alert>
                                 <ItemList 
                                     showIndex 
                                     startIndex={page * _scoresPerPage} 

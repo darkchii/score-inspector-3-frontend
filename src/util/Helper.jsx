@@ -462,6 +462,9 @@ export function GetIconFromLabel(label) {
 
 //like keyPath = ['beatmap', 'difficulty_data', 'star_rating']
 export function GetNestedValue(obj, keyPath) {
+    if (typeof keyPath === 'string') {
+        keyPath = keyPath.split('.');
+    }
     return keyPath.reduce((accumulator, currentKey) => {
         return accumulator ? accumulator[currentKey] : null;
     }, obj);

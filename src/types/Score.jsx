@@ -110,6 +110,26 @@ class Score {
         this.mod_acronyms = Array.isArray(api_data.mod_acronyms) ? api_data.mod_acronyms : [];
         this.mod_speed_change = api_data.mod_speed_change ? Number(api_data.mod_speed_change) : null;
 
+        if(this.mod_speed_change === null){
+            //set it based on mods
+            const speedMod = this.mods.find(mod => mod.acronym === 'DT' || mod.acronym === 'HT' || mod.acronym === 'NC');
+            if(speedMod){
+                //check if theres a setting set
+                if(speedMod.settings && speedMod.settings.speed_change){
+                    this.mod_speed_change = Number(speedMod.settings.speed_change);
+                } else {
+                    //default values
+                    if(speedMod.acronym === 'DT' || speedMod.acronym === 'NC'){
+                        this.mod_speed_change = 1.5;
+                    } else if(speedMod.acronym === 'HT'){
+                        this.mod_speed_change = 0.75;
+                    }
+                }
+            } else {
+                this.mod_speed_change = 1.0;
+            }
+        }
+
         this.using_classic_slider_accuracy = this.mods.some(mod => mod.acronym === 'CL' && (mod.settings?.using_classic_slider_accuracy === true || mod.settings?.using_classic_slider_accuracy === undefined));
 
         this.difficulty_reducing = Boolean(api_data.difficulty_reducing);
