@@ -53,6 +53,12 @@ function ProfilePageScores() {
                                     items={displayedScoreDatabase[page] || []}
                                     ItemListRowType={ScoreListRow}
                                 />
+                                <Pagination
+                                    count={Math.ceil(scoreCount / _scoresPerPage)}
+                                    page={page + 1}
+                                    onChange={(_, value) => setPage(value - 1)}
+                                    sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}
+                                />
                             </Box>
                     }
                 </Grid>

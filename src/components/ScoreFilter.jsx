@@ -1,6 +1,8 @@
 import { Alert, Autocomplete, Box, Button, Grid, IconButton, MenuItem, Paper, Select, Slider, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
 import { FormatNumber, GetNestedValue } from "../util/Helper";
+import ModData from "../data/Mods.json";
+import Mod from "./Mod";
 
 const ORDER_OPTIONS = [
     { value: "implied_pp", label: "PP" },
@@ -10,6 +12,7 @@ const ORDER_OPTIONS = [
     { value: "combo", label: "Combo" },
     { value: "star_rating", label: "Stars" },
     { value: "duration", label: "Length" },
+    { value: "grade", label: "Grade" }, //special case
     { value: "local_beatmap.bpm_modded", label: "BPM" },
     { value: "attr_diff.aim_difficulty", label: "Aim Diff" },
     { value: "attr_diff.speed_difficulty", label: "Speed Diff" },
@@ -47,6 +50,7 @@ const FILTER_OPTIONS = [
     { value: "attr_diff.aim_difficulty", label: "Aim Diff", type: "range", min: 0, max: 10, steps: 0.1, rulesets: ['osu'], description: "Only applicable for osu! mode" },
     { value: "attr_diff.speed_difficulty", label: "Speed Diff", type: "range", min: 0, max: 10, steps: 0.1, rulesets: ['osu'], description: "Only applicable for osu! mode" },
     { value: "attr_diff.rhythm_difficulty", label: "Rhythm Diff", type: "range", min: 0, max: 10, steps: 0.1, rulesets: ['taiko'], description: "Only applicable for Taiko mode" },
+    { value: "mods", label: "Mods", type: "mods" },
 ]
 
 const FilterScores = (scores, filter, order, direction) => {
@@ -84,6 +88,11 @@ const FilterScores = (scores, filter, order, direction) => {
                     return scoreValue && scoreValue.toLowerCase().includes(value.toLowerCase());
                 });
                 break;
+            case 'mods':
+                sortedScores = sortedScores.filter(score => {
+                    const scoreMods = score.mods ? score.mods.map(mod => mod.acronym) : [];
+                    return value.every(mod => scoreMods.includes(mod.Acronym));
+                });
             default:
                 console.warn("Unsupported filter operator:", operator);
         }
@@ -91,15 +100,25 @@ const FilterScores = (scores, filter, order, direction) => {
 
     // Sorting
     if (order && order.value) {
-        console.log("Sorting by", order.value, "in", direction, "order");
-        sortedScores.sort((a, b) => {
-            const aValue = GetNestedValue(a, order.value);
-            const bValue = GetNestedValue(b, order.value);
-            if (aValue < bValue) return direction === "asc" ? -1 : 1;
-            if (aValue > bValue) return direction === "asc" ? 1 : -1;
-            return 0;
+        if (order.value === "grade") {
+            const gradeOrder = { "XH": 7, "X": 6, "SH": 5, "S": 4, "A": 3, "B": 2, "C": 1, "D": 0 };
+            sortedScores.sort((a, b) => {
+                const aValue = gradeOrder[GetNestedValue(a, order.value)] || 0;
+                const bValue = gradeOrder[GetNestedValue(b, order.value)] || 0;
+                if (aValue < bValue) return direction === "asc" ? -1 : 1;
+                if (aValue > bValue) return direction === "asc" ? 1 : -1;
+                return 0;
+            });
+        } else {
+            sortedScores.sort((a, b) => {
+                const aValue = GetNestedValue(a, order.value);
+                const bValue = GetNestedValue(b, order.value);
+                if (aValue < bValue) return direction === "asc" ? -1 : 1;
+                if (aValue > bValue) return direction === "asc" ? 1 : -1;
+                return 0;
+            }
+            );
         }
-        );
     }
     return sortedScores;
 }
@@ -119,10 +138,10 @@ function ScoreFilter({ data, onFiltered, currentRuleset }) {
         const clonedFilterOptions = FILTER_OPTIONS.map(option => ({ ...option }));
         for (const option of clonedFilterOptions) {
             const values = data.map(score => GetNestedValue(score, option.value));
-            if(option.type === "date_range") {
+            if (option.type === "date_range") {
                 option.min = values.length > 0 ? Math.min(...values) : 0;
                 option.max = values.length > 0 ? Math.max(...values) : Date.now();
-            }else{
+            } else {
                 option.max = Math.ceil(Math.max(...values));
             }
         }
@@ -138,68 +157,83 @@ function ScoreFilter({ data, onFiltered, currentRuleset }) {
             <Typography variant="h6" sx={{ mb: 2 }}>
                 Score Filter
             </Typography>
-            {/* Sorting section (value + order) */}
-            <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                Sort By
-            </Typography>
-            <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
-                <Select
-                    fullWidth
-                    value={sort?.value || ""}
-                    onChange={(e) => setSort(ORDER_OPTIONS.find(o => o.value === e.target.value))}
-                    displayEmpty
-                    size="small"
-                >
-                    <MenuItem value="">None</MenuItem>
-                    {ORDER_OPTIONS.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                        </MenuItem>
-                    ))}
-                </Select>
-                <ToggleButtonGroup
-                    value={direction}
-                    exclusive
-                    onChange={(_, newDirection) => setDirection(newDirection)}
-                    disabled={!sort.value}
-                    size="small"
-                >
-                    <ToggleButton value="asc">Asc</ToggleButton>
-                    <ToggleButton value="desc">Desc</ToggleButton>
-                </ToggleButtonGroup>
-            </Stack>
 
-            {/* FILTERING SECTION */}
-            <Stack spacing={1} sx={{ mb: 3 }}>
-                {filterSet && filterSet.map((option) => (
-                    <Box sx={{ width: '100%' }} key={option.value}>
-                        <Box key={option.value} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography sx={{ minWidth: 80 }}>{option.label}</Typography>
+            {/* APPLY FILTER BUTTON */}
+            <Button variant="contained" onClick={() => onFiltered(applyFilter())} fullWidth>
+                Apply
+            </Button>
 
-                            {(option.type === "range" || option.type === "date_range") && (
-                                //disabled if currentRuleset is not in option.rulesets (if it exists) and currentRuleset is not 'all'
-                                <FilterSlider disabled={
-                                    option.rulesets && !option.rulesets.includes(currentRuleset) && currentRuleset !== 'all'
-                                } filter={filter} setFilter={setFilter} option={option} date={option.type === "date_range"} />
+            <Stack spacing={1} sx={{ my: 3 }}>
+                {/* Sorting section (value + order) */}
+                <Box key={sort?.value || ""} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography sx={{ minWidth: 80 }}>Sort By</Typography>
+                    <Select
+                        fullWidth
+                        value={sort?.value || ""}
+                        onChange={(e) => setSort(ORDER_OPTIONS.find(o => o.value === e.target.value))}
+                        displayEmpty
+                        size="small"
+                    >
+                        <MenuItem value="">None</MenuItem>
+                        {ORDER_OPTIONS.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <ToggleButtonGroup
+                        value={direction}
+                        exclusive
+                        onChange={(_, newDirection) => setDirection(newDirection)}
+                        disabled={!sort.value}
+                        size="small"
+                    >
+                        <ToggleButton value="asc">Asc</ToggleButton>
+                        <ToggleButton value="desc">Desc</ToggleButton>
+                    </ToggleButtonGroup>
+                </Box>
+
+                {/* FILTERING SECTION */}
+                {filterSet && filterSet.map((option) => {
+                    //dont render if not valid for current ruleset
+                    if (option.rulesets && !option.rulesets.includes(currentRuleset) && currentRuleset !== 'all') {
+                        return null;
+                    }
+                    return (
+                        <Box sx={{ width: '100%' }} key={option.value}>
+                            <Box key={option.value} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Typography sx={{ minWidth: 80 }}>{option.label}</Typography>
+
+                                {(option.type === "range" || option.type === "date_range") && (
+                                    //disabled if currentRuleset is not in option.rulesets (if it exists) and currentRuleset is not 'all'
+                                    <FilterSlider disabled={
+                                        option.rulesets && !option.rulesets.includes(currentRuleset) && currentRuleset !== 'all'
+                                    } filter={filter} setFilter={setFilter} option={option} date={option.type === "date_range"} />
+                                )}
+
+                                {option.type === "boolean" && (
+                                    <FilterBoolean disabled={option.rulesets && !option.rulesets.includes(currentRuleset) && currentRuleset !== 'all'} filter={filter} setFilter={setFilter} option={option} />
+                                )}
+
+                                {option.type === "text" && (
+                                    <FilterText disabled={option.rulesets && !option.rulesets.includes(currentRuleset) && currentRuleset !== 'all'} filter={filter} setFilter={setFilter} option={option} />
+                                )}
+                            </Box>
+                            {option.type === "mods" && (
+                                <Box sx={{ mt: 1, width: '100%' }}>
+                                    <FilterMods filter={filter} setFilter={setFilter} option={option} currentRuleset={currentRuleset} />
+                                </Box>
                             )}
-
-                            {option.type === "boolean" && (
-                                <FilterBoolean disabled={option.rulesets && !option.rulesets.includes(currentRuleset) && currentRuleset !== 'all'} filter={filter} setFilter={setFilter} option={option} />
-                            )}
-
-                            {option.type === "text" && (
-                                <FilterText disabled={option.rulesets && !option.rulesets.includes(currentRuleset) && currentRuleset !== 'all'} filter={filter} setFilter={setFilter} option={option} />
-                            )}
+                            {
+                                option.description && (
+                                    <Typography variant="caption" color="text.secondary">
+                                        {option.description}
+                                    </Typography>
+                                )
+                            }
                         </Box>
-                        {
-                            option.description && (
-                                <Typography variant="caption" color="text.secondary">
-                                    {option.description}
-                                </Typography>
-                            )
-                        }
-                    </Box>
-                ))}
+                    )
+                })}
             </Stack>
 
             {/* APPLY FILTER BUTTON */}
@@ -226,13 +260,13 @@ function FilterSlider({ filter, setFilter, option, disabled, date }) {
     }
 
     return (
-        <Box sx={{ 
+        <Box sx={{
             width: '100%',
             //reduce spacing between slider and labels
             '& .MuiSlider-root': {
                 marginBottom: 0,
             },
-            }}>
+        }}>
             <Slider
                 value={value}
                 onChange={handleChange}
@@ -284,7 +318,7 @@ function FilterText({ filter, setFilter, option, disabled }) {
             [option.value]: { operator: 'text', value: e.target.value }
         }));
     }
-    
+
     return (
         <TextField
             fullWidth
@@ -293,6 +327,64 @@ function FilterText({ filter, setFilter, option, disabled }) {
             size="small"
             placeholder={`Filter by ${option.label}`}
             disabled={disabled}
+        />
+    );
+}
+
+function FilterMods({ filter, setFilter, option, currentRuleset }) {
+    const [allMods, setAllMods] = useState([]);
+
+    useEffect(() => {
+        let rulesets = [0, 1, 2, 3];
+        if (currentRuleset !== 'all') {
+            const rulesetId = { osu: 0, taiko: 1, fruits: 2, mania: 3 }[currentRuleset];
+            rulesets = [rulesetId];
+        }
+        //combine all mods from all rulesets and remove duplicates
+        const modsSet = {};
+        for (const ruleset of rulesets) {
+            for (const mod of ModData[ruleset].Mods) {
+                modsSet[mod.Acronym] = mod;
+            }
+        }
+        setAllMods(Object.values(modsSet));
+    }, [currentRuleset]);
+
+    const handleChange = (e, newValue) => {
+        setFilter(prev => ({
+            ...prev,
+            [option.value]: { operator: 'mods', value: newValue }
+        }));
+    }
+
+    return (
+        <Autocomplete
+            multiple
+            options={allMods}
+            getOptionLabel={(mod) => mod.Name}
+            value={filter[option.value]?.value || []}
+            onChange={handleChange}
+            renderInput={(params) => <TextField {...params} size="small" placeholder="Filter by Mods" />}
+            //show both Acronym and Name in options
+            renderOption={(props, mod) => (
+                <li {...props} key={mod.Acronym}>
+                    {/* {mod.Acronym} - {mod.Name} */}
+                    <Mod data={mod} />
+                    {mod.Name}
+                </li>
+            )}
+            //show only mod icons in selected value
+            renderTags={(value, getTagProps) =>
+                value.map((mod, index) => (
+                    <Box key={mod.Acronym} {...getTagProps({ index })}>
+                        <Mod data={mod} />
+                    </Box>
+                ))
+            }
+            disableCloseOnSelect
+            sx={{
+                width: '100%',
+            }}
         />
     );
 }
