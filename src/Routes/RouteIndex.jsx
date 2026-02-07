@@ -3,6 +3,7 @@ import { Grid, Stack } from "@mui/material";
 import { usePageTitle } from "../providers/TitleProvider";
 import IndexLanding from "../components/index/IndexLanding";
 import IndexScoreSubmissions from "../components/index/IndexScoreSubmissions";
+import IndexDiscordWidget from "../components/index/IndexDiscordWidget";
 
 function RouteIndex() {
     usePageTitle(null); //reset to default title
@@ -10,15 +11,20 @@ function RouteIndex() {
     return (<>
         {/* <IndexTopPlayers /> */}
         <Stack spacing={1} sx={{ width: '100%', boxSizing: 'border-box', padding: 1 }}>
-            <IndexLanding />
             <Grid container spacing={2} sx={{
                 width: '100%',
                 boxSizing: 'border-box',
             }}>
                 <Grid item size={{ xs: 12, md: 9 }}>
                     <Stack spacing={1}>
+                        <IndexLanding />
                         <IndexTopPlayers />
                         <IndexScoreSubmissions />
+                    </Stack>
+                </Grid>
+                <Grid item size={{ xs: 12, md: 3 }}>
+                    <Stack spacing={1}>
+                        <IndexDiscordWidget />
                     </Stack>
                 </Grid>
             </Grid>
