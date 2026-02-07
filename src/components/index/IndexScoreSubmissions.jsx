@@ -51,11 +51,10 @@ const STAT_TYPES = [
     { label: 'Total Score', value: 'total_score_sum' },
 ]
 
-function IndexScoreSubmissions() {
+function IndexScoreSubmissions({ activeRuleset, setActiveRuleset }) {
     const theme = useTheme();
     const { getScoreSubmissions } = useApi();
     const [isWorking, setIsWorking] = useState(false);
-    const [selectedRuleset, setSelectedRuleset] = useState("osu");
     const [rawData, setRawData] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
 
@@ -76,7 +75,7 @@ function IndexScoreSubmissions() {
         setError(null);
         setRawData(null);
         try {
-            const data = await getScoreSubmissions(selectedRuleset);
+            const data = await getScoreSubmissions(activeRuleset);
             setRawData(data);
             if (data && data.last_updated) {
                 setLastUpdated(new Date(data.last_updated));
@@ -225,7 +224,7 @@ function IndexScoreSubmissions() {
 
     useEffect(() => {
         updateData();
-    }, [selectedRuleset])
+    }, [activeRuleset])
 
     return (
         <Paper elevation={3} sx={{ padding: 1, width: '100%' }}>
@@ -236,8 +235,8 @@ function IndexScoreSubmissions() {
                 <Fade in={!isWorking} unmountOnExit>
                     <Box>
                         <RulesetSelector
-                            activeRuleset={selectedRuleset}
-                            onChange={setSelectedRuleset}
+                            activeRuleset={activeRuleset}
+                            onChange={setActiveRuleset}
                             showCombined={false}
                             disabled={isWorking || isTransitioningDataSet}
                         />

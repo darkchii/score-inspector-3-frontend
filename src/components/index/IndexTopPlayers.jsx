@@ -5,7 +5,7 @@ import RulesetSelector from "../RulesetSelector";
 import { GetRulesetId } from "../../util/Helper";
 import PlayerLink from "../PlayerLink";
 
-function IndexTopPlayers() {
+function IndexTopPlayers({ activeRuleset, setActiveRuleset }) {
     const theme = useTheme();
     const { getTodayTopPlayers } = useApi();
     const [isWorking, setIsWorking] = useState(false);
@@ -13,7 +13,6 @@ function IndexTopPlayers() {
     const [error, setError] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
 
-    const [selectedRuleset, setSelectedRuleset] = useState("osu");
     const [selectedPeriod, setSelectedPeriod] = useState("today");
 
     const [selectedDataSet, setSelectedDataSet] = useState(null);
@@ -24,7 +23,7 @@ function IndexTopPlayers() {
         setIsTransitioningDataSet(true);
         setTimeout(() => {
             if (rawData && rawData.data) {
-                setSelectedDataSet(rawData.data[selectedPeriod][`${GetRulesetId(selectedRuleset)}`] || null);
+                setSelectedDataSet(rawData.data[selectedPeriod][`${GetRulesetId(activeRuleset)}`] || null);
             }
             setIsTransitioningDataSet(false);
         }, 300);
@@ -56,7 +55,7 @@ function IndexTopPlayers() {
         if (rawData && rawData.data) {
             applyDataSet();
         }
-    }, [selectedRuleset, selectedPeriod, rawData]);
+    }, [activeRuleset, selectedPeriod, rawData]);
 
     return (
         <Paper elevation={3} sx={{ padding: 1, width: '100%' }}>
@@ -68,8 +67,8 @@ function IndexTopPlayers() {
                 <Fade in={!isWorking} unmountOnExit>
                     <Box>
                         <RulesetSelector
-                            activeRuleset={selectedRuleset}
-                            onChange={setSelectedRuleset}
+                            activeRuleset={activeRuleset}
+                            onChange={setActiveRuleset}
                             showCombined={false}
                             disabled={isWorking || isTransitioningDataSet}
                         />
