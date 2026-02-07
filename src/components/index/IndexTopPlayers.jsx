@@ -144,8 +144,8 @@ function IndexTopPlayers() {
                                 )
                             }
                         </Fade>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', }} >
-                            <Typography variant="body2">Last Updated: {lastUpdated ? lastUpdated.toLocaleString() : "N/A"}</Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 1 }} >
+                            <Typography variant="body2">Last Updated: {lastUpdated ? lastUpdated.toLocaleString() : "N/A"} <span style={{ color: 'gray', fontSize: '0.8em' }}>(Grey numbers are the total amounts, including overridden scores)</span></Typography>
                             <ButtonGroup sx={{ mt: 1, mb: 1 }}>
                                 <Button
                                     variant={selectedPeriod === "yesterday" ? "contained" : "outlined"}

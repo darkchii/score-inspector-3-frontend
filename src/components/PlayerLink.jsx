@@ -56,7 +56,6 @@ function PlayerLink({ data, size = 24 }) {
     }, [data]);
 
     return (
-        //chip but our own elements
         <Box
             onClick={() => {
                 if (id) {
