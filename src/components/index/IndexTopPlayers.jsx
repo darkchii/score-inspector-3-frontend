@@ -84,7 +84,7 @@ function IndexTopPlayers() {
                 {!rawData || Object.keys(rawData).length === 0 ? (
                     <Typography variant="body2">No data available.</Typography>
                 ) : (
-                    <Box mt={2}>
+                    <Box>
                         <Fade in={!isTransitioningDataSet}>
                             {
                                 (selectedDataSet && Object.keys(selectedDataSet).length > 0) ? (
@@ -92,12 +92,12 @@ function IndexTopPlayers() {
                                     <Grid container>
                                         {
                                             Object.keys(selectedDataSet).map((key) => (
-                                                <Grid size={{ 
+                                                <Grid size={{
                                                     xs: 12,
                                                     md: 6,
                                                     lg: 12 / Object.keys(selectedDataSet).length,
-                                                    }} item key={`topplayers_grid_${key}`} sx={{ padding: 1 }}>
-                                                    <Paper key={`topplayers_${key}`} elevation={1} sx={{ padding: 1, marginBottom: 2 }}>
+                                                }} item key={`topplayers_grid_${key}`} sx={{ padding: 0.5 }}>
+                                                    <Paper key={`topplayers_${key}`} elevation={1} sx={{ padding: 0.5, marginBottom: 2 }}>
                                                         <Typography variant="subtitle2" gutterBottom>
                                                             {key.replace(/_/g, ' ').toUpperCase()}
                                                         </Typography>
