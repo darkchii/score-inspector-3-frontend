@@ -24,7 +24,10 @@ function ProfilePageScores() {
     }
 
     useEffect(() => {
-        applyFilteredScores(getRulesetStatistics(activeRuleset)?.scores_set.scores || []);
+        const _scores = getRulesetStatistics(activeRuleset)?.scores_set.scores || [];
+        //default sort by implied_pp desc
+        _scores.sort((a, b) => b.implied_pp - a.implied_pp);
+        applyFilteredScores(_scores);
     }, [activeRuleset]);
 
     return (
@@ -44,21 +47,23 @@ function ProfilePageScores() {
                                     onChange={(_, value) => setPage(value - 1)}
                                     sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}
                                 />
-                                <ItemList 
-                                    showIndex 
-                                    startIndex={page * _scoresPerPage} 
-                                    items={displayedScoreDatabase[page] || []} 
+                                <ItemList
+                                    showIndex
+                                    startIndex={page * _scoresPerPage}
+                                    items={displayedScoreDatabase[page] || []}
                                     ItemListRowType={ScoreListRow}
                                 />
                             </Box>
                     }
                 </Grid>
                 <Grid size={{ xs: 12, md: 2.5 }}>
-                    <ScoreFilter
-                        data={getRulesetStatistics(activeRuleset)?.scores_set.scores || []}
-                        onFiltered={applyFilteredScores}
-                        currentRuleset={activeRuleset}
-                    />
+                    <Box sx={{ width: '100%', pr: 1 }}>
+                        <ScoreFilter
+                            data={getRulesetStatistics(activeRuleset)?.scores_set.scores || []}
+                            onFiltered={applyFilteredScores}
+                            currentRuleset={activeRuleset}
+                        />
+                    </Box>
                 </Grid>
             </Grid>
         </Box>

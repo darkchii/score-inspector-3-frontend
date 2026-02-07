@@ -127,7 +127,7 @@ function ScoreFilter({ data, onFiltered, currentRuleset }) {
             }
         }
         setFilterSet(clonedFilterOptions);
-    }, [currentRuleset]);
+    }, [data]);
 
     const applyFilter = () => {
         return FilterScores(data, filter, sort, direction);
