@@ -30,13 +30,6 @@ function ProfilePageScores() {
     return (
         <Box sx={{ padding: 2 }}>
             <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 2.5 }}>
-                    <ScoreFilter
-                        data={getRulesetStatistics(activeRuleset)?.scores_set.scores || []}
-                        onFiltered={applyFilteredScores}
-                        currentRuleset={activeRuleset}
-                    />
-                </Grid>
                 <Grid size={{ xs: 12, md: 9.5 }}>
                     {
                         displayedScoreDatabase.length === 0 ?
@@ -59,6 +52,13 @@ function ProfilePageScores() {
                                 />
                             </Box>
                     }
+                </Grid>
+                <Grid size={{ xs: 12, md: 2.5 }}>
+                    <ScoreFilter
+                        data={getRulesetStatistics(activeRuleset)?.scores_set.scores || []}
+                        onFiltered={applyFilteredScores}
+                        currentRuleset={activeRuleset}
+                    />
                 </Grid>
             </Grid>
         </Box>
