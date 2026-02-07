@@ -65,7 +65,7 @@ function IndexScoreSubmissions({ activeRuleset, setActiveRuleset }) {
     const [selectedDataSet, setSelectedDataSet] = useState(null);
 
     const [selectedPeriodType, setSelectedPeriodType] = useState('months');
-    const [selectedPeriodValue, setSelectedPeriodValue] = useState(6);
+    const [selectedPeriodValue, setSelectedPeriodValue] = useState(-1);
     const [selectedStatType, setSelectedStatType] = useState('total_scores');
     const [isCumulative, setIsCumulative] = useState(false);
     const [cumulativeIncludingOutOfRange, setCumulativeIncludingOutOfRange] = useState(false);
@@ -217,8 +217,8 @@ function IndexScoreSubmissions({ activeRuleset, setActiveRuleset }) {
     }, [rawData, selectedPeriodType, selectedPeriodValue, selectedStatType, isCumulative, cumulativeIncludingOutOfRange]);
 
     useEffect(() => {
-        //default to the first value of the current period type
-        const defaultValue = CHART_TYPES[selectedPeriodType][0].value;
+        //default to the first value of the current period type (or -1 if that value exists)
+        const defaultValue = CHART_TYPES[selectedPeriodType].find((option) => option.value === -1)?.value || CHART_TYPES[selectedPeriodType][0].value;
         setSelectedPeriodValue(defaultValue);
     }, [selectedPeriodType])
 
@@ -323,7 +323,7 @@ function IndexScoreSubmissions({ activeRuleset, setActiveRuleset }) {
                                 <Typography variant="body2">No data available for the selected options.</Typography>
                         }
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 1 }} >
-                            <Typography variant="body2">Last Updated: {lastUpdated ? lastUpdated.toLocaleString() : "N/A"}</Typography>
+                            <Typography variant="body2">Last updated: {lastUpdated ? lastUpdated.toLocaleString() : "N/A"}</Typography>
                         </Box>
                     </Box>
                 )}
