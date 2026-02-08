@@ -22,7 +22,7 @@ function LandingCard({ children, title, isLoading, isError, icon = null, color =
                     {title}
                 </Typography>
             }
-                avatar={<Avatar sx={{ bgcolor: color }}>{icon}</Avatar>}
+                avatar={<Avatar sx={{ bgcolor: color, width: 28, height: 28 }}>{icon}</Avatar>}
                 sx={{
                     height: "56px",
                     ".MuiCardHeader-avatar": {
@@ -32,6 +32,8 @@ function LandingCard({ children, title, isLoading, isError, icon = null, color =
                     ".MuiCardHeader-action": {
                         margin: 0,
                     },
+                    p: 1,
+                    m: 0
                 }}
             />
             <Divider />
@@ -40,7 +42,8 @@ function LandingCard({ children, title, isLoading, isError, icon = null, color =
                 justifyContent: centerContent ? "center" : "flex-start",
                 alignItems: centerContent ? "center" : "flex-start",
                 textAlign: centerContent ? "center" : "left",
-                height: centerContent ? "calc(100% - 56px)" : "auto",
+                p: 1,
+                height: centerContent ? "calc(100% - 50px)" : "auto",
             }}>
                 {isLoading ? (
                     <CircularProgress size={24} />
@@ -116,6 +119,7 @@ function IndexLanding() {
                             data: activeUsersData.map(entry => ({ x: entry.hour, y: entry.count })),
                             fill: true,
                             borderColor: theme.palette.primary.main, //primary color with some transparency
+                            pointRadius: 0,
                         }]
                     };
                     setDataActiveUsersChart(chartData);
@@ -144,57 +148,61 @@ function IndexLanding() {
                         <Grid container spacing={2} sx={{
                             flexGrow: 1,
                         }}>
-                            <Grid size={{ xs: 6, md: 3 }}>
-                                <LandingCard
-                                    title="Beatmaps"
-                                    isLoading={loading}
-                                    isError={isError}
-                                    icon={<ListIcon />}
-                                    color={red[500]}
-                                    sx={{ height: "100%" }}
-                                    centerContent
-                                >
-                                    <Typography variant="h6" component="div">{FormatNumber(numBeatmaps)}</Typography>
-                                </LandingCard>
-                            </Grid>
-                            <Grid size={{ xs: 6, md: 3 }}>
-                                <LandingCard
-                                    title="Scores"
-                                    isLoading={loading}
-                                    isError={isError}
-                                    icon={<GamesIcon />}
-                                    color={blue[500]}
-                                    sx={{ height: "100%" }}
-                                    centerContent
-                                >
-                                    <Typography variant="h6" component="div">{FormatNumber(numScores)}</Typography>
-                                </LandingCard>
-                            </Grid>
-                            <Grid size={{ xs: 6, md: 3 }}>
-                                <LandingCard
-                                    title="Users"
-                                    isLoading={loading}
-                                    isError={isError}
-                                    icon={<PersonIcon />}
-                                    color={green[500]}
-                                    sx={{ height: "100%" }}
-                                    centerContent
-                                >
-                                    <Typography variant="h6" component="div">{FormatNumber(numUsers)}</Typography>
-                                </LandingCard>
-                            </Grid>
-                            <Grid size={{ xs: 6, md: 3 }}>
-                                <LandingCard
-                                    title="Teams"
-                                    isLoading={loading}
-                                    isError={isError}
-                                    icon={<GroupsIcon />}
-                                    color={purple[500]}
-                                    sx={{ height: "100%" }}
-                                    centerContent
-                                >
-                                    <Typography variant="h6" component="div">{FormatNumber(numTeams)}</Typography>
-                                </LandingCard>
+                            <Grid size={{ xs: 12, md: 12 }}>
+                                <Grid container spacing={1} sx={{ height: '100%' }}>
+                                    <Grid size={{ xs: 6, md: 3 }}>
+                                        <LandingCard
+                                            title="Beatmaps"
+                                            isLoading={loading}
+                                            isError={isError}
+                                            icon={<ListIcon />}
+                                            color={red[500]}
+                                            centerContent
+                                            sx={{ height: '100%' }}
+                                        >
+                                            <Typography variant="h6" component="div">{FormatNumber(numBeatmaps)}</Typography>
+                                        </LandingCard>
+                                    </Grid>
+                                    <Grid size={{ xs: 6, md: 3 }}>
+                                        <LandingCard
+                                            title="Scores"
+                                            isLoading={loading}
+                                            isError={isError}
+                                            icon={<GamesIcon />}
+                                            color={blue[500]}
+                                            centerContent
+                                            sx={{ height: '100%' }}
+                                        >
+                                            <Typography variant="h6" component="div">{FormatNumber(numScores)}</Typography>
+                                        </LandingCard>
+                                    </Grid>
+                                    <Grid size={{ xs: 6, md: 3 }}>
+                                        <LandingCard
+                                            title="Users"
+                                            isLoading={loading}
+                                            isError={isError}
+                                            icon={<PersonIcon />}
+                                            color={green[500]}
+                                            centerContent
+                                            sx={{ height: '100%' }}
+                                        >
+                                            <Typography variant="h6" component="div">{FormatNumber(numUsers)}</Typography>
+                                        </LandingCard>
+                                    </Grid>
+                                    <Grid size={{ xs: 6, md: 3 }}>
+                                        <LandingCard
+                                            title="Teams"
+                                            isLoading={loading}
+                                            isError={isError}
+                                            icon={<GroupsIcon />}
+                                            color={purple[500]}
+                                            centerContent
+                                            sx={{ height: '100%' }}
+                                        >
+                                            <Typography variant="h6" component="div">{FormatNumber(numTeams)}</Typography>
+                                        </LandingCard>
+                                    </Grid>
+                                </Grid>
                             </Grid>
                         </Grid>
                     </Box>
@@ -209,11 +217,13 @@ function IndexLanding() {
                         sx={{
                             height: '100%',
                         }}
+                        centerContent
                     >
                         {dataActiveUsersChart ? (
                             //basically hide everything except the line. No labels, no axes, nothing. Just the line and a bit of padding
                             <Box sx={{
-                                height: '100px'
+                                height: '100px',
+                                width: '100%',
                             }}><Line
                                     data={dataActiveUsersChart}
                                     options={{
