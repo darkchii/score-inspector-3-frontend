@@ -52,6 +52,23 @@ function RouteCompletionists() {
                     return acc;
                 }, {});
 
+                for (const mode in groupedData) {
+                    groupedData[mode].sort((a, b) => new Date(a.completion_date) - new Date(b.completion_date));
+                }
+
+                //count days between each completionist and the previous one, add that as a field to each item
+                for (const mode in groupedData) {
+                    groupedData[mode] = groupedData[mode].map((item, index, arr) => {
+                        if (index === 0) {
+                            return { ...item, days_since_last: null };
+                        }
+                        const prevItem = arr[index - 1];
+                        const diffTime = Math.abs(new Date(item.completion_date) - new Date(prevItem.completion_date));
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        return { ...item, days_since_last: diffDays };
+                    });
+                }
+
                 //order each mode by completion_date
                 for (const mode in groupedData) {
                     groupedData[mode].sort((a, b) => new Date(b.completion_date) - new Date(a.completion_date));
@@ -331,23 +348,7 @@ function RouteCompletionists() {
                                                                                     fontSize: '0.75rem',
                                                                                 }}
                                                                             >
-                                                                                {
-                                                                                    (() => {
-                                                                                        const index = data[mode].indexOf(item);
-                                                                                        if (index === 0) {
-                                                                                            return '-';
-                                                                                        } else {
-                                                                                            const prevItem = data[mode][index - 1];
-                                                                                            const diffTime = Math.abs(new Date(item.completion_date) - new Date(prevItem.completion_date));
-                                                                                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                                                                                            if (diffDays === 0) {
-                                                                                                return '-';
-                                                                                            } else {
-                                                                                                return `+${diffDays}d`;
-                                                                                            }
-                                                                                        }
-                                                                                    })()
-                                                                                }
+                                                                                {item.days_since_last !== null && item.days_since_last !== 0 ? `+${item.days_since_last}d` : '-'}
                                                                             </Typography>
                                                                         </TableCell>
                                                                     </TableRow>
