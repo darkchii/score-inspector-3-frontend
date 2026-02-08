@@ -114,7 +114,7 @@ function PlayerCard({ data, onClick = null }) {
                                         >
                                             <span
                                                 className={playerCardStyles['player-card__role__icon']}
-                                                style={{color: `#${role.color}`}}
+                                                style={{color: `${role.color}`}}
                                             >
                                                 <BetterTooltip title={role.title}>
                                                     {GetIconFromLabel(role.icon) || role.title}
