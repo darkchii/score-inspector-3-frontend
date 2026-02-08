@@ -13,8 +13,7 @@ function RouteIndex() {
     const [activeRuleset, setActiveRuleset] = useState('osu');
 
     return (<>
-        {/* <IndexTopPlayers /> */}
-        <Stack spacing={1} sx={{ width: '100%', boxSizing: 'border-box', padding: 1 }}>
+        <Stack spacing={0} sx={{ width: '100%', boxSizing: 'border-box', padding: 1 }}>
             <Grid container spacing={2} sx={{
                 width: '100%',
                 boxSizing: 'border-box',

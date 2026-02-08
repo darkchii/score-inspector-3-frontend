@@ -313,7 +313,7 @@ function IndexScoreSubmissions({ activeRuleset, setActiveRuleset }) {
                                                 y: {
                                                     title: {
                                                         display: true,
-                                                        text: 'Value',
+                                                        text: STAT_TYPES.find((stat) => stat.value === selectedStatType)?.label || selectedStatType,
                                                     },
                                                 },
                                             },

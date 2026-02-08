@@ -224,6 +224,7 @@ function IndexLanding() {
                             <Box sx={{
                                 height: '100px',
                                 width: '100%',
+                                px: 1
                             }}><Line
                                     data={dataActiveUsersChart}
                                     options={{
