@@ -14,6 +14,7 @@ import { useSearch } from "../providers/SearchProvider";
 import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import GroupsIcon from '@mui/icons-material/Groups';
 import InfoIcon from '@mui/icons-material/Info';
+import HeaderUser from "./header/HeaderUser";
 
 const HeaderButtonMenu = styled((props) => (
     <Menu
@@ -59,8 +60,6 @@ const HeaderButtonMenu = styled((props) => (
 }));
 
 function Header() {
-    const [showMenu, setShowMenu] = useState(null);
-    const { user, loading } = useAuth();
     const { openSearch } = useSearch();
     const theme = useTheme();
 
@@ -213,37 +212,7 @@ function Header() {
                         </Stack>
                     </Box>
                     <Box sx={{ flexGrow: 0 }}>
-                        {
-                            user ? <>
-                                <IconButton onClick={(e) => setShowMenu(e.currentTarget)} sx={{ p: 0 }}>
-                                    <Avatar alt={user.username} src={`https://a.ppy.sh/${user.id}`} />
-                                </IconButton>
-                                <Menu
-                                    id="menu-appbar"
-                                    sx={{ mt: '45px', pt: 0 }}
-                                    keepMounted
-                                    anchorEl={showMenu}
-                                    anchorOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    transformOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    open={Boolean(showMenu)}
-                                    onClose={() => setShowMenu(null)}
-                                >
-                                    <Box sx={{ width: '25em' }}>
-                                        {/* <HeaderAccountDropdown open={Boolean(showMenu)} onClose={() => setShowMenu(null)} /> */}
-                                    </Box>
-                                </Menu>
-                            </> : <>
-                                <LoadingButton loading={loading} component={Link} to={GetOsuAuthUrl()} variant="outlined" color="inherit" sx={{ mr: 2 }}>
-                                    Login with osu!
-                                </LoadingButton>
-                            </>
-                        }
+                        <HeaderUser />
                     </Box>
                 </Toolbar>
             </Box>
