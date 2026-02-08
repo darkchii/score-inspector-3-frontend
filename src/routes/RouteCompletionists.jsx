@@ -54,7 +54,7 @@ function RouteCompletionists() {
 
                 //order each mode by completion_date
                 for (const mode in groupedData) {
-                    groupedData[mode].sort((a, b) => new Date(a.completion_date) - new Date(b.completion_date));
+                    groupedData[mode].sort((a, b) => new Date(b.completion_date) - new Date(a.completion_date));
                 }
 
                 setData(groupedData);
@@ -145,7 +145,7 @@ function RouteCompletionists() {
                                                             label: function (context) {
                                                                 //show user
                                                                 const item = context.raw.data;
-                                                                return `${item.user?.username || `${item.osu_id} (restricted?)`} | Scores: ${FormatNumber(item.scores)} | Completion Date: ${new Date(item.completion_date).toLocaleDateString()}`;
+                                                                return `${item.user?.osuApi.username || `${item.osu_id} (restricted?)`} | Scores: ${FormatNumber(item.scores)} | Completion Date: ${new Date(item.completion_date).toLocaleDateString()}`;
                                                             }
                                                         }
                                                     },
@@ -263,20 +263,15 @@ function RouteCompletionists() {
                                                     size="small"
                                                     sx={{
                                                         [`& .${tableCellClasses.root}`]: {
-                                                            borderBottom: "none"
-                                                        }
+                                                            borderBottom: "none",
+                                                            padding: '4px 4px',
+                                                        },
                                                     }}>
                                                     <TableHead>
                                                         <TableRow>
                                                             <TableCell>User</TableCell>
                                                             <TableCell>Scores</TableCell>
                                                             <TableCell>Date</TableCell>
-                                                            <TableCell>
-                                                                <Typography variant="body2" color="textSecondary">Elapsed</Typography>
-                                                                <Typography variant="body2" color="textSecondary">
-                                                                    (days)
-                                                                </Typography>
-                                                            </TableCell> {/* how many days from previous completionist */}
                                                         </TableRow>
                                                     </TableHead>
                                                     <TableBody>
@@ -314,15 +309,28 @@ function RouteCompletionists() {
                                                                     <TableRow key={item.osu_id}>
                                                                         <TableCell>
                                                                             {
-                                                                                !item.user?.username ? <>{item.osu_id} (restricted?)</> :
-                                                                                    <PlayerLink data={item} />
+                                                                                !item.user?.osuApi.username ? <>{item.osu_id} (restricted?)</> :
+                                                                                    <PlayerLink size={18} data={item.user} />
                                                                             }
                                                                         </TableCell>
                                                                         <TableCell>{FormatNumber(item.scores)}</TableCell>
-                                                                        <TableCell>{new Date(item.completion_date).toLocaleDateString()}</TableCell>
                                                                         <TableCell>
-                                                                            {/* small text */}
-                                                                            <Typography variant="body2" color="textSecondary">
+                                                                            <Typography
+                                                                                variant="body2"
+                                                                                sx={{
+                                                                                    fontSize: '0.85rem',
+                                                                                }}
+                                                                            >
+                                                                                {new Date(item.completion_date).toLocaleDateString()}
+                                                                            </Typography>
+                                                                            <Typography
+                                                                                variant="body2"
+                                                                                color="textSecondary"
+                                                                                sx={{
+                                                                                    //smaller font
+                                                                                    fontSize: '0.75rem',
+                                                                                }}
+                                                                            >
                                                                                 {
                                                                                     (() => {
                                                                                         const index = data[mode].indexOf(item);
@@ -335,7 +343,7 @@ function RouteCompletionists() {
                                                                                             if (diffDays === 0) {
                                                                                                 return '-';
                                                                                             } else {
-                                                                                                return `+${diffDays}`;
+                                                                                                return `+${diffDays}d`;
                                                                                             }
                                                                                         }
                                                                                     })()

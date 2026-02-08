@@ -19,6 +19,7 @@ function PlayerLink({ data, size = 24 }) {
     const [roles, setRoles] = useState([]);
     const [isSelf, setIsSelf] = useState(false);
     const [isValid, setIsValid] = useState(true);
+    const [hasAltData, setHasAltData] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -34,6 +35,10 @@ function PlayerLink({ data, size = 24 }) {
         } else {
             setIsValid(false);
             return;
+        }
+
+        if (data.osuAlternative) {
+            setHasAltData(true);
         }
 
         if (api_user) {
@@ -59,7 +64,11 @@ function PlayerLink({ data, size = 24 }) {
         <Box
             onClick={() => {
                 if (id) {
-                    navigate(`/user/${id}`);
+                    if (hasAltData) {
+                        navigate(`/user/${id}`);
+                    } else {
+                        window.open(`https://osu.ppy.sh/users/${id}`, '_blank');
+                    }
                 }
             }}
             sx={{
@@ -95,6 +104,28 @@ function PlayerLink({ data, size = 24 }) {
                 }
                 {username}
             </Typography>
+            {
+                !hasAltData && (
+                    <BetterTooltip title="osu!alternative does not have any data for this player.">
+                        <Avatar
+                            sx={{
+                                width: size * 0.9,
+                                height: size * 0.9,
+                                ml: 0.3,
+                                display: 'inline-flex',
+                                bgcolor: 'transparent',
+                            }}>
+                            <Box sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}>
+                                <GetRoleIcon role={{ icon: 'Warning', color: theme.palette.warning.main }} size={size * 0.9} />
+                            </Box>
+                        </Avatar>
+                    </BetterTooltip>
+                )
+            }
             {
                 roles?.length > 0 && roles.map((role, index) => (
                     <BetterTooltip title={role.title}>
