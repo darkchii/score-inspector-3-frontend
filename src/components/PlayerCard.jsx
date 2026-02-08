@@ -11,6 +11,7 @@ function PlayerCard({ data, onClick = null }) {
     const navigate = useNavigate();
     const [username, setUsername] = useState(null);
     const [apiUser, setApiUser] = useState(null);
+    const [osuAltUser, setOsuAltUser] = useState(null);
     const [id, setId] = useState(null);
     const [team, setTeam] = useState(null);
     const [roles, setRoles] = useState(null);
@@ -31,6 +32,10 @@ function PlayerCard({ data, onClick = null }) {
             return;
         }
 
+        if(data.osuAlternative){
+            setOsuAltUser(data.osuAlternative);
+        }
+
         if (data.team) {
             team_data = data.team;
         }
@@ -49,6 +54,12 @@ function PlayerCard({ data, onClick = null }) {
     }, [data]);
 
     const handleClick = () => {
+        if(!osuAltUser){
+            //navigate to osu! profile if we don't have any data for this user
+            window.open(`https://osu.ppy.sh/users/${id}`, '_blank');
+            return;
+        }
+
         navigate(`/user/${id}`);
 
         if (onClick) {
@@ -101,6 +112,15 @@ function PlayerCard({ data, onClick = null }) {
                                 null
                         }
                         {username || "Unknown"}
+                        {/* if not osuAltUser, show a little warning sign */}
+                        {
+                            !osuAltUser ?
+                                <BetterTooltip title="osu!alternative does not have any data for this player.">
+                                    <span style={{ color: theme.palette.warning.main, marginLeft: 4 }}>⚠️</span>
+                                </BetterTooltip>
+                                :
+                                null
+                        }
                     </div>
                     <div className={playerCardStyles['player-card__roles']}>
                         {
