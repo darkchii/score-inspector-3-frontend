@@ -77,6 +77,7 @@ function Header() {
         {
             label: 'People',
             icon: <PersonIcon />,
+            to: '/people',
             dropdown: [
                 {
                     label: 'Completionists',
