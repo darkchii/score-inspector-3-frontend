@@ -100,39 +100,44 @@ function IndexTopPlayers({ activeRuleset, setActiveRuleset }) {
                                                         <Typography variant="subtitle2" gutterBottom>
                                                             {key.replace(/_/g, ' ').toUpperCase()}
                                                         </Typography>
-                                                        <TableContainer>
-                                                            <Table size="small" sx={{
-                                                                [`& .${tableCellClasses.root}`]: {
-                                                                    borderBottom: "none",
-                                                                    color: 'white !important',
-                                                                },
-                                                                [`& .${tableRowClasses.root}`]: {
-                                                                    borderBottom: "none",
-                                                                },
-                                                            }}>
-                                                                <TableBody>
-                                                                    {
-                                                                        selectedDataSet[key].map((entry, index) => (
-                                                                            <TableRow>
-                                                                                <TableCell align="right" sx={{ width: '10%' }}><Typography variant="caption">{index + 1}.</Typography></TableCell>
-                                                                                <TableCell><PlayerLink data={entry.user} size={18} /></TableCell>
-                                                                                <TableCell>
-                                                                                    {/* {entry.clear.toLocaleString()} */}
-                                                                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                                                                                        {entry.clear.toLocaleString()}
-                                                                                        {
-                                                                                            (entry.clear !== entry.total && key !== 'score') && (
-                                                                                                <span style={{ color: 'gray' }}> ({entry.total.toLocaleString()})</span>
-                                                                                            )
-                                                                                        }
-                                                                                    </Typography>
-                                                                                </TableCell>
-                                                                            </TableRow>
-                                                                        ))
-                                                                    }
-                                                                </TableBody>
-                                                            </Table>
-                                                        </TableContainer>
+                                                        {
+                                                            selectedDataSet[key].length === 0 ? (
+                                                                <Typography variant="body2">No data for this category.</Typography>
+                                                            ) :
+                                                                <TableContainer>
+                                                                    <Table size="small" sx={{
+                                                                        [`& .${tableCellClasses.root}`]: {
+                                                                            borderBottom: "none",
+                                                                            color: 'white !important',
+                                                                        },
+                                                                        [`& .${tableRowClasses.root}`]: {
+                                                                            borderBottom: "none",
+                                                                        },
+                                                                    }}>
+                                                                        <TableBody>
+                                                                            {
+                                                                                selectedDataSet[key].map((entry, index) => (
+                                                                                    <TableRow>
+                                                                                        <TableCell align="right" sx={{ width: '10%' }}><Typography variant="caption">{index + 1}.</Typography></TableCell>
+                                                                                        <TableCell><PlayerLink data={entry.user} size={18} /></TableCell>
+                                                                                        <TableCell>
+                                                                                            {/* {entry.clear.toLocaleString()} */}
+                                                                                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                                                                                                {entry.clear.toLocaleString()}
+                                                                                                {
+                                                                                                    (entry.clear !== entry.total && key !== 'score') && (
+                                                                                                        <span style={{ color: 'gray' }}> ({entry.total.toLocaleString()})</span>
+                                                                                                    )
+                                                                                                }
+                                                                                            </Typography>
+                                                                                        </TableCell>
+                                                                                    </TableRow>
+                                                                                ))
+                                                                            }
+                                                                        </TableBody>
+                                                                    </Table>
+                                                                </TableContainer>
+                                                        }
                                                     </Paper>
                                                 </Grid>
                                             ))

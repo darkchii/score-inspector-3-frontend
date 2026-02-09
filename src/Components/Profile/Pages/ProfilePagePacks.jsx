@@ -293,13 +293,13 @@ function ProfilePagePacks() {
                                     ))
                                 }
                             </div>
-                            <Alert severity="info" style={{ marginTop: '8px' }}>
-                                All packs shown here have beatmaps for the currently selected ruleset ({activeRuleset}). Even if the pack was designed for another ruleset, some sets may include beatmaps for multiple rulesets.<br />
-                                Unless if you are viewing the "All"/combined ruleset, the non-{activeRuleset} beatmaps in these packs are filtered out.
-                            </Alert>
                         </div>
                     ))
                 }
+                <Alert severity="info" style={{ marginTop: '8px' }}>
+                    All packs shown here have beatmaps for the currently selected ruleset ({activeRuleset}). Even if the pack was designed for another ruleset, some sets may include beatmaps for multiple rulesets.<br />
+                    Unless if you are viewing the "All"/combined ruleset, the non-{activeRuleset} beatmaps in these packs are filtered out.
+                </Alert>
             </div>
         </>
     )
