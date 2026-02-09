@@ -1,5 +1,6 @@
 {
     "WEBSITE_NAME": "osu! scores inspector",
+    "VERSION": "3.0.0",
     "DEV_MODE": true,
     "API": {
         "PRODUCTION": {

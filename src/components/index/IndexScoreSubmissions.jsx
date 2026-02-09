@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Collapse, Fade, Paper, Typography, useTheme } from "@mui/material";
+import { Alert, Box, Button, ButtonGroup, Collapse, Fade, Paper, Typography, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import RulesetSelector from "../RulesetSelector";
 import { useApi } from "../../providers/ApiProvider";
@@ -247,7 +247,7 @@ function IndexScoreSubmissions({ activeRuleset, setActiveRuleset }) {
                 <Typography variant="caption">Loading...</Typography>
             </Collapse>
             <Collapse in={!isWorking}>
-                {error && <Alert severity="error">Error loading: {error.message}</Alert>}
+                {error && <Alert severity="error" sx={{ mb: 1 }}>Error loading: {error.message}</Alert>}
                 {!rawData || Object.keys(rawData).length === 0 ? (
                     <Typography variant="body2">No data available.</Typography>
                 ) : (

@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { useApi } from "../providers/ApiProvider";
 import { Alert, Box, CircularProgress, Grid, Paper } from "@mui/material";
 import PlayerCard from "../components/PlayerCard";
+import { usePageTitle } from "../providers/TitleProvider";
 
 function RoutePeople() {
+    usePageTitle("People");
+
     const { getRoleUsers } = useApi();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
