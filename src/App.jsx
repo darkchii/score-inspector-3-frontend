@@ -12,6 +12,7 @@ import RouteScore from "./routes/RouteScore";
 import RouteCompletionists from "./routes/RouteCompletionists";
 import RouteLeaderboards from "./routes/RouteLeaderboards";
 import RoutePeople from "./routes/RoutePeople";
+import RouteTools from "./routes/RouteTools";
 
 function App() {
   const [title, setTitle] = useState(null);
@@ -26,6 +27,7 @@ function App() {
     { path: "*", element: <Route404 /> },
     { path: "/", element: <RouteIndex /> },
     { path: "/people", element: <RoutePeople /> },
+    { path: "/tools/:tool?", element: <RouteTools /> },
     { path: "/user/:userId/:ruleset?/:page?", element: <RouteProfile /> },
     { path: "/score/:scoreId", element: <RouteScore /> },
     { path: "/completionists", element: <RouteCompletionists /> },

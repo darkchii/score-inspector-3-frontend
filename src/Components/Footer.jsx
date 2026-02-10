@@ -4,22 +4,24 @@ import { useEffect, useState } from "react";
 import { useApi } from "../providers/ApiProvider";
 
 function Footer() {
-    const { getServerVersion } = useApi();
+    const { getServerInfo } = useApi();
 
     const [clientVersion, setClientVersion] = useState(null);
     const [serverVersion, setServerVersion] = useState(null);
     const [isServerOnline, setIsServerOnline] = useState(true);
+    const [isAltOnline, setIsAltOnline] = useState(true);
 
     useEffect(() => {
         setClientVersion(Config.VERSION);
         (async () => {
             try {
-                const version = await getServerVersion();
-                setServerVersion(version);
+                const info = await getServerInfo();
+                setServerVersion(info.version);
+                setIsAltOnline(info.altDbAccessable);
                 setIsServerOnline(true);
             }
             catch (error) {
-                console.error("Failed to fetch server version:", error);
+                console.error("Failed to fetch server info:", error);
                 setIsServerOnline(false);
             }
         })();
@@ -53,6 +55,23 @@ function Footer() {
                                     height: 8,
                                     borderRadius: '50%',
                                     backgroundColor: isServerOnline ? 'success.main' : 'error.main',
+                                    ml: 0.5,
+                                    mb: '2px',
+                                }}
+                            />
+                        }
+                        <Box sx={{ width: 16 }} />
+                        <Typography variant="caption" color={isAltOnline ? "text.secondary" : "error.main"}>
+                            osu!alternative
+                        </Typography>
+                        {
+                            <Box component="span"
+                                sx={{
+                                    display: 'inline-block',
+                                    width: 8,
+                                    height: 8,
+                                    borderRadius: '50%',
+                                    backgroundColor: isAltOnline ? 'success.main' : 'error.main',
                                     ml: 0.5,
                                     mb: '2px',
                                 }}

@@ -14,6 +14,7 @@ import { useSearch } from "../providers/SearchProvider";
 import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import GroupsIcon from '@mui/icons-material/Groups';
 import InfoIcon from '@mui/icons-material/Info';
+import BuildIcon from '@mui/icons-material/Build';
 import HeaderUser from "./header/HeaderUser";
 
 const HeaderButtonMenu = styled((props) => (
@@ -90,6 +91,11 @@ function Header() {
             label: 'Leaderboards',
             icon: <LeaderboardIcon />,
             to: '/leaderboards',
+        },
+        {
+            label: 'Tools',
+            icon: <BuildIcon />,
+            to: '/tools',
         },
         {
             label: 'Teams',

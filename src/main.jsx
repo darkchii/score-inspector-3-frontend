@@ -17,6 +17,7 @@ import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers"
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"
 import React from 'react';
 import { TitleProvider } from './providers/TitleProvider.jsx';
+import { ReputationProvider } from './providers/ReputationProvider.jsx';
 
 
 const theme = createTheme({
@@ -68,6 +69,9 @@ const _providers = [
     Provider: ScoreViewProvider,
   },
   {
+    Provider: ReputationProvider,
+  },
+  {
     Provider: SearchProvider,
   },
   {
@@ -75,6 +79,8 @@ const _providers = [
     props: { dateAdapter: AdapterMoment },
   }
 ]
+
+console.log("Providers loaded:", _providers.map(p => p.Provider.name).join(", "));
 
 const _wrapWithProviders = (children) => {
   return _providers.reduceRight((acc, { Provider, props }) => {
