@@ -21,7 +21,8 @@ function ProfileHeader() {
             <Box sx={{
                 width: '100%',
                 height: `calc(100vw / ${_profileHeaderImageRatio})`,
-                maxHeight: '300px',
+                // maxHeight: '300px',
+                maxHeight: { xs: '200px', md: '300px' },
                 position: 'relative',
             }}>
                 <Box sx={{
@@ -62,7 +63,12 @@ function ProfileHeader() {
                             <Avatar
                                 src={userLive.osuApi.avatar_url}
                                 alt={userLive.osuApi.username}
-                                sx={{ width: 160, height: 160 }}
+                                // sx={{ width: 160, height: 160 }}
+                                //160 on desktop, 80 on mobile
+                                sx={{
+                                    width: { xs: 80, md: 140 },
+                                    height: { xs: 80, md: 140 },
+                                }}
                                 variant="rounded"
                             />
 
@@ -71,14 +77,27 @@ function ProfileHeader() {
                                     {
                                         userLive.team &&
                                         <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: userLive.team.color || '#000000', p: 0.5, borderRadius: `${theme.shape.borderRadius}px` }}>
-                                            <Typography variant="h4" sx={{ color: getContrastColor(userLive.team.color || '#000000') }} >{userLive.team.short_name}</Typography>
+                                            <Typography
+                                                sx={{
+                                                    color: getContrastColor(userLive.team.color || '#000000'),
+                                                    fontSize: { xs: '1.2rem', md: '2rem' },
+                                                }}
+                                            >{userLive.team.short_name}</Typography>
                                         </Box>
                                     }
-                                    <Typography variant="h4" >{userLive.osuApi.username}</Typography>
+                                    <Typography
+                                        sx={{ fontSize: { xs: '1.2rem', md: '2rem' } }}
+                                    >{userLive.osuApi.username}</Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-                                    <img src={getFlagIcon(userLive.osuApi.country_code)} alt={userLive.osuApi.country_code} height={24} />
-                                    <Typography variant="body1">{userLive.osuApi.country.name}</Typography>
+                                    <img
+                                        src={getFlagIcon(userLive.osuApi.country_code)}
+                                        alt={userLive.osuApi.country_code}
+                                        height={24}
+                                    />
+                                    <Typography
+                                        sx={{ fontSize: { xs: '0.9rem', md: '1rem' } }}
+                                    >{userLive.osuApi.country.name}</Typography>
                                 </Box>
                                 {/* <Typography variant="body1"><img src={getFlagIcon(userLive.osuApi.country_code)} alt={userLive.osuApi.country_code} /> {userLive.osuApi.country.name}</Typography> */}
                             </Box>
@@ -90,16 +109,20 @@ function ProfileHeader() {
                                 </Box>
                             </Fade>
 
-                            <Box className="profile-header-actions">
+                            <Box className="profile-header-actions" sx={{
+                                display: { xs: 'none', md: 'flex' },
+                            }}>
                                 <ProfileRulesetSelector />
                             </Box>
                         </Box>
                     </Container>
                 </Box>
             </Box >
-
-
-        </div >
+            {/* if mobile, show ProfileRulesetSelector here */}
+            <Box className="profile-header-actions" sx={{ display: { xs: 'flex', md: 'none' }, justifyContent: 'center' }}>
+                <ProfileRulesetSelector />
+            </Box>
+        </div>
     );
 }
 
