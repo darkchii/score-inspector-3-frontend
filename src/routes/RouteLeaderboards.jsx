@@ -8,6 +8,7 @@ import { FormatNumber } from "../util/Helper";
 import ItemList from "../components/list/ItemList";
 import PlayerListRow from "../components/list/PlayerListRow";
 import { usePageTitle } from "../providers/TitleProvider";
+import BetterTooltip from "../components/tooltips/BetterTooltip";
 
 const LIMIT = 50;
 const LEADERBOARDS = {
@@ -36,6 +37,7 @@ const LEADERBOARDS = {
         img: [TextureDatabase.SVGGradeXH, TextureDatabase.SVGGradeX],
         category: 'grades',
         formatter: FormatNumber,
+        description: 'Total SS ranks, gold and silver combined',
     },
     'grade_counts_ssh': {
         title: 'Grade SSH',
@@ -54,6 +56,7 @@ const LEADERBOARDS = {
         img: [TextureDatabase.SVGGradeSH, TextureDatabase.SVGGradeS],
         category: 'grades',
         formatter: FormatNumber,
+        description: 'Total S ranks, gold and silver combined',
     },
     'grade_counts_sh': {
         title: 'Grade SH',
@@ -188,43 +191,45 @@ function RouteLeaderboards() {
                                 <ButtonGroup size='small' key={`leaderboards-category-tabs-${category}`} variant="text" aria-label={`leaderboards-tabs-${category}`}>
                                     {Object.keys(LEADERBOARDS).filter((key) => LEADERBOARDS[key].category === category).map((key) => {
                                         return (
-                                            <Button
-                                                variant={statistic === key ? "contained" : "text"}
-                                                key={`leaderboard-tab-${key}`}
-                                                value={key}
-                                                onClick={() => setStatistic(key)}
-                                                disabled={statistic === key || isWorking}
-                                            >
-                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    {
-                                                        LEADERBOARDS[key].img ? (
-                                                            // <Box
-                                                            //     component="img"
-                                                            //     src={LEADERBOARDS[key].img}
-                                                            //     alt={key}
-                                                            // />
-                                                            LEADERBOARDS[key].img instanceof Array ? (
-                                                                <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-                                                                    {LEADERBOARDS[key].img.map((img, index) => (
-                                                                        <Box
-                                                                            key={`leaderboard-tab-img-${key}-${index}`}
-                                                                            component="img"
-                                                                            src={img}
-                                                                            alt={`${key}-${index}`}
-                                                                        />
-                                                                    ))}
-                                                                </Box>
-                                                            ) : (
-                                                                <Box
-                                                                    component="img"
-                                                                    src={LEADERBOARDS[key].img}
-                                                                    alt={key}
-                                                                />
-                                                            )
-                                                        ) : LEADERBOARDS[key].title
-                                                    }
-                                                </Box>
-                                            </Button>
+                                            <BetterTooltip key={`leaderboard-tab-tooltip-${key}`} title={LEADERBOARDS[key].description || ''} placement="top">
+                                                <Button
+                                                    variant={statistic === key ? "contained" : "text"}
+                                                    key={`leaderboard-tab-${key}`}
+                                                    value={key}
+                                                    onClick={() => setStatistic(key)}
+                                                    disabled={statistic === key || isWorking}
+                                                >
+                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                        {
+                                                            LEADERBOARDS[key].img ? (
+                                                                // <Box
+                                                                //     component="img"
+                                                                //     src={LEADERBOARDS[key].img}
+                                                                //     alt={key}
+                                                                // />
+                                                                LEADERBOARDS[key].img instanceof Array ? (
+                                                                    <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                                                                        {LEADERBOARDS[key].img.map((img, index) => (
+                                                                            <Box
+                                                                                key={`leaderboard-tab-img-${key}-${index}`}
+                                                                                component="img"
+                                                                                src={img}
+                                                                                alt={`${key}-${index}`}
+                                                                            />
+                                                                        ))}
+                                                                    </Box>
+                                                                ) : (
+                                                                    <Box
+                                                                        component="img"
+                                                                        src={LEADERBOARDS[key].img}
+                                                                        alt={key}
+                                                                    />
+                                                                )
+                                                            ) : LEADERBOARDS[key].title
+                                                        }
+                                                    </Box>
+                                                </Button>
+                                            </BetterTooltip>
                                         );
                                     })}
                                 </ButtonGroup>
