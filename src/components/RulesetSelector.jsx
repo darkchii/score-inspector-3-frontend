@@ -59,70 +59,72 @@ function RulesetSelector({ activeRuleset, onChange, disabled = false, availableR
                     showCombined && (
                         <>
                             <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-                            <IconButton
-                                key={'ruleset_combined'}
-                                onClick={() => onChange('all')}
-                                className={activeRuleset === 'all' ? "profile-selected-ruleset" : ""}
-                                title="All Rulesets"
-                                disabled={disabled}
-                            >
-                                {/* show a combination of the four ruleset icons, show a corner of each */}
-                                <div style={{
-                                    position: 'relative',
-                                    width: 24,
-                                    height: 24,
-                                }}>
-                                    <Fade in={activeRuleset === 'all'} unmountOnExit>
-                                        <Box
-                                            sx={{
-                                                position: 'absolute',
-                                                bottom: -10,
-                                                left: '50%',
-                                                transform: 'translateX(-50%)',
-                                                width: 0,
-                                                height: 0,
-                                                borderLeft: '6px solid transparent',
-                                                borderRight: '6px solid transparent',
-                                                borderBottom: `8px solid ${grey[500]}`,
-                                                //glow
-                                                filter: `drop-shadow(0 0 4px ${grey[500]})`,
-                                            }}
+                            <BetterTooltip title="All rulesets combined">
+                                <IconButton
+                                    key={'ruleset_combined'}
+                                    onClick={() => onChange('all')}
+                                    className={activeRuleset === 'all' ? "profile-selected-ruleset" : ""}
+                                    title="All Rulesets"
+                                    disabled={disabled}
+                                >
+                                    {/* show a combination of the four ruleset icons, show a corner of each */}
+                                    <div style={{
+                                        position: 'relative',
+                                        width: 24,
+                                        height: 24,
+                                    }}>
+                                        <Fade in={activeRuleset === 'all'} unmountOnExit>
+                                            <Box
+                                                sx={{
+                                                    position: 'absolute',
+                                                    bottom: -10,
+                                                    left: '50%',
+                                                    transform: 'translateX(-50%)',
+                                                    width: 0,
+                                                    height: 0,
+                                                    borderLeft: '6px solid transparent',
+                                                    borderRight: '6px solid transparent',
+                                                    borderBottom: `8px solid ${grey[500]}`,
+                                                    //glow
+                                                    filter: `drop-shadow(0 0 4px ${grey[500]})`,
+                                                }}
+                                            />
+                                        </Fade>
+                                        <img
+                                            src={TextureDatabase.RulesetOsuIcon}
+                                            alt="osu!"
+                                            className="profile-ruleset-icon"
+                                            width={12}
+                                            height={12}
+                                            style={{ position: 'absolute', top: 0, left: 0, filter: activeRuleset === 'all' ? `drop-shadow(0 0 4px ${GetRulesetColor('osu')[500]})` : 'none', }}
                                         />
-                                    </Fade>
-                                    <img
-                                        src={TextureDatabase.RulesetOsuIcon}
-                                        alt="osu!"
-                                        className="profile-ruleset-icon"
-                                        width={12}
-                                        height={12}
-                                        style={{ position: 'absolute', top: 0, left: 0, filter: activeRuleset === 'all' ? `drop-shadow(0 0 4px ${GetRulesetColor('osu')[500]})` : 'none', }}
-                                    />
-                                    <img
-                                        src={TextureDatabase.RulesetTaikoIcon}
-                                        alt="Taiko"
-                                        className="profile-ruleset-icon"
-                                        width={12}
-                                        height={12}
-                                        style={{ position: 'absolute', top: 0, right: 0, filter: activeRuleset === 'all' ? `drop-shadow(0 0 4px ${GetRulesetColor('taiko')[500]})` : 'none', }}
-                                    />
-                                    <img
-                                        src={TextureDatabase.RulesetCatchIcon}
-                                        alt="Catch the Beat"
-                                        className="profile-ruleset-icon"
-                                        width={12}
-                                        height={12}
-                                        style={{ position: 'absolute', bottom: 0, left: 0, filter: activeRuleset === 'all' ? `drop-shadow(0 0 4px ${GetRulesetColor('fruits')[500]})` : 'none', }}
-                                    />
-                                    <img
-                                        src={TextureDatabase.RulesetManiaIcon}
-                                        alt="Mania"
-                                        className="profile-ruleset-icon"
-                                        width={12}
-                                        height={12}
-                                        style={{ position: 'absolute', bottom: 0, right: 0, filter: activeRuleset === 'all' ? `drop-shadow(0 0 4px ${GetRulesetColor('mania')[500]})` : 'none', }}
-                                    />
-                                </div>
-                            </IconButton>
+                                        <img
+                                            src={TextureDatabase.RulesetTaikoIcon}
+                                            alt="Taiko"
+                                            className="profile-ruleset-icon"
+                                            width={12}
+                                            height={12}
+                                            style={{ position: 'absolute', top: 0, right: 0, filter: activeRuleset === 'all' ? `drop-shadow(0 0 4px ${GetRulesetColor('taiko')[500]})` : 'none', }}
+                                        />
+                                        <img
+                                            src={TextureDatabase.RulesetCatchIcon}
+                                            alt="Catch the Beat"
+                                            className="profile-ruleset-icon"
+                                            width={12}
+                                            height={12}
+                                            style={{ position: 'absolute', bottom: 0, left: 0, filter: activeRuleset === 'all' ? `drop-shadow(0 0 4px ${GetRulesetColor('fruits')[500]})` : 'none', }}
+                                        />
+                                        <img
+                                            src={TextureDatabase.RulesetManiaIcon}
+                                            alt="Mania"
+                                            className="profile-ruleset-icon"
+                                            width={12}
+                                            height={12}
+                                            style={{ position: 'absolute', bottom: 0, right: 0, filter: activeRuleset === 'all' ? `drop-shadow(0 0 4px ${GetRulesetColor('mania')[500]})` : 'none', }}
+                                        />
+                                    </div>
+                                </IconButton>
+                            </BetterTooltip>
                         </>
                     )
                 }
