@@ -185,11 +185,11 @@ function RouteLeaderboards() {
                         LEADERBOARDS_CATEGORIES.map((category) => {
                             return (
                                 // <Tabs key={`leaderboards-category-tabs-${category}`} aria-label={`leaderboards-tabs-${category}`} value={statistic} textColor="primary" indicatorColor="primary">
-                                <ButtonGroup size='small' key={`leaderboards-category-tabs-${category}`} variant="outlined" aria-label={`leaderboards-tabs-${category}`}>
+                                <ButtonGroup size='small' key={`leaderboards-category-tabs-${category}`} variant="text" aria-label={`leaderboards-tabs-${category}`}>
                                     {Object.keys(LEADERBOARDS).filter((key) => LEADERBOARDS[key].category === category).map((key) => {
                                         return (
                                             <Button
-                                                variant={statistic === key ? "contained" : "outlined"}
+                                                variant={statistic === key ? "contained" : "text"}
                                                 key={`leaderboard-tab-${key}`}
                                                 value={key}
                                                 onClick={() => setStatistic(key)}
