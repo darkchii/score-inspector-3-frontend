@@ -2,6 +2,7 @@ import { Avatar, Box, TableCell, TableRow, Typography, useTheme } from "@mui/mat
 import { getContrastColor } from "../../util/Helper";
 import ItemListRowBase from "./ItemListRowBase";
 import { useNavigate } from "react-router";
+import PlayerLink from "../PlayerLink";
 
 function PlayerListRow({ item, index, isCompact = false, showIndex = true, startIndex = 0, leaderboardField = null, leaderboardFormat = null }) {
     const theme = useTheme();
@@ -28,7 +29,7 @@ function PlayerListRow({ item, index, isCompact = false, showIndex = true, start
                     whiteSpace: 'nowrap',
                     gap: 1
                 }}>
-                    <Avatar
+                    {/* <Avatar
                         src={item?.osuApi?.avatar_url || ''}
                         alt={item?.osuApi?.username || 'Avatar'}
                         sx={{ width: isCompact ? 32 : 40, height: isCompact ? 32 : 40, borderRadius: '4px', mr: 1 }}
@@ -39,7 +40,8 @@ function PlayerListRow({ item, index, isCompact = false, showIndex = true, start
                             <Typography sx={{ fontSize: '0.85rem', color: getContrastColor(item?.team.color || '#000000') }} >{item.team.short_name}</Typography>
                         </Box>
                     }
-                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 'bold' }}>{item?.osuApi?.username || 'Unknown'}</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 'bold' }}>{item?.osuApi?.username || 'Unknown'}</Typography> */}
+                    <PlayerLink data={item} size={32} />
                 </div>
             </TableCell>
         </ItemListRowBase>

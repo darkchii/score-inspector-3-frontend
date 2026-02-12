@@ -75,7 +75,7 @@ function RouteProfile() {
     }
 
     return (<>
-        <Box>
+        <Box sx={{width: '100%' }}>
             {
                 userLive?.is_sync === false &&
                 <Box sx={{ width: '100%', p: 1, bgcolor: theme.palette.error.main, color: theme.palette.error.contrastText, textAlign: 'center' }}>
@@ -94,8 +94,11 @@ function RouteProfile() {
             <ProfileHeader />
 
             {/* page selection */}
-            <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 1, justifyContent: 'center' }}>
-                <Tabs aria-label='profile-page-tabs' value={activePage} textColor="primary" indicatorColor="primary">
+            <Box sx={{ 
+                display: { xs: 'block', md: 'flex' },
+                justifyContent: { xs: 'flex-start', md: 'center' },
+                gap: 2, mb: 0, mt: 1, width: '100%' }}>
+                <Tabs scrollButtons="auto" aria-label='profile-page-tabs' value={activePage} textColor="primary" indicatorColor="primary">
                     {Object.keys(pageComponents).map((key) => {
                         return (
                             <Tab

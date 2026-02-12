@@ -4,6 +4,8 @@ import { useAuth } from "../providers/AuthProvider";
 import { useNavigate } from "react-router";
 import BetterTooltip from "./tooltips/BetterTooltip";
 import * as Muicon from "@mui/icons-material";
+import PlayerTooltip from "./tooltips/PlayerTooltip";
+import { getFlagIcon } from "../assets/textures/TextureDatabase";
 
 function GetRoleIcon({ role, size = 16 }) {
     const Icon = Muicon[role.icon ?? 'QuestionMark'];
@@ -61,95 +63,107 @@ function PlayerLink({ data, size = 24 }) {
     }, [data]);
 
     return (
-        <Box
-            onClick={() => {
-                if (id) {
-                    if (hasAltData) {
-                        navigate(`/user/${id}`);
-                    } else {
-                        window.open(`https://osu.ppy.sh/users/${id}`, '_blank');
+        <PlayerTooltip data={data}>
+            <Box
+                onClick={() => {
+                    if (id) {
+                        if (hasAltData) {
+                            navigate(`/user/${id}`);
+                        } else {
+                            window.open(`https://osu.ppy.sh/users/${id}`, '_blank');
+                        }
                     }
-                }
-            }}
-            sx={{
-                display: 'flex',
-                borderRadius: '1em',
-                bgcolor: `${isSelf ? theme.palette.primary.main : '#ffffff'}22`,
-                textDecoration: 'none',
-                color: '#fff',
-                p: 0.1,
-                pr: 1,
-                width: 'fit-content',
-                alignItems: 'center',
-                justifyContent: 'center',
-                //hover effect
-                '&:hover': {
-                    bgcolor: `${isSelf ? theme.palette.primary.main : '#ffffff'}44`,
-                    cursor: 'pointer',
-                    //animate
+                }}
+                sx={{
+                    display: 'flex',
+                    //borderradius based on size
+                    borderRadius: `${size / 2}px`,
+                    bgcolor: `${isSelf ? theme.palette.primary.main : '#ffffff'}22`,
+                    textDecoration: 'none',
+                    color: '#fff',
+                    p: 0.1,
+                    pr: 1,
+                    width: 'fit-content',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    //hover effect
+                    '&:hover': {
+                        bgcolor: `${isSelf ? theme.palette.primary.main : '#ffffff'}44`,
+                        cursor: 'pointer',
+                        //animate
+                        transition: 'background-color 0.2s',
+                    },
                     transition: 'background-color 0.2s',
-                },
-                transition: 'background-color 0.2s',
-            }}>
-            <Avatar
-                src={`https://a.ppy.sh/${id}`}
-                alt={username}
-                sx={{ width: size, height: size, mr: 0.5 }}
-            />
-            <Typography variant="body2" sx={{ fontWeight: isSelf ? 'bold' : 'normal' }}>
+                    backdropFilter: 'blur(4px)',
+                }}>
+                <Avatar
+                    src={`https://a.ppy.sh/${id}`}
+                    alt={username}
+                    sx={{ width: size, height: size, mr: 0.5 }}
+                />
+                <img src={getFlagIcon(data?.osuApi?.country_code)} alt={data?.osuApi?.country_code}
+                    style={{
+                        width: size,
+                        height: 'auto',
+                        borderRadius: '2px',
+                        marginRight: 4,
+                    }}
+                />
+                <Typography variant="body2" sx={{ fontWeight: isSelf ? 'bold' : 'normal' }}>
+                    {
+                        team && <>
+                            <span style={{ color: team.color, fontWeight: 'bold' }}>[{team.short_name}] </span>
+                        </>
+                    }
+                    {username}
+                </Typography>
                 {
-                    team && <>
-                        <span style={{ color: team.color, fontWeight: 'bold' }}>[{team.short_name}] </span>
-                    </>
+                    !hasAltData && (
+                        <BetterTooltip title="osu!alternative does not have any data for this player.">
+                            <Avatar
+                                sx={{
+                                    width: size * 0.9,
+                                    height: size * 0.9,
+                                    ml: 0.3,
+                                    display: 'inline-flex',
+                                    bgcolor: 'transparent',
+                                }}>
+                                <Box sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}>
+                                    <GetRoleIcon role={{ icon: 'Warning', color: theme.palette.warning.main }} size={size * 0.9} />
+                                </Box>
+                            </Avatar>
+                        </BetterTooltip>
+                    )
                 }
-                {username}
-            </Typography>
-            {
-                !hasAltData && (
-                    <BetterTooltip title="osu!alternative does not have any data for this player.">
-                        <Avatar
-                            sx={{
-                                width: size * 0.9,
-                                height: size * 0.9,
-                                ml: 0.3,
-                                display: 'inline-flex',
-                                bgcolor: 'transparent',
-                            }}>
-                            <Box sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}>
-                                <GetRoleIcon role={{ icon: 'Warning', color: theme.palette.warning.main }} size={size * 0.9} />
-                            </Box>
-                        </Avatar>
-                    </BetterTooltip>
-                )
-            }
-            {
-                roles?.length > 0 && roles.map((role, index) => (
-                    <BetterTooltip title={role.title}>
-                        <Avatar
-                            key={index}
-                            sx={{
-                                width: size * 0.9,
-                                height: size * 0.9,
-                                ml: 0.3,
-                                display: 'inline-flex',
-                                bgcolor: 'transparent',
-                            }}>
-                            <Box sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}>
-                                <GetRoleIcon role={role} size={size * 0.9} />
-                            </Box>
-                        </Avatar>
-                    </BetterTooltip>
-                ))
-            }
-        </Box>
+                {
+                    roles?.length > 0 && roles.map((role, index) => (
+                        <BetterTooltip title={role.title}>
+                            <Avatar
+                                key={index}
+                                sx={{
+                                    width: size * 0.9,
+                                    height: size * 0.9,
+                                    ml: 0.3,
+                                    display: 'inline-flex',
+                                    bgcolor: 'transparent',
+                                }}>
+                                <Box sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}>
+                                    <GetRoleIcon role={role} size={size * 0.9} />
+                                </Box>
+                            </Avatar>
+                        </BetterTooltip>
+                    ))
+                }
+            </Box>
+        </PlayerTooltip>
     )
 }
 
