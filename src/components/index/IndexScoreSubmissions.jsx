@@ -237,7 +237,6 @@ function IndexScoreSubmissions({ activeRuleset, setActiveRuleset }) {
                         <RulesetSelector
                             activeRuleset={activeRuleset}
                             onChange={setActiveRuleset}
-                            showCombined={false}
                             disabled={isWorking || isTransitioningDataSet}
                         />
                     </Box>

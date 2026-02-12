@@ -12,7 +12,7 @@ function GetRoleIcon({ role, size = 16 }) {
     return <Icon sx={{ color: `${role.color}`, fontSize: size }} />;
 }
 
-function PlayerLink({ data, size = 24 }) {
+function PlayerLink({ data, size = 24, hideCountry = false }) {
     const theme = useTheme();
     const { user } = useAuth();
     const [username, setUsername] = useState(null);
@@ -101,14 +101,18 @@ function PlayerLink({ data, size = 24 }) {
                     alt={username}
                     sx={{ width: size, height: size, mr: 0.5 }}
                 />
-                <img src={getFlagIcon(data?.osuApi?.country_code)} alt={data?.osuApi?.country_code}
-                    style={{
-                        width: size,
-                        height: 'auto',
-                        borderRadius: '2px',
-                        marginRight: 4,
-                    }}
-                />
+                {
+                    !hideCountry && data?.osuApi?.country_code && (
+                        <img src={getFlagIcon(data?.osuApi?.country_code)} alt={data?.osuApi?.country_code}
+                            style={{
+                                width: size,
+                                height: 'auto',
+                                borderRadius: '2px',
+                                marginRight: 4,
+                            }}
+                        />
+                    )
+                }
                 <Typography variant="body2" sx={{ fontWeight: isSelf ? 'bold' : 'normal' }}>
                     {
                         team && <>

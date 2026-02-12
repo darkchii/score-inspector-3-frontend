@@ -73,8 +73,8 @@ export function ApiProvider({ children }) {
         return response;
     }
 
-    const getTodayTopPlayers = async(progressEvent = null) => {
-        const response = await apiGet(`stats/top-day`, progressEvent);
+    const getTodayTopPlayers = async(ruleset, progressEvent = null) => {
+        const response = await apiGet(`stats/top-day/${ruleset}`, progressEvent);
         return response;
     }
 
