@@ -5,6 +5,13 @@ import RulesetSelector from "../RulesetSelector";
 import { GetRulesetId } from "../../util/Helper";
 import PlayerLink from "../PlayerLink";
 
+const titleMap = {
+    'today': 'today',
+    'yesterday': 'yesterday',
+    'year': 'this year',
+    'last_year': 'last year'
+}
+
 function IndexTopPlayers({ activeRuleset, setActiveRuleset }) {
     const theme = useTheme();
     const { getTodayTopPlayers } = useApi();
@@ -62,8 +69,7 @@ function IndexTopPlayers({ activeRuleset, setActiveRuleset }) {
             {/* inbetween spacing */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', }} >
                 <Typography variant="h6" gutterBottom>
-                    {/* use selectedPeriod, but remove underscores and capitalize all first letters */}
-                    Top players {selectedPeriod.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                    Top players {titleMap[selectedPeriod]}
                 </Typography>
                 <Fade in={!isWorking} unmountOnExit>
                     <Box>
