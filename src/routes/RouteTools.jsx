@@ -1,8 +1,9 @@
-import { Box, Collapse, Grid, List, ListItemButton, ListItemText, Paper, Typography } from "@mui/material";
+import { Box, Collapse, Divider, Grid, List, ListItemButton, ListItemText, Paper, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { usePageTitle } from "../providers/TitleProvider";
 import ToolAttributeCalculator from "../components/tools/ToolAttributeCalculator";
+import ToolLevelCalculator from "../components/tools/ToolLevelCalculator";
 
 const TOOLS = [
     {
@@ -10,6 +11,12 @@ const TOOLS = [
         description: 'Calculates attributes based on mods',
         link: '/tools/attribute-calculator',
         component: <ToolAttributeCalculator />
+    },
+    {
+        name: 'Level Calculator',
+        description: 'Total score and level calculator',
+        link: '/tools/level-calculator',
+        component: <ToolLevelCalculator />
     }
 ]
 
@@ -45,7 +52,7 @@ function RouteTools() {
                     </Paper>
                 </Grid>
                 <Grid size={{ xs: 12, md: 10 }}>
-                    <Paper sx={{ p: 2 }}>
+                    <Paper sx={{ p: 1 }}>
                         {
                             !tool ? (
                                 <Collapse in={!tool}>
@@ -53,7 +60,11 @@ function RouteTools() {
                                 </Collapse>
                             ) : (
                                 <Collapse in={!!toolData}>
-                                    {toolData ? toolData.component : (
+                                    {toolData ? <>
+                                        <Typography variant="h5" gutterBottom>{toolData.name}</Typography>
+                                        <Divider sx={{ mb: 2 }} />
+                                        {toolData.component}
+                                    </> : (
                                         <Typography variant="h5" align="center">Tool not found</Typography>
                                     )}
                                 </Collapse>
