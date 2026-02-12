@@ -109,6 +109,7 @@ function IndexTopPlayers({ activeRuleset, setActiveRuleset }) {
                                                                         [`& .${tableCellClasses.root}`]: {
                                                                             borderBottom: "none",
                                                                             color: 'white !important',
+                                                                            padding: '2px'
                                                                         },
                                                                         [`& .${tableRowClasses.root}`]: {
                                                                             borderBottom: "none",
