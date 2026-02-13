@@ -23,6 +23,7 @@
     "chart.js": "^4.5.1",
     "chartjs-adapter-moment": "^1.0.1",
     "chartjs-plugin-annotation": "^3.1.0",
+    "country-data-list": "^1.6.0",
     "d3": "^7.9.0",
     "downsample": "^1.4.0",
     "moment": "^2.30.1",

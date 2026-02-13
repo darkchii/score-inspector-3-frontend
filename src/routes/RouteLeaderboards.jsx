@@ -1,4 +1,4 @@
-import { Alert, Box, Button, ButtonGroup, Collapse, Pagination } from "@mui/material";
+import { Alert, Autocomplete, Box, Button, ButtonGroup, Collapse, Pagination, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router";
 import RulesetSelector from "../components/RulesetSelector";
@@ -9,6 +9,7 @@ import ItemList from "../components/list/ItemList";
 import PlayerListRow from "../components/list/PlayerListRow";
 import { usePageTitle } from "../providers/TitleProvider";
 import BetterTooltip from "../components/tooltips/BetterTooltip";
+import { countries, currencies, languages, timezones, lookup } from 'country-data-list';
 
 const LIMIT = 50;
 const LEADERBOARDS = {
@@ -136,6 +137,7 @@ function RouteLeaderboards() {
     const [ruleset, setRuleset] = useState('osu');
     const [statistic, setStatistic] = useState(params.statistic || Object.keys(LEADERBOARDS)[0]);
     const [page, setPage] = useState(params.page || 1);
+    const [country, setCountry] = useState(params.country || null);
     const [leaderboardResults, setLeaderboardResults] = useState(null);
 
     const [error, setError] = useState(null);
@@ -145,19 +147,20 @@ function RouteLeaderboards() {
         setStatistic(params.statistic || Object.keys(LEADERBOARDS)[0]);
         setPage(params.page || 1);
         setRuleset(params.ruleset || 'osu');
-    }, [params.statistic, params.page, params.ruleset]);
+        setCountry(params.country || null);
+    }, [params.statistic, params.page, params.ruleset, params.country]);
 
     usePageTitle(`Leaderboards - ${LEADERBOARDS[statistic] ? LEADERBOARDS[statistic].title : ''}`);
 
     useEffect(() => {
         //change url without reloading
-        window.history.replaceState(null, null, `/leaderboards/${ruleset}/${statistic || 'pp'}/page/${page || 1}`);
+        window.history.replaceState(null, null, `/leaderboards/${ruleset}/${statistic || 'pp'}/page/${page || 1}/country/${country || ''}`);
 
         //fetch leaderboard data here based on statistic and page
         (async () => {
             setIsWorking(true);
             try {
-                const data = await getLeaderboard(ruleset, statistic, page, "desc", LIMIT);
+                const data = await getLeaderboard(ruleset, statistic, page, "desc", LIMIT, country);
 
                 //data.entries[i].value should be moved to data.entries[i].user.osuAlternative.lb_value
                 if (data && data.entries) {
@@ -177,7 +180,11 @@ function RouteLeaderboards() {
             }
             setIsWorking(false);
         })()
-    }, [ruleset, statistic, page]);
+    }, [ruleset, statistic, page, country]);
+
+    useEffect(() => {
+        console.log(countries.all);
+    }, []);
 
     if (!statistic) {
         return <Navigate to={`/leaderboards/osu/${Object.keys(LEADERBOARDS)[0]}`} replace />;
@@ -243,6 +250,22 @@ function RouteLeaderboards() {
                             );
                         })
                     }
+                    <Autocomplete
+                        disablePortal
+                        id="country-select"
+                        options={countries.all.map(c => ({ code: c.alpha2, label: c.name, emoji: c.emoji }))}
+                        sx={{ width: 300 }}
+                        value={country ? { code: country, label: lookup.countries({ alpha2: country })[0].name } : null}
+                        onChange={(event, newValue) => {
+                            setCountry(newValue ? newValue.code : null);
+                        }}
+                        getOptionLabel={(option) => {
+                            return `${option.emoji || ''} ${option.label}`;
+                        }}
+                        //selected value should show flag and country name
+                        renderInput={(params) => <TextField {...params} label="Filter by country" />}
+                        disabled={isWorking}
+                    />
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                     <Box sx={{

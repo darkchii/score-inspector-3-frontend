@@ -68,8 +68,8 @@ export function ApiProvider({ children }) {
         return response;
     }
 
-    const getLeaderboard = async (ruleset, statistic, page, sort_direction = "desc", limit = 50, progressEvent = null) => {
-        const response = await apiGet(`leaderboard/${ruleset}/${statistic}/${page}/${sort_direction}/${limit}`, progressEvent);
+    const getLeaderboard = async (ruleset, statistic, page, sort_direction = "desc", limit = 50, country = null, progressEvent = null) => {
+        const response = await apiGet(`leaderboard/${ruleset}/${statistic}/${page}/${sort_direction}/${limit}/${country || ''}`, progressEvent);
         return response;
     }
 

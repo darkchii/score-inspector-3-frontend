@@ -31,7 +31,7 @@ function App() {
     { path: "/user/:userId/:ruleset?/:page?", element: <RouteProfile /> },
     { path: "/score/:scoreId", element: <RouteScore /> },
     { path: "/completionists", element: <RouteCompletionists /> },
-    { path: "/leaderboards/:ruleset?/:statistic?/page?/:page?", element: <RouteLeaderboards /> },
+    { path: "/leaderboards/:ruleset?/:statistic?/page?/:page?/country?/:country?", element: <RouteLeaderboards /> },
   ];
 
   const getRoute = (obj, is_child = false) => {
