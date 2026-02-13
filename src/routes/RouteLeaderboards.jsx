@@ -4,7 +4,7 @@ import { Navigate, useParams } from "react-router";
 import RulesetSelector from "../components/RulesetSelector";
 import { useApi } from "../providers/ApiProvider";
 import { TextureDatabase } from "../assets/textures/TextureDatabase";
-import { FormatNumber } from "../util/Helper";
+import { FormatNumber, FormatNumberWithPrecision } from "../util/Helper";
 import ItemList from "../components/list/ItemList";
 import PlayerListRow from "../components/list/PlayerListRow";
 import { usePageTitle } from "../providers/TitleProvider";
@@ -113,6 +113,13 @@ const LEADERBOARDS = {
         title: 'Play Count',
         category: 'user',
         formatter: FormatNumber,
+    },
+    'completion': {
+        title: 'Completion',
+        category: 'user',
+        formatter: (value) => {
+            return `${FormatNumberWithPrecision(value, 2)}%`;
+        },
     }
 }
 const LEADERBOARDS_CATEGORIES = Object.keys(LEADERBOARDS).reduce((acc, key) => {
