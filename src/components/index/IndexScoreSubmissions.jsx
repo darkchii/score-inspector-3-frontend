@@ -1,4 +1,4 @@
-import { Alert, Box, Button, ButtonGroup, Collapse, Fade, Paper, Typography, useTheme } from "@mui/material";
+import { Alert, Box, Button, ButtonGroup, CircularProgress, Collapse, Fade, Paper, Typography, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import RulesetSelector from "../RulesetSelector";
 import { useApi } from "../../providers/ApiProvider";
@@ -51,10 +51,9 @@ const STAT_TYPES = [
     { label: 'Total Score', value: 'total_score_sum' },
 ]
 
-function IndexScoreSubmissions({ activeRuleset, setActiveRuleset }) {
+function IndexScoreSubmissions({ activeRuleset, setActiveRuleset, isWorking, setIsWorking }) {
     const theme = useTheme();
     const { getScoreSubmissions } = useApi();
-    const [isWorking, setIsWorking] = useState(false);
     const [rawData, setRawData] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
 
@@ -242,8 +241,10 @@ function IndexScoreSubmissions({ activeRuleset, setActiveRuleset }) {
                     </Box>
                 </Fade>
             </Box>
-            <Collapse in={isWorking} sx={{ display: 'inline-block', marginLeft: 2 }}>
-                <Typography variant="caption">Loading...</Typography>
+            <Collapse in={isWorking} sx={{ display: 'inline-block', marginLeft: 2, width: '100%' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100, width: '100%' }}>
+                    <CircularProgress size={48} />
+                </Box>
             </Collapse>
             <Collapse in={!isWorking}>
                 {error && <Alert severity="error" sx={{ mb: 1 }}>Error loading: {error.message}</Alert>}

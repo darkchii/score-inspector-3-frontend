@@ -18,6 +18,10 @@ function BeatmapListRow({ item, index, showPlayed = false, isCompact = false, sh
     const { getScoreById } = useProfile();
     const { loadScoreView } = useScoreView();
 
+    if(!item) {
+        return null;
+    }
+
     return (
         <ItemListRowBase
             cover_url={`https://assets.ppy.sh/beatmaps/${item.beatmapset_id}/covers/cover.jpg` || ''}

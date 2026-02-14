@@ -12,10 +12,9 @@ const titleMap = {
     'last_year': 'last year'
 }
 
-function IndexTopPlayers({ activeRuleset, setActiveRuleset }) {
+function IndexTopPlayers({ activeRuleset, setActiveRuleset, isWorking, setIsWorking }) {
     const theme = useTheme();
     const { getTodayTopPlayers } = useApi();
-    const [isWorking, setIsWorking] = useState(false);
     const [rawData, setRawData] = useState(null);
     const [error, setError] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);

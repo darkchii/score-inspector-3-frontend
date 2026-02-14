@@ -1,5 +1,5 @@
 import { Avatar, TableCell, TableRow, Typography, useTheme } from "@mui/material";
-import { getContrastColor } from "../../util/Helper";
+import { FormatNumber, getContrastColor } from "../../util/Helper";
 
 function ItemListRowBase({
     item,
@@ -13,6 +13,10 @@ function ItemListRowBase({
     children
 }) {
     const theme = useTheme();
+
+    if(!item) {
+        return null;
+    }
 
     return (
         <TableRow
@@ -43,7 +47,7 @@ function ItemListRowBase({
         >
             {showIndex &&
                 <TableCell width={40}>
-                    <Typography sx={{ fontSize: '0.9rem', fontWeight: 'bold' }}>#{startIndex + index + 1}</Typography>
+                    <Typography sx={{ fontSize: '0.9rem', fontWeight: 'bold' }}>#{FormatNumber(startIndex + index + 1)}</Typography>
                 </TableCell>
             }
             {children}

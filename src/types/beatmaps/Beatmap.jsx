@@ -7,6 +7,7 @@ class Beatmap {
         }
 
         this.beatmap_id = Number(api_data.beatmap_id);
+        this.id = this.beatmap_id; // alias for id, used in some places
         this.beatmapset_id = Number(api_data.beatmapset_id);
 
         this.mapper_id = Number(api_data.mapper_id);
@@ -71,6 +72,8 @@ class Beatmap {
         this.lchg_time = api_data.lchg_time ? new Date(api_data.lchg_time) : null;
 
         this.attr_diff = null;
+
+        this.lb_value = null; // for leaderboards, is always set externally
     }
 
     addScore(score) {

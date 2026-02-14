@@ -51,7 +51,7 @@ function ItemList({
                     }}>
                         {items?.slice(0, displayCount).map((item, index) => (
                             <ItemListRowType
-                                key={item.id}
+                                key={item?.id || index}
                                 item={item}
                                 index={index}
                                 showIndex={showIndex}
