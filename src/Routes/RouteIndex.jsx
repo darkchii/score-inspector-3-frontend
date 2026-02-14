@@ -1,5 +1,5 @@
 import IndexTopPlayers from "../components/index/IndexTopPlayers";
-import { Alert, Grid, Stack } from "@mui/material";
+import { Alert, AlertTitle, Grid, Stack } from "@mui/material";
 import { usePageTitle } from "../providers/TitleProvider";
 import IndexLanding from "../components/index/IndexLanding";
 import IndexScoreSubmissions from "../components/index/IndexScoreSubmissions";
@@ -39,9 +39,14 @@ function RouteIndex() {
     return (<>
         <Stack spacing={1} sx={{ width: '100%', boxSizing: 'border-box', padding: 1 }}>
             {alerts.map((alert, index) => (
-                <Alert key={index} severity={alert.type} sx={{ width: '100%' }}>
-                    <strong>{alert.title}</strong><br />
+                <Alert key={index} variant='outlined' severity={alert.type} sx={{ 
+                    position: 'relative',
+                }}>
+                    <AlertTitle>{alert.title}</AlertTitle>
                     {alert.text}
+                    <div style={{ position: 'absolute', top: 8, right: 8, fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.7)' }}>
+                        {new Date(alert.created_at).toLocaleString()}
+                    </div>
                 </Alert>
             ))}
             <Grid container spacing={2} sx={{
