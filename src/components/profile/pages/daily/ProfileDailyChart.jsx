@@ -5,14 +5,14 @@ import { useScoreView } from "../../../../providers/ScoreViewProvider";
 import { Chart } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { useEffect, useState } from "react";
-import { Button, ButtonGroup } from "@mui/material";
+import { Button, ButtonGroup, FormControlLabel, FormGroup, Switch } from "@mui/material";
 
 Chart.register(annotationPlugin);
 
 const chartDefinitions = {
     pp: { value: 'pp', nesting: ['implied_pp'], label: 'Performance', yFormat: (y) => y.toFixed(2) + 'pp' },
     score: { value: 'score', nesting: ['implied_total_score'], label: 'Score', yFormat: (y) => y.toLocaleString('en-US') },
-    accuracy: { value: 'accuracy', nesting: ['accuracy'], label: 'Accuracy', yFormat: (y) => (y * 100).toFixed(2) + '%', max: 1},
+    accuracy: { value: 'accuracy', nesting: ['accuracy'], label: 'Accuracy', yFormat: (y) => (y * 100).toFixed(2) + '%', max: 1 },
     combo: { value: 'combo', nesting: ['combo'], label: 'Combo', yFormat: (y) => y.toLocaleString('en-US') + 'x' },
     length: { value: 'length', nesting: ['local_beatmap', 'length_modded'], label: 'Length', yFormat: (y) => `${Math.floor(y / 60)}:${(y % 60).toString().padStart(2, '0')}` },
     sr: { value: 'sr', nesting: ['star_rating'], label: 'Stars', yFormat: (y) => y.toFixed(2) + '★' },
@@ -28,6 +28,9 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartE
 
     const [sessionAnnotations, setSessionAnnotations] = useState([]);
     const [activeDisplayChart, setActiveDisplayChart] = useState(chartDefinitions.pp.value);
+
+    const [displayAnnotations, setDisplayAnnotations] = useState(true);
+    const [_displayStartEnd, setDisplayStartEnd] = useState(displayStartEnd);
 
     useEffect(() => {
         const annotations = {};
@@ -165,7 +168,7 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartE
                             annotation: {
                                 //vertical line at start and end of day
                                 annotations: {
-                                    ...(displayStartEnd ? {
+                                    ...(_displayStartEnd ? {
                                         startLine: {
                                             type: 'line',
                                             xMin: new Date(`${dateStart}T00:00:00Z`).getTime() / 1000,
@@ -179,7 +182,7 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartE
                                             }
                                         }
                                     } : {}),
-                                    ...(displayStartEnd ? {
+                                    ...(_displayStartEnd ? {
                                         endLine: {
                                             type: 'line',
                                             xMin: new Date(`${dateEnd || dateStart}T23:59:59Z`).getTime() / 1000,
@@ -195,7 +198,7 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartE
                                     } : {}),
                                     //extra lines for each day if dateEnd is set and > 1 day
                                     ...(
-                                        dateEnd && dateEnd !== dateStart ?
+                                        (_displayStartEnd && dateEnd && dateEnd !== dateStart) ?
                                             (() => {
                                                 const extraAnnotations = {};
                                                 const startDate = new Date(dateStart);
@@ -223,7 +226,7 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartE
                                             })()
                                             : {}
                                     ),
-                                    ...(sessionAnnotations || {})
+                                    ...((displayAnnotations && sessionAnnotations) ? sessionAnnotations : {})
                                 }
                             }
                         },
@@ -238,6 +241,14 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartE
                         }
                     }}
                 />
+            </div>
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+                <FormGroup>
+                    <FormControlLabel control={<Switch checked={displayAnnotations} onChange={(e) => setDisplayAnnotations(e.target.checked)} />} label="Show Sessions/Breaks" />
+                </FormGroup>
+                <FormGroup>
+                    <FormControlLabel control={<Switch checked={_displayStartEnd} onChange={(e) => setDisplayStartEnd(e.target.checked)} />} label="Show day Start/End" />
+                </FormGroup>
             </div>
         </div>
     )
