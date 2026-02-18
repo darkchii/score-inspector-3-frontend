@@ -1,6 +1,14 @@
 import { Box, Table, TableBody, tableCellClasses, TableContainer, tableRowClasses, Typography, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 
+function getWindowDimensions() {
+    const { innerWidth: width, innerHeight: height } = window;
+    return {
+        width,
+        height
+    };
+}
+
 const truncateStep = 10;
 function ItemList({
     startIndex = 0,
@@ -17,6 +25,20 @@ function ItemList({
 
     const theme = useTheme();
     const [displayCount, setDisplayCount] = useState(truncate ? truncateStartStep : items?.length || 0);
+
+    const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
+    const [isMobile, setIsMobile] = useState(windowDimensions.width < theme.breakpoints.values.md);
+
+    useEffect(() => {
+        function handleResize() {
+            const newDimensions = getWindowDimensions();
+            setWindowDimensions(newDimensions);
+            setIsMobile(newDimensions.width < theme.breakpoints.values.md);
+        }
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         if (truncate) {
@@ -59,6 +81,7 @@ function ItemList({
                                 isCompact={isCompact}
                                 leaderboardField={leaderboardField}
                                 leaderboardFormat={leaderboardFormat}
+                                isMobile={isMobile}
                                 {...passthroughProps}
                             />
                         ))}
