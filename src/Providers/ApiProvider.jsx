@@ -38,8 +38,16 @@ export function ApiProvider({ children }) {
         return response.data;
     }
 
-    const getBeatmapsLive = async (progressEvent = null) => {
-        const response = await apiGet('beatmap/all', progressEvent);
+    const apiPost = async (endpoint, body, progressEvent = null) => {
+        const url = `${getApiUrl()}${endpoint}`;
+        const response = await axios.post(url, body, {
+            onUploadProgress: progressEvent
+        });
+        return response.data;
+    }
+
+    const getBeatmapsLive = async (compact = false, progressEvent = null) => {
+        const response = await apiGet(`beatmap/all?compact=${compact}`, progressEvent);
         return response;
     }
 
@@ -108,8 +116,16 @@ export function ApiProvider({ children }) {
         return response;
     }
 
+    const getProcessedRealm = async (realmFile, progressEvent = null) => {
+        const formData = new FormData();
+        formData.append('realmFile', realmFile);
+
+        const response = await apiPost(`system/process-realm`, formData, progressEvent);
+        return response;
+    }
+
     return (
-        <ApiContext.Provider value={{ getUserLive, getScoresLive, getBeatmapsLive, getBeatmapPacks, getCompletionists, getUserSearch, getLeaderboard, getTodayTopPlayers, getGlobalStats, getScoreSubmissions, getActiveUsers, getRoleUsers, getServerInfo, getAlerts }}>
+        <ApiContext.Provider value={{ getUserLive, getScoresLive, getBeatmapsLive, getBeatmapPacks, getCompletionists, getUserSearch, getLeaderboard, getTodayTopPlayers, getGlobalStats, getScoreSubmissions, getActiveUsers, getRoleUsers, getServerInfo, getAlerts, getProcessedRealm }}>
             {children}
         </ApiContext.Provider>
     )

@@ -247,6 +247,22 @@ export const GetRulesets = () => {
     ]
 }
 
+export const GetStatusLabelFromInt = (status) => {
+    switch (status) {
+        default:
+        case 0:
+            return 'Unranked';
+        case 1:
+            return 'Ranked';
+        case 2:
+            return 'Approved';
+        case 3:
+            return 'Qualified';
+        case 4:
+            return 'Loved';
+    }
+}
+
 export const getContrastColor = (bgColor) => {
     // Calculate the luminance of the background color
     const color = bgColor.charAt(0) === '#' ? bgColor.substring(1, 7) : bgColor;
@@ -468,4 +484,18 @@ export function GetNestedValue(obj, keyPath) {
     return keyPath.reduce((accumulator, currentKey) => {
         return accumulator ? accumulator[currentKey] : null;
     }, obj);
+}
+
+export function readFileAsync(file) {
+    return new Promise((resolve, reject) => {
+        let reader = new FileReader();
+
+        reader.onload = () => {
+            resolve(reader.result);
+        };
+
+        reader.onerror = reject;
+
+        reader.readAsArrayBuffer(file);
+    })
 }
