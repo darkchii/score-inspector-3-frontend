@@ -2,28 +2,21 @@ import { Box, Collapse, Divider, Grid, List, ListItemButton, ListItemText, Paper
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { usePageTitle } from "../providers/TitleProvider";
-import ToolAttributeCalculator from "../components/tools/ToolAttributeCalculator";
 import ToolLevelCalculator from "../components/tools/ToolLevelCalculator";
 import ToolMissingBeatmaps from "../components/tools/ToolMissingBeatmaps";
 
 const TOOLS = [
     {
-        name: 'Attribute Calculator',
-        description: 'Calculates attributes based on mods',
-        link: '/tools/attribute-calculator',
-        component: <ToolAttributeCalculator />
+        name: 'Missing Beatmaps',
+        description: 'Find missing beatmaps from your osu! install',
+        link: '/tools/missing-beatmaps',
+        component: <ToolMissingBeatmaps />
     },
     {
         name: 'Level Calculator',
         description: 'Total score and level calculator',
         link: '/tools/level-calculator',
         component: <ToolLevelCalculator />
-    }, 
-    {
-        name: 'Missing Beatmaps',
-        description: 'Find missing beatmaps from your osu! install',
-        link: '/tools/missing-beatmaps',
-        component: <ToolMissingBeatmaps />
     }
 ]
 
