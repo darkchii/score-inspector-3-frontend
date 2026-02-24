@@ -19,6 +19,39 @@ import React from 'react';
 import { TitleProvider } from './providers/TitleProvider.jsx';
 import { ReputationProvider } from './providers/ReputationProvider.jsx';
 
+// Register Chart.js components globally
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  LogarithmicScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  TimeScale,
+  Filler
+} from 'chart.js';
+import 'chartjs-adapter-moment';
+import annotationPlugin from 'chartjs-plugin-annotation';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  LogarithmicScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  TimeScale,
+  Filler,
+  annotationPlugin
+);
+
 
 const theme = createTheme({
   palette: {

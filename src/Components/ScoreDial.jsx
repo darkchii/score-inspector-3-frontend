@@ -1,12 +1,12 @@
-import * as d3 from 'd3';
+import { arc, pie, easeQuadInOut } from 'd3';
 import { displayRank, GetGradeFromAccuracy, rankCutoffs } from '../util/Helper';
 import { animated, useSpring } from '@react-spring/web';
 import { useState } from 'react';
 import dialStyles from '../styles/dial.module.less';
 
 function ScoreDial({ score }) {
-    const arc = d3.arc();
-    const pie = d3.pie().sortValues(null);
+    const arcGenerator = arc();
+    const pieGenerator = pie().sortValues(null);
 
     const [displayedRank, setDisplayedRank] = useState("D");
     const _rankCutoffs = rankCutoffs(score);
@@ -20,7 +20,7 @@ function ScoreDial({ score }) {
         },
         config: {
             duration: 1250,
-            easing: d3.easeQuadInOut,
+            easing: easeQuadInOut,
         },
         onChange: (result) => {
             if (!score) return;
@@ -44,11 +44,11 @@ function ScoreDial({ score }) {
                     </defs>
                     <g transform="translate(100,100)">
                         {
-                            pie(_rankCutoffs).map((d) => (
+                            pieGenerator(_rankCutoffs).map((d) => (
                                 <path
                                     key={d.index}
                                     className={`${dialStyles.dial__inner} ${dialStyles[`dial__inner--${d.index}`]}`}
-                                    d={arc({ innerRadius: 68, outerRadius: 73, ...d }) ?? undefined}
+                                    d={arcGenerator({ innerRadius: 68, outerRadius: 73, ...d }) ?? undefined}
                                 />
                             ))
                         }
@@ -57,14 +57,14 @@ function ScoreDial({ score }) {
                                 <path
                                     key={1}
                                     className={`${dialStyles.dial__outer} ${dialStyles[`dial__outer--${1}`]}`}
-                                    d={arc({ innerRadius: 75, outerRadius: 100, startAngle: 0, endAngle: 2 * Math.PI }) ?? undefined}
+                                    d={arcGenerator({ innerRadius: 75, outerRadius: 100, startAngle: 0, endAngle: 2 * Math.PI }) ?? undefined}
                                 />
                                 <animated.path
                                     key={0}
                                     className={`${dialStyles.dial__outer} ${dialStyles[`dial__outer--${0}`]}`}
                                     d={
                                         springData.pos.to((accuracy) => {
-                                            return arc({ innerRadius: 75, outerRadius: 100, startAngle: 0, endAngle: accuracy })
+                                            return arcGenerator({ innerRadius: 75, outerRadius: 100, startAngle: 0, endAngle: accuracy })
                                         })
                                     }
                                 />

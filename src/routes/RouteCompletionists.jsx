@@ -3,32 +3,9 @@ import { useApi } from "../providers/ApiProvider";
 import { FormatNumber, GetRulesetColor, GetRulesetNameFromId, GetRulesetPrettyNameFromId, ShowNotification } from "../util/Helper";
 import { Alert, Divider, Grid, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { Line } from "react-chartjs-2";
-import 'chartjs-adapter-moment';
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-    TimeScale
-} from 'chart.js';
 import PlayerLink from "../components/PlayerLink";
 import { getCompletionistBadge, TextureDatabase } from "../assets/textures/TextureDatabase";
 import { usePageTitle } from "../providers/TitleProvider";
-
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-    TimeScale
-);
 
 function RouteCompletionists() {
     usePageTitle("Completionists");

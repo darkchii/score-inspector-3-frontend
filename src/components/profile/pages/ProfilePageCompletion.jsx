@@ -4,19 +4,9 @@ import { useProfile } from "../../../providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import { FormatNumber, FormatNumberWithPrecision } from "../../../util/Helper";
 import { Bar } from "react-chartjs-2";
-import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from "chart.js";
 import { GetColorInterpolation } from "../../../util/ColorUtils";
 import BetterTooltip from "../../tooltips/BetterTooltip";
 import NumberFlow from "@number-flow/react";
-
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend
-)
 
 const COMPLETION_DATA = {
     'cs': {

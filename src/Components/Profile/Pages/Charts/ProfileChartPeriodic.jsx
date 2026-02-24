@@ -3,18 +3,6 @@ import { useEffect, useState } from "react";
 import { useProfile } from "../../../../providers/ProfileProvider";
 import { Line } from "react-chartjs-2";
 import { FormatNumber, FormatNumberWithPrecision, GetGradeColor } from "../../../../util/Helper";
-import { Chart as ChartJS, CategoryScale, LinearScale, LogarithmicScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
-
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    LogarithmicScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-);
 
 const INCR_CUMUL_CHART_TYPES = {
     'scores': {

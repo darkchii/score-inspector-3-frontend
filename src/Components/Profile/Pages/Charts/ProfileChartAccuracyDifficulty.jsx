@@ -1,18 +1,8 @@
 // import { ScatterChart } from '@mui/x-charts/ScatterChart';
-import {
-  Chart as ChartJS,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend,
-} from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
 import { useProfile } from '../../../../providers/ProfileProvider';
 import { useScoreView } from '../../../../providers/ScoreViewProvider';
 import { Alert } from '@mui/material';
-
-ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend);
 
 function ProfileChartAccuracyDifficulty() {
     const { getRulesetStatistics, activeRuleset, getScoreById } = useProfile();

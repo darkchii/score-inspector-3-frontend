@@ -2,12 +2,8 @@ import { Scatter } from "react-chartjs-2";
 import { GetGradeColor, GetNestedValue } from "../../../../util/Helper";
 import { useProfile } from "../../../../providers/ProfileProvider";
 import { useScoreView } from "../../../../providers/ScoreViewProvider";
-import { Chart } from 'chart.js';
-import annotationPlugin from 'chartjs-plugin-annotation';
 import { useEffect, useState } from "react";
 import { Button, ButtonGroup, FormControlLabel, FormGroup, Switch } from "@mui/material";
-
-Chart.register(annotationPlugin);
 
 const chartDefinitions = {
     pp: { value: 'pp', nesting: ['implied_pp'], label: 'Performance', yFormat: (y) => y.toFixed(2) + 'pp' },
