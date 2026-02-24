@@ -5,7 +5,7 @@ import { ProfileRulesetStatisticsPacks } from "./ProfileRulesetStatisticsPacks";
 import SessionCollection from "./SessionCollection";
 
 const PERIODIC_SUFFIXES = ['daily', 'monthly', 'yearly'];
-const PERIODIC_SUFFIXES_CHARTS = ['daily', 'monthly', 'yearly'];
+const PERIODIC_SUFFIXES_CHARTS = ['monthly', 'yearly'];
 const LIMIT_CHART_SAMPLE_SIZE = 10000;
 
 const DATE_ISO_FORMAT_SLICES = {
