@@ -1,7 +1,8 @@
 import { Avatar, TableCell, TableRow, Typography, useTheme } from "@mui/material";
 import { FormatNumber, getContrastColor } from "../../util/Helper";
+import { memo } from "react";
 
-function ItemListRowBase({
+const ItemListRowBase = memo(function ItemListRowBase({
     item,
     cover_url,
     index,
@@ -61,6 +62,6 @@ function ItemListRowBase({
             }
         </TableRow>
     )
-}
+});
 
 export default ItemListRowBase;

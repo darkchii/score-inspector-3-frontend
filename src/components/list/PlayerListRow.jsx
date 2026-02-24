@@ -3,10 +3,15 @@ import { getContrastColor } from "../../util/Helper";
 import ItemListRowBase from "./ItemListRowBase";
 import { useNavigate } from "react-router";
 import PlayerLink from "../PlayerLink";
+import { memo, useCallback } from "react";
 
-function PlayerListRow({ item, index, isCompact = false, showIndex = true, startIndex = 0, leaderboardField = null, leaderboardFormat = null }) {
+const PlayerListRow = memo(function PlayerListRow({ item, index, isCompact = false, showIndex = true, startIndex = 0, leaderboardField = null, leaderboardFormat = null }) {
     const theme = useTheme();
     const navigate = useNavigate();
+    
+    const handleClick = useCallback(() => {
+        navigate(`/user/${item?.osuAlternative?.user_id || item?.osuApi?.id}`);
+    }, [navigate, item?.osuAlternative?.user_id, item?.osuApi?.id]);
 
     return (
         <ItemListRowBase
@@ -18,7 +23,7 @@ function PlayerListRow({ item, index, isCompact = false, showIndex = true, start
             leaderboardField={leaderboardField}
             leaderboardFormat={leaderboardFormat}
             item={item}
-            onClick={() => navigate(`/user/${item?.osuAlternative?.user_id || item?.osuApi?.id}`)}
+            onClick={handleClick}
         >
             <TableCell sx={{ maxWidth: '100px' }}>
                 <div style={{
@@ -46,6 +51,6 @@ function PlayerListRow({ item, index, isCompact = false, showIndex = true, start
             </TableCell>
         </ItemListRowBase>
     )
-}
+});
 
 export default PlayerListRow;

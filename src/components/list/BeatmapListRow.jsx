@@ -1,5 +1,5 @@
 import { Box, Button, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, tableRowClasses, Typography, useTheme } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import { GetRulesetIconFromId, TimeAgo } from "../../util/Helper";
 import DoneIcon from '@mui/icons-material/Done';
 import CloseIcon from '@mui/icons-material/Close';
@@ -13,7 +13,7 @@ import ItemListRowBase from "./ItemListRowBase";
 import { useScoreView } from "../../providers/ScoreViewProvider";
 import { useProfile } from "../../providers/ProfileProvider";
 
-function BeatmapListRow({ item, index, showPlayed = false, isCompact = false, showIndex = true, startIndex = 0, leaderboardField = null, leaderboardFormat = null }) {
+const BeatmapListRow = memo(function BeatmapListRow({ item, index, showPlayed = false, isCompact = false, showIndex = true, startIndex = 0, leaderboardField = null, leaderboardFormat = null }) {
     const theme = useTheme();
     const { getScoreById } = useProfile();
     const { loadScoreView } = useScoreView();
@@ -121,6 +121,6 @@ function BeatmapListRow({ item, index, showPlayed = false, isCompact = false, sh
             </TableCell>
         </ItemListRowBase>
     )
-}
+});
 
 export default BeatmapListRow;

@@ -1,5 +1,5 @@
 import { Box, Table, TableBody, tableCellClasses, TableContainer, tableRowClasses, Typography, useTheme } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback, memo } from "react";
 
 function getWindowDimensions() {
     const { innerWidth: width, innerHeight: height } = window;
@@ -10,7 +10,7 @@ function getWindowDimensions() {
 }
 
 const truncateStep = 10;
-function ItemList({
+const ItemList = memo(function ItemList({
     startIndex = 0,
     showIndex = false,
     items,
@@ -27,17 +27,28 @@ function ItemList({
     const [displayCount, setDisplayCount] = useState(truncate ? truncateStartStep : items?.length || 0);
 
     const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
-    const [isMobile, setIsMobile] = useState(windowDimensions.width < theme.breakpoints.values.md);
+    
+    // Memoize isMobile calculation
+    const isMobile = useMemo(() => {
+        return windowDimensions.width < theme.breakpoints.values.md;
+    }, [windowDimensions.width, theme.breakpoints.values.md]);
 
+    // Debounced resize handler
     useEffect(() => {
+        let timeoutId;
         function handleResize() {
-            const newDimensions = getWindowDimensions();
-            setWindowDimensions(newDimensions);
-            setIsMobile(newDimensions.width < theme.breakpoints.values.md);
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                const newDimensions = getWindowDimensions();
+                setWindowDimensions(newDimensions);
+            }, 150); // Debounce by 150ms
         }
 
         window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
 
     useEffect(() => {
@@ -46,7 +57,17 @@ function ItemList({
         } else {
             setDisplayCount(items?.length || 0);
         }
-    }, [truncate, items?.length]);
+    }, [truncate, truncateStartStep, items?.length]);
+    
+    // Memoize sliced items to avoid recalculating on every render
+    const displayedItems = useMemo(() => {
+        return items?.slice(0, displayCount) || [];
+    }, [items, displayCount]);
+    
+    // Memoize show more handler
+    const handleShowMore = useCallback(() => {
+        setDisplayCount(prev => Math.min(prev + truncateStep, items.length));
+    }, [items]);
 
     return (
         <>
@@ -71,7 +92,7 @@ function ItemList({
                             borderRadius: theme.shape.borderRadius,
                         },
                     }}>
-                        {items?.slice(0, displayCount).map((item, index) => (
+                        {displayedItems.map((item, index) => (
                             <ItemListRowType
                                 key={item?.id || index}
                                 item={item}
@@ -91,7 +112,7 @@ function ItemList({
             {
                 truncate && displayCount < (items?.length || 0) ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
-                        <Typography sx={{ cursor: 'pointer', color: theme.palette.primary.main }} onClick={() => setDisplayCount(prev => Math.min(prev + truncateStep, items.length))}>
+                        <Typography sx={{ cursor: 'pointer', color: theme.palette.primary.main }} onClick={handleShowMore}>
                             Show more...
                         </Typography>
                     </Box>
@@ -99,6 +120,6 @@ function ItemList({
             }
         </>
     )
-}
+});
 
 export default ItemList;

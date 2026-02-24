@@ -9,12 +9,16 @@ import BetterTooltip from "../tooltips/BetterTooltip";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ModDisplay from "../ModDisplay";
 import WarningIcon from '@mui/icons-material/Warning';
-import React from "react";
+import React, { memo, useCallback } from "react";
 import { grey } from "@mui/material/colors";
 
-function ScoreListRow({ item, index, isCompact = false, isMobile = false, showIndex = true, startIndex = 0, leaderboardField = null, leaderboardFormat = null }) {
+const ScoreListRow = memo(function ScoreListRow({ item, index, isCompact = false, isMobile = false, showIndex = true, startIndex = 0, leaderboardField = null, leaderboardFormat = null }) {
     const theme = useTheme();
     const { loadScoreView } = useScoreView();
+    
+    const handleClick = useCallback(() => {
+        loadScoreView(item);
+    }, [loadScoreView, item]);
 
     return (
         <React.Fragment>
@@ -27,7 +31,7 @@ function ScoreListRow({ item, index, isCompact = false, isMobile = false, showIn
                 leaderboardField={leaderboardField}
                 leaderboardFormat={leaderboardFormat}
                 item={item}
-                onClick={() => loadScoreView(item)}
+                onClick={handleClick}
             >
                 {/* Ruleset Icon */}
                 {
@@ -193,6 +197,6 @@ function ScoreListRow({ item, index, isCompact = false, isMobile = false, showIn
             }
         </React.Fragment>
     )
-}
+});
 
 export default ScoreListRow;
