@@ -1,22 +1,23 @@
 import axios from "axios";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo } from "react";
 
 const ApiContext = createContext();
 const apiAge = 1000 * 60 * 10; //10 minutes
 
 export function ApiProvider({ children }) {
-    const [apiCache, setApiCache] = useState({});
+    // Use useRef instead of useState to prevent re-renders when cache updates
+    const apiCacheRef = useRef({});
 
-    const getApiUrl = () => {
+    const getApiUrl = useCallback(() => {
         if(import.meta.env.NODE_ENV === 'development') {
             return import.meta.env.VITE_API_BASE_URL_DEV;
         }
         return import.meta.env.VITE_API_BASE_URL;
-    }
+    }, []);
 
-    const apiGet = async (endpoint, progressEvent = null) => {
+    const apiGet = useCallback(async (endpoint, progressEvent = null) => {
         const now = Date.now();
-        const cached = apiCache[endpoint];
+        const cached = apiCacheRef.current[endpoint];
         if (cached && (now - cached.timestamp < apiAge)) {
             return cached.data;
         }
@@ -27,105 +28,141 @@ export function ApiProvider({ children }) {
             onDownloadProgress: progressEvent
         });
 
-        setApiCache({
-            ...apiCache,
+        // Update cache without triggering re-renders
+        apiCacheRef.current = {
+            ...apiCacheRef.current,
             [endpoint]: {
                 data: response.data,
                 timestamp: now
             }
-        });
+        };
 
         return response.data;
-    }
+    }, [getApiUrl]);
 
-    const apiPost = async (endpoint, body, progressEvent = null) => {
+    const apiPost = useCallback(async (endpoint, body, progressEvent = null) => {
         const url = `${getApiUrl()}${endpoint}`;
         const response = await axios.post(url, body, {
             onUploadProgress: progressEvent
         });
         return response.data;
-    }
+    }, [getApiUrl]);
 
-    const getBeatmapsLive = async (compact = false, progressEvent = null) => {
+    const getBeatmapsLive = useCallback(async (compact = false, progressEvent = null) => {
         const response = await apiGet(`beatmap/all?compact=${compact}`, progressEvent);
         return response;
-    }
+    }, [apiGet]);
 
-    const getBeatmapPacks = async (progressEvent = null) => {
+    const getBeatmapPacks = useCallback(async (progressEvent = null) => {
         const response = await apiGet('beatmappack/all', progressEvent);
         return response;
-    }
+    }, [apiGet]);
 
-    const getUserLive = async (userId, progressEvent = null) => {
+    const getUserLive = useCallback(async (userId, progressEvent = null) => {
         const response = await apiGet(`user/${userId}/profile`, progressEvent);
         return response;
-    }
+    }, [apiGet]);
 
-    const getScoresLive = async (userId, progressEvent = null) => {
+    const getScoresLive = useCallback(async (userId, progressEvent = null) => {
         const response = await apiGet(`user/${userId}/scores`, progressEvent);
         return response;
-    }
+    }, [apiGet]);
 
-    const getCompletionists = async () => {
+    const getCompletionists = useCallback(async () => {
         const response = await apiGet(`user/completionists`);
         return response;
-    }
+    }, [apiGet]);
 
-    const getUserSearch = async (query, progressEvent = null) => {
+    const getUserSearch = useCallback(async (query, progressEvent = null) => {
         const response = await apiGet(`user/search/${encodeURIComponent(query)}`, progressEvent);
         return response;
-    }
+    }, [apiGet]);
 
-    const getLeaderboard = async (ruleset, statistic, page, sort_direction = "desc", limit = 50, country = null, progressEvent = null) => {
+    const getLeaderboard = useCallback(async (ruleset, statistic, page, sort_direction = "desc", limit = 50, country = null, progressEvent = null) => {
         const response = await apiGet(`leaderboard/${ruleset}/${statistic}/${page}/${sort_direction}/${limit}/${country || ''}`, progressEvent);
         return response;
-    }
+    }, [apiGet]);
 
-    const getTodayTopPlayers = async(ruleset, progressEvent = null) => {
+    const getTodayTopPlayers = useCallback(async(ruleset, progressEvent = null) => {
         const response = await apiGet(`stats/top-day/${ruleset}`, progressEvent);
         return response;
-    }
+    }, [apiGet]);
 
-    const getGlobalStats = async(progressEvent = null) => {
+    const getGlobalStats = useCallback(async(progressEvent = null) => {
         const response = await apiGet(`stats/global-stats`, progressEvent);
         return response;
-    }
+    }, [apiGet]);
 
-    const getScoreSubmissions = async (ruleset, progressEvent = null) => {
+    const getScoreSubmissions = useCallback(async (ruleset, progressEvent = null) => {
         const response = await apiGet(`stats/score-submissions/${ruleset}`, progressEvent);
         return response;
-    }
+    }, [apiGet]);
 
-    const getActiveUsers = async (progressEvent = null) => {
+    const getActiveUsers = useCallback(async (progressEvent = null) => {
         const response = await apiGet(`stats/active-users`, progressEvent);
         return response;
-    }
+    }, [apiGet]);
 
-    const getRoleUsers = async (progressEvent = null) => {
+    const getRoleUsers = useCallback(async (progressEvent = null) => {
         const response = await apiGet(`user/people`, progressEvent);
         return response;
-    }
+    }, [apiGet]);
 
-    const getServerInfo = async (progressEvent = null) => {
+    const getServerInfo = useCallback(async (progressEvent = null) => {
         const response = await apiGet(`system/info`, progressEvent);
         return response;
-    }
+    }, [apiGet]);
 
-    const getAlerts = async (progressEvent = null) => {
+    const getAlerts = useCallback(async (progressEvent = null) => {
         const response = await apiGet(`system/alerts`, progressEvent);
         return response;
-    }
+    }, [apiGet]);
 
-    const getProcessedRealm = async (realmFile, progressEvent = null) => {
+    const getProcessedRealm = useCallback(async (realmFile, progressEvent = null) => {
         const formData = new FormData();
         formData.append('realmFile', realmFile);
 
         const response = await apiPost(`system/process-realm`, formData, progressEvent);
         return response;
-    }
+    }, [apiPost]);
+
+    // Memoize the context value to prevent unnecessary re-renders
+    const contextValue = useMemo(() => ({
+        getUserLive,
+        getScoresLive,
+        getBeatmapsLive,
+        getBeatmapPacks,
+        getCompletionists,
+        getUserSearch,
+        getLeaderboard,
+        getTodayTopPlayers,
+        getGlobalStats,
+        getScoreSubmissions,
+        getActiveUsers,
+        getRoleUsers,
+        getServerInfo,
+        getAlerts,
+        getProcessedRealm
+    }), [
+        getUserLive,
+        getScoresLive,
+        getBeatmapsLive,
+        getBeatmapPacks,
+        getCompletionists,
+        getUserSearch,
+        getLeaderboard,
+        getTodayTopPlayers,
+        getGlobalStats,
+        getScoreSubmissions,
+        getActiveUsers,
+        getRoleUsers,
+        getServerInfo,
+        getAlerts,
+        getProcessedRealm
+    ]);
 
     return (
-        <ApiContext.Provider value={{ getUserLive, getScoresLive, getBeatmapsLive, getBeatmapPacks, getCompletionists, getUserSearch, getLeaderboard, getTodayTopPlayers, getGlobalStats, getScoreSubmissions, getActiveUsers, getRoleUsers, getServerInfo, getAlerts, getProcessedRealm }}>
+        <ApiContext.Provider value={contextValue}>
             {children}
         </ApiContext.Provider>
     )
