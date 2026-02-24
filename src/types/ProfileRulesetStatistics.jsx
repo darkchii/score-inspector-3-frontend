@@ -5,7 +5,7 @@ import { ProfileRulesetStatisticsPacks } from "./ProfileRulesetStatisticsPacks";
 import SessionCollection from "./SessionCollection";
 
 const PERIODIC_SUFFIXES = ['daily', 'monthly', 'yearly'];
-const PERIODIC_SUFFIXES_CHARTS = ['monthly', 'yearly'];
+const PERIODIC_SUFFIXES_CHARTS = ['daily', 'monthly', 'yearly'];
 const LIMIT_CHART_SAMPLE_SIZE = 10000;
 
 const DATE_ISO_FORMAT_SLICES = {
@@ -25,6 +25,48 @@ const getUTCDateString = (date, interval) => {
         throw new Error(`Invalid interval for date string: ${interval}`);
     }
     return date.toISOString().slice(0, DATE_ISO_FORMAT_SLICES[interval]);
+}
+
+// Optimized helper to calculate statistics in a single pass
+const calculateStatsInSinglePass = (scores, extractValue, filterFn = null) => {
+    if (!scores || scores.length === 0) {
+        return { max: 0, filteredMax: 0, values: [], filteredValues: [] };
+    }
+
+    let max = -Infinity;
+    let filteredMax = -Infinity;
+    const values = [];
+    const filteredValues = [];
+
+    for (const score of scores) {
+        const value = extractValue(score);
+        if (value !== null && value !== undefined) {
+            values.push(value);
+            if (value > max) max = value;
+            
+            if (filterFn && filterFn(score)) {
+                filteredValues.push(value);
+                if (value > filteredMax) filteredMax = value;
+            }
+        }
+    }
+
+    return {
+        max: max === -Infinity ? 0 : max,
+        filteredMax: filteredMax === -Infinity ? 0 : filteredMax,
+        values,
+        filteredValues
+    };
+}
+
+// Calculate median from sorted array
+const getMedian = (sortedArray) => {
+    if (sortedArray.length === 0) return 0;
+    const mid = Math.floor(sortedArray.length / 2);
+    if (sortedArray.length % 2 === 0) {
+        return (sortedArray[mid - 1] + sortedArray[mid]) / 2;
+    }
+    return sortedArray[mid];
 }
 
 export class ProfileRulesetStatistics {
@@ -371,16 +413,22 @@ export class ProfileRulesetStatistics {
                     grades_d: 0, //incompatible
                 }
 
+                // Calculate max values in a single pass to avoid creating multiple temporary arrays
+                const impliedScoreStats = calculateStatsInSinglePass(entry.set, s => s.implied_total_score, s => s.is_ss);
+                const lazerScoreStats = calculateStatsInSinglePass(entry.set, s => s.total_score, s => s.is_ss);
+                const ppStats = calculateStatsInSinglePass(entry.set_by_pp, s => s.implied_pp);
+                const durationStats = calculateStatsInSinglePass(entry.set, s => s.duration || 0);
+
                 this.periodic_graph_data[interval].highest[entry.date_string] = {
                     clears: 0, //incompatible
                     scores: 0, //incompatible
-                    implied_score: entry.set?.length > 0 ? Math.max(...entry.set.map(s => s.implied_total_score)) : 0,
-                    implied_score_ss: entry.set?.length > 0 ? Math.max(...entry.set.map(s => s.is_ss ? s.implied_total_score : 0)) : 0,
-                    lazer_score: entry.set?.length > 0 ? Math.max(...entry.set.map(s => s.total_score)) : 0,
-                    lazer_score_ss: entry.set?.length > 0 ? Math.max(...entry.set.map(s => s.is_ss ? s.total_score : 0)) : 0,
-                    pp: entry.set_by_pp?.length > 0 ? Math.max(...entry.set_by_pp.map(s => s.implied_pp)) : 0,
+                    implied_score: impliedScoreStats.max,
+                    implied_score_ss: impliedScoreStats.filteredMax,
+                    lazer_score: lazerScoreStats.max,
+                    lazer_score_ss: lazerScoreStats.filteredMax,
+                    pp: ppStats.max,
                     raw_pp: 0, //incompatible
-                    length_seconds: entry.set?.length > 0 ? Math.max(...entry.set.map(s => s.duration || 0)) : 0,
+                    length_seconds: durationStats.max,
                     sessions: 0, //incompatible
                     sessions_length_seconds: 0, //incompatible
                     grades_xh: 0, //incompatible
@@ -393,42 +441,18 @@ export class ProfileRulesetStatistics {
                     grades_d: 0, //incompatible
                 }
 
-                let _median_implied_score = 0;
-                let _median_implied_score_ss = 0;
-                let _median_lazer_score = 0;
-                let _median_lazer_score_ss = 0;
-                let _median_pp = 0;
+                // Sort the values arrays extracted earlier and calculate medians
+                impliedScoreStats.values.sort((a, b) => a - b);
+                impliedScoreStats.filteredValues.sort((a, b) => a - b);
+                lazerScoreStats.values.sort((a, b) => a - b);
+                lazerScoreStats.filteredValues.sort((a, b) => a - b);
+                ppStats.values.sort((a, b) => a - b);
 
-                if (entry.set?.length > 0) {
-                    const sorted_implied_scores = entry.set.map(s => s.implied_total_score).sort((a, b) => a - b);
-                    const sorted_implied_scores_ss = entry.set.filter(s => s.is_ss).map(s => s.implied_total_score).sort((a, b) => a - b);
-                    const sorted_lazer_scores = entry.set.map(s => s.total_score).sort((a, b) => a - b);
-                    const sorted_lazer_scores_ss = entry.set.filter(s => s.is_ss).map(s => s.total_score).sort((a, b) => a - b);
-                    const sorted_pp = entry.set_by_pp?.map(s => s.implied_pp).sort((a, b) => a - b) || [];
-
-                    const mid = Math.floor(entry.set.length / 2);
-
-                    if (entry.set.length % 2 === 0) {
-                        _median_implied_score = (sorted_implied_scores[mid - 1] + sorted_implied_scores[mid]) / 2;
-                        _median_lazer_score = (sorted_lazer_scores[mid - 1] + sorted_lazer_scores[mid]) / 2;
-                        _median_pp = sorted_pp.length > 0 ? (sorted_pp[mid - 1] + sorted_pp[mid]) / 2 : 0;
-                    } else {
-                        _median_implied_score = sorted_implied_scores[mid];
-                        _median_lazer_score = sorted_lazer_scores[mid];
-                        _median_pp = sorted_pp.length > 0 ? sorted_pp[mid] : 0;
-                    }
-                    if (sorted_implied_scores_ss.length > 0) {
-                        const mid_ss = Math.floor(sorted_implied_scores_ss.length / 2);
-                        if (sorted_implied_scores_ss.length % 2 === 0) {
-                            _median_implied_score_ss = (sorted_implied_scores_ss[mid_ss - 1] + sorted_implied_scores_ss[mid_ss]) / 2;
-                            _median_lazer_score_ss = (sorted_lazer_scores_ss[mid_ss - 1] + sorted_lazer_scores_ss[mid_ss]) / 2;
-                        }
-                        else {
-                            _median_implied_score_ss = sorted_implied_scores_ss[mid_ss];
-                            _median_lazer_score_ss = sorted_lazer_scores_ss[mid_ss];
-                        }
-                    }
-                }
+                const _median_implied_score = getMedian(impliedScoreStats.values);
+                const _median_implied_score_ss = getMedian(impliedScoreStats.filteredValues);
+                const _median_lazer_score = getMedian(lazerScoreStats.values);
+                const _median_lazer_score_ss = getMedian(lazerScoreStats.filteredValues);
+                const _median_pp = getMedian(ppStats.values);
 
                 this.periodic_graph_data[interval].median[entry.date_string] = {
                     clears: 0, //incompatible
