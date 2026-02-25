@@ -220,6 +220,15 @@ function RouteScore() {
                                 secondaryLeaderboardField={`score_rank.gained_score`}
                                 leaderboardFormat={(value) => `${FormatNumber(value)}`}
                             />
+                            <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 1, justifyContent: 'center' }}>
+                                <Pagination
+                                    count={data?.total_pages || 1}
+                                    page={parseInt(activePage)}
+                                    onChange={(event, value) => setActivePage(value)}
+                                    color="primary"
+                                    disabled={isWorking}
+                                />
+                            </Box>
                         </Box>
                     </Collapse>
                     <Collapse in={!isWorking && (!data || !data.entries || data.entries.length === 0)} unmountOnExit>

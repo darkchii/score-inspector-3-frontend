@@ -16,6 +16,7 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import InfoIcon from '@mui/icons-material/Info';
 import BuildIcon from '@mui/icons-material/Build';
 import HeaderUser from "./header/HeaderUser";
+import HistoryIcon from '@mui/icons-material/History';
 
 const HeaderButtonMenu = styled((props) => (
     <Menu
@@ -91,6 +92,13 @@ function Header() {
             label: 'Leaderboards',
             icon: <LeaderboardIcon />,
             to: '/leaderboards',
+            dropdown: [
+                {
+                    label: 'Score Rank History',
+                    to: '/score/',
+                    icon: <HistoryIcon />
+                }
+            ]
         },
         {
             label: 'Tools',
