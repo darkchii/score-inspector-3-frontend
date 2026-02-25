@@ -5,7 +5,19 @@ import { useNavigate } from "react-router";
 import PlayerLink from "../PlayerLink";
 import { memo, useCallback } from "react";
 
-const PlayerListRow = memo(function PlayerListRow({ item, index, isCompact = false, showIndex = true, startIndex = 0, leaderboardField = null, leaderboardFormat = null }) {
+const PlayerListRow = memo(function PlayerListRow({ 
+    item, 
+    index, 
+    isCompact = false, 
+    showIndex = true,
+    showIndexDifference = false,
+    indexDifferencePosition = null, 
+    indexFromItem = null,
+    startIndex = 0, 
+    leaderboardField = null, 
+    secondaryLeaderboardField = null,
+    leaderboardFormat = null 
+}) {
     const theme = useTheme();
     const navigate = useNavigate();
     
@@ -19,8 +31,12 @@ const PlayerListRow = memo(function PlayerListRow({ item, index, isCompact = fal
             index={index}
             isCompact={isCompact}
             showIndex={showIndex}
+            showIndexDifference={showIndexDifference}
+            indexDifferencePosition={indexDifferencePosition}
             startIndex={startIndex}
+            indexFromItem={indexFromItem}
             leaderboardField={leaderboardField}
+            secondaryLeaderboardField={secondaryLeaderboardField}
             leaderboardFormat={leaderboardFormat}
             item={item}
             onClick={handleClick}

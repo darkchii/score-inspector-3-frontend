@@ -17,7 +17,7 @@
     "@mui/material": "^7.1.0",
     "@mui/x-charts": "^8.21.0",
     "@mui/x-data-grid": "^8.27.1",
-    "@mui/x-date-pickers": "^8.23.0",
+    "@mui/x-date-pickers": "^8.27.2",
     "@number-flow/react": "^0.5.10",
     "@react-spring/web": "^10.0.3",
     "axios": "^1.9.0",

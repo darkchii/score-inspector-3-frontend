@@ -1,96 +1,237 @@
-import { useParams } from 'react-router';
-import scorePageStyles from '../styles/score-page.module.less';
+import { Box, Button, ButtonGroup, CircularProgress, Collapse, Divider, Pagination, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { GetExtraData, GetScoreFromId } from '../util/ScoreHelper';
-import ScoreView from '../components/scoreView/ScoreView';
-import { GetRulesetIconFromId } from '../util/Helper';
-import DifficultyBadge from '../components/DifficultyBadge';
+import RulesetSelector from '../components/RulesetSelector';
+import { Navigate, useParams } from 'react-router';
+import { useApi } from '../providers/ApiProvider';
+import { FormatNumber, ShowNotification } from '../util/Helper';
+import { DatePicker } from '@mui/x-date-pickers';
+import moment from 'moment';
+import ItemList from '../components/list/ItemList';
+import PlayerListRow from '../components/list/PlayerListRow';
+
+const VALID_STATS = {
+    rank: {
+        name: 'Rank',
+        key: 'rank',
+    },
+    gained_score: {
+        name: 'Gained Score',
+        key: 'gained_score',
+    },
+    gained_rank: {
+        name: 'Gained Rank',
+        key: 'gained_rank',
+    }
+};
 
 function RouteScore() {
-    const { scoreId } = useParams();
-    const [score, setScore] = useState(null);
-    const [rawBeatmap, setRawBeatmap] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [errorMessage, setErrorMessage] = useState(null);
+    const params = useParams();
+    const { getScoreRankDates, getHistoricScoreRanks } = useApi();
+    const [activeRuleset, setActiveRuleset] = useState(params.ruleset || 'osu');
+    const [activeStat, setActiveStat] = useState(params.stat || 'rank');
+    const [activeDate, setActiveDate] = useState(params.date ? moment.utc(params.date, 'YYYY-MM-DD', true) : null);
+    const [activePage, setActivePage] = useState(params.page || 1);
+    const [data, setData] = useState(null);
 
-    useEffect(() => {
-        //fetch score data
-        setIsLoading(true);
-        (async () => {
-            try {
-                const score = await GetScoreFromId(scoreId);
-                if (score) {
-                    const _rawBeatmap = await GetExtraData(score.beatmap_id, score.ruleset, score.mods);
-                    console.log(_rawBeatmap);
-                    setRawBeatmap(_rawBeatmap);
-                    setScore(score);
-                    setIsLoading(false);
-                } else {
-                    setErrorMessage("Score not found.");
-                    setIsLoading(false);
-                }
-            } catch (error) {
-                console.error("Error fetching score data:", error);
-                setErrorMessage("Failed to load score data.");
+    //TODO: date selector should grey out dates not in validDates
+    const [validDates, setValidDates] = useState(null);
+
+    const [isWorking, setIsWorking] = useState(false);
+    const [isLoadingDates, setIsLoadingDates] = useState(false);
+
+    const requestLeaderboard = async () => {
+        if (!activeRuleset || !activeStat || !activeDate) return;
+
+        setIsWorking(true);
+        try {
+            const response = await getHistoricScoreRanks(activeRuleset, activeStat, activeDate.format('YYYY-MM-DD'), activePage);
+            if (response && response.entries) {
+                setData(response);
+                console.log("Fetched leaderboard data:", response);
+            } else {
+                setData(null);
+                ShowNotification("No data available for the selected date and ruleset.", "info");
             }
-        })();
-    }, [scoreId]);
-
-    if (isLoading) {
-        return (
-            <div className={scorePageStyles['score-page']}>
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    padding: '20px',
-                }}>
-                    <h1>Loading score...</h1>
-                </div>
-            </div>
-        )
+        } catch (error) {
+            ShowNotification("Failed to fetch leaderboard data.", "error");
+            console.error("Error fetching leaderboard data:", error);
+        } finally {
+            setIsWorking(false);
+        }
     }
 
-    if (errorMessage) {
-        return (
-            <div className={scorePageStyles['score-page']}>
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    padding: '20px',
-                }}>
-                    <h1>{errorMessage}</h1>
-                </div>
-            </div>
-        )
+    const requestValidDates = async () => {
+        if (!activeRuleset) return;
+
+        setIsLoadingDates(true);
+        try {
+            const response = await getScoreRankDates(activeRuleset);
+            if (response.dates && Array.isArray(response.dates)) {
+                const dateMoments = response.dates.map(date => {
+                    const m = moment.utc(date, moment.ISO_8601, true);
+                    if (m.isValid()) {
+                        return m;
+                    } else {
+                        console.warn(`Invalid date format received from API: ${date}`);
+                        return null;
+                    }
+                }).filter(d => d !== null);
+
+                setValidDates(dateMoments);
+
+                // If activeDate is not set from params, set it to the most recent date
+                if (!params.date && dateMoments.length > 0) {
+                    const mostRecentDate = dateMoments.reduce((latest, current) =>
+                        current.isAfter(latest) ? current : latest
+                    );
+                    setActiveDate(mostRecentDate);
+                }
+            } else {
+                setValidDates([]);
+            }
+        } catch (error) {
+            ShowNotification("Failed to fetch valid dates for leaderboard.", "error");
+            console.error("Error fetching valid dates for leaderboard:", error);
+            setValidDates([]);
+        } finally {
+            setIsLoadingDates(false);
+        }
+    }
+
+    useEffect(() => {
+        requestValidDates();
+    }, [activeRuleset]);
+
+    useEffect(() => {
+        // Sync state with URL params  
+        const newRuleset = params.ruleset || 'osu';
+        const newStat = params.stat || 'rank';
+        const newDate = params.date ? moment.utc(params.date, 'YYYY-MM-DD', true) : null;
+        const newPage = parseInt(params.page) || 1;
+
+        setActiveRuleset(newRuleset);
+        setActiveStat(newStat);
+        setActivePage(newPage);
+
+        // Only set date from params if it's valid
+        if (newDate && newDate.isValid()) {
+            setActiveDate(newDate);
+        }
+    }, [params.ruleset, params.stat, params.date, params.page]);
+
+    useEffect(() => {
+        // Update URL when state changes
+        if (activeRuleset && activeDate) {
+            const url = `/score/${activeRuleset}/${activeStat}/${activeDate.format('YYYY-MM-DD')}/page/${activePage}`;
+            window.history.replaceState({}, '', url);
+        }
+    }, [activeRuleset, activeStat, activeDate, activePage]);
+
+    useEffect(() => {
+        // Fetch leaderboard data when all required params are ready
+        if (activeRuleset && activeStat && activeDate && !isLoadingDates) {
+            requestLeaderboard();
+        }
+    }, [activeRuleset, activeStat, activeDate, activePage, isLoadingDates]);
+
+    if (!activeRuleset) {
+        return <Navigate to={`/score/osu/rank`} replace />;
+    }
+
+    const isLoading = isLoadingDates || (isWorking && !data);
+
+    if (isLoadingDates || validDates === null) {
+        return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <CircularProgress />
+        </Box>
     }
 
     return (
-        <div className={scorePageStyles['score-page']}>
-            <div
-                style={{
-                    '--background-image': `url(https://assets.ppy.sh/beatmaps/${score.beatmap.beatmapset_id}/covers/fullsize.jpg)`,
-                }}
-                className={scorePageStyles['score-page__background']}
+        <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center', width: '100%' }}>
+            <RulesetSelector
+                activeRuleset={activeRuleset}
+                onChange={(ruleset) => setActiveRuleset(ruleset)}
+                showCombined={false}
             />
-            <div className={scorePageStyles['score-page__header']}>
-                <div><span className={scorePageStyles['score-page__header__title']}>{score.beatmap.title}</span> by {score.beatmap.artist}</div>
-                <div className={scorePageStyles['score-page__header__details']}>
-                    <img src={GetRulesetIconFromId(score.ruleset_id)} style={{ width: '1.5em', height: '1.5em', verticalAlign: 'middle', marginRight: '0.3em' }} />
-                    <DifficultyBadge difficulty={score.star_rating} />
-                    <span>{score.beatmap.version}</span>
-                    <div className={scorePageStyles['score-page__header__details__mapper']}>mapped by <strong>{score.beatmap.mapper || 'N/A'}</strong></div>
-                </div>
-            </div>
-            <div className={scorePageStyles['score-page__content']}>
-                <div className={scorePageStyles['score-page__content__score-view']}>
-                    <ScoreView score={score} noBackground={true} compact={true} />
-                </div>
-                <div className={scorePageStyles['score-page__content__score-details']}>
-                </div>
-            </div>
-        </div>
+
+            <Box sx={{pt: 1}} />
+
+            <DatePicker
+                label="Select Date"
+                value={activeDate}
+                onChange={(newValue) => setActiveDate(newValue)}
+                renderInput={(params) => <TextField {...params} />}
+                shouldDisableDate={(date) => {
+                    return !validDates.some(validDate => validDate.isSame(date, 'day'));
+                }}
+            />
+
+            <ButtonGroup variant="contained">
+                {
+                    Object.values(VALID_STATS).map((stat) => (
+                        <Button
+                            key={`stat_${stat.key}`}
+                            onClick={() => setActiveStat(stat.key)}
+                            color={activeStat === stat.key ? 'primary' : 'inherit'}
+                        >
+                            {stat.name}
+                        </Button>
+                    ))
+                }
+            </ButtonGroup>
+
+            <Divider />
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{
+                    minWidth: '50vw',
+                    mt: 2,
+                    //minWidth 100% on small screens
+                    '@media (max-width: 600px)': {
+                        minWidth: '100vw',
+                    },
+                }}>
+                    <Collapse in={isWorking} unmountOnExit>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+                            <CircularProgress />
+                        </Box>
+                    </Collapse>
+                    <Collapse in={!isWorking && data && data.entries && data.entries.length > 0} unmountOnExit>
+                        <Box sx={{ mt: 2, width: '100%' }}>
+                            <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 1, justifyContent: 'center' }}>
+                                <Pagination
+                                    count={data?.total_pages || 1}
+                                    page={parseInt(activePage)}
+                                    onChange={(event, value) => setActivePage(value)}
+                                    color="primary"
+                                    disabled={isWorking}
+                                />
+                            </Box>
+                            <ItemList
+                                startIndex={(activePage - 1) * 50}
+                                showIndex={true}
+                                showIndexDifference={true}
+                                indexFromItem={'score_rank.rank'}
+                                indexDifferencePosition='score_rank.gained_rank'
+                                items={data?.entries?.map(entry => entry.user)}
+                                isCompact={false}
+                                truncate={false}
+                                ItemListRowType={PlayerListRow}
+                                leaderboardField={`score_rank.ranked_score`}
+                                secondaryLeaderboardField={`score_rank.gained_score`}
+                                leaderboardFormat={(value) => `${FormatNumber(value)}`}
+                            />
+                        </Box>
+                    </Collapse>
+                    <Collapse in={!isWorking && (!data || !data.entries || data.entries.length === 0)} unmountOnExit>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+                            <Typography variant="body1" color="text.secondary">
+                                No data available for the selected date and ruleset.
+                            </Typography>
+                        </Box>
+                    </Collapse>
+                </Box>
+            </Box>
+        </Box>
     )
 }
 

@@ -38,7 +38,7 @@ function App() {
     { path: "/people", element: <RoutePeople /> },
     { path: "/tools/:tool?", element: <RouteTools /> },
     { path: "/user/:userId/:ruleset?/:page?", element: <RouteProfile /> },
-    { path: "/score/:scoreId", element: <RouteScore /> },
+    { path: "/score/:ruleset?/:stat?/:date?/page?/:page?", element: <RouteScore /> },
     { path: "/completionists", element: <RouteCompletionists /> },
     { path: "/leaderboards/:ruleset?/:statistic?/page?/:page?/country?/:country?", element: <RouteLeaderboards /> },
   ];

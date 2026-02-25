@@ -117,7 +117,6 @@ function IndexLanding() {
                         datasets: [{
                             label: 'Active Users',
                             data: activeUsersData.map(entry => ({ x: entry.hour, y: entry.count })),
-                            fill: true,
                             borderColor: theme.palette.primary.main, //primary color with some transparency
                             pointRadius: 0,
                         }]

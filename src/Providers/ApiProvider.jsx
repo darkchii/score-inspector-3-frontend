@@ -126,6 +126,16 @@ export function ApiProvider({ children }) {
         return response;
     }, [apiPost]);
 
+    const getScoreRankDates = useCallback(async (ruleset, progressEvent = null) => {
+        const response = await apiGet(`leaderboard/score-rank/info/${ruleset}`, progressEvent);
+        return response;
+    }, [apiGet]);
+
+    const getHistoricScoreRanks = useCallback(async (ruleset, stat, date, page, progressEvent = null) => {
+        const response = await apiGet(`leaderboard/score-rank/${ruleset}/${stat}/${date}/${page}`, progressEvent);
+        return response;
+    }, [apiGet]);
+
     // Memoize the context value to prevent unnecessary re-renders
     const contextValue = useMemo(() => ({
         getUserLive,
@@ -142,7 +152,9 @@ export function ApiProvider({ children }) {
         getRoleUsers,
         getServerInfo,
         getAlerts,
-        getProcessedRealm
+        getProcessedRealm,
+        getScoreRankDates,
+        getHistoricScoreRanks
     }), [
         getUserLive,
         getScoresLive,
@@ -158,7 +170,9 @@ export function ApiProvider({ children }) {
         getRoleUsers,
         getServerInfo,
         getAlerts,
-        getProcessedRealm
+        getProcessedRealm,
+        getScoreRankDates,
+        getHistoricScoreRanks
     ]);
 
     return (

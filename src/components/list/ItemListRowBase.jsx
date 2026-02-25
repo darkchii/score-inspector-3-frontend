@@ -1,14 +1,27 @@
 import { Avatar, TableCell, TableRow, Typography, useTheme } from "@mui/material";
-import { FormatNumber, getContrastColor } from "../../util/Helper";
+import { FormatNumber, FormatNumberWithPrecision, getContrastColor } from "../../util/Helper";
 import { memo } from "react";
+
+const getGainColor = (value, theme) => {
+    if(value > 0) {
+        return theme.palette.success.main;
+    } else if(value < 0) {
+        return theme.palette.error.main;
+    }
+    return theme.palette.text.primary;
+}
 
 const ItemListRowBase = memo(function ItemListRowBase({
     item,
     cover_url,
     index,
     showIndex = true,
+    showIndexDifference = false,
+    indexDifferencePosition = null,
+    indexFromItem = null,
     startIndex = 0,
     leaderboardField = null,
+    secondaryLeaderboardField = null,
     leaderboardFormat = null,
     onClick = null,
     children
@@ -48,7 +61,15 @@ const ItemListRowBase = memo(function ItemListRowBase({
         >
             {showIndex &&
                 <TableCell width={40}>
-                    <Typography sx={{ fontSize: '0.9rem', fontWeight: 'bold' }}>#{FormatNumber(startIndex + index + 1)}</Typography>
+                    <Typography sx={{ fontSize: '0.9rem', fontWeight: 'bold' }}>#{FormatNumber(indexFromItem ? indexFromItem.split('.').reduce((obj, key) => obj && obj[key] !== 'undefined' ? obj[key] : null, item) : startIndex + index + 1)}</Typography>
+                    {
+                        showIndexDifference && indexDifferencePosition &&
+                        <Typography sx={{ fontSize: '0.75rem', color: getGainColor(item?.[indexDifferencePosition.split('.')[0]]?.[indexDifferencePosition.split('.')[1]], theme) }}>
+                            {/* make sure to check separator (.) */}
+                            {item?.[indexDifferencePosition.split('.')[0]]?.[indexDifferencePosition.split('.')[1]] > 0 && `+${FormatNumber(item[indexDifferencePosition.split('.')[0]][indexDifferencePosition.split('.')[1]])}`}
+                            {item?.[indexDifferencePosition.split('.')[0]]?.[indexDifferencePosition.split('.')[1]] < 0 && `${FormatNumber(item[indexDifferencePosition.split('.')[0]][indexDifferencePosition.split('.')[1]])}`}
+                        </Typography>
+                    }
                 </TableCell>
             }
             {children}
@@ -58,6 +79,12 @@ const ItemListRowBase = memo(function ItemListRowBase({
                     <Typography sx={{ fontSize: '0.85rem', fontWeight: 'bold' }}>
                         {leaderboardFormat ? leaderboardFormat(leaderboardField.split('.').reduce((obj, key) => obj && obj[key] !== 'undefined' ? obj[key] : null, item)) : FormatNumberWithPrecision(leaderboardField.split('.').reduce((obj, key) => obj && obj[key] !== 'undefined' ? obj[key] : null, item), 2)}
                     </Typography>
+                    {
+                        secondaryLeaderboardField &&
+                        <Typography sx={{ fontSize: '0.75rem', color: getGainColor(secondaryLeaderboardField.split('.').reduce((obj, key) => obj && obj[key] !== 'undefined' ? obj[key] : null, item), theme) }}>
+                            {leaderboardFormat ? leaderboardFormat(secondaryLeaderboardField.split('.').reduce((obj, key) => obj && obj[key] !== 'undefined' ? obj[key] : null, item)) : FormatNumberWithPrecision(secondaryLeaderboardField.split('.').reduce((obj, key) => obj && obj[key] !== 'undefined' ? obj[key] : null, item), 2)}
+                        </Typography>
+                    }
                 </TableCell>
             }
         </TableRow>

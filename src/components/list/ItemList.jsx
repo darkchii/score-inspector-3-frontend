@@ -13,11 +13,15 @@ const truncateStep = 10;
 const ItemList = memo(function ItemList({
     startIndex = 0,
     showIndex = false,
+    showIndexDifference = false,
+    indexDifferencePosition = null,
+    indexFromItem = null,
     items,
     isCompact = false,
     truncate = false,
     truncateStartStep = truncateStep,
     leaderboardField = null,
+    secondaryLeaderboardField = null,
     leaderboardFormat = null,
     passthroughProps = {},
     ItemListRowType
@@ -98,9 +102,13 @@ const ItemList = memo(function ItemList({
                                 item={item}
                                 index={index}
                                 showIndex={showIndex}
+                                showIndexDifference={showIndexDifference}
+                                indexDifferencePosition={indexDifferencePosition}
+                                indexFromItem={indexFromItem}
                                 startIndex={startIndex}
                                 isCompact={isCompact}
                                 leaderboardField={leaderboardField}
+                                secondaryLeaderboardField={secondaryLeaderboardField}
                                 leaderboardFormat={leaderboardFormat}
                                 isMobile={isMobile}
                                 {...passthroughProps}
