@@ -12,6 +12,7 @@ import BetterTooltip from "../components/tooltips/BetterTooltip";
 import { countries, currencies, languages, timezones, lookup } from 'country-data-list';
 import BeatmapListRow from "../components/list/BeatmapListRow";
 import Beatmap from "../types/beatmaps/Beatmap";
+import { grey } from "@mui/material/colors";
 
 const LIMIT = 50;
 const LEADERBOARDS = {
@@ -19,6 +20,7 @@ const LEADERBOARDS = {
         title: 'Performance',
         suffix: 'pp',
         category: 'user',
+        formatter: FormatNumber,
     },
     'ranked_score': {
         title: 'Ranked Score',
@@ -239,12 +241,14 @@ function RouteLeaderboards() {
                         const _beatmap = new Beatmap(entry.beatmap);
                         entry.beatmap = _beatmap;
                         entry.beatmap.lb_value = entry.value;
+                        entry.beatmap.lb_value_diff = entry.difference_value;
                         return entry;
                     });
                 } else {
                     data.entries = data.entries.map(entry => {
                         entry.user.osuAlternative = entry.user.osuAlternative || {};
                         entry.user.osuAlternative.lb_value = entry.value;
+                        entry.user.osuAlternative.lb_value_diff = entry.difference_value;
                         return entry;
                     });
                 }
@@ -425,10 +429,12 @@ function RouteLeaderboards() {
                                                     isCompact={false}
                                                     truncate={false}
                                                     leaderboardField={!LEADERBOARDS[statistic].hide_value ? 'lb_value' : null}
+                                                    secondaryLeaderboardField={!LEADERBOARDS[statistic].hide_value ? 'lb_value_diff' : null}
                                                     leaderboardFormat={(value) => {
                                                         return `${LEADERBOARDS[statistic].formatter ? LEADERBOARDS[statistic].formatter(value) : Number(value)}${LEADERBOARDS[statistic].suffix || ''}`;
                                                     }}
                                                     ItemListRowType={BeatmapListRow}
+                                                    secondaryFieldColor={grey[500]}
                                                 />
                                             ) : (
                                                 <ItemList
@@ -438,10 +444,12 @@ function RouteLeaderboards() {
                                                     isCompact={false}
                                                     truncate={false}
                                                     leaderboardField={!LEADERBOARDS[statistic].hide_value ? 'osuAlternative.lb_value' : null}
+                                                    secondaryLeaderboardField={!LEADERBOARDS[statistic].hide_value ? 'osuAlternative.lb_value_diff' : null}
                                                     leaderboardFormat={(value) => {
                                                         return `${LEADERBOARDS[statistic].formatter ? LEADERBOARDS[statistic].formatter(value) : Number(value)}${LEADERBOARDS[statistic].suffix || ''}`;
                                                     }}
                                                     ItemListRowType={PlayerListRow}
+                                                    secondaryFieldColor={grey[500]}
                                                 />
                                             )
                                         }

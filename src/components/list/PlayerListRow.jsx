@@ -16,7 +16,9 @@ const PlayerListRow = memo(function PlayerListRow({
     startIndex = 0, 
     leaderboardField = null, 
     secondaryLeaderboardField = null,
-    leaderboardFormat = null 
+    secondaryFieldColor = null,
+    leaderboardFormat = null,
+    ...props
 }) {
     const theme = useTheme();
     const navigate = useNavigate();
@@ -38,8 +40,10 @@ const PlayerListRow = memo(function PlayerListRow({
             leaderboardField={leaderboardField}
             secondaryLeaderboardField={secondaryLeaderboardField}
             leaderboardFormat={leaderboardFormat}
+
             item={item}
             onClick={handleClick}
+            {...props}
         >
             <TableCell sx={{ maxWidth: '100px' }}>
                 <div style={{

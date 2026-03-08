@@ -13,12 +13,24 @@ import ItemListRowBase from "./ItemListRowBase";
 import { useScoreView } from "../../providers/ScoreViewProvider";
 import { useProfile } from "../../providers/ProfileProvider";
 
-const BeatmapListRow = memo(function BeatmapListRow({ item, index, showPlayed = false, isCompact = false, showIndex = true, startIndex = 0, leaderboardField = null, leaderboardFormat = null }) {
+const BeatmapListRow = memo(function BeatmapListRow({
+    item,
+    index,
+    showPlayed = false,
+    isCompact = false,
+    showIndex = true,
+    startIndex = 0,
+    leaderboardField = null,
+    secondaryLeaderboardField = null,
+    secondaryFieldColor = null,
+    leaderboardFormat = null,
+    ...props
+}) {
     const theme = useTheme();
     const { getScoreById } = useProfile();
     const { loadScoreView } = useScoreView();
 
-    if(!item) {
+    if (!item) {
         return null;
     }
 
@@ -30,8 +42,10 @@ const BeatmapListRow = memo(function BeatmapListRow({ item, index, showPlayed = 
             showIndex={showIndex}
             startIndex={startIndex}
             leaderboardField={leaderboardField}
+            secondaryLeaderboardField={secondaryLeaderboardField}
             leaderboardFormat={leaderboardFormat}
             item={item}
+            {...props}
         >
             {
                 showPlayed && (

@@ -24,7 +24,8 @@ const ItemList = memo(function ItemList({
     secondaryLeaderboardField = null,
     leaderboardFormat = null,
     passthroughProps = {},
-    ItemListRowType
+    ItemListRowType,
+    ...props
 }) {
 
     const theme = useTheme();
@@ -112,6 +113,7 @@ const ItemList = memo(function ItemList({
                                 leaderboardFormat={leaderboardFormat}
                                 isMobile={isMobile}
                                 {...passthroughProps}
+                                {...props}
                             />
                         ))}
                     </TableBody>

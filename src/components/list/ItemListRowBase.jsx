@@ -22,6 +22,7 @@ const ItemListRowBase = memo(function ItemListRowBase({
     startIndex = 0,
     leaderboardField = null,
     secondaryLeaderboardField = null,
+    secondaryFieldColor = null,
     leaderboardFormat = null,
     onClick = null,
     children
@@ -81,7 +82,7 @@ const ItemListRowBase = memo(function ItemListRowBase({
                     </Typography>
                     {
                         secondaryLeaderboardField &&
-                        <Typography sx={{ fontSize: '0.75rem', color: getGainColor(secondaryLeaderboardField.split('.').reduce((obj, key) => obj && obj[key] !== 'undefined' ? obj[key] : null, item), theme) }}>
+                        <Typography sx={{ fontSize: '0.75rem', color: secondaryFieldColor || getGainColor(secondaryLeaderboardField.split('.').reduce((obj, key) => obj && obj[key] !== 'undefined' ? obj[key] : null, item), theme) }}>
                             {leaderboardFormat ? leaderboardFormat(secondaryLeaderboardField.split('.').reduce((obj, key) => obj && obj[key] !== 'undefined' ? obj[key] : null, item)) : FormatNumberWithPrecision(secondaryLeaderboardField.split('.').reduce((obj, key) => obj && obj[key] !== 'undefined' ? obj[key] : null, item), 2)}
                         </Typography>
                     }
