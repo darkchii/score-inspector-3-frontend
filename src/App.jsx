@@ -43,19 +43,25 @@ function App() {
     { path: "/leaderboards/:ruleset?/:statistic?/page?/:page?/country?/:country?", element: <RouteLeaderboards /> },
   ];
 
+  const withSuspense = (element) => (
+    <Suspense fallback={<PageLoader />}>
+      {element}
+    </Suspense>
+  );
+
   const getRoute = (obj, is_child = false) => {
     return <>
       {
         is_child && <Route
           onTitleChange={(title) => setTitle(title)}
           index
-          element={obj.element}
+          element={withSuspense(obj.element)}
         />
       }
       <Route
         key={obj.path}
         path={obj.path}
-        element={obj.element}
+        element={withSuspense(obj.element)}
       >
         {
           obj.children && obj.children.map((child) => getRoute(child, true))
@@ -89,13 +95,11 @@ function App() {
       <Box>
         <Header />
       </Box>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          {
-            routes.map((route) => getRoute(route))
-          }
-        </Routes>
-      </Suspense>
+      <Routes>
+        {
+          routes.map((route) => getRoute(route))
+        }
+      </Routes>
       <Footer />
     </React.Fragment>
   )
