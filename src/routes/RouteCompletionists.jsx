@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useApi } from "../providers/ApiProvider";
-import { FormatNumber, GetRulesetColor, GetRulesetNameFromId, GetRulesetPrettyNameFromId, ShowNotification } from "../util/Helper";
+import { FormatNumber, GetRulesetPrettyNameFromId, ShowNotification } from "../util/Helper";
 import { Alert, Divider, Grid, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
-import { Line } from "react-chartjs-2";
 import PlayerLink from "../components/PlayerLink";
 import { getCompletionistBadge } from "../assets/textures/TextureDatabase";
 import { usePageTitle } from "../providers/TitleProvider";
 import CompletionistsCountryMap from "../components/completionists/CompletionistsCountryMap";
+import CompletionistsScoresChart from "../components/completionists/CompletionistsScoresChart";
+import CompletionistsCountChart from "../components/completionists/CompletionistsCountChart";
 
 function RouteCompletionists() {
     usePageTitle("Completionists");
@@ -73,168 +74,6 @@ function RouteCompletionists() {
                 ) : (
                     <div>
                         <Grid container spacing={1}>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <Paper elevation={3} sx={{ padding: 1 }}>
-                                    <div style={{ height: 300 }}>
-                                        {/* line chart per mode, y = .scores, x = .completion_date */}
-                                        <Line
-                                            data={{
-                                                datasets: [
-                                                    ...Object.keys(data).map(mode => ({
-                                                        label: GetRulesetPrettyNameFromId(mode),
-                                                        data: data[mode].map(item => ({
-                                                            x: new Date(item.completion_date).getTime(),
-                                                            y: item.scores,
-                                                            data: item
-                                                        })),
-                                                        borderColor: GetRulesetColor(GetRulesetNameFromId(mode))[500],
-                                                        backgroundColor: GetRulesetColor(GetRulesetNameFromId(mode))[500],
-                                                        pointRadius: 4,
-                                                        pointHoverRadius: 6,
-                                                    })),
-                                                    //add invisible dataset to start the dates earlier and end later (both by 5% of the total range)
-                                                    {
-                                                        label: 'Invisible',
-                                                        data: [
-                                                            {
-                                                                x: new Date(new Date(data[Object.keys(data)[0]][0].completion_date).getTime() - (new Date().getTime() - new Date(data[Object.keys(data)[0]][0].completion_date).getTime()) * 0.05),
-                                                                y: 0
-                                                            },
-                                                            {
-                                                                x: new Date(new Date().getTime() + (new Date().getTime() - new Date(data[Object.keys(data)[0]][0].completion_date).getTime()) * 0.05),
-                                                                //+5% of max scores value
-                                                                y: Math.max(...Object.values(data).flat().map(item => item.scores)) * 1.05
-                                                            }
-                                                        ],
-                                                        borderColor: 'rgba(0,0,0,0)',
-                                                        backgroundColor: 'rgba(0,0,0,0)',
-                                                        pointRadius: 0,
-                                                    }
-                                                ]
-                                            }}
-                                            options={{
-                                                responsive: true,
-                                                maintainAspectRatio: false,
-                                                scales: {
-                                                    x: {
-                                                        type: 'time',
-                                                        time: {
-                                                            unit: 'day',
-                                                        },
-                                                    },
-                                                    y: {
-                                                        title: {
-                                                            display: true,
-                                                            text: 'Scores',
-                                                        },
-                                                        ticks: {
-                                                            callback: function (value) {
-                                                                return `${FormatNumber(value)}`;
-                                                            }
-                                                        }
-                                                    }
-                                                },
-                                                plugins: {
-                                                    tooltip: {
-                                                        callbacks: {
-                                                            label: function (context) {
-                                                                //show user
-                                                                const item = context.raw.data;
-                                                                return `${item.user?.osuApi.username || `${item.osu_id} (restricted?)`} | Scores: ${FormatNumber(item.scores)} | Completion Date: ${new Date(item.completion_date).toLocaleDateString()}`;
-                                                            }
-                                                        }
-                                                    },
-                                                    legend: {
-                                                        //hide invisible dataset
-                                                        labels: {
-                                                            filter: function (legendItem, chartData) {
-                                                                return legendItem.text !== 'Invisible';
-                                                            }
-
-                                                        }
-                                                    }
-                                                },
-                                                layout: {
-                                                    padding: 10
-                                                },
-                                            }
-                                            }
-                                        />
-                                    </div>
-                                </Paper>
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <Paper elevation={3} sx={{ padding: 1 }}>
-                                    <div style={{ height: 300 }}>
-                                        {/* line chart per mode, y = .scores, x = .completion_date */}
-                                        <Line
-                                            data={{
-                                                datasets: [
-                                                    ...Object.keys(data).map(mode => ({
-                                                        label: GetRulesetPrettyNameFromId(mode),
-                                                        data: data[mode].map(item => ({
-                                                            x: new Date(item.completion_date).getTime(),
-                                                            //count of completionists up to current item
-                                                            y: data[mode].filter(i => new Date(i.completion_date) <= new Date(item.completion_date)).length
-                                                        })),
-                                                        borderColor: GetRulesetColor(GetRulesetNameFromId(mode))[500],
-                                                        backgroundColor: GetRulesetColor(GetRulesetNameFromId(mode))[500],
-                                                        pointRadius: 4,
-                                                        pointHoverRadius: 6,
-                                                        stepped: true,
-                                                    })),
-                                                    //combined dataset
-                                                    {
-                                                        label: 'Combined',
-                                                        //order all items by date as well, otherwise the line will jump around
-                                                        data: Object.values(data).flat().sort((a, b) => new Date(a.completion_date) - new Date(b.completion_date)).map((item, index, arr) => ({
-                                                            x: new Date(item.completion_date).getTime(),
-                                                            y: arr.filter(i => new Date(i.completion_date) <= new Date(item.completion_date)).length
-                                                        })),
-                                                        //50% opacity gray
-                                                        borderColor: 'rgba(128,128,128,0.5)',
-                                                        backgroundColor: 'rgba(128,128,128,0.5)',
-                                                        pointRadius: 4,
-                                                        pointHoverRadius: 6,
-                                                        stepped: true,
-                                                    }
-                                                ]
-                                            }}
-                                            options={{
-                                                responsive: true,
-                                                maintainAspectRatio: false,
-                                                scales: {
-                                                    x: {
-                                                        type: 'time',
-                                                        time: {
-                                                            unit: 'day',
-                                                        },
-                                                    },
-                                                    y: {
-                                                        title: {
-                                                            display: true,
-                                                            text: 'Completionists',
-                                                        },
-                                                        ticks: {
-                                                            callback: function (value) {
-                                                                return `${FormatNumber(value)}`;
-                                                            }
-                                                        }
-                                                    }
-                                                },
-                                                layout: {
-                                                    padding: {
-                                                        top: 20,
-                                                        right: 20,
-                                                        bottom: 20,
-                                                        left: 20,
-                                                    },
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                </Paper>
-                            </Grid>
                             <CompletionistsCountryMap data={data} />
                             {
                                 //list each mode with all users
@@ -342,6 +181,8 @@ function RouteCompletionists() {
                                     </Grid>
                                 ))
                             }
+                            <CompletionistsScoresChart data={data} />
+                            <CompletionistsCountChart data={data} />
                         </Grid>
                         {/* show a linear horizontal bar chart of completionists, basically a timeline with correct spacing, modes combined */}
                     </div>
