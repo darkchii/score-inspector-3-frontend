@@ -1,14 +1,18 @@
 import { GetRulesetId } from "../util/Helper";
+import { IBeatmap, IScore, IProfileRulesetStatisticsPacks } from "./types";
 
-export class ProfileRulesetStatisticsPacks {
-    constructor(beatmaps, packs, ruleset = null) {
+export class ProfileRulesetStatisticsPacks implements IProfileRulesetStatisticsPacks {
+    packs: any[] = [];
+    ruleset: string | null = null;
+    
+    constructor(beatmaps: IBeatmap[], packs: any, ruleset = null) {
         this.packs = [];
         this.ruleset = ruleset;
 
         this.processPacks(beatmaps, packs);
     }
 
-    processPacks(beatmaps, packs) {
+    processPacks(beatmaps: IBeatmap[], packs: any) {
         //deepcopy packs, they are reused per ruleset and need ruleset-specific data
         let _packs = JSON.parse(JSON.stringify(packs));
 
@@ -57,7 +61,7 @@ export class ProfileRulesetStatisticsPacks {
         }
     }
 
-    processScores(scores, beatmaps) {
+    processScores(scores: IScore[], beatmaps: IBeatmap[]) {
         //first list all unique beatmap ids from scores
         const playedBeatmapIds = new Set();
         for(const score of scores) {

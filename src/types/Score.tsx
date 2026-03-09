@@ -3,9 +3,132 @@ import { ReorderMods } from "../util/ModHelper";
 import PerformancePoints from "./performance/PerformancePoints";
 import { BeatmapApplyModsToDifficulty, DetermineIsScoreFC } from "../util/ScoreHelper";
 import ScoreDifficulty from "./ScoreDifficulty";
+import { IBeatmap, IPerformancePoints, IScore, IScoreDifficulty } from "./types";
 import Beatmap from "./beatmaps/Beatmap";
 
-class Score {
+class Score implements IScore {
+    beatmap: IBeatmap | null;
+    local_beatmap: IBeatmap | null
+    user: any; //can be User or null
+
+    id: number;
+    beatmap_id: number;
+    user_id: number;
+    best_id: number | null;
+    build_id: number | null;
+
+    is_lazer: boolean;
+
+    accuracy: number;
+
+    classic_total_score: number;
+    has_replay: boolean;
+
+    is_perfect_combo: boolean;
+
+    legacy_perfect: boolean;
+
+    legacy_score_id: number | null;
+
+    legacy_total_score: number | null;
+
+    combo: number;
+
+    maximum_statistics_perfect: number;
+    maximum_statistics_great: number;
+    maximum_statistics_good: number;
+    maximum_statistics_ok: number;
+    maximum_statistics_meh: number;
+    maximum_statistics_miss: number;
+    maximum_statistics_ignore_hit: number;
+    maximum_statistics_ignore_miss: number;
+    maximum_statistics_slider_tail_hit: number;
+    maximum_statistics_legacy_combo_increase: number;
+    maximum_statistics_large_bonus: number;
+    maximum_statistics_large_tick_hit: number
+    maximum_statistics_large_tick_miss: number;
+    maximum_statistics_small_bonus: number;
+    maximum_statistics_small_tick_hit: number;
+
+    ruleset_id: number;
+    ruleset: string;
+
+    passed: boolean;
+
+    pp: number | null;
+
+    preserve: boolean;
+
+    processed: boolean;
+    grade: string;
+
+    replay: boolean;
+    ended_at: Date | null;
+    started_at: Date | null
+    lchg_time: Date | null;
+
+    ended_at_seconds: number | null;
+    ended_at_str: {
+        'YYYY-MM-DD'?: string;
+        'YYYY-MM'?: string;
+        'YYYY'?: string;
+    };
+
+    statistics_perfect: number;
+    statistics_great: number
+    statistics_good: number;
+    statistics_ok: number
+    statistics_meh: number;
+    statistics_miss: number
+    statistics_ignore_hit: number;
+    statistics_ignore_miss: number
+    statistics_slider_tail_hit: number;
+    statistics_slider_tail_miss: number
+    statistics_large_bonus: number;
+    statistics_large_tick_hit: number
+    statistics_large_tick_miss: number;
+    statistics_small_bonus: number
+    statistics_small_tick_hit: number
+    statistics_small_tick_miss: number
+    statistics_combo_break: number;
+
+    total_score: number
+    total_score_without_mods: number | null;
+
+    type: string;
+    highest_score: boolean;
+    highest_pp: boolean;
+    rank: number | null;
+
+    mods: any[];
+    mod_acronyms: string[];
+    mod_speed_change: number | null;
+    using_classic_slider_accuracy: boolean;
+
+    difficulty_reducing: boolean;
+    difficulty_removing: boolean;
+    is_ss: boolean;
+    is_fc: boolean;
+    is_convert: boolean;
+    implied_total_score: number;
+    beatmap_attributes: any;
+
+    attr_diff: IScoreDifficulty | null;
+    attr_recalc: boolean;
+
+    diff_missing: boolean;
+
+    star_rating: number | null;
+    max_combo: number | null;
+    performance: {
+        base: IPerformancePoints | null;
+        ss?: IPerformancePoints | null;
+    } | null;
+
+    duration: number | null;
+
+    implied_pp: number;
+
     constructor(api_data, beatmap = null, user = null) {
         // this.beatmap = beatmap;
         //if beatmap is not of type Beatmap, create it, otherwise use as is
@@ -158,7 +281,7 @@ class Score {
             if (this.ended_at && this.started_at) {
                 const startedAt = new Date(this.started_at);
                 const endedAt = new Date(this.ended_at);
-                this.duration = (endedAt - startedAt) / 1000; //duration in seconds
+                this.duration = (endedAt.getTime() - startedAt.getTime()) / 1000; //duration in seconds
             }
 
             this.beatmap_attributes = BeatmapApplyModsToDifficulty(this.ruleset, this.local_beatmap, this.mods);
@@ -202,7 +325,7 @@ class Score {
     getOtherScores() {
         if (!this.beatmap) return [];
 
-        return this.beatmap.getScores().filter(s => s.id !== this.id);
+        return this.beatmap.getScores(null, 'desc').filter(s => s.id !== this.id);
     }
 }
 

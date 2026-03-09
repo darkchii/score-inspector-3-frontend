@@ -9,7 +9,7 @@ class FilterStorage {
         }
     }
 
-    saveAll(presets) {
+    saveAll(presets: any) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(presets));
     }
 }

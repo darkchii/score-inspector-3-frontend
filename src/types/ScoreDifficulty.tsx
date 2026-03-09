@@ -1,4 +1,33 @@
-class ScoreDifficulty {
+import { IScoreDifficulty } from "./types";
+
+class ScoreDifficulty implements IScoreDifficulty {
+    max_combo: number;
+    star_rating: number;
+
+    first_object_start_time: number;
+    last_object_end_time: number;
+
+    //osu
+    slider_factor: number
+    aim_difficulty: number;
+    speed_difficulty: number
+    speed_note_count: number;
+    nested_score_per_object: number
+    aim_difficult_slider_count: number;
+    aim_difficult_strain_count: number
+    speed_difficult_slider_count: number;
+    maximum_legacy_combo_score: number
+    speed_difficult_strain_count: number;
+    aim_top_weighted_slider_factor: number
+    speed_top_weighted_slider_factor: number;
+    legacy_score_base_multiplier: number
+    flashlight_difficulty: number;
+
+    //taiko
+    rhythm_difficulty: number;
+    consistency_factor: number;
+    mono_stamina_factor: number;
+
     constructor(api_data) {
         this.max_combo = api_data.max_combo;
         this.star_rating = api_data.star_rating;

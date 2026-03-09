@@ -1,8 +1,13 @@
 import { GetRulesetNameFromId } from "../util/Helper";
 import { ProfileRulesetStatistics } from "./ProfileRulesetStatistics";
+import { IBeatmap, IProfileStatistics, IScore, IProfileRulesetStatistics } from "./types";
 
-export class ProfileStatistics {
-    constructor(scores, beatmaps, packs, without_loved = false) {
+export class ProfileStatistics implements IProfileStatistics {
+    rulesets: {
+        [ruleset: string]: IProfileRulesetStatistics;
+    } = {};
+
+    constructor(scores: IScore[], beatmaps: IBeatmap[], packs: any, without_loved: boolean = false) {
         this.rulesets = {
             'total': new ProfileRulesetStatistics(beatmaps, packs, null, true, without_loved),
         };

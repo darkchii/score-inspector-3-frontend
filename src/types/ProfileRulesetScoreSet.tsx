@@ -1,47 +1,74 @@
 import { CalculateBonusPerformance, CalculateRawPerformance } from "../util/ScoreHelper";
 import SessionCollection from "./SessionCollection";
+import { IProfileRulesetScoreSet, IScore, ISessionCollection } from "./types";
 
-export class ProfileRulesetScoreSet {
+export class ProfileRulesetScoreSet implements IProfileRulesetScoreSet {
+    scores: IScore[] = [];
+    scores_map: { [id: string]: IScore } = {};
+    grades: { [grade: string]: number } = {};
+
+    clears: number = 0;
+    ranked_clears: number = 0;
+
+    fc_count: number = 0;
+    max_combo: number = 0;
+
+    missing_difficulty: number = 0;
+
+    implied_total_score: number = 0;
+    implied_total_score_ss: number = 0;
+
+    score: number = 0;
+    score_ss: number = 0;
+
+    performance_points: number = 0;
+    total_performance_points: number = 0;
+    bonus_performance_points: number = 0;
+    average_performance: number = 0;
+
+    duration_seconds: number = 0;
+
+    recent_scores: IScore[] = [];
+    top_scores: IScore[] = [];
+
+    highlighted_scores: {
+        top_pp: IScore | null;
+        top_score: IScore | null;
+        top_stars_fc: IScore | null;
+        top_stars_ss: IScore | null;
+        oldest: IScore | null;
+    } = {
+        top_pp: null,
+        top_score: null,
+        top_stars_fc: null,
+        top_stars_ss: null,
+        oldest: null,
+    };
+
+    sessions: ISessionCollection = new SessionCollection([]);
+
+    scores_reordered: {
+        [key: string]: IScore[];
+    } = {};
+
+    average_accuracy: number = 0;
+    average_length: number = 0;
+    average_stars: number = 0;
+    average_score: number = 0;
+    average_implied_score: number = 0;
+    fc_rate: number = 0;
+
     constructor() {
-        this.scores = [];
-        this.scores_map = {};
-        this.grades = {};
-
-        this.clears = 0;
-        this.ranked_clears = 0;
-
-        this.fc_count = 0;
-        this.max_combo = 0;
-
-        this.missing_difficulty = 0; //number of scores with missing beatmap difficulty data (its likely in queue for processing)
-
-        this.implied_total_score = 0;
-        this.implied_total_score_ss = 0;
-
-        this.score = 0;
-        this.score_ss = 0;
-
-        this.performance_points = 0;
-        this.bonus_performance_points = 0;
-
-        this.duration_seconds = 0;
-
-        this.recent_scores = [];
-        this.top_scores = [];
-
-        this.highlighted_scores = {};
         this.highlighted_scores['top_pp'] = null;
         this.highlighted_scores['top_score'] = null;
         this.highlighted_scores['top_stars_fc'] = null;
         this.highlighted_scores['top_stars_ss'] = null;
         this.highlighted_scores['oldest'] = null;
 
-        this.sessions = [];
-
         this.scores_reordered = {};
     }
 
-    static merge(sets) {
+    static merge(sets: ProfileRulesetScoreSet[]) {
         const mergedSet = new ProfileRulesetScoreSet();
         sets.forEach(set => {
             set.scores.forEach(score => {
@@ -53,7 +80,7 @@ export class ProfileRulesetScoreSet {
         return mergedSet;
     }
 
-    addScore(score) {
+    addScore(score: IScore) {
         this.scores.push(score);
 
         this.scores_map[score.id] = score;
@@ -115,7 +142,7 @@ export class ProfileRulesetScoreSet {
         }
     }
 
-    reorder(param, descending = true) {
+    reorder(param: keyof IScore, descending: boolean = true) {
         // this.scores.sort((a, b) => {
         //     if (descending) {
         //         return b[param] - a[param];
@@ -174,10 +201,10 @@ export class ProfileRulesetScoreSet {
         this.performance_points = CalculateRawPerformance(this.scores, false, false);
 
         this.sessions = SessionCollection.fromScores(this.scores);
-        this.sessions.sessions.sort((a, b) => b.start - a.start);
+        this.sessions.sessions.sort((a, b) => b.start.getTime() - a.start.getTime());
     }
 
-    getById(id) {
+    getById(id: string): IScore | undefined {
         return this.scores_map[id];
     }
 }

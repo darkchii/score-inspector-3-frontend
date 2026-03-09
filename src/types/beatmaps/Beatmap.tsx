@@ -1,6 +1,69 @@
 import { GetRulesetNameFromId } from "../../util/Helper";
+import { IBeatmap, IScore } from "../types";
 
-class Beatmap {
+class Beatmap implements IBeatmap {
+    beatmap_id: number;
+    id: number
+    beatmapset_id: number;
+
+    mapper_id: number;
+    mapper: string;
+
+    ruleset_id: number;
+    ruleset: string;
+
+    status: string;
+    is_ranked: boolean;
+
+    stars: number;
+
+    ar: number;
+    cs: number
+    hp: number;
+    od: number;
+
+    slider_multiplier: number;
+    slider_tick_rate: number;
+    bpm: number;
+    bpm_modded: number | null;
+
+    length: number;
+    length_modded: number | null;
+    drain_time: number;
+    drain_time_modded: number | null;
+
+    count_circles: number;
+    count_sliders: number;
+    count_spinners: number;
+    max_combo: number;
+
+    pass_count: number;
+    play_count: number;
+    fc_count: number
+    ss_count: number;
+    favourite_count: number;
+    ranked_date: Date | null;
+    submitted_date: Date | null
+    last_updated: Date | null;
+
+    version: string;
+    title: string;
+    artist: string;
+    source: string;
+    tags: string[];
+    checksum: string;
+    track_id: number | null;
+    pack: string | null;
+    lchg_time: Date | null;
+    attr_diff: any; // for storing difficulty attributes, can be any type depending on ruleset
+
+    scores: Map<number, any> | null; // map of score_id to score object, can be any type depending on ruleset
+
+    lb_value: number | null; // for leaderboards, can be any type depending on statistic
+
+    is_played: boolean = false; // whether the user has played this beatmap, set externally
+    score_data: any = null; // for storing additional score data related to this beatmap, can be any type depending on ruleset/statistic
+
     constructor(api_data) {
         if (api_data === null || api_data === undefined) {
             throw new Error("Invalid api_data for Beatmap");
@@ -76,7 +139,7 @@ class Beatmap {
         this.lb_value = null; // for leaderboards, is always set externally
     }
 
-    addScore(score) {
+    addScore(score: IScore) {
         if (!this.scores) {
             this.scores = new Map();
         }
@@ -88,7 +151,7 @@ class Beatmap {
         this.scores.set(score.id, score);
     }
 
-    getScores(sort = null, direction = 'desc') {
+    getScores(sort: keyof IScore | null = null, direction: 'asc' | 'desc' = 'desc') {
         if (!this.scores) {
             return [];
         }

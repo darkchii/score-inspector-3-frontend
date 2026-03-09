@@ -1,13 +1,17 @@
 //Global performance class, will deal with the rulesets and calculations
 //Overrides means adjusted score values (ie simulating SS on a score that was 94.6%)
 
+import { IPerformanceCalculator, IPerformancePoints, IScore } from "../types";
 import PerformanceCalculatorFruits from "./PerformanceCalculatorFruits";
 import PerformanceCalculatorMania from "./PerformanceCalculatorMania";
 import PerformanceCalculatorOsu from "./PerformanceCalculatorOsu";
 import PerformanceCalculatorTaiko from "./PerformanceCalculatorTaiko";
 
-class PerformancePoints {
-    constructor(score, options = {}) {
+class PerformancePoints implements IPerformancePoints {
+    pp: number;
+    calculator: IPerformanceCalculator;
+
+    constructor(score: IScore, options: any = {}) {
         if (score.diff_missing) {
             throw new Error("Cannot calculate performance for a score with missing or outdated diff data");
         }
@@ -33,7 +37,7 @@ class PerformancePoints {
         this.pp = this.calculator.totalPerformance;
     }
 
-    static getCalculator(score, overrides = null) {
+    static getCalculator(score: IScore, overrides: any = null) {
         switch (score.ruleset) {
             case 'osu':
                 return new PerformanceCalculatorOsu(score, overrides);
@@ -48,8 +52,8 @@ class PerformancePoints {
         }
     }
 
-    static getOverridesFor(score, option) {
-        let overrides = {};
+    static getOverridesFor(score: IScore, option: string) {
+        let overrides: any = {};
         switch (option) {
             case 'ss':
                 overrides.combo = score.attr_diff.max_combo;
@@ -62,13 +66,13 @@ class PerformancePoints {
                 overrides.statistics_miss = score.maximum_statistics_miss || 0;
                 overrides.statistics_ignore_hit = score.maximum_statistics_ignore_hit || 0;
                 overrides.statistics_ignore_miss = score.maximum_statistics_ignore_miss || 0;
-                overrides.statistics_slider_tail_hit = score.maximum_statistics_slider_tail_hit;
-                overrides.statistics_large_tick_hit = score.maximum_statistics_large_tick_hit;
-                overrides.statistics_large_tick_miss = score.maximum_statistics_large_tick_miss;
-                overrides.statistics_large_bonus = score.maximum_statistics_large_bonus;
-                overrides.statistics_small_bonus = score.maximum_statistics_small_bonus;
-                overrides.statistics_small_tick_hit = score.maximum_statistics_small_tick_hit;
-                overrides.statistics_legacy_combo_increase = score.maximum_statistics_legacy_combo_increase; //unused?
+                overrides.statistics_slider_tail_hit = score.maximum_statistics_slider_tail_hit || 0;
+                overrides.statistics_large_tick_hit = score.maximum_statistics_large_tick_hit || 0;
+                overrides.statistics_large_tick_miss = score.maximum_statistics_large_tick_miss || 0;
+                overrides.statistics_large_bonus = score.maximum_statistics_large_bonus || 0;
+                overrides.statistics_small_bonus = score.maximum_statistics_small_bonus || 0;
+                overrides.statistics_small_tick_hit = score.maximum_statistics_small_tick_hit || 0;
+                overrides.statistics_legacy_combo_increase = score.maximum_statistics_legacy_combo_increase || 0; //unused?
                 break;
             default:
                 break;

@@ -1,5 +1,35 @@
-class Session {
-    constructor(start, end, scores, breaks, duration) {
+import { IScore, ISessionBreak, ISession } from "./types";
+
+class Session implements ISession {
+    id: string;
+    start: Date;
+    end: Date;
+    scores: IScore[] = [];
+    breaks: ISessionBreak[] = [];
+    duration: number;
+
+    break_count: number;
+    total_break_time: number
+    average_break_time: number;
+    longest_break_time: number;
+
+    score_count: number;
+
+    grades: { [grade: string]: number };
+
+    cumulative_implied_total_score: number
+    average_implied_total_score: number;
+    max_implied_total_score: number;
+
+    cumulative_lazer_score: number
+    average_lazer_score: number;
+    max_lazer_score: number;
+
+    cumulative_pp: number
+    average_pp: number;
+    max_pp: number;
+
+    constructor(start: Date, end: Date, scores: IScore[], breaks: ISessionBreak[], duration: number) {
         this.id = `${start.getTime()}`;
         this.start = start; //date object
         this.end = end; //date object

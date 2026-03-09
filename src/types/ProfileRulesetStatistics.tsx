@@ -1,8 +1,7 @@
 import { GetGradeColor, GetRulesetId } from "../util/Helper";
-import { CalculateBonusPerformance, CalculateRawPerformance } from "../util/ScoreHelper";
 import { ProfileRulesetScoreSet } from "./ProfileRulesetScoreSet";
 import { ProfileRulesetStatisticsPacks } from "./ProfileRulesetStatisticsPacks";
-import SessionCollection from "./SessionCollection";
+import { IBeatmap, IProfileRulesetScoreSet, IProfileRulesetStatistics, IProfileRulesetStatisticsPacks, IScore } from "./types";
 
 const PERIODIC_SUFFIXES = ['daily', 'monthly', 'yearly'];
 const PERIODIC_SUFFIXES_CHARTS = ['monthly', 'yearly'];
@@ -43,7 +42,7 @@ const calculateStatsInSinglePass = (scores, extractValue, filterFn = null) => {
         if (value !== null && value !== undefined) {
             values.push(value);
             if (value > max) max = value;
-            
+
             if (filterFn && filterFn(score)) {
                 filteredValues.push(value);
                 if (value > filteredMax) filteredMax = value;
@@ -69,20 +68,187 @@ const getMedian = (sortedArray) => {
     return sortedArray[mid];
 }
 
-export class ProfileRulesetStatistics {
-    constructor(beatmaps, packs, ruleset = null, generate_periodic = true, without_loved = false) {
+export class ProfileRulesetStatistics implements IProfileRulesetStatistics {
+    without_loved: boolean = false;
+
+    beatmaps: IBeatmap[] = [];
+    beatmaps_with_converts: IBeatmap[] = [];
+    beatmaps_map: { [beatmap_id: string]: IBeatmap } = {};
+    beatmaps_with_converts_map: { [beatmap_id: string]: IBeatmap } = {};
+
+    ruleset: string | null = null;
+
+    beatmap_count: number = 0;
+    beatmap_count_with_converts: number = 0;
+    beatmap_count_ranked: number = 0;
+    beatmap_count_ranked_with_converts: number = 0;
+
+    scores_set: IProfileRulesetScoreSet = new ProfileRulesetScoreSet();
+    scores_set_by_pp: IProfileRulesetScoreSet = new ProfileRulesetScoreSet();
+    scores_set_by_score: IProfileRulesetScoreSet = new ProfileRulesetScoreSet();
+    pack_statistics: IProfileRulesetStatisticsPacks;
+
+    completion: number = 0;
+    completion_with_converts: number = 0;
+
+    completion_statistics: any;
+
+    implied_playtime_seconds: number = 0;
+    generate_periodic: boolean = true;
+
+    periodic: {
+        [interval: string]: {
+            [date_string: string]: IScore[];
+        }
+    } = {};
+
+    periodic_by_pp: {
+        [interval: string]: {
+            [date_string: string]: IScore[];
+        }
+    } = {};
+
+    periodic_by_score: {
+        [interval: string]: {
+            [date_string: string]: IScore[];
+        }
+    } = {};
+
+    periodic_by_year: {
+        [year: string]: {
+            [interval: string]: {
+                [date_string: string]: IScore[];
+            }
+        }
+    } = {};
+
+    periodic_graph_data: {
+        [interval: string]: {
+            incremental: {
+                [date_string: string]: {
+                    clears: number | null;
+                    scores: number | null;
+                    implied_score: number | null;
+                    implied_score_ss: number | null;
+                    lazer_score: number | null;
+                    lazer_score_ss: number | null;
+                    pp: number | null;
+                    raw_pp: number | null;
+                    length_seconds: number | null;
+                    grades_xh: number | null;
+                    grades_x: number | null;
+                    grades_sh: number | null;
+                    grades_s: number | null;
+                    grades_a: number | null;
+                    grades_b: number | null;
+                    grades_c: number | null;
+                    grades_d: number | null;
+                }
+            };
+            cumulative: {
+                [date_string: string]: {
+                    clears: number | null;
+                    scores: number | null;
+                    implied_score: number | null;
+                    implied_score_ss: number | null;
+                    lazer_score: number | null;
+                    lazer_score_ss: number | null;
+                    pp: number | null;
+                    raw_pp: number | null;
+                    length_seconds: number | null;
+                    grades_xh: number | null;
+                    grades_x: number | null;
+                    grades_sh: number | null;
+                    grades_s: number | null;
+                    grades_a: number | null;
+                    grades_b: number | null;
+                    grades_c: number | null;
+                    grades_d: number | null;
+                }
+            };
+            average: {
+                [date_string: string]: {
+                    clears: number | null;
+                    scores: number | null;
+                    implied_score: number | null;
+                    implied_score_ss: number | null;
+                    lazer_score: number | null;
+                    lazer_score_ss: number | null;
+                    pp: number | null;
+                    raw_pp: number | null;
+                    length_seconds: number | null;
+                    grades_xh: number | null;
+                    grades_x: number | null;
+                    grades_sh: number | null;
+                    grades_s: number | null;
+                    grades_a: number | null;
+                    grades_b: number | null;
+                    grades_c: number | null;
+                    grades_d: number | null;
+                }
+            };
+            highest: {
+                [date_string: string]: {
+                    clears: number | null;
+                    scores: number | null;
+                    implied_score: number | null;
+                    implied_score_ss: number | null;
+                    lazer_score: number | null;
+                    lazer_score_ss: number | null;
+                    pp: number | null;
+                    raw_pp: number | null;
+                    length_seconds: number | null;
+                    grades_xh: number | null;
+                    grades_x: number | null;
+                    grades_sh: number | null;
+                    grades_s: number | null;
+                    grades_a: number | null;
+                    grades_b: number | null;
+                    grades_c: number | null;
+                    grades_d: number | null;
+                }
+            };
+            median: {
+                [date_string: string]: {
+                    clears: number | null;
+                    scores: number | null;
+                    implied_score: number | null;
+                    implied_score_ss: number | null;
+                    lazer_score: number | null;
+                    lazer_score_ss: number | null;
+                    pp: number | null;
+                    raw_pp: number | null;
+                    length_seconds: number | null;
+                    grades_xh: number | null;
+                    grades_x: number | null;
+                    grades_sh: number | null;
+                    grades_s: number | null;
+                    grades_a: number | null;
+                    grades_b: number | null;
+                    grades_c: number | null;
+                    grades_d: number | null;
+                }
+            }
+        };
+    } = {};
+
+    charts: {
+        [key: string]: any;
+    } = {};
+
+    constructor(beatmaps: IBeatmap[], packs: any, ruleset: string | null = null, generate_periodic: boolean = true, without_loved: boolean = false) {
         this.without_loved = without_loved;
 
         //ProfileRulesetScoreSets
         this.beatmaps = beatmaps;
         this.beatmaps_with_converts = [];
-        if (ruleset || ruleset === 0) {
+        if (ruleset !== null) {
             this.ruleset = ruleset;
             this.beatmaps = beatmaps.filter(b => b.ruleset_id === GetRulesetId(ruleset));
             this.beatmaps_with_converts = beatmaps.filter(b => b.ruleset_id === GetRulesetId(ruleset) || b.ruleset_id === 0);
         }
 
-        if(this.without_loved) {
+        if (this.without_loved) {
             this.beatmaps = this.beatmaps.filter(b => b.status !== 'loved');
             this.beatmaps_with_converts = this.beatmaps_with_converts.filter(b => b.status !== 'loved');
         }
@@ -134,10 +300,10 @@ export class ProfileRulesetStatistics {
     }
 
     //add score
-    addScore(score) {
-        if(!this.include_loved) {
+    addScore(score: IScore) {
+        if (this.without_loved) {
             const beatmap = this.beatmaps_map[score.beatmap_id];
-            if(!beatmap || beatmap.status === 'loved') {
+            if (!beatmap || beatmap.status === 'loved') {
                 return;
             }
         }
@@ -192,9 +358,9 @@ export class ProfileRulesetStatistics {
 
         if (this.generate_periodic) {
             //sort scores by ended_at ascending
-            const sorted_scores = this.scores_set.scores.slice().sort((a, b) => a.ended_at - b.ended_at);
-            const sorted_scores_by_pp = this.scores_set_by_pp.scores.slice().sort((a, b) => a.ended_at - b.ended_at);
-            const sorted_scores_by_score = this.scores_set_by_score.scores.slice().sort((a, b) => a.ended_at - b.ended_at);
+            const sorted_scores = this.scores_set.scores.slice().sort((a, b) => a.ended_at.getTime() - b.ended_at.getTime());
+            const sorted_scores_by_pp = this.scores_set_by_pp.scores.slice().sort((a, b) => a.ended_at.getTime() - b.ended_at.getTime());
+            const sorted_scores_by_score = this.scores_set_by_score.scores.slice().sort((a, b) => a.ended_at.getTime() - b.ended_at.getTime());
 
             for (const interval of PERIODIC_SUFFIXES) {
                 this.periodic[interval] = this.calculatePeriodic(sorted_scores, interval);
@@ -291,6 +457,7 @@ export class ProfileRulesetStatistics {
                     lazer_score: _incremental_lazer_score || 0,
                     lazer_score_ss: _incremental_lazer_score_ss || 0,
                     pp: _incremental_pp || 0,
+                    raw_pp: 0, //incompatible
 
                     length_seconds: _incremental_length_seconds || 0,
 
@@ -305,7 +472,7 @@ export class ProfileRulesetStatistics {
                 };
             }
 
-            let _cumulative_scores = [];
+            let _cumulative_scores: IScore[] = [];
             for (const entry of ordered_dates[interval]) {
                 let _current_scores = entry.set || [];
                 _cumulative_scores = _cumulative_scores.concat(_current_scores);
@@ -313,8 +480,8 @@ export class ProfileRulesetStatistics {
                 //this system makes sure that overwritten scores still count at the time they were achieved,
                 //but not anymore if overwritten later (this can show scores that were fixed later for better grade or something)
                 //get all scores unique by beatmap_id where implied_pp is highest
-                let _current_scores_by_pp_map = {};
-                let _current_scores_by_score_map = {};
+                let _current_scores_by_pp_map: { [beatmap_id: string]: IScore } = {};
+                let _current_scores_by_score_map: { [beatmap_id: string]: IScore } = {};
 
                 for (const score of _cumulative_scores) {
                     if (!score.beatmap) {
@@ -382,6 +549,7 @@ export class ProfileRulesetStatistics {
                     lazer_score: _cumulative_lazer_score,
                     lazer_score_ss: _cumulative_lazer_score_ss,
                     pp: _cumulative_pp,
+                    raw_pp: 0, //incompatible
                     length_seconds: _cumulative_length_seconds,
                     grades_xh: _cumulative_grades['XH'],
                     grades_x: _cumulative_grades['X'],
@@ -429,8 +597,6 @@ export class ProfileRulesetStatistics {
                     pp: ppStats.max,
                     raw_pp: 0, //incompatible
                     length_seconds: durationStats.max,
-                    sessions: 0, //incompatible
-                    sessions_length_seconds: 0, //incompatible
                     grades_xh: 0, //incompatible
                     grades_x: 0, //incompatible
                     grades_sh: 0, //incompatible
@@ -464,8 +630,6 @@ export class ProfileRulesetStatistics {
                     pp: _median_pp,
                     raw_pp: 0, //incompatible
                     length_seconds: 0, //incompatible
-                    sessions: 0, //incompatible
-                    sessions_length_seconds: 0, //incompatible
                     grades_xh: 0, //incompatible
                     grades_x: 0, //incompatible
                     grades_sh: 0, //incompatible
@@ -479,7 +643,7 @@ export class ProfileRulesetStatistics {
         }
     }
 
-    calculatePeriodic(sorted_scores, interval) {
+    calculatePeriodic(sorted_scores: IScore[], interval: string) {
         if (!PERIODIC_SUFFIXES.includes(interval)) {
             throw new Error(`Invalid periodic interval: ${interval}`);
         }
@@ -509,10 +673,10 @@ export class ProfileRulesetStatistics {
         //the above has small chance of infinite loop if date manipulation fails for some reason, we need to calculate steps needed and loop on that
         let steps = 0;
         let firstYear = firstDate.getUTCFullYear();
-        let lastYear = lastDate.slice(0, 4);
+        let lastYear = parseInt(lastDate.slice(0, 4));
         //calculate number of steps between firstDate and lastDate
         if (interval === 'daily') {
-            const diffTime = new Date(lastDate) - firstDate;
+            const diffTime = new Date(lastDate).getTime() - firstDate.getTime();
             steps = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         } else if (interval === 'monthly') {
             let firstMonth = firstDate.getUTCMonth();
@@ -612,7 +776,7 @@ export class ProfileRulesetStatistics {
             }
 
             let low = 0;
-            let high = Object.keys(this.completion_statistics[statType]).reduce((a, b) => Math.max(a, b), 0);
+            let high = Object.keys(this.completion_statistics[statType]).reduce((a, b) => Math.max(Number(a), Number(b)), 0);
             for (let i = low; i <= high; i++) {
                 if (!this.completion_statistics[statType][i]) {
                     this.completion_statistics[statType][i] = {
@@ -664,7 +828,7 @@ export class ProfileRulesetStatistics {
         }
     }
 
-    calculateAccuracyDifficultyScatterChart(limit = LIMIT_CHART_SAMPLE_SIZE) {
+    calculateAccuracyDifficultyScatterChart(limit: number = LIMIT_CHART_SAMPLE_SIZE) {
         const data = [];
         let scores_sorted = this.scores_set.scores.slice().sort((a, b) => b.implied_total_score - a.implied_total_score);
 
@@ -691,7 +855,7 @@ export class ProfileRulesetStatistics {
         this.charts.accuracyDifficultyScatter = data;
     }
 
-    calculatePerformanceSpreadChart(limit = LIMIT_CHART_SAMPLE_SIZE) {
+    calculatePerformanceSpreadChart(limit: number = LIMIT_CHART_SAMPLE_SIZE) {
         const data = [];
         //sort by score pp
         let scores_sorted = this.scores_set_by_pp.scores.slice().sort((a, b) => a.implied_pp - b.implied_pp).reverse();
@@ -720,7 +884,7 @@ export class ProfileRulesetStatistics {
         this.charts.performanceSpread = data;
     }
 
-    calculateScoreSpreadChart(limit = LIMIT_CHART_SAMPLE_SIZE) {
+    calculateScoreSpreadChart(limit: number = LIMIT_CHART_SAMPLE_SIZE) {
         const data = [];
         //sort by score, bit complex, if ruleset = mania (3), we use .total_score, else .implied_total_score
         let scores_sorted = this.scores_set_by_score.scores.slice().sort((a, b) => {
@@ -753,7 +917,7 @@ export class ProfileRulesetStatistics {
         this.charts.scoreSpread = data;
     }
 
-    getBeatmapsMap(with_converts = false) {
+    getBeatmapsMap(with_converts: boolean = false) : { [beatmap_id: string]: IBeatmap } { 
         return with_converts ? this.beatmaps_with_converts_map : this.beatmaps_map;
     }
 }
