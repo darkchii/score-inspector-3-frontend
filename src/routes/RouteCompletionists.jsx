@@ -4,8 +4,9 @@ import { FormatNumber, GetRulesetColor, GetRulesetNameFromId, GetRulesetPrettyNa
 import { Alert, Divider, Grid, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { Line } from "react-chartjs-2";
 import PlayerLink from "../components/PlayerLink";
-import { getCompletionistBadge, TextureDatabase } from "../assets/textures/TextureDatabase";
+import { getCompletionistBadge } from "../assets/textures/TextureDatabase";
 import { usePageTitle } from "../providers/TitleProvider";
+import CompletionistsCountryMap from "../components/completionists/CompletionistsCountryMap";
 
 function RouteCompletionists() {
     usePageTitle("Completionists");
@@ -234,6 +235,7 @@ function RouteCompletionists() {
                                     </div>
                                 </Paper>
                             </Grid>
+                            <CompletionistsCountryMap data={data} />
                             {
                                 //list each mode with all users
                                 Object.keys(data).map(mode => (
