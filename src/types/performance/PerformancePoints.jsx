@@ -44,7 +44,7 @@ class PerformancePoints {
             case 'mania':
                 return new PerformanceCalculatorMania(score, overrides);
             default:
-                throw new Error(`Unknown ruleset: ${ruleset}`);
+                throw new Error(`Unknown ruleset: ${score.ruleset}`);
         }
     }
 

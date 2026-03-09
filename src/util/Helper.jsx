@@ -274,6 +274,37 @@ export const getContrastColor = (bgColor) => {
     return luminance > 0.5 ? '#000000' : '#FFFFFF';
 }
 
+const detailedTimeAgo = (seconds) => {
+    if (!seconds || seconds <= 0) {
+        return " ago";
+    }
+
+    const units = [
+        { label: 'month', value: 2592000 },
+        { label: 'day', value: 86400 },
+        { label: 'hour', value: 3600 },
+        { label: 'minute', value: 60 },
+        { label: 'second', value: 1 },
+    ];
+
+    const parts = [];
+    let remaining = seconds;
+
+    for (const unit of units) {
+        const amount = Math.floor(remaining / unit.value);
+        if (amount > 0) {
+            parts.push(`${amount} ${unit.label}${amount > 1 ? 's' : ''}`);
+            remaining %= unit.value;
+        }
+
+        if (parts.length === 2) {
+            break;
+        }
+    }
+
+    return parts.length > 0 ? `, ${parts.join(' ')} ago` : " ago";
+}
+
 export const TimeAgo = (date, detailed = false) => {
     //smart time ago function (pick largest unit, and if detailed, show next every next unit as well)
     const now = new Date();

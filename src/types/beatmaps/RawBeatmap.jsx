@@ -52,11 +52,20 @@ class RawBeatmap {
         this.BeatmapVersion = data.beatmapVersion;
 
         //Non-standard fields
-        this.HitsPerSeconds = CalculateHitsPerSecond(this.HitObjects);
+        this.HitsPerSeconds = this.CalculateHitsPerSecond(this.HitObjects);
     }
 
     CalculateHitsPerSecond(hitObjects) {
-        
+        if (!Array.isArray(hitObjects) || hitObjects.length === 0) {
+            return 0;
+        }
+
+        const sortedByStart = [...hitObjects].sort((a, b) => (a.StartTime || 0) - (b.StartTime || 0));
+        const firstTime = sortedByStart[0]?.StartTime || 0;
+        const lastTime = sortedByStart[sortedByStart.length - 1]?.StartTime || firstTime;
+        const durationSeconds = Math.max((lastTime - firstTime) / 1000, 1);
+
+        return hitObjects.length / durationSeconds;
     }
 
     ProcessHitObjects(hitObjectsData) {

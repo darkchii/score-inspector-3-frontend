@@ -85,7 +85,7 @@ export function ProfileProvider({ children }) {
             let _fetchLog = [];
 
             _fetchLog.push("%working% Fetching user data");
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
             let startMs = Date.now();
             const user = await getUser(_userId);
             let endMs = Date.now();
@@ -95,73 +95,73 @@ export function ProfileProvider({ children }) {
             }else{
                 _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched user data`);
             }
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
 
             
             _fetchLog.push("%working% Fetching scores");
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             const scores = await getScoresLive(_userId);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched ${FormatNumber(scores.length)} scores`);
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
 
             
             _fetchLog.push("%working% Fetching beatmaps");
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             const beatmaps = await getBeatmapsLive();
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched ${FormatNumber(beatmaps.length)} beatmaps`);
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
 
 
             _fetchLog.push("%working% Fetching beatmap packs");
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             const packs = await getBeatmapPacks();
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Fetched ${FormatNumber(packs.length)} beatmap packs`);
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
             
             _fetchLog.push("%working% Processing beatmaps");
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             const _beatmaps = ProcessBeatmaps(beatmaps);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Processed beatmaps`);
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
             
             _fetchLog.push("%working% Mapping beatmaps to scores");
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             const [mappedScores, missingCount] = await MapScoreBeatmaps(scores, _beatmaps);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Mapped beatmaps to scores (${FormatNumber(missingCount)} scores missing beatmaps)`);
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
             
             _fetchLog.push("%working% Processing scores");
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             let processedScores = await ProcessScores(mappedScores, user);
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Processed scores`);
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
             
             _fetchLog.push("%working% Building profile statistics");
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
             console.log(packs);
@@ -169,7 +169,7 @@ export function ProfileProvider({ children }) {
             endMs = Date.now();
             _fetchLog.pop();
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Built profile statistics`);
-            setFetchLog(_fetchLog);
+            setFetchLog([..._fetchLog]);
             
             let _scoreMap = {};
             processedScores.forEach(score => {

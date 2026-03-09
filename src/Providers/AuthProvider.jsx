@@ -70,13 +70,12 @@ export function AuthProvider({ children }) {
                 ShowNotification("Failed to fetch user data. Please log in again.", "error");
                 reset();
                 return;
+            } finally {
+                setLoading(false);
             }
         }
 
-        fetchUserData().then(() => {
-            // setUser({ id: "user_id_placeholder", token_type: "Bearer" }); // Placeholder, replace with actual user data
-            // setLoading(false);
-        }).catch((error) => {
+        fetchUserData().catch((error) => {
             console.error("Error fetching user data:", error);
             ShowNotification("Error fetching user data. Please log in again.", "error");
             reset();
@@ -88,6 +87,7 @@ export function AuthProvider({ children }) {
         try {
             if (!refreshToken) {
                 ShowNotification("No refresh token available. Please log in again.", "error");
+                reset();
                 return;
             }
 
@@ -122,6 +122,7 @@ export function AuthProvider({ children }) {
         } catch (error) {
             ShowNotification("Failed to refresh token. Please log in again.", "error");
             console.error("Refresh token error:", error);
+            reset();
         } finally {
             setLoading(false);
         }

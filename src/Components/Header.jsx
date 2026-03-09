@@ -1,7 +1,6 @@
 import { alpha, AppBar, Avatar, Box, Button, IconButton, InputBase, Menu, Stack, styled, Toolbar, Tooltip, Typography, useTheme } from "@mui/material";
 import Config from "../Data/Config";
 import { Link } from "react-router";
-import { useAuth } from "../providers/AuthProvider";
 import React, { useState } from "react";
 import { GetOsuAuthUrl } from "../util/ApiHelper";
 import LoadingButton from "./LoadingButton";
@@ -128,10 +127,6 @@ function Header() {
         setActiveDropdownIndex(null);
         setShowDropdown(false);
         setAnchorElDropdown(null);
-    };
-
-    const handleDrawerToggle = () => {
-        setMobileOpen((prevState) => !prevState);
     };
 
     return <React.Fragment>

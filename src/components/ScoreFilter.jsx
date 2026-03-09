@@ -93,6 +93,7 @@ const FilterScores = (scores, filter, order, direction) => {
                     const scoreMods = score.mods ? score.mods.map(mod => mod.acronym) : [];
                     return value.every(mod => scoreMods.includes(mod.Acronym));
                 });
+                break;
             default:
                 console.warn("Unsupported filter operator:", operator);
         }
