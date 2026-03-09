@@ -1,7 +1,7 @@
 import { Box, CircularProgress } from "@mui/material"
 import { Route, Routes, useSearchParams } from "react-router";
 import { useAuth } from "./providers/AuthProvider";
-import React, { useEffect, useState, lazy, Suspense } from "react";
+import React, { useEffect, useState, lazy } from "react";
 import { ToastContainer } from "react-toastify";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -43,25 +43,19 @@ function App() {
     { path: "/leaderboards/:ruleset?/:statistic?/page?/:page?/country?/:country?", element: <RouteLeaderboards /> },
   ];
 
-  const withSuspense = (element) => (
-    <Suspense fallback={<PageLoader />}>
-      {element}
-    </Suspense>
-  );
-
   const getRoute = (obj, is_child = false) => {
     return <>
       {
         is_child && <Route
           onTitleChange={(title) => setTitle(title)}
           index
-          element={withSuspense(obj.element)}
+          element={obj.element}
         />
       }
       <Route
         key={obj.path}
         path={obj.path}
-        element={withSuspense(obj.element)}
+        element={obj.element}
       >
         {
           obj.children && obj.children.map((child) => getRoute(child, true))
