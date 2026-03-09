@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import scoreViewStyles from '../../styles/score-view.module.less';
-import ScoreViewReplay from './ScoreViewReplay';
 import { Collapse, Fade } from '@mui/material';
 import ScoreViewOtherScores from './ScoreViewOtherScores';
 
@@ -9,11 +8,6 @@ const VIEWS = [
         id: 'other-scores',
         name: 'Other Scores',
         component: ScoreViewOtherScores
-    },
-    {
-        id: 'replay',
-        name: 'Replay',
-        component: ScoreViewReplay
     }
 ]
 

@@ -1,17 +1,20 @@
+import { IOsuBuffer, IOsuDb } from "../types";
 import { OsuBuffer } from "./OsuBuffer";
 
-export class OsuDb {
-    constructor(data) {
-        this.Data = data;
+export class OsuDb implements IOsuDb {
+    Data: ArrayBuffer;
 
-        this.OsuVersion = 0;
-        this.FolderCount = 0;
-        this.AccountUnlocked = false;
-        this.AccountUnlockDate = null;
-        this.AccountName = '';
-        this.BeatmapCount = 0;
-        this.Beatmaps = [];
-        this.AccountRank = 0;
+    OsuVersion: number = 0;
+    FolderCount: number = 0;
+    AccountUnlocked: boolean = false;
+    AccountUnlockDate: Date | null = null;
+    AccountName: string = '';
+    BeatmapCount: number = 0;
+    Beatmaps: any[] = [];
+    AccountRank: number = 0;
+
+    constructor(data: ArrayBuffer) {
+        this.Data = data;
 
         this.read();
     }
@@ -33,8 +36,8 @@ export class OsuDb {
         this.AccountRank = buffer.ReadInt32();
     }
 
-    readBeatmap(buffer) {
-        let beatmap = {
+    readBeatmap(buffer: IOsuBuffer) {
+        let beatmap: any = {
             // Size: buffer.ReadInt32(), // old version only
             ArtistName: buffer.ReadOsuString(), //1
             ArtistNameUnicode: buffer.ReadOsuString(), //2
@@ -61,7 +64,7 @@ export class OsuDb {
 
         for (let i = 0; i < 4; i++) {
             let length = buffer.ReadInt32();
-            let diffs = {};
+            let diffs: { [mode: number]: number } = {};
 
             for (let j = 0; j < length; j++) {
                 buffer.ReadByte();

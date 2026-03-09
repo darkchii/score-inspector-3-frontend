@@ -1,3 +1,5 @@
+import { Buffer } from "buffer";
+
 export interface IBeatmap {
     beatmap_id: number;
     id: number
@@ -608,4 +610,58 @@ export type ISessionCollectionActivity = {
     done: boolean;
     breaks: ISessionBreak[];
     duration: number;
+}
+
+export type IOsuBuffer = {
+    buffer: Buffer;
+    position: number;
+    length: number;
+
+    toString(type?: string): string;
+    canRead(length: number): boolean;
+    EOF(): boolean;
+    Slice(length: number, asOsuBuffer?: boolean): IOsuBuffer | Buffer;
+    Peek(): number;
+    ReadByte(): number;
+    ReadInt(byteLength: number): number;
+    ReadUInt(byteLength: number): number;
+    ReadInt8(): number;
+    ReadUInt8(): number;
+    ReadInt16(): number;
+    ReadUInt16(): number;
+    ReadInt32(): number;
+    ReadUInt32(): number;
+    ReadInt64(): number;
+    ReadUInt64(): number;
+    ReadFloat(): number;
+    ReadDouble(): number;
+    ReadString(length: number): string;
+    ReadVarInt(): number;
+    ReadULeb128(): number;
+    ReadBoolean(): boolean;
+    ReadOsuString(): string;
+}
+
+export type IOsuDb = {
+    Data: ArrayBuffer;
+
+    OsuVersion: number;
+    FolderCount: number;
+    AccountUnlocked: boolean;
+    AccountUnlockDate: Date | null;
+    AccountName: string;
+    BeatmapCount: number;
+    Beatmaps: any[];
+    AccountRank: number;
+}
+
+export type IOsuLegacyScoreMissCalculator = {
+    score: IScore;
+    overrides: any;
+
+    calculate(): number;
+    calculateScoreAtCombo(combo: number, relevantComboPerObject: number, scoreV1Multiplier: number): number;
+    calculateMaximumMissCount(): number;
+    calculateRelevantComboPerObject(): number;
+    getLegacyScoreMultiplier(): number;
 }

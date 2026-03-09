@@ -1,7 +1,11 @@
 import { Buffer } from "buffer";
+import { IOsuBuffer } from "../types";
 
-export class OsuBuffer {
-    constructor(input) {
+export class OsuBuffer implements IOsuBuffer {
+    buffer: Buffer;
+    position: number;
+
+    constructor(input: any) {
         this.buffer = Buffer.from(input);
         this.position = 0;
     }
@@ -14,15 +18,17 @@ export class OsuBuffer {
         return this.buffer.toString(type);
     }
 
-    static from() {
-        if (arguments[0] instanceof OsuBuffer) {
-            arguments[0] = arguments[0].buffer;
+    static from(...args: any[]): OsuBuffer {
+        if (args[0] instanceof OsuBuffer) {
+            args[0] = args[0].buffer;
         }
 
-        return new OsuBuffer(Buffer.from(...arguments));
+        return new OsuBuffer(
+            (Buffer.from as (...args: any[]) => Buffer)(...args)
+        );
     }
 
-    canRead(length) {
+    canRead(length: number) {
         return length + this.position <= this.buffer.length;
     }
 
@@ -30,7 +36,7 @@ export class OsuBuffer {
         return this.position >= this.buffer.length;
     }
 
-    Slice(length, asOsuBuffer = true) {
+    Slice(length: number, asOsuBuffer = true) {
         this.position += length;
         return asOsuBuffer ? OsuBuffer.from(this.buffer.slice(this.position - length, this.position)) : this.buffer.slice(this.position - length, this.position);
     }
@@ -43,12 +49,12 @@ export class OsuBuffer {
         return this.buffer[this.position++];
     }
 
-    ReadInt(byteLength) {
+    ReadInt(byteLength: number) {
         this.position += byteLength;
         return this.buffer.readIntLE(this.position - byteLength, byteLength);
     }
 
-    ReadUInt(byteLength) {
+    ReadUInt(byteLength: number) {
         this.position += byteLength;
         return this.buffer.readUIntLE(this.position - byteLength, byteLength);
     }
@@ -103,16 +109,16 @@ export class OsuBuffer {
         let total = 0;
         let shift = 0;
         let byte = this.ReadUInt8();
-        if((byte & 0x80) === 0) {
+        if ((byte & 0x80) === 0) {
             total |= ((byte & 0x7F) << shift);
         } else {
             let end = false;
             do {
-                if(shift) {
+                if (shift) {
                     byte = this.ReadUInt8();
                 }
                 total |= ((byte & 0x7F) << shift);
-                if((byte & 0x80) === 0) end = true;
+                if ((byte & 0x80) === 0) end = true;
                 shift += 7;
             } while (!end);
         }
@@ -130,7 +136,7 @@ export class OsuBuffer {
 
     ReadOsuString() {
         let isString = this.ReadByte() === 11;
-        if(!isString) return '';
+        if (!isString) return '';
 
         let length = this.ReadVarInt();
         return this.ReadString(length);
