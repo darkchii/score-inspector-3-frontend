@@ -6,15 +6,43 @@ import "leaflet/dist/leaflet.css";
 import { FormatNumber } from "../../util/Helper";
 
 const WORLD_GEOJSON_URL = "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson";
+const DARK_TILE_URL = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+const DARK_TILE_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+const COUNTRY_FILL_COLOR_RANGE = {
+    min: "rgb(70, 90, 120)",
+    max: "rgb(185, 205, 225)",
+};
 
-function getCountryFillColor(count, maxCount) {
+function parseRgbColor(color) {
+    const match = color.match(/rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)/i);
+    if (!match) {
+        return null;
+    }
+
+    return [
+        Math.max(0, Math.min(255, Number(match[1]))),
+        Math.max(0, Math.min(255, Number(match[2]))),
+        Math.max(0, Math.min(255, Number(match[3]))),
+    ];
+}
+
+function getCountryFillColor(count, maxCount, colorRange = COUNTRY_FILL_COLOR_RANGE) {
     if (!count || maxCount <= 0) {
-        return "#e7ecf2";
+        return "#e7ecf200";
+    }
+
+    const minRgb = parseRgbColor(colorRange?.min);
+    const maxRgb = parseRgbColor(colorRange?.max);
+    if (!minRgb || !maxRgb) {
+        return "rgb(140, 160, 180)";
     }
 
     const normalized = Math.min(1, count / maxCount);
-    const intensity = Math.round(225 - normalized * 130);
-    return `rgb(${Math.max(70, intensity - 40)}, ${Math.max(90, intensity - 20)}, ${Math.max(120, intensity)})`;
+    const interpolated = minRgb.map((channel, idx) => (
+        Math.round(channel + (maxRgb[idx] - channel) * normalized)
+    ));
+
+    return `rgb(${interpolated[0]}, ${interpolated[1]}, ${interpolated[2]})`;
 }
 
 function CompletionistsCountryMap({ data }) {
@@ -105,11 +133,19 @@ function CompletionistsCountryMap({ data }) {
                                 minZoom={1}
                                 maxZoom={6}
                                 scrollWheelZoom={false}
-                                style={{ height: "100%", width: "100%", borderRadius: 8 }}
+                                style={{
+                                    height: "100%",
+                                    width: "100%",
+                                    borderRadius: 8,
+                                    background: "#ffffff00",
+                                }}
                             >
                                 <TileLayer
-                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                                    url="https://maps.kirino.sh/natural_earth/ne2sr/{z}/{x}/{y}.png"
+                                    attribution={DARK_TILE_ATTRIBUTION}
+                                    url={DARK_TILE_URL}
+                                    noWrap={true}
+                                    //transparent if no tiles, to avoid white background
+                                    background={"#ffffff00"}
                                 />
                                 <GeoJSON
                                     data={worldGeoJson}
