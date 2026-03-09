@@ -1,10 +1,7 @@
-import { alpha, AppBar, Avatar, Box, Button, IconButton, InputBase, Menu, Stack, styled, Toolbar, Tooltip, Typography, useTheme } from "@mui/material";
+import { alpha, AppBar, Box, Button, Collapse, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, Menu, Stack, styled, Toolbar, Tooltip, Typography, useTheme } from "@mui/material";
 import Config from "../Data/Config";
 import { Link } from "react-router";
 import React, { useState } from "react";
-import { GetOsuAuthUrl } from "../util/ApiHelper";
-import LoadingButton from "./LoadingButton";
-import DebouncedTextField from "./DebouncedTextField";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import PersonIcon from '@mui/icons-material/Person';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
@@ -16,6 +13,9 @@ import InfoIcon from '@mui/icons-material/Info';
 import BuildIcon from '@mui/icons-material/Build';
 import HeaderUser from "./header/HeaderUser";
 import HistoryIcon from '@mui/icons-material/History';
+import MenuIcon from '@mui/icons-material/Menu';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 const HeaderButtonMenu = styled((props) => (
     <Menu
@@ -68,6 +68,8 @@ function Header() {
     const [activeDropdownIndex, setActiveDropdownIndex] = useState(null);
     const [showDropdown, setShowDropdown] = useState(false);
     const [anchorElDropdown, setAnchorElDropdown] = useState(null);
+    const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+    const [openMobileGroups, setOpenMobileGroups] = useState({});
 
     const HEADER_NAV_ITEMS = [
         {
@@ -129,6 +131,24 @@ function Header() {
         setAnchorElDropdown(null);
     };
 
+    const toggleMobileDrawer = (open) => {
+        setMobileDrawerOpen(open);
+    };
+
+    const toggleMobileGroup = (index) => {
+        setOpenMobileGroups((prev) => ({
+            ...prev,
+            [index]: !prev[index],
+        }));
+    };
+
+    const closeMobileDrawerAndRun = (item) => {
+        toggleMobileDrawer(false);
+        if (item.onClick) {
+            item.onClick();
+        }
+    };
+
     return <React.Fragment>
         <HeaderButtonMenu
             anchorEl={anchorElDropdown}
@@ -184,7 +204,7 @@ function Header() {
                                 fontStyle: 'italic',
                             }}>v3</Typography>
                     </Box>
-                    <Box sx={{ display: { xs: 'none', sm: 'none', md: 'none', lg: 'block', flexGrow: 1 } }}>
+                    <Box sx={{ display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' }, flexGrow: 1 }}>
                         <Stack direction={'row'} spacing={2}>
                             {
                                 HEADER_NAV_ITEMS.map((item, index) => {
@@ -221,12 +241,110 @@ function Header() {
                             }
                         </Stack>
                     </Box>
+                    <Box sx={{ display: { xs: 'block', sm: 'block', md: 'block', lg: 'none' }, ml: 'auto', mr: 1 }}>
+                        <IconButton
+                            color="inherit"
+                            aria-label="open navigation"
+                            onClick={() => toggleMobileDrawer(true)}
+                            size="large"
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                    </Box>
                     <Box sx={{ flexGrow: 0 }}>
                         <HeaderUser />
                     </Box>
                 </Toolbar>
             </Box>
         </AppBar>
+        <Drawer
+            anchor="left"
+            open={mobileDrawerOpen}
+            onClose={() => toggleMobileDrawer(false)}
+            sx={{ display: { xs: 'block', sm: 'block', md: 'block', lg: 'none' } }}
+        >
+            <Box sx={{ width: 300 }} role="presentation">
+                <Box sx={{ px: 2, py: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
+                    <Typography variant="h6">{Config.WEBSITE_NAME}</Typography>
+                </Box>
+                <List>
+                    {HEADER_NAV_ITEMS.map((item, index) => {
+                        const hasDropdown = item.dropdown && item.dropdown.length > 0;
+                        const isOpen = !!openMobileGroups[index];
+
+                        if (hasDropdown) {
+                            return (
+                                <React.Fragment key={index}>
+                                    <ListItemButton
+                                        component={item.to ? Link : (item.href ? 'a' : 'button')}
+                                        to={item.to || '#'}
+                                        href={item.href || undefined}
+                                        target={item.href ? "_blank" : undefined}
+                                        onClick={(e) => {
+                                            if (!item.to && !item.href && !item.onClick) {
+                                                e.preventDefault();
+                                            }
+                                            closeMobileDrawerAndRun(item);
+                                        }}
+                                    >
+                                        <ListItemIcon>{item.icon || null}</ListItemIcon>
+                                        <ListItemText primary={item.label} />
+                                        <IconButton
+                                            edge="end"
+                                            size="small"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                toggleMobileGroup(index);
+                                            }}
+                                        >
+                                            {isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                        </IconButton>
+                                    </ListItemButton>
+                                    <Collapse in={isOpen} timeout="auto" unmountOnExit>
+                                        <List component="div" disablePadding>
+                                            {item.dropdown.map((dropdownItem, dropdownIndex) => (
+                                                <ListItemButton
+                                                    key={`${index}-${dropdownIndex}`}
+                                                    sx={{ pl: 4 }}
+                                                    component={dropdownItem.to ? Link : (dropdownItem.href ? 'a' : 'button')}
+                                                    to={dropdownItem.to || '#'}
+                                                    href={dropdownItem.href || undefined}
+                                                    target={dropdownItem.href ? "_blank" : undefined}
+                                                    onClick={() => closeMobileDrawerAndRun(dropdownItem)}
+                                                >
+                                                    <ListItemIcon>{dropdownItem.icon || null}</ListItemIcon>
+                                                    <ListItemText primary={dropdownItem.label} />
+                                                </ListItemButton>
+                                            ))}
+                                        </List>
+                                    </Collapse>
+                                </React.Fragment>
+                            );
+                        }
+
+                        return (
+                            <ListItemButton
+                                key={index}
+                                component={item.to ? Link : (item.href ? 'a' : 'button')}
+                                to={item.to || '#'}
+                                href={item.href || undefined}
+                                target={item.href ? "_blank" : undefined}
+                                onClick={(e) => {
+                                    if (!item.to && !item.href && !item.onClick) {
+                                        e.preventDefault();
+                                    }
+                                    closeMobileDrawerAndRun(item);
+                                }}
+                            >
+                                <ListItemIcon>{item.icon || null}</ListItemIcon>
+                                <ListItemText primary={item.label} />
+                            </ListItemButton>
+                        );
+                    })}
+                </List>
+            </Box>
+        </Drawer>
     </React.Fragment>;
 }
 
