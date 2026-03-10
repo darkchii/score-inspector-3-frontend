@@ -1,4 +1,4 @@
-export function GetColorInterpolation(value, min, max, rgbMin, rgbMax, alpha = 1.0) {
+export function GetColorInterpolation(value: number, min: number, max: number, rgbMin: number[] | { r: number, g: number, b: number }, rgbMax: number[] | { r: number, g: number, b: number }, alpha: number = 1.0): string {
     //rgb is basically [r, g, b] (or convert from { r: , g: , b: } if needed )
     const ratio = (value - min) / (max - min);
     let rMin = Array.isArray(rgbMin) ? rgbMin[0] : rgbMin.r;

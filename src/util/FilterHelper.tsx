@@ -1,4 +1,5 @@
 import ModData from "../data/Mods.json";
+import { IScore } from "../types/types";
 
 export const FILTER_FIELDS = [
     { label: 'ID', value: 'id', type: 'number' },
@@ -44,7 +45,7 @@ export const EMPTY_SORT = {
     direction: "asc" // "asc" | "desc"
 }
 
-export function FilterScores(scores, filter) {
+export function FilterScores(scores: IScore[], filter: any[]): IScore[] {
     return scores.filter(score => {
         for (const f of filter) {
             switch (f.type) {
@@ -60,7 +61,7 @@ export function FilterScores(scores, filter) {
     });
 }
 
-function ScoreFilterGetFieldValue(score, field) {
+function ScoreFilterGetFieldValue(score: IScore, field: string): any {
     const fieldParts = field.split('.');
     let fieldValue = score;
     for (const part of fieldParts) {
@@ -69,7 +70,7 @@ function ScoreFilterGetFieldValue(score, field) {
     return fieldValue;
 }
 
-function ScoreFilterTestNumber(score, filter) {
+function ScoreFilterTestNumber(score: IScore, filter: any): boolean {
     const scoreField = ScoreFilterGetFieldValue(score, filter.field);
     const numericValue = parseFloat(filter.value);
     if (isNaN(numericValue) || isNaN(scoreField)) return false;

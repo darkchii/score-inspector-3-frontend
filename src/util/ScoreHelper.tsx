@@ -3,9 +3,10 @@ import axios from "axios";
 import { GetAPI } from "./ApiHelper";
 import Score from "../types/Score";
 import ScoreDifficulty from "../types/ScoreDifficulty";
+import { IBeatmap, IScore } from "../types/types";
 
 //Helper functions for score data
-export function GetStarRating(score) {
+export function GetStarRating(score: IScore): number | null {
     if (!score.diff_missing) {
         return score.attr_diff.star_rating;
     }
@@ -13,7 +14,7 @@ export function GetStarRating(score) {
     return score.beatmap ? score.beatmap.stars : null;
 }
 
-export function GetHitResultColor(hitResult) {
+export function GetHitResultColor(hitResult: string) {
     switch (hitResult) {
         case 'ignore_miss':
         case 'small_tick_miss':
@@ -44,7 +45,7 @@ export function GetHitResultColor(hitResult) {
     }
 }
 
-export function BeatmapApplyModsToDifficulty(ruleset, beatmap, mods) {
+export function BeatmapApplyModsToDifficulty(ruleset: string, beatmap: IBeatmap, mods: any[]): any {
     let modifiedAttributes = {
         ar: beatmap.ar,
         od: beatmap.od,
@@ -106,7 +107,7 @@ export function BeatmapApplyModsToDifficulty(ruleset, beatmap, mods) {
     return modifiedAttributes;
 }
 
-export const CalculateRawPerformance = (scores, include_loved = false, sort = true) => {
+export const CalculateRawPerformance = (scores: IScore[], include_loved: boolean = false, sort: boolean = true): number => {
     let subset = scores;
 
     if (!include_loved) {
@@ -130,11 +131,11 @@ export const CalculateRawPerformance = (scores, include_loved = false, sort = tr
     return totalPerformance;
 }
 
-export const CalculateBonusPerformance = (scoreCount) => {
+export const CalculateBonusPerformance = (scoreCount: number): number => {
     return 416.6667 * (1 - Math.pow(0.9995, Math.min(scoreCount, 1000)));
 }
 
-export const DetermineIsScoreFC = (score) => {
+export const DetermineIsScoreFC = (score: IScore): boolean => {
     if (!score.beatmap) {
         return false;
     }
@@ -148,7 +149,7 @@ export const DetermineIsScoreFC = (score) => {
         if (!score.using_classic_slider_accuracy) {
             const countSliderEndsDropped = score.beatmap.count_sliders - score.statistics_slider_tail_hit;
             //if score.combo + dropped slider ends >= max combo, its a full combo
-            return score.combo + countSliderEndsDropped >= (score.diff_attr?.max_combo || score.beatmap?.max_combo || 0);
+            return score.combo + countSliderEndsDropped >= (score.attr_diff?.max_combo || score.beatmap?.max_combo || 0);
         } else {
             //estimate missed slider ends
             const countMiss = score.statistics_miss || 0;
@@ -157,16 +158,16 @@ export const DetermineIsScoreFC = (score) => {
                 return false;
             }
 
-            return ((score.diff_attr?.max_combo || score.beatmap?.max_combo || 0) - score.combo) <= count100;
+            return ((score.attr_diff?.max_combo || score.beatmap?.max_combo || 0) - score.combo) <= count100;
         }
     }
 
-    return score.combo >= (score.diff_attr?.max_combo || score.beatmap?.max_combo || 0);
+    return score.combo >= (score.attr_diff?.max_combo || score.beatmap?.max_combo || 0);
 }
 
-const _localScoreCache = new Map();
+const _localScoreCache = new Map<number, IScore>();
 //Only for singular score fetching like /score/:scoreId
-export const GetScoreFromId = async (scoreId) => {
+export const GetScoreFromId = async (scoreId: number): Promise<IScore | null> => {
     if (_localScoreCache.has(scoreId)) {
         return _localScoreCache.get(scoreId);
     }
@@ -202,7 +203,7 @@ export const GetScoreFromId = async (scoreId) => {
     }
 }
 
-export const LevelToTotalScore = (level) => {
+export const LevelToTotalScore = (level: number): number => {
     if (level <= 100) {
         if (level > 1) {
             return Math.floor(5000 / 3 * (4 * Math.pow(level, 3) - 3 * Math.pow(level, 2) - level) + Math.floor(1.25 * Math.pow(1.8, level - 60)));
@@ -212,7 +213,7 @@ export const LevelToTotalScore = (level) => {
     return Math.floor(26931190829 + 100000000000 * (level - 100));
 }
 
-export const TotalScoreToLevel = (totalScore) => {
+export const TotalScoreToLevel = (totalScore: number): number => {
     if (isNaN(totalScore) || totalScore < 0) {
         return 0;
     }
@@ -233,7 +234,7 @@ export const TotalScoreToLevel = (totalScore) => {
     return result;
 }
 
-function getLevel(score) {
+function getLevel(score: number): number {
     let i = 1;
     for (; ;) {
         var lScore = LevelToTotalScore(i);

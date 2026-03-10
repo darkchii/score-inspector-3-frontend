@@ -6,7 +6,7 @@ const difficultyColourSpectrum = scaleLinear()
     .range(['#4290FB', '#4FC0FF', '#4FFFD5', '#7CFF4F', '#F6F05C', '#FF8068', '#FF4E6F', '#C645B8', '#6563DE', '#18158E', '#000000'])
     .interpolate(interpolateRgb.gamma(2.2));
 
-export const getDiffColour = (rating) => {
+export const getDiffColour = (rating: number): string => {
     if (rating < 0.1) return '#AAAAAA';
     if (rating >= 9) return '#000000';
     return difficultyColourSpectrum(rating);

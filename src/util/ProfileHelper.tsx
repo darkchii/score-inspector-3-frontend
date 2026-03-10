@@ -1,8 +1,9 @@
 import Beatmap from "../types/beatmaps/Beatmap";
 import { ProfileStatistics } from "../types/ProfileStatistics";
 import Score from "../types/Score";
+import { IBeatmap, IScore } from "../types/types";
 
-export async function ProcessUser(user) {
+export async function ProcessUser(user: any): Promise<any> {
     user.osuAlternative.rulesets = {};
 
     //map everything with osu_ prefix to ruleset 0
@@ -113,7 +114,7 @@ export async function ProcessUser(user) {
     return user;
 }
 
-export function getDedicationLevel(a, b, c, d, xp) {
+export function getDedicationLevel(a: number, b: number, c: number, d: number, xp: number): number {
     let l = 0;
     let fl = a * l * l * l + b * l * l + c * l + d - xp;
     let i = 0;
@@ -126,11 +127,11 @@ export function getDedicationLevel(a, b, c, d, xp) {
     return l;
 }
 
-export function ProcessBeatmaps(beatmaps) {
+export function ProcessBeatmaps(beatmaps: IBeatmap[]): IBeatmap[] {
     return beatmaps.map(beatmap => new Beatmap(beatmap));
 }
 
-export async function MapScoreBeatmaps(scores, beatmaps) {
+export async function MapScoreBeatmaps(scores: IScore[], beatmaps: Beatmap[]): Promise<[IScore[], number]> {
     //This function maps beatmaps to all scores
     //We probably need to deep copy each beatmap since every score needs to manipulate its own copy
     // score[x].beatmap = beatmap
@@ -157,11 +158,11 @@ export async function MapScoreBeatmaps(scores, beatmaps) {
     return [scores, missingCount];
 }
 
-export async function ProcessScores(scores, user = null) {
+export async function ProcessScores(scores: IScore[], user: any = null): Promise<IScore[]> {
     return scores.map(score => new Score(score, score.beatmap, user));
 }
 
-export async function BuildProfileStatistics(scores, beatmaps, packs) {
+export async function BuildProfileStatistics(scores: IScore[], beatmaps: IBeatmap[], packs: any[]): Promise<{ profileStats: ProfileStatistics; profileStatsWithoutLoved: ProfileStatistics }> {
     // const profileStats = new ProfileStatistics(scores, beatmaps, packs);
     // return profileStats;
     const profileStats = new ProfileStatistics(scores, beatmaps, packs, false);

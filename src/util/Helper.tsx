@@ -1,22 +1,30 @@
 import Config from '../data/Config.json';
-import { toast } from "react-toastify";
+import { toast, type ToastOptions } from "react-toastify";
 import { TextureDatabase } from '../assets/textures/TextureDatabase';
 import { blue, green, pink, purple } from '@mui/material/colors';
 import { HasHiddenMod, HasMod } from './ModHelper';
 import ScoreData from '../data/ScoreData.json';
 import NumberFlow from '@number-flow/react';
 import * as Muicon from "@mui/icons-material";
-import axios from 'axios';
+import { IScore } from '../types/types';
 
-export const ShowNotification = (message, severity) => {
-    toast[severity](message, Config.NOTIFICATIONS);
+type DurationParts = {
+    years: number;
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
 };
 
-export const DateToString = (date) => {
+export const ShowNotification = (message: string, severity: "info" | "success" | "warning" | "error") => {
+    toast[severity](message, Config.NOTIFICATIONS as ToastOptions);
+};
+
+export const DateToString = (date: Date | null): string => {
     //Convert date object to "DD/MM/YYYY HH:MM (Timezone)" format, timezone would be UTC+9 for example, no commas
     if (!date) return 'N/A';
 
-    const options = {
+    const options: Intl.DateTimeFormatOptions = {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
@@ -28,16 +36,16 @@ export const DateToString = (date) => {
     return new Intl.DateTimeFormat('en-GB', options).format(date).replace(/,/g, '');
 }
 
-export const FormatNumber = (number) => {
+export const FormatNumber = (number: number) => {
     return new Intl.NumberFormat().format(number);
 }
 
-export const FormatNumberWithPrecision = (number, precision) => {
+export const FormatNumberWithPrecision = (number: number, precision: number) => {
     return new Intl.NumberFormat(undefined, { minimumFractionDigits: precision, maximumFractionDigits: precision }).format(number);
 }
 
-export const FormatDuration = (seconds, style = 'narrow', highest_tier = null) => {
-    const duration = {
+export const FormatDuration = (seconds: number, style: 'narrow' | 'short' | 'long' | 'raw' = 'narrow', highest_tier: 'years' | 'days' | 'hours' | 'minutes' | 'seconds' | null = null) => {
+    const duration: DurationParts = {
         years: Math.floor(seconds / 31536000),
         days: Math.floor((seconds % 31536000) / 86400),
         hours: Math.floor((seconds % 86400) / 3600),
@@ -77,12 +85,20 @@ export const FormatDuration = (seconds, style = 'narrow', highest_tier = null) =
         return duration;
     }
 
-    return new Intl.DurationFormat('en', { style: style }).format(duration);
+    const IntlWithDurationFormat = Intl as typeof Intl & {
+        DurationFormat?: new (locale: string, options: { style: string }) => { format: (value: unknown) => string }
+    };
+
+    if (IntlWithDurationFormat.DurationFormat) {
+        return new IntlWithDurationFormat.DurationFormat('en', { style: style }).format(duration);
+    }
+
+    return `${duration.years}y ${duration.days}d ${duration.hours}h ${duration.minutes}m ${duration.seconds}s`;
 }
 
-export const FormatDurationNumberFlow = (seconds, spacing = true, highest_tier = null) => {
+export const FormatDurationNumberFlow = (seconds: number, spacing: boolean = true, highest_tier: 'years' | 'days' | 'hours' | 'minutes' | 'seconds' | null = null) => {
     //Format duration with all numeric values in NumberFlow components
-    const duration = FormatDuration(seconds, 'raw', highest_tier);
+    const duration = FormatDuration(seconds, 'raw', highest_tier) as DurationParts;
 
     let formatted = <></>;
 
@@ -124,7 +140,7 @@ export const FormatDurationNumberFlow = (seconds, spacing = true, highest_tier =
     return formatted;
 }
 
-export const GetRulesetIconFromId = (rulesetId) => {
+export const GetRulesetIconFromId = (rulesetId: number) => {
     switch (rulesetId) {
         default:
         case 0:
@@ -138,7 +154,7 @@ export const GetRulesetIconFromId = (rulesetId) => {
     }
 }
 
-export const GetRulesetColor = (ruleset) => {
+export const GetRulesetColor = (ruleset: string) => {
     const _ruleset = typeof ruleset === 'string' ? ruleset.toLowerCase() : null;
 
     switch (_ruleset) {
@@ -154,7 +170,7 @@ export const GetRulesetColor = (ruleset) => {
     }
 }
 
-export const GetRulesetNameFromId = (rulesetId) => {
+export const GetRulesetNameFromId = (rulesetId: number | string) => {
     switch (rulesetId) {
         default:
         case 0:
@@ -179,7 +195,7 @@ export const GetRulesetNameFromId = (rulesetId) => {
     }
 }
 
-export const GetRulesetPrettyNameFromId = (rulesetId) => {
+export const GetRulesetPrettyNameFromId = (rulesetId: number | string) => {
     switch (rulesetId) {
         default:
         case 0:
@@ -204,7 +220,7 @@ export const GetRulesetPrettyNameFromId = (rulesetId) => {
     }
 }
 
-export const GetRulesetId = (rulesetName) => {
+export const GetRulesetId = (rulesetName: string) => {
     switch (rulesetName) {
         default:
         case 'osu':
@@ -247,7 +263,7 @@ export const GetRulesets = () => {
     ]
 }
 
-export const GetStatusLabelFromInt = (status) => {
+export const GetStatusLabelFromInt = (status: number) => {
     switch (status) {
         default:
         case 0:
@@ -263,7 +279,7 @@ export const GetStatusLabelFromInt = (status) => {
     }
 }
 
-export const getContrastColor = (bgColor) => {
+export const getContrastColor = (bgColor: string): string => {
     // Calculate the luminance of the background color
     const color = bgColor.charAt(0) === '#' ? bgColor.substring(1, 7) : bgColor;
     const r = parseInt(color.substring(0, 2), 16) / 255;
@@ -274,7 +290,7 @@ export const getContrastColor = (bgColor) => {
     return luminance > 0.5 ? '#000000' : '#FFFFFF';
 }
 
-const detailedTimeAgo = (seconds) => {
+const detailedTimeAgo = (seconds: number): string => {
     if (!seconds || seconds <= 0) {
         return " ago";
     }
@@ -305,10 +321,11 @@ const detailedTimeAgo = (seconds) => {
     return parts.length > 0 ? `, ${parts.join(' ')} ago` : " ago";
 }
 
-export const TimeAgo = (date, detailed = false) => {
+export const TimeAgo = (date: Date | string, detailed: boolean = false): string => {
     //smart time ago function (pick largest unit, and if detailed, show next every next unit as well)
     const now = new Date();
-    const seconds = Math.floor((now - date) / 1000);
+    const dateValue = date instanceof Date ? date.getTime() : new Date(date).getTime();
+    const seconds = Math.floor((now.getTime() - dateValue) / 1000);
 
     let interval = Math.floor(seconds / 31536000);
     if (interval >= 1) {
@@ -338,7 +355,7 @@ export const TimeAgo = (date, detailed = false) => {
     return Math.floor(seconds) + " second" + (seconds > 1 ? "s" : "") + " ago";
 }
 
-export const displayRank = {
+export const displayRank: { [key: string]: string } = {
     "D": "D",
     "C": "C",
     "B": "B",
@@ -349,11 +366,11 @@ export const displayRank = {
     "XH": "SS"
 }
 
-export const rankCutoffs = (score) => {
+export const rankCutoffs = (score: IScore): number[] => {
     const hasCL = score.mods && HasMod(score.mods, "CL");
     const ruleset = score.ruleset || GetRulesetIconFromId(score.ruleset_id);
 
-    let absoluteCutoffs = [];
+    let absoluteCutoffs: number[] = [];
 
     if (hasCL) {
         switch (ruleset) {
@@ -390,8 +407,8 @@ export const rankCutoffs = (score) => {
     return differenceBetweenConsecutiveElements(absoluteCutoffs);
 }
 
-function differenceBetweenConsecutiveElements(arr) {
-    const result = [];
+function differenceBetweenConsecutiveElements(arr: number[]): number[] {
+    const result: number[] = [];
 
     for (let i = 1; i < arr.length; i++) {
         result.push(arr[i] - arr[i - 1]);
@@ -400,9 +417,9 @@ function differenceBetweenConsecutiveElements(arr) {
     return result;
 }
 
-function GetGradeFromAccuracyBase(accuracy, ruleset = 'osu') {
+function GetGradeFromAccuracyBase(accuracy: number, ruleset: string = 'osu'): string {
     const cutoffs = ScoreData.accuracyCutoffs[ruleset];
-    let grade;
+    let grade: string;
 
     if (accuracy >= cutoffs.x) {
         grade = 'X';
@@ -421,7 +438,7 @@ function GetGradeFromAccuracyBase(accuracy, ruleset = 'osu') {
     return grade;
 }
 
-export function GetGradeFromAccuracy(score, accuracy) {
+export function GetGradeFromAccuracy(score: IScore, accuracy: number): string {
     let grade = GetGradeFromAccuracyBase(accuracy);
 
     switch (score.ruleset) {
@@ -463,7 +480,7 @@ export function GetGradeFromAccuracy(score, accuracy) {
     return grade;
 }
 
-export function GetGradeColor(grade) {
+export function GetGradeColor(grade: string): string {
     switch (grade) {
         default:
             return '#ffffff';
@@ -486,7 +503,7 @@ export function GetGradeColor(grade) {
     }
 }
 
-export function HexToRgb(hex) {
+export function HexToRgb(hex: string): [number, number, number] | null {
     // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
     const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
     hex = hex.replace(shorthandRegex, function (m, r, g, b) {
@@ -502,13 +519,13 @@ export function HexToRgb(hex) {
 }
 
 //gets any icon from mui icon by its name
-export function GetIconFromLabel(label) {
+export function GetIconFromLabel(label: string) {
     const IconComponent = Muicon[label];
     return IconComponent ? <IconComponent /> : null;
 }
 
 //like keyPath = ['beatmap', 'difficulty_data', 'star_rating']
-export function GetNestedValue(obj, keyPath) {
+export function GetNestedValue(obj: any, keyPath: string | string[]): any {
     if (typeof keyPath === 'string') {
         keyPath = keyPath.split('.');
     }
@@ -517,12 +534,12 @@ export function GetNestedValue(obj, keyPath) {
     }, obj);
 }
 
-export function readFileAsync(file) {
+export function readFileAsync(file: File): Promise<ArrayBuffer> {
     return new Promise((resolve, reject) => {
         let reader = new FileReader();
 
         reader.onload = () => {
-            resolve(reader.result);
+            resolve(reader.result as ArrayBuffer);
         };
 
         reader.onerror = reject;
