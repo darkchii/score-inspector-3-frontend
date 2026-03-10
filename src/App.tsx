@@ -6,23 +6,16 @@ import { ToastContainer } from "react-toastify";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
-// Lazy load routes for code splitting
-const RouteIndex = lazy(() => import("./routes/RouteIndex"));
-const RouteProfile = lazy(() => import("./routes/RouteProfile"));
-const Route404 = lazy(() => import("./routes/Route404"));
-const RouteScore = lazy(() => import("./routes/RouteScore"));
-const RouteCompletionists = lazy(() => import("./routes/RouteCompletionists"));
-const RouteLeaderboards = lazy(() => import("./routes/RouteLeaderboards"));
-const RoutePeople = lazy(() => import("./routes/RoutePeople"));
-const RouteTools = lazy(() => import("./routes/RouteTools"));
+import RouteIndex from "./routes/RouteIndex";
+import RouteProfile from "./routes/RouteProfile";
+import Route404 from "./routes/Route404";
+import RouteScore from "./routes/RouteScore";
+import RouteCompletionists from "./routes/RouteCompletionists";
+import RouteLeaderboards from "./routes/RouteLeaderboards";
+import RoutePeople from "./routes/RoutePeople";
+import RouteTools from "./routes/RouteTools";
 
-// Loading fallback component
-const PageLoader = () => (
-  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-    <CircularProgress />
-  </Box>
-);
-
+declare const window: any; //ts fix
 function App() {
   const [title, setTitle] = useState(null);
   const [searchParams] = useSearchParams();
@@ -47,7 +40,7 @@ function App() {
     return <>
       {
         is_child && <Route
-          onTitleChange={(title) => setTitle(title)}
+          // onTitleChange={(title) => setTitle(title)}
           index
           element={obj.element}
         />

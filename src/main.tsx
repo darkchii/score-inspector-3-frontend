@@ -19,6 +19,11 @@ import React from 'react';
 import { TitleProvider } from './providers/TitleProvider.jsx';
 import { ReputationProvider } from './providers/ReputationProvider.jsx';
 
+type ProviderEntry = {
+  Provider: React.ComponentType<React.PropsWithChildren<any>>;
+  props?: Record<string, unknown>;
+};
+
 // Register Chart.js components globally
 import {
   Chart as ChartJS,
@@ -81,7 +86,7 @@ const theme = createTheme({
 //   ScoreViewProvider,
 //   SearchProvider
 // ]
-const _providers = [
+const _providers: ProviderEntry[] = [
   {
     Provider: ThemeProvider,
     props: { theme: theme },
@@ -115,7 +120,7 @@ const _providers = [
 
 console.log("Providers loaded:", _providers.map(p => p.Provider.name).join(", "));
 
-const _wrapWithProviders = (children) => {
+const _wrapWithProviders = (children: React.ReactNode) => {
   return _providers.reduceRight((acc, { Provider, props }) => {
     return <Provider {...props}>{acc}</Provider>
   }, children);
