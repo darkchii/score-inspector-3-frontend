@@ -43,13 +43,13 @@ function RoutePeople() {
                 });
 
                 //sort users in each role by amount of roles they have (more roles means higher index)
-                Object.values(roleMap).forEach(role => {
+                Object.values(roleMap).forEach((role: any) => {
                     role.users.sort((a, b) => (b.roles ? b.roles.length : 0) - (a.roles ? a.roles.length : 0));
                 });
 
                 const vals = Object.values(roleMap);
                 //sort by role.priority descending
-                vals.sort((a, b) => b.role.priority - a.role.priority);
+                vals.sort((a: any, b: any) => b.role.priority - a.role.priority);
 
                 setData(vals);
             } catch (error) {
@@ -80,7 +80,7 @@ function RoutePeople() {
     return (
         <Box sx={{ p: 2 }}>
             {
-                data.map((roleData, index) => (
+                data.map((roleData: any, index: number) => (
                     <Paper key={index} sx={{ mb: 4, p: 2 }}>
                         <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
                             <Box sx={{ width: 16, height: 16, backgroundColor: `${roleData.role.color}`, borderRadius: '50%', mr: 1 }} />
@@ -88,7 +88,7 @@ function RoutePeople() {
                         </Box>
                         <Box>
                             <Grid container spacing={2}>
-                                {roleData.users.map((user, index) => (
+                                {roleData.users.map((user: any, index: number) => (
                                     <Grid size={{ xs: 12, md: 3 }} key={index}>
                                         <PlayerCard data={user} />
                                     </Grid>

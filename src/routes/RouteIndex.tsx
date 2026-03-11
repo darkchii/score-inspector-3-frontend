@@ -53,14 +53,14 @@ function RouteIndex() {
                 width: '100%',
                 boxSizing: 'border-box',
             }}>
-                <Grid item size={{ xs: 12, md: 9 }}>
-                    <Stack spacing={1}>
-                        <IndexLanding />
-                        <IndexTopPlayers isWorking={isWorking > 0} setIsWorking={_setIsWorking} activeRuleset={activeRuleset} setActiveRuleset={setActiveRuleset} />
-                        <IndexScoreSubmissions isWorking={isWorking > 0} setIsWorking={_setIsWorking} activeRuleset={activeRuleset} setActiveRuleset={setActiveRuleset} />
-                    </Stack>
+                <Grid size={{ xs: 12, md: 9 }}>
+                        <Stack spacing={1}>
+                            <IndexLanding />
+                            <IndexTopPlayers isWorking={isWorking > 0} setIsWorking={_setIsWorking} activeRuleset={activeRuleset} setActiveRuleset={setActiveRuleset} />
+                            <IndexScoreSubmissions isWorking={isWorking > 0} setIsWorking={_setIsWorking} activeRuleset={activeRuleset} setActiveRuleset={setActiveRuleset} />
+                        </Stack>
                 </Grid>
-                <Grid item size={{ xs: 12, md: 3 }}>
+                <Grid size={{ xs: 12, md: 3 }}>
                     <Stack spacing={1}>
                         <IndexDonation />
                         <IndexDiscordWidget />

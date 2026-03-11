@@ -32,7 +32,7 @@ function RouteCompletionists() {
                 }, {});
 
                 for (const mode in groupedData) {
-                    groupedData[mode].sort((a, b) => new Date(a.completion_date) - new Date(b.completion_date));
+                    groupedData[mode].sort((a, b) => new Date(a.completion_date).getTime() - new Date(b.completion_date).getTime());
                 }
 
                 //count days between each completionist and the previous one, add that as a field to each item
@@ -42,7 +42,7 @@ function RouteCompletionists() {
                             return { ...item, days_since_last: null };
                         }
                         const prevItem = arr[index - 1];
-                        const diffTime = Math.abs(new Date(item.completion_date) - new Date(prevItem.completion_date));
+                        const diffTime = Math.abs(new Date(item.completion_date).getTime() - new Date(prevItem.completion_date).getTime());
                         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                         return { ...item, days_since_last: diffDays };
                     });
@@ -50,7 +50,7 @@ function RouteCompletionists() {
 
                 //order each mode by completion_date
                 for (const mode in groupedData) {
-                    groupedData[mode].sort((a, b) => new Date(b.completion_date) - new Date(a.completion_date));
+                    groupedData[mode].sort((a, b) => new Date(b.completion_date).getTime() - new Date(a.completion_date).getTime());
                 }
 
                 setData(groupedData);
@@ -78,7 +78,7 @@ function RouteCompletionists() {
                             {
                                 //list each mode with all users
                                 Object.keys(data).map(mode => (
-                                    <Grid item key={mode} size={{ xs: 12, md: 3 }}>
+                                    <Grid key={mode} size={{ xs: 12, md: 3 }}>
                                         <Paper elevation={3} sx={{ padding: 1 }}>
                                             <div style={{
                                                 display: 'flex',

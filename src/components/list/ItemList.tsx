@@ -1,5 +1,7 @@
 import { Box, Table, TableBody, tableCellClasses, TableContainer, tableRowClasses, Typography, useTheme } from "@mui/material";
 import { useEffect, useState, useMemo, useCallback, memo } from "react";
+import type { ComponentType } from "react";
+import type { ItemListRowBaseProps } from "./ItemListRowBase";
 
 function getWindowDimensions() {
     const { innerWidth: width, innerHeight: height } = window;
@@ -10,7 +12,18 @@ function getWindowDimensions() {
 }
 
 const truncateStep = 10;
-const ItemList = memo(function ItemList({
+interface ItemListProps<TItem extends object> extends Omit<ItemListRowBaseProps<TItem>, "item" | "index" | "cover_url" | "children" | "onClick"> {
+    items?: TItem[];
+    isCompact?: boolean;
+    truncate?: boolean;
+    truncateStartStep?: number;
+    passthroughProps?: Record<string, unknown>;
+    // During incremental JS->TS migration, row wrappers are intentionally accepted loosely.
+    ItemListRowType: ComponentType<any>;
+    [key: string]: unknown;
+}
+
+const ItemList = memo(function ItemList<TItem extends object>({
     startIndex = 0,
     showIndex = false,
     showIndexDifference = false,
@@ -26,7 +39,7 @@ const ItemList = memo(function ItemList({
     passthroughProps = {},
     ItemListRowType,
     ...props
-}) {
+}: ItemListProps<TItem>) {
 
     const theme = useTheme();
     const [displayCount, setDisplayCount] = useState(truncate ? truncateStartStep : items?.length || 0);
@@ -71,7 +84,7 @@ const ItemList = memo(function ItemList({
     
     // Memoize show more handler
     const handleShowMore = useCallback(() => {
-        setDisplayCount(prev => Math.min(prev + truncateStep, items.length));
+        setDisplayCount((prev) => Math.min(prev + truncateStep, items?.length || 0));
     }, [items]);
 
     return (
@@ -99,7 +112,7 @@ const ItemList = memo(function ItemList({
                     }}>
                         {displayedItems.map((item, index) => (
                             <ItemListRowType
-                                key={item?.id || index}
+                                key={(item as { id?: string | number })?.id ?? index}
                                 item={item}
                                 index={index}
                                 showIndex={showIndex}

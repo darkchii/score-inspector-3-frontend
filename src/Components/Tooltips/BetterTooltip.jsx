@@ -11,11 +11,11 @@ const LocalStyledTooltip = styled(({ className, ...props }) => (
     max-width: 600px;
     `);
 
-function BetterTooltip({ children, title }) {
+function BetterTooltip({ children, title, placement = 'bottom-start' }) {
     return (
         <LocalStyledTooltip
             title={title}
-            placement={'bottom-start'}
+            placement={placement}
             slotProps={{
                 popper: {
                     modifiers: [

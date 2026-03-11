@@ -1,6 +1,7 @@
 import { Avatar, Box, TableCell, TableRow, Typography, useTheme } from "@mui/material";
 import { FormatNumberWithPrecision, getContrastColor, GetRulesetIconFromId, GetRulesetNameFromId, TimeAgo } from "../../util/Helper";
 import ItemListRowBase from "./ItemListRowBase";
+import type { ItemListRowBaseProps } from "./ItemListRowBase";
 import { useScoreView } from "../../providers/ScoreViewProvider";
 import { getGradeIcon } from "../../assets/textures/TextureDatabase";
 import { GetStarRating } from "../../util/ScoreHelper";
@@ -11,10 +12,24 @@ import ModDisplay from "../ModDisplay";
 import WarningIcon from '@mui/icons-material/Warning';
 import React, { memo, useCallback } from "react";
 import { grey } from "@mui/material/colors";
+import type { IBeatmap, IScore } from "../../types/types";
 
-const ScoreListRow = memo(function ScoreListRow({ item, index, isCompact = false, isMobile = false, showIndex = true, startIndex = 0, leaderboardField = null, leaderboardFormat = null }) {
+type ScoreListItem = IScore & {
+    beatmap: IBeatmap;
+};
+
+interface ScoreListRowProps extends Omit<ItemListRowBaseProps<ScoreListItem>, "cover_url" | "children"> {
+    isCompact?: boolean;
+    isMobile?: boolean;
+}
+
+const ScoreListRow = memo(function ScoreListRow({ item, index, isCompact = false, isMobile = false, showIndex = true, startIndex = 0, leaderboardField = null, leaderboardFormat = null }: ScoreListRowProps) {
     const theme = useTheme();
     const { loadScoreView } = useScoreView();
+
+    if (!item) {
+        return null;
+    }
     
     const handleClick = useCallback(() => {
         loadScoreView(item);

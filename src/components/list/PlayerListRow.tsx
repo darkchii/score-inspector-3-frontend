@@ -1,9 +1,33 @@
 import { Avatar, Box, TableCell, TableRow, Typography, useTheme } from "@mui/material";
 import { getContrastColor } from "../../util/Helper";
 import ItemListRowBase from "./ItemListRowBase";
+import type { ItemListRowBaseProps } from "./ItemListRowBase";
 import { useNavigate } from "react-router";
 import PlayerLink from "../PlayerLink";
 import { memo, useCallback } from "react";
+
+type PlayerListItem = {
+    osuAlternative?: {
+        user_id?: number;
+    };
+    osuApi?: {
+        id?: number;
+        username?: string;
+        avatar_url?: string;
+        cover?: {
+            custom_url?: string;
+            url?: string;
+        };
+    };
+    team?: {
+        color?: string;
+        short_name?: string;
+    };
+} & Record<string, unknown>;
+
+interface PlayerListRowProps extends Omit<ItemListRowBaseProps<PlayerListItem>, "cover_url" | "children" | "onClick"> {
+    isCompact?: boolean;
+}
 
 const PlayerListRow = memo(function PlayerListRow({ 
     item, 
@@ -19,7 +43,7 @@ const PlayerListRow = memo(function PlayerListRow({
     secondaryFieldColor = null,
     leaderboardFormat = null,
     ...props
-}) {
+}: PlayerListRowProps) {
     const theme = useTheme();
     const navigate = useNavigate();
     
@@ -39,6 +63,7 @@ const PlayerListRow = memo(function PlayerListRow({
             indexFromItem={indexFromItem}
             leaderboardField={leaderboardField}
             secondaryLeaderboardField={secondaryLeaderboardField}
+            secondaryFieldColor={secondaryFieldColor}
             leaderboardFormat={leaderboardFormat}
 
             item={item}

@@ -30,7 +30,7 @@ function RouteScore() {
     const [activeRuleset, setActiveRuleset] = useState(params.ruleset || 'osu');
     const [activeStat, setActiveStat] = useState(params.stat || 'rank');
     const [activeDate, setActiveDate] = useState(params.date ? moment.utc(params.date, 'YYYY-MM-DD', true) : null);
-    const [activePage, setActivePage] = useState(params.page || 1);
+    const [activePage, setActivePage] = useState(parseInt(params.page) || 1);
     const [data, setData] = useState(null);
 
     //TODO: date selector should grey out dates not in validDates
@@ -160,15 +160,19 @@ function RouteScore() {
                 label="Select Date"
                 value={activeDate}
                 onChange={(newValue) => setActiveDate(newValue)}
-                renderInput={(params) => <TextField {...params} />}
+                slotProps={{
+                    textField: {
+                        fullWidth: false,
+                    },
+                }}
                 shouldDisableDate={(date) => {
-                    return !validDates.some(validDate => validDate.isSame(date, 'day'));
+                    return !validDates.some((validDate: any) => validDate.isSame(date, 'day'));
                 }}
             />
 
             <ButtonGroup variant="contained">
                 {
-                    Object.values(VALID_STATS).map((stat) => (
+                    Object.values(VALID_STATS).map((stat: any) => (
                         <Button
                             key={`stat_${stat.key}`}
                             onClick={() => setActiveStat(stat.key)}
@@ -200,7 +204,7 @@ function RouteScore() {
                             <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 1, justifyContent: 'center' }}>
                                 <Pagination
                                     count={data?.total_pages || 1}
-                                    page={parseInt(activePage)}
+                                    page={activePage}
                                     onChange={(event, value) => setActivePage(value)}
                                     color="primary"
                                     disabled={isWorking}
@@ -212,18 +216,18 @@ function RouteScore() {
                                 showIndexDifference={true}
                                 indexFromItem={'score_rank.rank'}
                                 indexDifferencePosition='score_rank.gained_rank'
-                                items={data?.entries?.map(entry => entry.user)}
+                                items={data?.entries?.map((entry: any) => entry.user)}
                                 isCompact={false}
                                 truncate={false}
                                 ItemListRowType={PlayerListRow}
                                 leaderboardField={`score_rank.ranked_score`}
                                 secondaryLeaderboardField={`score_rank.gained_score`}
-                                leaderboardFormat={(value) => `${FormatNumber(value)}`}
+                                leaderboardFormat={(value: number) => `${FormatNumber(value)}`}
                             />
                             <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 1, justifyContent: 'center' }}>
                                 <Pagination
                                     count={data?.total_pages || 1}
-                                    page={parseInt(activePage)}
+                                    page={activePage}
                                     onChange={(event, value) => setActivePage(value)}
                                     color="primary"
                                     disabled={isWorking}

@@ -14,7 +14,7 @@ import BeatmapListRow from "../components/list/BeatmapListRow";
 import Beatmap from "../types/beatmaps/Beatmap";
 import { grey } from "@mui/material/colors";
 
-const LIMIT = 50;
+const LIMIT: number = 50;
 const LEADERBOARDS = {
     'pp': {
         title: 'Performance',
@@ -220,7 +220,7 @@ function RouteLeaderboards() {
     const { getLeaderboard } = useApi();
     const [ruleset, setRuleset] = useState('osu');
     const [statistic, setStatistic] = useState(params.statistic || Object.keys(LEADERBOARDS)[0]);
-    const [page, setPage] = useState(params.page || 1);
+    const [page, setPage] = useState(parseInt(params.page) || 1);
     const [country, setCountry] = useState(params.country || null);
     const [leaderboardResults, setLeaderboardResults] = useState(null);
 
@@ -276,7 +276,7 @@ function RouteLeaderboards() {
 
     useEffect(() => {
         setStatistic(params.statistic || Object.keys(LEADERBOARDS)[0]);
-        setPage(params.page || 1);
+        setPage(parseInt(params.page) || 1);
         setRuleset(params.ruleset || 'osu');
         setCountry(params.country || null);
     }, [params.statistic, params.page, params.ruleset, params.country]);
@@ -376,7 +376,7 @@ function RouteLeaderboards() {
                         id="country-select"
                         options={countries.all.map(c => ({ code: c.alpha2, label: c.name, emoji: c.emoji }))}
                         sx={{ width: 300 }}
-                        value={country ? { code: country, label: lookup.countries({ alpha2: country })[0].name } : null}
+                        value={country ? { code: country, label: lookup.countries({ alpha2: country })[0].name, emoji: lookup.countries({ alpha2: country })[0].emoji } : null}
                         onChange={(event, newValue) => {
                             applyCountry(newValue ? newValue.code : null);
                         }}
@@ -413,7 +413,7 @@ function RouteLeaderboards() {
                                         <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 1, justifyContent: 'center' }}>
                                             <Pagination
                                                 count={leaderboardResults.total_pages}
-                                                page={parseInt(page)}
+                                                page={page}
                                                 onChange={(event, value) => setPage(value)}
                                                 color="primary"
                                                 disabled={isWorking}
@@ -456,7 +456,7 @@ function RouteLeaderboards() {
                                         <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 1, justifyContent: 'center' }}>
                                             <Pagination
                                                 count={leaderboardResults.total_pages}
-                                                page={parseInt(page)}
+                                                page={page}
                                                 onChange={(event, value) => setPage(value)}
                                                 color="primary"
                                                 disabled={isWorking}

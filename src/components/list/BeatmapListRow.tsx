@@ -10,8 +10,24 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import BetterTooltip from "../tooltips/BetterTooltip";
 import DifficultyBadge from "../DifficultyBadge";
 import ItemListRowBase from "./ItemListRowBase";
+import type { ItemListRowBaseProps } from "./ItemListRowBase";
 import { useScoreView } from "../../providers/ScoreViewProvider";
 import { useProfile } from "../../providers/ProfileProvider";
+import type { IBeatmap } from "../../types/types";
+
+type BeatmapListItem = IBeatmap & {
+    score_data?: {
+        grade?: string;
+        is_pfc?: boolean;
+        is_fc?: boolean;
+        score_id?: number;
+    };
+};
+
+interface BeatmapListRowProps extends Omit<ItemListRowBaseProps<BeatmapListItem>, "cover_url" | "children" | "onClick"> {
+    isCompact?: boolean;
+    showPlayed?: boolean;
+}
 
 const BeatmapListRow = memo(function BeatmapListRow({
     item,
@@ -25,7 +41,7 @@ const BeatmapListRow = memo(function BeatmapListRow({
     secondaryFieldColor = null,
     leaderboardFormat = null,
     ...props
-}) {
+}: BeatmapListRowProps) {
     const theme = useTheme();
     const { getScoreById } = useProfile();
     const { loadScoreView } = useScoreView();
@@ -43,6 +59,7 @@ const BeatmapListRow = memo(function BeatmapListRow({
             startIndex={startIndex}
             leaderboardField={leaderboardField}
             secondaryLeaderboardField={secondaryLeaderboardField}
+            secondaryFieldColor={secondaryFieldColor}
             leaderboardFormat={leaderboardFormat}
             item={item}
             {...props}
