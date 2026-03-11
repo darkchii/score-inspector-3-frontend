@@ -1,21 +1,32 @@
-import { Avatar, styled, Tooltip } from "@mui/material";
+import { Avatar, styled, Tooltip, tooltipClasses } from "@mui/material";
+import type { TooltipProps } from "@mui/material";
+import { isValidElement } from "react";
 import { getFlagIcon } from "../../assets/textures/TextureDatabase";
 
 //use styled components
-const LocalStyledTooltip = styled(({ className, ...props }) => (
-    <Tooltip {...props} componentsProps={{ tooltip: { className: className } }} />
-))(`
-    background-color: rgba(0, 0, 0, 0.6);
-    font-size: 18px;
-    font-weight: 400;
-    backdrop-filter: blur(4px);
-    min-width: 200px;
-    max-width: 400px;
-    height: 80px;
-    padding: 0px;
-`);
+const LocalStyledTooltip = styled(({ className, ...props }: TooltipProps) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+))({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        fontSize: '18px',
+        fontWeight: 400,
+        backdropFilter: 'blur(4px)',
+        minWidth: '200px',
+        maxWidth: '400px',
+        height: '80px',
+        padding: '0px',
+    },
+});
 
-function PlayerTooltip({ data, children }) {
+type PlayerTooltipProps = {
+    data: any;
+    children: React.ReactNode;
+};
+
+function PlayerTooltip({ data, children }: PlayerTooltipProps) {
+    const tooltipChild = isValidElement(children) ? children : <span>{children}</span>;
+
     return (
         <LocalStyledTooltip
             title={<>
@@ -84,7 +95,7 @@ function PlayerTooltip({ data, children }) {
             placement={'top'}
             followCursor
             >
-            {children}
+            {tooltipChild}
         </LocalStyledTooltip>
     )
 }

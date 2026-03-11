@@ -1,15 +1,24 @@
-import { Box, List, ListItem, ListItemText, styled, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, Tooltip, Typography, useTheme } from "@mui/material";
+import { Box, styled, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, Tooltip, tooltipClasses, Typography, useTheme } from "@mui/material";
+import type { TooltipProps } from "@mui/material";
+import { isValidElement } from "react";
 import { GetModSettingForDisplay } from "../../util/ModHelper";
 import ModDisplay from "../ModDisplay";
 
-const LocalStyledTooltip = styled(({ className, ...props }) => (
-    <Tooltip {...props} componentsProps={{ tooltip: { className: className } }} />
-))(`
-    padding: 0;
-    background-color: transparent;
-    box-shadow: none;
-    color: white;
-`);
+type ModSettingDefinition = {
+    Name: string;
+    Label: string;
+};
+
+const LocalStyledTooltip = styled(({ className, ...props }: TooltipProps) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+))({
+    [`& .${tooltipClasses.tooltip}`]: {
+        padding: 0,
+        backgroundColor: 'transparent',
+        boxShadow: 'none',
+        color: 'white',
+    },
+});
 
 function ModTooltipContent({ mod, data, ruleset }) {
     const theme = useTheme();
@@ -52,7 +61,7 @@ function ModTooltipContent({ mod, data, ruleset }) {
                                 }}>
                                     <TableBody>
                                         {
-                                            Object.entries(data.Settings).map(([settingKey, settingValue]) => {
+                                            Object.entries(data.Settings as Record<string, ModSettingDefinition>).map(([settingKey, settingValue]) => {
                                                 if (mod.settings[settingValue.Name] === undefined || mod.settings[settingValue.Name] === null) return null;
                                                 return (
                                                     <TableRow key={settingKey} sx={{ mb: 1 }}>
@@ -85,7 +94,17 @@ function ModTooltipContent({ mod, data, ruleset }) {
     )
 }
 
-function ModTooltip({ children, mod, data, ruleset, disabled = false }) {
+type ModTooltipProps = {
+    children: React.ReactNode;
+    mod: any;
+    data: any;
+    ruleset: any;
+    disabled?: boolean;
+};
+
+function ModTooltip({ children, mod, data, ruleset, disabled = false }: ModTooltipProps) {
+    const tooltipChild = isValidElement(children) ? children : <span>{children}</span>;
+
     if (disabled) {
         return children;
     }
@@ -95,7 +114,7 @@ function ModTooltip({ children, mod, data, ruleset, disabled = false }) {
             title={<ModTooltipContent mod={mod} data={data} ruleset={ruleset} />}
             placement={'top'}
             followCursor>
-            {children}
+            {tooltipChild}
         </LocalStyledTooltip>
     )
 }

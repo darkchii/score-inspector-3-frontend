@@ -8,7 +8,7 @@ import { OsuDb } from "../../types/database/OsuDb";
 
 function ToolMissingBeatmaps() {
     const [allBeatmaps, setAllBeatmaps] = useState([]);
-    const [sortedBeatmaps, setSortedBeatmaps] = useState([]);
+    const [sortedBeatmaps, setSortedBeatmaps] = useState<any>([]);
     const [beatmapStats, setBeatmapStats] = useState({});
     const [isDownloading, setIsDownloading] = useState(false);
     const [isWorking, setIsWorking] = useState(false);
@@ -135,7 +135,7 @@ function ToolMissingBeatmaps() {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = type === 'osu' ? '.db' : '.realm';
-        input.onchange = async (event) => {
+        input.onchange = async (event: any) => {
             setIsWorking(true);
             const file = event.target.files[0];
             if (file) {
@@ -226,21 +226,6 @@ function ToolMissingBeatmaps() {
             </Collapse>
         </Box>
     );
-}
-
-//because missing maps can technically be in the 200k range, we need to use a virtual table to display them
-//use virtuoso
-
-const VirtuosoTableComponents = {
-    Scroller: React.forwardRef((props, ref) => (
-        <TableContainer component={Paper} ref={ref} {...props} />
-    )),
-    Table: (props) => (
-        <Table {...props} sx={{ borderCollapse: 'separate', tableLayout: 'fixed' }} />
-    ),
-    TableHead: React.forwardRef((props, ref) => <TableHead ref={ref} {...props} />),
-    TableRow,
-    TableBody: React.forwardRef((props, ref) => <TableBody ref={ref} {...props} />),
 }
 
 const missingLabelMap = {

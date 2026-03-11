@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from "react";
 
 function InteractiveBox({ children = null, onClick = null, onLongPress = null, longPressDuration = 500, style = {}, className = "" }) {
     
-    const holdEvent = useLongPress((e) => {
+    const holdEvent = useLongPress((e: any) => {
         if (onLongPress) onLongPress(e);
     }, (e) => {
         if (onClick) onClick(e);
@@ -24,16 +24,16 @@ export default InteractiveBox;
 
 
 const useLongPress = (
-    onLongPress,
-    onClick,
+    onLongPress: (event: any) => void,
+    onClick: (event: any) => void,
     { shouldPreventDefault = true, delay = 300 } = {}
 ) => {
     const [longPressTriggered, setLongPressTriggered] = useState(false);
-    const timeout = useRef();
-    const target = useRef();
+    const timeout = useRef<any>(null);
+    const target = useRef<EventTarget | null>(null);
 
     const start = useCallback(
-        event => {
+        (event: any) => {
             if (shouldPreventDefault && event.target) {
                 event.target.addEventListener("touchend", preventDefault, {
                     passive: false
@@ -49,7 +49,7 @@ const useLongPress = (
     );
 
     const clear = useCallback(
-        (event, shouldTriggerClick = true) => {
+        (event: any, shouldTriggerClick = true) => {
             timeout.current && clearTimeout(timeout.current);
             shouldTriggerClick && !longPressTriggered && onClick(event);
             setLongPressTriggered(false);
@@ -69,11 +69,11 @@ const useLongPress = (
     };
 };
 
-const isTouchEvent = event => {
+const isTouchEvent = (event: any): event is TouchEvent => {
     return "touches" in event;
 };
 
-const preventDefault = event => {
+const preventDefault = (event: any) => {
     if (!isTouchEvent(event)) return;
 
     if (event.touches.length < 2 && event.preventDefault) {

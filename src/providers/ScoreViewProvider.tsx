@@ -25,7 +25,7 @@ export function ScoreViewProvider({ children }: { children: React.ReactNode }) {
                 open={enabled}
                 onClose={unloadScoreView}
                 closeAfterTransition
-                style={{
+                sx={{
                     //prevent blue outline on focus
                     '&:focus': {
                         outline: 'none',

@@ -1,4 +1,5 @@
 import { Buffer } from "buffer";
+import React from "react";
 
 export interface IBeatmap {
     beatmap_id: number;
@@ -665,3 +666,7 @@ export type IOsuLegacyScoreMissCalculator = {
     calculateRelevantComboPerObject(): number;
     getLegacyScoreMultiplier(): number;
 }
+
+export type NumberFlowStyleWithVars = React.CSSProperties & {
+    '--number-flow-mask-height'?: string;
+};

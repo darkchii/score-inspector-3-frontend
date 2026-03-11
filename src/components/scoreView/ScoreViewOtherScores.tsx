@@ -4,7 +4,7 @@ import NumberFlow from "@number-flow/react";
 import ItemList from "../list/ItemList";
 import ScoreListRow from "../list/ScoreListRow";
 
-function ScoreViewOtherScores({ score }) {
+function ScoreViewOtherScores({ score, active = null }) {
     return (
         <div>
             {

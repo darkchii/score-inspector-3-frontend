@@ -2,7 +2,7 @@ import { Alert, Autocomplete, Box, Button, Grid, IconButton, MenuItem, Paper, Se
 import React, { useEffect, useMemo, useState } from "react";
 import { FormatNumber, GetNestedValue } from "../util/Helper";
 import ModData from "../data/Mods.json";
-import Mod from "./Mod";
+import ModIcon from "./ModIcon";
 
 const ORDER_OPTIONS = [
     { value: "implied_pp", label: "PP" },
@@ -129,7 +129,7 @@ function ScoreFilter({ data, onFiltered, currentRuleset }) {
     const [sort, setSort] = useState(ORDER_OPTIONS[0]);
     const [direction, setDirection] = useState("desc");
     const [filter, setFilter] = useState({});
-    const [filterSet, setFilterSet] = useState(false); //a local copy to readjust max values to the current score set
+    const [filterSet, setFilterSet] = useState<any>(false); //a local copy to readjust max values to the current score set
 
     useEffect(() => {
         setSort(ORDER_OPTIONS[0]);
@@ -370,7 +370,7 @@ function FilterMods({ filter, setFilter, option, currentRuleset }) {
             renderOption={(props, mod) => (
                 <li {...props} key={mod.Acronym}>
                     {/* {mod.Acronym} - {mod.Name} */}
-                    <Mod data={mod} />
+                    <ModIcon data={mod} />
                     {mod.Name}
                 </li>
             )}
@@ -378,7 +378,7 @@ function FilterMods({ filter, setFilter, option, currentRuleset }) {
             renderTags={(value, getTagProps) =>
                 value.map((mod, index) => (
                     <Box key={mod.Acronym} {...getTagProps({ index })}>
-                        <Mod data={mod} />
+                        <ModIcon data={mod} />
                     </Box>
                 ))
             }

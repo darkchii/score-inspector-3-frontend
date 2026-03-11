@@ -1,5 +1,6 @@
 import { alpha, AppBar, Box, Button, Collapse, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, Menu, Stack, styled, Toolbar, Tooltip, Typography, useTheme } from "@mui/material";
-import Config from "../Data/Config";
+import type { MenuProps } from "@mui/material";
+import Config from "../data/Config.json";
 import { Link } from "react-router";
 import React, { useState } from "react";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -17,7 +18,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
-const HeaderButtonMenu = styled((props) => (
+const HeaderButtonMenu = styled((props: MenuProps) => (
     <Menu
         elevation={0}
         anchorOrigin={{
@@ -119,7 +120,7 @@ function Header() {
         }
     ];
 
-    const handleHeaderMenuOpen = (event, index) => {
+    const handleHeaderMenuOpen = (event: React.MouseEvent<HTMLElement>, index: number) => {
         setActiveDropdownIndex(index);
         setShowDropdown(true);
         setAnchorElDropdown(event.currentTarget);
@@ -131,18 +132,18 @@ function Header() {
         setAnchorElDropdown(null);
     };
 
-    const toggleMobileDrawer = (open) => {
+    const toggleMobileDrawer = (open: boolean) => {
         setMobileDrawerOpen(open);
     };
 
-    const toggleMobileGroup = (index) => {
+    const toggleMobileGroup = (index: number) => {
         setOpenMobileGroups((prev) => ({
             ...prev,
             [index]: !prev[index],
         }));
     };
 
-    const closeMobileDrawerAndRun = (item) => {
+    const closeMobileDrawerAndRun = (item: any) => {
         toggleMobileDrawer(false);
         if (item.onClick) {
             item.onClick();
@@ -156,7 +157,7 @@ function Header() {
             onClose={handleHeaderMenuClose}
         >
             {
-                activeDropdownIndex !== null && HEADER_NAV_ITEMS[activeDropdownIndex].dropdown.map((item, index) => (
+                activeDropdownIndex !== null && HEADER_NAV_ITEMS[activeDropdownIndex].dropdown.map((item: any, index: number) => (
                     <Button
                         key={index}
                         component={item.to ? Link : 'button'}
@@ -207,33 +208,35 @@ function Header() {
                     <Box sx={{ display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' }, flexGrow: 1 }}>
                         <Stack direction={'row'} spacing={2}>
                             {
-                                HEADER_NAV_ITEMS.map((item, index) => {
+                                HEADER_NAV_ITEMS.map((item: any, index: number) => {
                                     return (
                                         <Stack key={index} direction={'row'}>
                                             <Tooltip title={item.tooltip || ''}>
-                                                <Button
-                                                    size='small'
-                                                    component={item.to ? Link : (item.href ? 'a' : 'button')}
-                                                    to={item.to || '#'}
-                                                    href={item.href || null}
-                                                    onClick={item.onClick}
-                                                    startIcon={item.icon || null}
-                                                    disabled={!item.onClick && !item.to && !item.href}
-                                                    target={item.href ? "_blank" : undefined}
-                                                >
-                                                    {item.label || ''}
-                                                </Button>
-                                                {
-                                                    item.dropdown && item.dropdown.length > 0 && (
-                                                        <IconButton
-                                                            size="small"
-                                                            onClick={(e) => handleHeaderMenuOpen(e, index)}
-                                                            sx={{ ml: -0.5 }}
-                                                        >
-                                                            <KeyboardArrowDownIcon fontSize="small" />
-                                                        </IconButton>
-                                                    )
-                                                }
+                                                <>
+                                                    <Button
+                                                        size='small'
+                                                        component={item.to ? Link : (item.href ? 'a' : 'button')}
+                                                        to={item.to || '#'}
+                                                        href={item.href || null}
+                                                        onClick={item.onClick}
+                                                        startIcon={item.icon || null}
+                                                        disabled={!item.onClick && !item.to && !item.href}
+                                                        target={item.href ? "_blank" : undefined}
+                                                    >
+                                                        {item.label || ''}
+                                                    </Button>
+                                                    {
+                                                        item.dropdown && item.dropdown.length > 0 && (
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={(e) => handleHeaderMenuOpen(e, index)}
+                                                                sx={{ ml: -0.5 }}
+                                                            >
+                                                                <KeyboardArrowDownIcon fontSize="small" />
+                                                            </IconButton>
+                                                        )
+                                                    }
+                                                </>
                                             </Tooltip>
                                         </Stack>
                                     )
@@ -303,7 +306,7 @@ function Header() {
                                     </ListItemButton>
                                     <Collapse in={isOpen} timeout="auto" unmountOnExit>
                                         <List component="div" disablePadding>
-                                            {item.dropdown.map((dropdownItem, dropdownIndex) => (
+                                            {item.dropdown.map((dropdownItem: any, dropdownIndex: number) => (
                                                 <ListItemButton
                                                     key={`${index}-${dropdownIndex}`}
                                                     sx={{ pl: 4 }}

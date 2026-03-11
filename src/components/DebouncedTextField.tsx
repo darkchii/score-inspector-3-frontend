@@ -1,8 +1,8 @@
 import { TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 
-function DebouncedTextField({ value = "", delay = 500, onDebouncedChange, ...props}) {
-    const [internalValue, setInternalValue] = useState(value || props?.defaultValue || "");
+function DebouncedTextField({ value = "", delay = 500, onDebouncedChange, ...props}: { value?: string; delay?: number; onDebouncedChange?: (value: string) => void; [key: string]: any }) {
+    const [internalValue, setInternalValue] = useState<string>(value || props?.defaultValue || "");
 
     useEffect(() => {
         setInternalValue(value);

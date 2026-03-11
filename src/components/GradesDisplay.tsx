@@ -1,8 +1,8 @@
 import { Box, Grid, Typography } from "@mui/material";
 import { TextureDatabase } from "../assets/textures/TextureDatabase";
-import { FormatNumber } from "../util/Helper";
 import BetterTooltip from "./tooltips/BetterTooltip";
 import NumberFlow from "@number-flow/react";
+import type { NumberFlowStyleWithVars } from "../types/types";
 
 function _SingularGradeDisplay({ grade, count, overrideCount }) {
     //only tooltip if overrideCount is given (even if 0)
@@ -18,11 +18,11 @@ function _SingularGradeDisplay({ grade, count, overrideCount }) {
                 justifyContent: 'center',
                 lineHeight: '0.1em'
             }}>
-                <Typography variant="h6" sx={{ lineHeight: '0.1em' }}><NumberFlow style={{ '--number-flow-mask-height': '0.10em' }} value={count} /></Typography>
+                <Typography variant="h6" sx={{ lineHeight: '0.1em' }}><NumberFlow style={{ '--number-flow-mask-height': '0.10em' } as NumberFlowStyleWithVars} value={count} /></Typography>
                 {
                     overrideCount !== undefined && (
                         <BetterTooltip title='Including overridden scores'>
-                            <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: '0.1em' }}><NumberFlow style={{ '--number-flow-mask-height': '0.10em' }} value={overrideCount} /></Typography>
+                            <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: '0.1em' }}><NumberFlow style={{ '--number-flow-mask-height': '0.10em' } as NumberFlowStyleWithVars} value={overrideCount} /></Typography>
                         </BetterTooltip>
                     )
                 }

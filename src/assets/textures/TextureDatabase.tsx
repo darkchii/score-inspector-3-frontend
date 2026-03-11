@@ -34,7 +34,7 @@ export function getFlagIcon(country_code){
     try {
         // const flag = import(`../Assets/Flags/${country_code}.png`);
         const path = `./flags/${country_code}.png`;
-        const flag_modules = import.meta.glob('./flags/*.png', {
+        const flag_modules = import.meta.glob<{ default: string }>('./flags/*.png', {
             eager: true
         });
         return flag_modules[path].default;
