@@ -1,4 +1,4 @@
-import { IScore, ISessionBreak, ISession } from "./types";
+import type { IScore, ISessionBreak, ISession } from "./types";
 
 class Session implements ISession {
     id: string;

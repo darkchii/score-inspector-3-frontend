@@ -3,7 +3,7 @@ import axios from "axios";
 import { GetAPI } from "./ApiHelper";
 import Score from "../types/Score";
 import ScoreDifficulty from "../types/ScoreDifficulty";
-import { IBeatmap, IScore } from "../types/types";
+import type { IBeatmap, IScore } from "../types/types";
 
 //Helper functions for score data
 export function GetStarRating(score: IScore): number | null {

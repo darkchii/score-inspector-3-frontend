@@ -1,6 +1,6 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { ApiContextValue } from "./ContextTypes";
+import type { ApiContextValue } from "./ContextTypes";
 
 const ApiContext = createContext<ApiContextValue | null>(null);
 const apiAge = 1000 * 60 * 10; //10 minutes

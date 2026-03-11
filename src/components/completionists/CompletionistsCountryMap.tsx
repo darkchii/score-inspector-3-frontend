@@ -5,6 +5,10 @@ import { GeoJSON, MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { FormatNumber } from "../../util/Helper";
 
+const AnyMapContainer = MapContainer as any;
+const AnyTileLayer = TileLayer as any;
+const AnyGeoJSON = GeoJSON as any;
+
 const WORLD_GEOJSON_URL = "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson";
 const DARK_TILE_URL = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
 const DARK_TILE_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
@@ -45,8 +49,8 @@ function getCountryFillColor(count, maxCount, colorRange = COUNTRY_FILL_COLOR_RA
     return `rgb(${interpolated[0]}, ${interpolated[1]}, ${interpolated[2]})`;
 }
 
-function CompletionistsCountryMap({ data }) {
-    const [worldGeoJson, setWorldGeoJson] = useState(null);
+function CompletionistsCountryMap({ data }: { data: any }) {
+    const [worldGeoJson, setWorldGeoJson] = useState<any>(null);
 
     useEffect(() => {
         const abortController = new AbortController();
@@ -77,9 +81,10 @@ function CompletionistsCountryMap({ data }) {
         }
 
         // Some users are completionists in multiple modes; count each user once globally.
-        const usersById = new Map();
+        const usersById = new Map<string, any>();
+        const allItems = Object.values(data as Record<string, any[]>).flat() as any[];
 
-        for (const item of Object.values(data).flat()) {
+        for (const item of allItems) {
             if(!item.user?.osuApi?.id) {
                 continue;
             }
@@ -89,7 +94,7 @@ function CompletionistsCountryMap({ data }) {
             }
         }
 
-        const counts = {};
+        const counts: Record<string, number> = {};
         for (const user of usersById.values()) {
             const alpha2 = user?.osuApi?.country_code;
             if (!alpha2) {
@@ -106,7 +111,6 @@ function CompletionistsCountryMap({ data }) {
             counts[alpha3] = (counts[alpha3] || 0) + 1;
         }
 
-        console.log("Country counts:", counts);
         return counts;
     }, [data]);
 
@@ -127,7 +131,7 @@ function CompletionistsCountryMap({ data }) {
                 <div style={{ height: 420, width: "100%" }}>
                     {
                         worldGeoJson ? (
-                            <MapContainer
+                            <AnyMapContainer
                                 center={[20, 0]}
                                 zoom={1.35}
                                 minZoom={1}
@@ -140,14 +144,14 @@ function CompletionistsCountryMap({ data }) {
                                     background: "#ffffff00",
                                 }}
                             >
-                                <TileLayer
+                                <AnyTileLayer
                                     attribution={DARK_TILE_ATTRIBUTION}
                                     url={DARK_TILE_URL}
                                     noWrap={true}
                                     //transparent if no tiles, to avoid white background
                                     background={"#ffffff00"}
                                 />
-                                <GeoJSON
+                                <AnyGeoJSON
                                     data={worldGeoJson}
                                     style={(feature) => {
                                         const iso3 = feature?.properties?.["ISO3166-1-Alpha-3"];
@@ -168,7 +172,7 @@ function CompletionistsCountryMap({ data }) {
                                         layer.bindTooltip(`${countryName}: ${FormatNumber(count)} completionist${count === 1 ? "" : "s"}`);
                                     }}
                                 />
-                            </MapContainer>
+                            </AnyMapContainer>
                         ) : (
                             <div style={{ padding: 12 }}>
                                 <Typography variant="body2" color="textSecondary">

@@ -2,7 +2,7 @@ import BeatmapDifficultyInfo from "../BeatmapDifficultyInfo";
 import MathHelper from "../../util/MathHelper";
 import { CalculateRateWithMods } from "../../util/ModHelper";
 import PerformanceCalculator from "./PerformanceCalculator";
-import { IPerformanceCalculatorFruits, IScore } from "../types";
+import type { IPerformanceCalculatorFruits, IScore } from "../types";
 
 class PerformanceCalculatorFruits extends PerformanceCalculator implements IPerformanceCalculatorFruits {
     combo: number;

@@ -5,7 +5,7 @@ import MathHelper from "../../util/MathHelper";
 import { CalculateRateWithMods, CalculateVisibilityBonus } from "../../util/ModHelper";
 import OsuLegacyScoreMissCalculator from "../missCalculator/OsuLegacyScoreMissCalculator";
 import PerformanceCalculator from "./PerformanceCalculator";
-import { IHitWindowsOsu, IPerformanceCalculatorOsu, IScore } from "../types";
+import type { IHitWindowsOsu, IPerformanceCalculatorOsu, IScore } from "../types";
 
 class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerformanceCalculatorOsu {
     usingScoreV2: boolean;

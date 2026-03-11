@@ -147,9 +147,9 @@ function IndexScoreSubmissions({ activeRuleset, setActiveRuleset, isWorking, set
         //if value is not -1, filter to the last X hours/days/months/years
         let _data = convertedData;
         if (selectedPeriodValue !== -1) {
-            const now = new Date();
+            const now = (new Date()).getTime();
             _data = _data.filter((entry) => {
-                const period = entry.period;
+                const period = entry.period.getTime();
                 switch (selectedPeriodType) {
                     case 'hours':
                         return (now - period) <= selectedPeriodValue * 60 * 60 * 1000;

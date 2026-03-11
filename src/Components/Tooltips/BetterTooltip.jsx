@@ -11,7 +11,7 @@ const LocalStyledTooltip = styled(({ className, ...props }) => (
     max-width: 600px;
     `);
 
-function BetterTooltip({ children, title, placement = 'bottom-start' }) {
+function BetterTooltip({ children, title, placement = 'bottom-start', arrow = false, disableInteractive = true }) {
     return (
         <LocalStyledTooltip
             title={title}
@@ -28,6 +28,8 @@ function BetterTooltip({ children, title, placement = 'bottom-start' }) {
                     ],
                 },
             }}
+            arrow={arrow}
+            disableInteractive={disableInteractive}
             followCursor>
             {children}
         </LocalStyledTooltip>

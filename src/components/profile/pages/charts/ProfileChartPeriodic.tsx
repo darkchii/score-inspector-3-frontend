@@ -4,7 +4,7 @@ import { useProfile } from "../../../../providers/ProfileProvider";
 import { Line } from "react-chartjs-2";
 import { FormatNumber, FormatNumberWithPrecision, GetGradeColor } from "../../../../util/Helper";
 
-const INCR_CUMUL_CHART_TYPES = {
+const INCR_CUMUL_CHART_TYPES: any = {
     'scores': {
         name: 'scores',
         labels: ['Scores', 'Clears'],
@@ -66,11 +66,11 @@ function ProfileChartPeriodic() {
     const [activeChartType, setActiveChartType] = useState('scores');
     const [activeInterval, setActiveInterval] = useState('monthly');
     const [activeAggregation, setActiveAggregation] = useState('cumulative');
-    const [activeScaleType, setActiveScaleType] = useState('linear');
+    const [activeScaleType, setActiveScaleType] = useState<'linear' | 'logarithmic'>('linear');
 
     const [existingAggregations, setExistingAggregations] = useState(['cumulative', 'incremental']);
 
-    const [data, setData] = useState();
+    const [data, setData] = useState<any>();
 
     useEffect(() => {
         const stats = getRulesetStatistics(activeRuleset);
@@ -168,7 +168,7 @@ function ProfileChartPeriodic() {
             }
             <ButtonGroup variant="outlined" size="small">
                 {
-                    Object.values(INCR_CUMUL_CHART_TYPES).map(chartType => (
+                    Object.values(INCR_CUMUL_CHART_TYPES).map((chartType: any) => (
                         <Button
                             key={chartType.name}
                             variant={activeChartType === chartType.name ? 'contained' : 'outlined'}
@@ -219,7 +219,7 @@ function ProfileChartPeriodic() {
             </ButtonGroup>
             <ButtonGroup variant="outlined" size="small" sx={{ mt: 1 }}>
                 {
-                    ['linear', 'logarithmic'].map(scaleType => (
+                    ['linear', 'logarithmic'].map((scaleType: 'linear' | 'logarithmic') => (
                         <Button
                             key={scaleType}
                             variant={activeScaleType === scaleType ? 'contained' : 'outlined'}

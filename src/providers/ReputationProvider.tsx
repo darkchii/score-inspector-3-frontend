@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { ReputationContextValue } from "./ContextTypes";
+import type { ReputationContextValue } from "./ContextTypes";
 
 const ReputationContext = createContext<ReputationContextValue | null>(null);
 

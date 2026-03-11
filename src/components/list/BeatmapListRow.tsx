@@ -92,7 +92,7 @@ const BeatmapListRow = memo(function BeatmapListRow({
 
             <TableCell width={20}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
-                    <img src={GetRulesetIconFromId(item.ruleset_id)} alt={item.ruleset_id} width={20} height={20} />
+                    <img src={GetRulesetIconFromId(item.ruleset_id)} alt={`${item.ruleset_id}`} width={20} height={20} />
                 </Box>
             </TableCell>
 

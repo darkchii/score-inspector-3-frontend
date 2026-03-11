@@ -1,4 +1,4 @@
-import { ISessionCollectionActivity, IScore, ISessionBreak } from "./types";
+import type { ISessionCollectionActivity, IScore, ISessionBreak } from "./types";
 
 class SessionCollectionActivity implements ISessionCollectionActivity {
     scores: IScore[];

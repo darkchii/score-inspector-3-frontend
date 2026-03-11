@@ -1,4 +1,4 @@
-import { IOsuBuffer, IOsuDb } from "../types";
+import type { IOsuBuffer, IOsuDb } from "../types";
 import { OsuBuffer } from "./OsuBuffer";
 
 export class OsuDb implements IOsuDb {

@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 
-function InteractiveBox({ children, onClick = null, onLongPress = null, longPressDuration = 500, style = {}, className = "" }) {
+function InteractiveBox({ children = null, onClick = null, onLongPress = null, longPressDuration = 500, style = {}, className = "" }) {
     
     const holdEvent = useLongPress((e) => {
         if (onLongPress) onLongPress(e);

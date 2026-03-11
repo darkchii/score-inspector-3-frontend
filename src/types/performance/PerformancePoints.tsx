@@ -1,7 +1,7 @@
 //Global performance class, will deal with the rulesets and calculations
 //Overrides means adjusted score values (ie simulating SS on a score that was 94.6%)
 
-import { IPerformanceCalculator, IPerformancePoints, IScore } from "../types";
+import type { IPerformanceCalculator, IPerformancePoints, IScore } from "../types";
 import PerformanceCalculatorFruits from "./PerformanceCalculatorFruits";
 import PerformanceCalculatorMania from "./PerformanceCalculatorMania";
 import PerformanceCalculatorOsu from "./PerformanceCalculatorOsu";

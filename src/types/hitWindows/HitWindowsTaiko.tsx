@@ -1,5 +1,5 @@
 import BeatmapDifficultyInfo from "../BeatmapDifficultyInfo";
-import { IHitWindowsTaiko } from "../types";
+import type { IHitWindowsTaiko } from "../types";
 import HitWindows from "./HitWindows";
 
 const GREAT_WINDOW_RANGE = [50, 35, 20];

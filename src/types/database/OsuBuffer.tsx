@@ -1,5 +1,5 @@
 import { Buffer } from "buffer";
-import { IOsuBuffer } from "../types";
+import type { IOsuBuffer } from "../types";
 
 export class OsuBuffer implements IOsuBuffer {
     buffer: Buffer;

@@ -1,6 +1,6 @@
 import { CalculateBonusPerformance, CalculateRawPerformance } from "../util/ScoreHelper";
 import SessionCollection from "./SessionCollection";
-import { IProfileRulesetScoreSet, IScore, ISessionCollection } from "./types";
+import type { IProfileRulesetScoreSet, IScore, ISessionCollection } from "./types";
 
 export class ProfileRulesetScoreSet implements IProfileRulesetScoreSet {
     scores: IScore[] = [];

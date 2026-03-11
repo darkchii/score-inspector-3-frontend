@@ -1,7 +1,7 @@
 import Beatmap from "../types/beatmaps/Beatmap";
 import { ProfileStatistics } from "../types/ProfileStatistics";
 import Score from "../types/Score";
-import { IBeatmap, IScore } from "../types/types";
+import type { IBeatmap, IScore } from "../types/types";
 
 export async function ProcessUser(user: any): Promise<any> {
     user.osuAlternative.rulesets = {};

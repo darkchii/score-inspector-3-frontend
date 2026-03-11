@@ -22,7 +22,7 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartE
     const { getScoreById } = useProfile();
     const { loadScoreView } = useScoreView();
 
-    const [sessionAnnotations, setSessionAnnotations] = useState([]);
+    const [sessionAnnotations, setSessionAnnotations] = useState<any>([]);
     const [activeDisplayChart, setActiveDisplayChart] = useState(chartDefinitions.pp.value);
 
     const [displayAnnotations, setDisplayAnnotations] = useState(true);
@@ -121,15 +121,15 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartE
                                     text: 'Time',
                                 },
                                 ticks: {
-                                    callback: function (value) {
+                                    callback: function (value: any) {
                                         // const date = new Date(value * 1000);
                                         // return date.toISOString().substr(11, 5); //HH:MM
                                         //show as local time
                                         const date = new Date(value * 1000);
                                         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                                     },
-                                    min: new Date(`${dateStart}T00:00:00Z`).getTime() / 1000,
-                                    max: new Date(`${dateEnd || dateStart}T23:59:59Z`).getTime() / 1000,
+                                    // min: new Date(`${dateStart}T00:00:00Z`).getTime() / 1000,
+                                    // max: new Date(`${dateEnd || dateStart}T23:59:59Z`).getTime() / 1000,
                                 }
                             },
                             y: {
@@ -138,19 +138,19 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartE
                                     text: chartDefinitions[activeDisplayChart].label,
                                 },
                                 ticks: {
-                                    callback: function (value) {
+                                    callback: function (value: any) {
                                         return chartDefinitions[activeDisplayChart].yFormat ? chartDefinitions[activeDisplayChart].yFormat(value) : value;
                                     },
-                                    max: chartDefinitions[activeDisplayChart].max || undefined,
+                                    // max: chartDefinitions[activeDisplayChart].max || undefined,
                                     //put min at lowest data point
-                                    min: Math.min(...(scores?.map(item => GetNestedValue(item, chartDefinitions[activeDisplayChart].nesting)) || [])) * 0.9,
+                                    // min: Math.min(...(scores?.map(item => GetNestedValue(item, chartDefinitions[activeDisplayChart].nesting)) || [])) * 0.9,
                                 },
                             }
                         },
                         plugins: {
                             tooltip: {
                                 callbacks: {
-                                    label: function (context) {
+                                    label: function (context: any) {
                                         const score = getScoreById(context.raw.id);
                                         if (score && score.beatmap) {
                                             return `${score.beatmap.artist} - ${score.beatmap.title} [${score.beatmap.version}]\nTime: ${new Date(context.raw.x * 1000).toISOString().substr(11, 5)}\n${chartDefinitions[activeDisplayChart].label}: ${chartDefinitions[activeDisplayChart].yFormat ? chartDefinitions[activeDisplayChart].yFormat(context.raw.y) : context.raw.y}`;
@@ -199,7 +199,7 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartE
                                                 const extraAnnotations = {};
                                                 const startDate = new Date(dateStart);
                                                 const endDate = new Date(dateEnd);
-                                                const dayCount = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                                                const dayCount = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
                                                 for (let i = 1; i < dayCount + 1; i++) {
                                                     const currentDate = new Date(startDate);
                                                     currentDate.setDate(startDate.getDate() + i);

@@ -8,9 +8,10 @@ import NumberFlow from "@number-flow/react";
 import StarIcon from '@mui/icons-material/Star';
 import ItemList from "../../list/ItemList";
 import BeatmapListRow from "../../list/BeatmapListRow";
+import type { IBeatmap } from "../../../types/types";
 
 //Tag -> Full Name
-const BeatmappackTypes = {
+const BeatmappackTypes: Record<string, string> = {
     "S": "Standard",
     "F": "Featured Artist",
     "P": "Tournament",
@@ -20,7 +21,58 @@ const BeatmappackTypes = {
     "A": "Artist/Album"
 }
 
-const PackSquare = memo(function PackSquare({ pack, onClick }) {
+type Pack = {
+    id: number | string;
+    tag: string;
+    name: string;
+    author: string;
+    url: string;
+    pack_date: string | Date;
+    beatmap_ids: number[];
+    total: number;
+    completed: number;
+    completed_fc: number;
+    completion: number;
+    is_completed: boolean;
+    is_completed_fc: boolean;
+};
+
+type PackSquareProps = {
+    pack: Pack;
+    onClick: () => void;
+};
+
+type PackModalProps = {
+    pack: Pack | null;
+    onClose: () => void;
+};
+
+type PackCategory = {
+    type: string;
+    packs: Pack[];
+    total_packs: number;
+    total_completed: number;
+    total_completed_fc: number;
+    total_beatmaps: number;
+    total_scores: number;
+    total_scores_fc: number;
+    completion: number;
+    completion_fc: number;
+};
+
+type GridStyleWithVars = React.CSSProperties & {
+    "--square-size": string;
+    "--square-gap": string;
+};
+
+const packGridStyle: GridStyleWithVars = {
+    display: 'inline-flex',
+    flexWrap: 'wrap',
+    '--square-size': '14px',
+    '--square-gap': '1px',
+};
+
+const PackSquare = memo(function PackSquare({ pack, onClick }: PackSquareProps) {
     const theme = useTheme();
     const startSquareColor = HexToRgb('#1a1a1a');
     const endSquareColor = HexToRgb(theme.palette.primary.main);
@@ -64,17 +116,23 @@ const PackSquare = memo(function PackSquare({ pack, onClick }) {
     )
 });
 
-function PackModal({ pack, onClose }) {
+function PackModal({ pack, onClose }: PackModalProps) {
     const { getRulesetStatistics, activeRuleset } = useProfile();
     const [enabled, setEnabled] = useState(false);
-    const [beatmaps, setBeatmaps] = useState([]);
+    const [beatmaps, setBeatmaps] = useState<IBeatmap[]>([]);
 
     useEffect(() => {
         //get beatmaps
         if (pack) {
             const stats = getRulesetStatistics(activeRuleset);
+            if (!stats) {
+                setEnabled(false);
+                setBeatmaps([]);
+                return;
+            }
+
             const beatmapsMap = stats.getBeatmapsMap();
-            const bms = [];
+            const bms: IBeatmap[] = [];
             for (const beatmapId of pack.beatmap_ids) {
                 const bm = beatmapsMap[beatmapId];
                 if (bm) {
@@ -99,7 +157,7 @@ function PackModal({ pack, onClose }) {
             setEnabled(false);
             setBeatmaps([]);
         }
-    }, [pack]);
+    }, [pack, getRulesetStatistics, activeRuleset]);
 
     if (!pack) {
         return null;
@@ -113,9 +171,9 @@ function PackModal({ pack, onClose }) {
                 closeAfterTransition
                 style={{
                     //prevent blue outline on focus
-                    '&:focus': {
-                        outline: 'none',
-                    },
+                    // '&:focus': {
+                    //     outline: 'none',
+                    // },
                 }}
             >
                 <Fade in={enabled}>
@@ -180,14 +238,14 @@ function PackModal({ pack, onClose }) {
 
 function ProfilePagePacks() {
     const { getRulesetStatistics, activeRuleset } = useProfile();
-    const [categorizedPacks, setCategorizedPacks] = useState(null);
-    const [selectedPack, setSelectedPack] = useState(null);
+    const [categorizedPacks, setCategorizedPacks] = useState<Record<string, PackCategory> | null>(null);
+    const [selectedPack, setSelectedPack] = useState<Pack | null>(null);
 
     useEffect(() => {
         if (!activeRuleset) return;
         setSelectedPack(null);
 
-        const packs = getRulesetStatistics(activeRuleset)?.pack_statistics.packs || [];
+        const packs: Pack[] = getRulesetStatistics(activeRuleset)?.pack_statistics.packs || [];
 
         //sort by tag ascending
         packs.sort((a, b) => {
@@ -206,9 +264,9 @@ function ProfilePagePacks() {
 
             if (matchA && matchB) {
                 const letterA = matchA[1];
-                const numberA = parseInt(matchA[2]);
+                const numberA = parseInt(matchA[2], 10);
                 const letterB = matchB[1];
-                const numberB = parseInt(matchB[2]);
+                const numberB = parseInt(matchB[2], 10);
                 if (letterA < letterB) return -1;
                 if (letterA > letterB) return 1;
                 return numberA - numberB;
@@ -216,7 +274,7 @@ function ProfilePagePacks() {
             return 0;
         });
 
-        const categorized = {};
+        const categorized: Record<string, PackCategory> = {};
 
         for (const pack of packs) {
             //get first letter of pack.tag
@@ -232,6 +290,8 @@ function ProfilePagePacks() {
                     total_beatmaps: 0,
                     total_scores: 0,
                     total_scores_fc: 0,
+                    completion: 0,
+                    completion_fc: 0,
                 }
             }
             categorized[typeFullName].packs.push(pack);
@@ -277,14 +337,9 @@ function ProfilePagePacks() {
                                     <strong>Completion:</strong> <NumberFlow format={{ maximumFractionDigits: 2 }} value={packs.total_packs > 0 ? (packs.total_completed / packs.total_packs * 100) : 0} suffix="%" />
                                 </BetterTooltip>
                             </div>
-                            <div style={{
-                                display: 'inline-flex',
-                                flexWrap: 'wrap',
-                                '--square-size': '14px',
-                                '--square-gap': '1px',
-                            }}>
+                            <div style={packGridStyle}>
                                 {
-                                    packs.packs.map(pack => (
+                                    packs.packs.map((pack) => (
                                         <PackSquare
                                             key={pack.id}
                                             pack={pack}

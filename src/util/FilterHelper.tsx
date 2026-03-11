@@ -1,5 +1,5 @@
 import ModData from "../data/Mods.json";
-import { IScore } from "../types/types";
+import type { IScore } from "../types/types";
 
 export const FILTER_FIELDS = [
     { label: 'ID', value: 'id', type: 'number' },

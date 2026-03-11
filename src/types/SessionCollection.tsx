@@ -1,7 +1,7 @@
 import Session from "./Session";
 import SessionCollectionActivity from "./SessionActivity";
 import SessionBreak from "./SessionBreak";
-import { IScore, ISession, ISessionCollection } from "./types";
+import type { IScore, ISession, ISessionCollection } from "./types";
 
 const SESSION_ACTIVITY_THRESHOLD = 60 * 60 * 1.5; //this value dictates a new activity region
 const SESSION_BREAK_THRESHOLD = 60 * 5; //this value dictates a break region

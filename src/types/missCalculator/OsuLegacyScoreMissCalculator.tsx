@@ -1,4 +1,4 @@
-import { IOsuLegacyScoreMissCalculator, IScore } from "../types";
+import type { IOsuLegacyScoreMissCalculator, IScore } from "../types";
 
 class OsuLegacyScoreMissCalculator implements IOsuLegacyScoreMissCalculator {
     score: IScore;

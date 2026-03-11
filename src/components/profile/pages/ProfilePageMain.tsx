@@ -18,35 +18,35 @@ function ProfilePageMain() {
                 <ProfileHighlightCollection />
                 <Divider sx={{ my: 2 }} />
                 <Grid container spacing={2}>
-                    <Grid item size={{ xs: 12, sm: 12, md: 6, lg: 12 / 5 }}>
+                    <Grid size={{ xs: 12, sm: 12, md: 6, lg: 12 / 5 }}>
                         <ScoreCard
                             title="Top performance"
                             value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_pp'] ? (getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_pp'].performance?.base?.pp || getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_pp'].pp || 0) : 0} suffix='pp' />}
                             score={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_pp']}
                         />
                     </Grid>
-                    <Grid item size={{ xs: 12, sm: 12, md: 6, lg: 12 / 5 }}>
+                    <Grid size={{ xs: 12, sm: 12, md: 6, lg: 12 / 5 }}>
                         <ScoreCard
                             title="Top score"
                             value={<NumberFlow value={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_score']?.implied_total_score} />}
                             score={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_score']}
                         />
                     </Grid>
-                    <Grid item size={{ xs: 12, sm: 12, md: 6, lg: 12 / 5 }}>
+                    <Grid size={{ xs: 12, sm: 12, md: 6, lg: 12 / 5 }}>
                         <ScoreCard
                             title="Top stars FC"
                             value={<div style={{ display: 'flex' }}><DifficultyBadge difficulty={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_fc']?.attr_diff?.star_rating || getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_fc']?.beatmap?.stars} /></div>}
                             score={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_fc']}
                         />
                     </Grid>
-                    <Grid item size={{ xs: 12, sm: 12, md: 6, lg: 12 / 5 }}>
+                    <Grid size={{ xs: 12, sm: 12, md: 6, lg: 12 / 5 }}>
                         <ScoreCard
                             title="Top stars SS"
                             value={<div style={{ display: 'flex' }}><DifficultyBadge difficulty={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_ss']?.attr_diff?.star_rating || getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_ss']?.beatmap?.stars} /></div>}
                             score={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_ss']}
                         />
                     </Grid>
-                    <Grid item size={{ xs: 12, sm: 12, md: 6, lg: 12 / 5 }}>
+                    <Grid size={{ xs: 12, sm: 12, md: 6, lg: 12 / 5 }}>
                         <ScoreCard
                             title="Oldest"
                             //is already a date object, need to format

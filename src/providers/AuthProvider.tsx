@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { ShowNotification } from "../util/Helper";
 import { GetAPI } from "../util/ApiHelper";
 import axios from "axios";
-import { AuthContextValue } from "./ContextTypes";
+import type { AuthContextValue } from "./ContextTypes";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 

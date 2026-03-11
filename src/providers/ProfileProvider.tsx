@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useApi } from "./ApiProvider";
 import { FormatNumber, GetRulesetNameFromId } from "../util/Helper";
 import { BuildProfileStatistics, MapScoreBeatmaps, ProcessBeatmaps, ProcessScores, ProcessUser } from "../util/ProfileHelper";
-import { ProfileContextValue } from "./ContextTypes";
+import type { ProfileContextValue } from "./ContextTypes";
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
 

@@ -1,6 +1,6 @@
 import { GetRulesetNameFromId } from "../util/Helper";
 import { ProfileRulesetStatistics } from "./ProfileRulesetStatistics";
-import { IBeatmap, IProfileStatistics, IScore, IProfileRulesetStatistics } from "./types";
+import type { IBeatmap, IProfileStatistics, IScore, IProfileRulesetStatistics } from "./types";
 
 export class ProfileStatistics implements IProfileStatistics {
     rulesets: {

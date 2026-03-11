@@ -102,7 +102,7 @@ function IndexTopPlayers({ activeRuleset, setActiveRuleset, isWorking, setIsWork
                                                     xs: 12,
                                                     md: 6,
                                                     lg: 12 / Object.keys(selectedDataSet).length,
-                                                }} item key={`topplayers_grid_${key}`} sx={{ padding: 0.5 }}>
+                                                }} key={`topplayers_grid_${key}`} sx={{ padding: 0.5 }}>
                                                     <Paper key={`topplayers_${key}`} elevation={1} sx={{ padding: 0.5, marginBottom: 2 }}>
                                                         <Typography variant="subtitle2" gutterBottom>
                                                             {key.replace(/_/g, ' ').toUpperCase()}

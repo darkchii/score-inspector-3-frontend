@@ -1,5 +1,5 @@
 import { GetRulesetId } from "../util/Helper";
-import { IBeatmap, IScore, IProfileRulesetStatisticsPacks } from "./types";
+import type { IBeatmap, IScore, IProfileRulesetStatisticsPacks } from "./types";
 
 export class ProfileRulesetStatisticsPacks implements IProfileRulesetStatisticsPacks {
     packs: any[] = [];

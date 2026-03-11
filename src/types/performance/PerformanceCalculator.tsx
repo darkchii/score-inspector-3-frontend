@@ -1,4 +1,4 @@
-import { IPerformanceCalculator, IScore } from "../types";
+import type { IPerformanceCalculator, IScore } from "../types";
 
 class PerformanceCalculator implements IPerformanceCalculator {
     totalPerformance: number;

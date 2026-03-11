@@ -1,10 +1,10 @@
-// import { ScatterChart } from '@mui/x-charts/ScatterChart';
-import { Scatter } from 'react-chartjs-2';
-import { useProfile } from '../../../../providers/ProfileProvider';
-import { useScoreView } from '../../../../providers/ScoreViewProvider';
-import { Alert } from '@mui/material';
+import { Scatter } from "react-chartjs-2";
+import { useProfile } from "../../../../providers/ProfileProvider";
+import { useScoreView } from "../../../../providers/ScoreViewProvider";
+import { FormatNumberWithPrecision } from "../../../../util/Helper";
+import { Alert } from "@mui/material";
 
-function ProfileChartAccuracyDifficulty() {
+function PerformanceChartPerformanceSpread() {
     const { getRulesetStatistics, activeRuleset, getScoreById } = useProfile();
     const { loadScoreView } = useScoreView();
 
@@ -16,12 +16,13 @@ function ProfileChartAccuracyDifficulty() {
                         datasets: [
                             {
                                 label: 'Scores',
-                                data: getRulesetStatistics(activeRuleset)?.charts?.accuracyDifficultyScatter.map(item => ({ x: item.x, y: item.y, id: item.id })) || [],
-                                pointBackgroundColor: getRulesetStatistics(activeRuleset)?.charts?.accuracyDifficultyScatter.map(item => item.color) || [],
+                                data: getRulesetStatistics(activeRuleset)?.charts?.performanceSpread.map(item => ({ x: item.x, y: item.y, id: item.id })) || [],
+                                pointBackgroundColor: getRulesetStatistics(activeRuleset)?.charts?.performanceSpread.map(item => item.color) || [],
                                 pointRadius: 2,
                             }
                         ]
                     }}
+
                     options={{
                         responsive: true,
                         maintainAspectRatio: false,
@@ -29,46 +30,45 @@ function ProfileChartAccuracyDifficulty() {
                             x: {
                                 title: {
                                     display: true,
-                                    text: 'Star Rating',
+                                    text: '#',
                                 },
                                 ticks: {
                                     callback: function(value) {
-                                        return `${Number(value).toFixed(2)}★`;
+                                        return `#${Number(value).toLocaleString()}`;
                                     }
                                 }
                             },
                             y: {
                                 title: {
                                     display: true,
-                                    text: 'Accuracy (%)',
+                                    text: 'Performance',
                                 },
                                 ticks: {
-                                    callback: function(value) {
-                                        return `${(Number(value) * 100).toFixed(2)}%`;
+                                    callback: function(value: any) {
+                                        return `${FormatNumberWithPrecision(value, 2)}pp`;
                                     }
-                                },
-                                max: 1,
+                                }
                             }
                         },
                         plugins: {
                             tooltip: {
                                 callbacks: {
-                                    label: function(context) {
+                                    label: function(context: any) {
                                         const score = getScoreById(context.raw.id);
                                         if (score && score.beatmap) {
-                                            return `${score.beatmap.artist} - ${score.beatmap.title} [${score.beatmap.version}]\nStars: ${context.raw.x.toFixed(2)}★\nAccuracy: ${(context.raw.y * 100).toFixed(2)}%`;
-                                        } else {
-                                            return `Score ID: ${context.raw.id}\nStars: ${context.raw.x.toFixed(2)}★\nAccuracy: ${(context.raw.y * 100).toFixed(2)}%`;
+                                            return `${score.beatmap.artist} - ${score.beatmap.title} [${score.beatmap.version}]\nRank: #${context.raw.x.toLocaleString()}\nPP: ${FormatNumberWithPrecision(context.raw.y, 2)}pp`;
+                                        }
+                                        else {
+                                            return `Score ID: ${context.raw.id}\nRank: #${context.raw.x.toLocaleString()}\nPP: ${FormatNumberWithPrecision(context.raw.y, 2)}pp`;
                                         }
                                     }
                                 }
-                            },
-                            legend: { display: false }
+                            }
                         },
-                        onClick: (event, elements) => {
+                        onClick: (evt: any, elements: any) => {
                             if (elements.length > 0) {
                                 const index = elements[0].index;
-                                const score = getScoreById(getRulesetStatistics(activeRuleset)?.charts?.accuracyDifficultyScatter[index].id);
+                                const score = getScoreById(getRulesetStatistics(activeRuleset)?.charts?.performanceSpread[index]?.id);
                                 if (score) {
                                     loadScoreView(score);
                                 }
@@ -87,4 +87,4 @@ function ProfileChartAccuracyDifficulty() {
     );
 }
 
-export default ProfileChartAccuracyDifficulty;
+export default PerformanceChartPerformanceSpread;

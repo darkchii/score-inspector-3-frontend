@@ -1,4 +1,4 @@
-import { ISessionBreak } from "./types";
+import type { ISessionBreak } from "./types";
 
 class SessionBreak implements ISessionBreak {
     start: Date;

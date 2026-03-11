@@ -1,7 +1,7 @@
 import { Fade, Modal } from "@mui/material";
 import { createContext, useContext, useState } from "react";
 import ScoreView from "../components/scoreView/ScoreView";
-import { ScoreViewContextValue } from "./ContextTypes";
+import type { ScoreViewContextValue } from "./ContextTypes";
 
 const ScoreViewContext = createContext<ScoreViewContextValue | null>(null);
 

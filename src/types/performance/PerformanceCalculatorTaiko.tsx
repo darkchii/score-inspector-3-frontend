@@ -3,7 +3,7 @@ import HitWindowsTaiko from "../hitWindows/HitWindowsTaiko";
 import { CalculateRateWithMods } from "../../util/ModHelper";
 import PerformanceCalculator from "./PerformanceCalculator";
 import Score from "../Score";
-import { IHitWindowsTaiko } from "../types";
+import type { IHitWindowsTaiko } from "../types";
 
 class PerformanceCalculatorTaiko extends PerformanceCalculator {
     countGreat: number;

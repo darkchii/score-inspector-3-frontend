@@ -1,7 +1,7 @@
 import { GetGradeColor, GetRulesetId } from "../util/Helper";
 import { ProfileRulesetScoreSet } from "./ProfileRulesetScoreSet";
 import { ProfileRulesetStatisticsPacks } from "./ProfileRulesetStatisticsPacks";
-import { IBeatmap, IProfileRulesetScoreSet, IProfileRulesetStatistics, IProfileRulesetStatisticsPacks, IScore } from "./types";
+import type { IBeatmap, IProfileRulesetScoreSet, IProfileRulesetStatistics, IProfileRulesetStatisticsPacks, IScore } from "./types";
 
 const PERIODIC_SUFFIXES = ['daily', 'monthly', 'yearly'];
 const PERIODIC_SUFFIXES_CHARTS = ['monthly', 'yearly'];

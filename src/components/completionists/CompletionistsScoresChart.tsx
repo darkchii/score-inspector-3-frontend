@@ -31,7 +31,7 @@ function CompletionistsScoresChart({ data }) {
                                         },
                                         {
                                             x: new Date(new Date().getTime() + (new Date().getTime() - new Date(data[Object.keys(data)[0]][0].completion_date).getTime()) * 0.05),
-                                            y: Math.max(...Object.values(data).flat().map(item => item.scores)) * 1.05,
+                                            y: Math.max(...Object.values(data).flat().map((item: any) => item.scores)) * 1.05,
                                         },
                                     ],
                                     borderColor: "rgba(0,0,0,0)",
@@ -56,14 +56,14 @@ function CompletionistsScoresChart({ data }) {
                                         text: "Scores",
                                     },
                                     ticks: {
-                                        callback: value => `${FormatNumber(value)}`,
+                                        callback: (value: any) => `${FormatNumber(value)}`,
                                     },
                                 },
                             },
                             plugins: {
                                 tooltip: {
                                     callbacks: {
-                                        label: context => {
+                                        label: (context: any) => {
                                             const item = context.raw.data;
                                             return `${item.user?.osuApi.username || `${item.osu_id} (restricted?)`} | Scores: ${FormatNumber(item.scores)} | Completion Date: ${new Date(item.completion_date).toLocaleDateString()}`;
                                         },
@@ -71,7 +71,7 @@ function CompletionistsScoresChart({ data }) {
                                 },
                                 legend: {
                                     labels: {
-                                        filter: legendItem => legendItem.text !== "Invisible",
+                                        filter: (legendItem: any) => legendItem.text !== "Invisible",
                                     },
                                 },
                             },

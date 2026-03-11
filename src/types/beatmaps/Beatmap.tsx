@@ -1,5 +1,5 @@
 import { GetRulesetNameFromId } from "../../util/Helper";
-import { IBeatmap, IScore } from "../types";
+import type { IBeatmap, IScore } from "../types";
 
 class Beatmap implements IBeatmap {
     beatmap_id: number;

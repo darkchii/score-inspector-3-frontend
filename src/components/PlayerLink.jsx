@@ -12,7 +12,7 @@ function GetRoleIcon({ role, size = 16 }) {
     return <Icon sx={{ color: `${role.color}`, fontSize: size }} />;
 }
 
-function PlayerLink({ data, size = 24, hideCountry = false }) {
+function PlayerLink({ data, size = 24, hideCountry = false, ...props }) {
     const theme = useTheme();
     const { user } = useAuth();
     const [username, setUsername] = useState(null);
@@ -63,7 +63,7 @@ function PlayerLink({ data, size = 24, hideCountry = false }) {
     }, [data]);
 
     return (
-        <PlayerTooltip data={data}>
+        <PlayerTooltip data={data} {...props}>
             <Box
                 onClick={() => {
                     if (id) {

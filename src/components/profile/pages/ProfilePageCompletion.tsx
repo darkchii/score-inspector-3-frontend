@@ -109,7 +109,7 @@ function ProfilePageCompletion() {
                 />
             </FormControl>
             <Grid container spacing={1}>
-                {Object.entries(COMPLETION_DATA).map(([dataKey, dataInfo]) => (
+                {Object.entries(COMPLETION_DATA).map(([dataKey, dataInfo]: [string, any]) => (
                     <Grid size={{ xs: 12, md: 3 }} key={`completion-data-${dataKey}`}>
                         <Paper sx={{ padding: 1 }}>
                             <Typography variant="subtitle1" gutterBottom>{dataInfo.title}</Typography>
@@ -121,10 +121,10 @@ function ProfilePageCompletion() {
                                         datasets: [
                                             {
                                                 label: 'Completion %',
-                                                data: completionStats[dataInfo.key] ? Object.values(completionStats[dataInfo.key]).map(stats => (stats.completion || 0) * 100) : [],
+                                                data: completionStats[dataInfo.key] ? Object.values(completionStats[dataInfo.key]).map((stats: any) => (stats.completion || 0) * 100) : [],
                                                 //backgroundColor: theme.palette.primary.main,
                                                 //colorscale based on value
-                                                backgroundColor: Object.values(completionStats[dataInfo.key] || {}).map(stats => {
+                                                backgroundColor: Object.values(completionStats[dataInfo.key] || {}).map((stats: any) => {
                                                     return GetColorInterpolation((stats.completion || 0), 0, 1, [255, 35, 35], [35, 255, 35], 1.0);
                                                 }),
                                             },
@@ -156,7 +156,7 @@ function ProfilePageCompletion() {
                                 <Table size="small">
                                     <TableBody>
                                         {
-                                            completionStats[dataInfo.key] ? Object.entries(completionStats[dataInfo.key]).map(([key, stats]) => (
+                                            completionStats[dataInfo.key] ? Object.entries(completionStats[dataInfo.key]).map(([key, stats]: [string, any]) => (
                                                 <TableRow key={`completion-${dataKey}-${key}`}>
                                                     <TableCell>
                                                         <BetterTooltip title={dataInfo.description + (dataInfo.extra_info ? ` (${dataInfo.extra_info})` : '')} arrow>

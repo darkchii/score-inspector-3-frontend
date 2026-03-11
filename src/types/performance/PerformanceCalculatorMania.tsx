@@ -1,4 +1,4 @@
-import { IPerformanceCalculatorMania, IScore } from "../types";
+import type { IPerformanceCalculatorMania, IScore } from "../types";
 import PerformanceCalculator from "./PerformanceCalculator";
 
 class PerformanceCalculatorMania extends PerformanceCalculator implements IPerformanceCalculatorMania {

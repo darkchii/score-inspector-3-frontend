@@ -46,7 +46,7 @@ function ProfilePageDaily() {
             //find newest entry in .periodic['daily'] to set active date to
             const dailyData = profileStatistics.periodic?.['daily'];
             if (dailyData) {
-                const dailyDates = Object.keys(dailyData).sort((a, b) => new Date(b) - new Date(a));
+                const dailyDates = Object.keys(dailyData).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
                 if (dailyDates.length > 0) {
                     setActiveDateStart(dailyDates[0]);
                     setActiveDateEnd(null);

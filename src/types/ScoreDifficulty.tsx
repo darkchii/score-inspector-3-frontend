@@ -1,4 +1,4 @@
-import { IScoreDifficulty } from "./types";
+import type { IScoreDifficulty } from "./types";
 
 class ScoreDifficulty implements IScoreDifficulty {
     max_combo: number;

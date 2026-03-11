@@ -3,7 +3,7 @@ import { ReorderMods } from "../util/ModHelper";
 import PerformancePoints from "./performance/PerformancePoints";
 import { BeatmapApplyModsToDifficulty, DetermineIsScoreFC } from "../util/ScoreHelper";
 import ScoreDifficulty from "./ScoreDifficulty";
-import { IBeatmap, IPerformancePoints, IScore, IScoreDifficulty } from "./types";
+import type { IBeatmap, IPerformancePoints, IScore, IScoreDifficulty } from "./types";
 import Beatmap from "./beatmaps/Beatmap";
 
 class Score implements IScore {

@@ -20,6 +20,7 @@ export interface ItemListRowBaseProps<TItem extends object = object> {
     secondaryFieldColor?: string | null;
     leaderboardFormat?: LeaderboardFormatter | null;
     onClick?: MouseEventHandler<HTMLTableRowElement> | null;
+    isCompact?: boolean;
     children?: ReactNode;
 }
 
@@ -59,6 +60,7 @@ const ItemListRowBase = memo(function ItemListRowBase<TItem extends object>({
     secondaryFieldColor = null,
     leaderboardFormat = null,
     onClick = null,
+    isCompact = false,
     children
 }: ItemListRowBaseProps<TItem>) {
     const theme = useTheme();
