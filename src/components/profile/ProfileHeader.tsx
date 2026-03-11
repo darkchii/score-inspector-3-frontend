@@ -105,7 +105,7 @@ function ProfileHeader() {
                             <Fade in={activeRuleset !== 'all'}>
                                 <Box sx={{ m: '12px' }} >
                                     <Typography variant="h6">Rank</Typography>
-                                    <Typography variant="h5" sx={{ fontWeight: 'bold' }}>#<NumberFlow value={getRulesetUser(activeRuleset)?.global_rank > 0 ? getRulesetUser(activeRuleset)?.global_rank : null} fallback="N/A" /></Typography>
+                                    <Typography variant="h5" sx={{ fontWeight: 'bold' }}>#<NumberFlow value={getRulesetUser(activeRuleset)?.global_rank > 0 ? getRulesetUser(activeRuleset)?.global_rank : null} /></Typography>
                                 </Box>
                             </Fade>
 

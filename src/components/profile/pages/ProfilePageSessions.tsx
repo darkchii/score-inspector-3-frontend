@@ -8,6 +8,7 @@ import { FormatDuration, FormatNumber, FormatNumberWithPrecision } from "../../.
 import ProfileDailyChart from "./daily/ProfileDailyChart";
 import ItemList from "../../list/ItemList";
 import ScoreListRow from "../../list/ScoreListRow";
+import type { ISession } from "../../../types/types";
 
 const SESSION_SORT_FIELDS = [
     { label: 'Date', field: 'start', format: (value) => new Date(value).toLocaleString() },
@@ -19,7 +20,7 @@ const SESSION_SORT_FIELDS = [
 
 ]
 
-function SessionDisplay({ session }) {
+function SessionDisplay({ session }: { session: ISession }) {
     const theme = useTheme();
 
     if (!session) return <Alert severity="info">No session selected.</Alert>;
@@ -79,7 +80,7 @@ function SessionDisplay({ session }) {
                         <TableBody>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Duration</TableCell>
-                                <TableCell>{FormatDuration(session.duration)}</TableCell>
+                                <TableCell><>{FormatDuration(session.duration)}</></TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Scores</TableCell>
@@ -135,15 +136,15 @@ function SessionDisplay({ session }) {
                                     <>
                                         <TableRow>
                                             <TableCell sx={{ fontWeight: 'bold' }}>Total Break Time</TableCell>
-                                            <TableCell>{FormatDuration(session.total_break_time || 0)}</TableCell>
+                                            <TableCell><>{FormatDuration(session.total_break_time || 0)}</></TableCell>
                                         </TableRow>
                                         <TableRow>
                                             <TableCell sx={{ fontWeight: 'bold' }}>Average Break Time</TableCell>
-                                            <TableCell>{FormatDuration(session.average_break_time || 0)}</TableCell>
+                                            <TableCell><>{FormatDuration(session.average_break_time || 0)}</></TableCell>
                                         </TableRow>
                                         <TableRow>
                                             <TableCell sx={{ fontWeight: 'bold' }}>Longest Break Time</TableCell>
-                                            <TableCell>{FormatDuration(session.longest_break_time || 0)}</TableCell>
+                                            <TableCell><>{FormatDuration(session.longest_break_time || 0)}</></TableCell>
                                         </TableRow></>
                                 ) : null
                             }
@@ -237,7 +238,7 @@ function ProfilePageSessions() {
         <Box sx={{ px: 2, pb: 2 }}>
             <Grid container spacing={2}>
                 {/* Session listing sidebar*/}
-                <Grid item size={{ xs: 12, sm: 12, md: 4, lg: 3 }}>
+                <Grid size={{ xs: 12, sm: 12, md: 4, lg: 3 }}>
                     <Paper elevation={3} sx={{ width: '100%', height: '100%', p: 2 }}>
                         <Box sx={{ maxHeight: '100vh', overflowY: 'auto' }}>
                             {sessionCount === 0 ? (
@@ -296,7 +297,7 @@ function ProfilePageSessions() {
                     </Paper>
                 </Grid>
                 {/* Session viewer */}
-                <Grid item size={{ xs: 12, sm: 12, md: 8, lg: 9 }}>
+                <Grid size={{ xs: 12, sm: 12, md: 8, lg: 9 }}>
                     <Paper elevation={3} sx={{ width: '100%', height: '100%', p: 2 }}>
                         {
                             (!selectedSessionId || displaySessionData === undefined) ? (

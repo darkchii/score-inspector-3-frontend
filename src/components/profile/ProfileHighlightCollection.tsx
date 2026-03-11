@@ -11,175 +11,175 @@ function ProfileHighlightCollection() {
     return (
         <>
             <Grid container spacing={0.5}>
-                <Grid item key="scores" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
+                <Grid key="scores" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
                     <ProfileHighlight
                         title={"Scores"}
                         value={<NumberFlow value={getRulesetStatistics(activeRuleset)?.scores_set?.clears || 0} />}
                     />
                 </Grid>
 
-                <Grid item key="clears" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
+                <Grid key="clears" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
                     <ProfileHighlight
                         title={"Clears"}
                         value={<NumberFlow value={getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.clears || 0} />}
                     />
                 </Grid>
 
-                <Grid item key="playcount" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
+                <Grid key="playcount" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
                     <ProfileHighlight
                         title={"Playcount"}
                         value={<NumberFlow value={getRulesetUser(activeRuleset)?.play_count || 0} />}
                     />
                 </Grid>
 
-                <Grid item key="total_performance" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                <Grid key="total_performance" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"Total Performance"}
                         value={<NumberFlow format={{ maximumFractionDigits: 0 }} value={(getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.total_performance_points || 0)} suffix='pp' />}
                     />
                 </Grid>
 
-                <Grid item key="performance" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                <Grid key="performance" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"Performance"}
                         value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={(getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.performance_points || 0) + (getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.bonus_performance_points || 0)} suffix='pp' />}
                     />
                 </Grid>
 
-                <Grid item key="avg_performance" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                <Grid key="avg_performance" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"Avg Performance"}
                         value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={(getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.average_performance || 0)} suffix='pp' />}
                     />
                 </Grid>
 
-                <Grid item key="avg_accuracy" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
+                <Grid key="avg_accuracy" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
                     <ProfileHighlight
                         title={"Avg Accuracy"}
                         value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={(getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.average_accuracy || 0) * 100} suffix='%' />}
                     />
                 </Grid>
 
-                <Grid item key="avg_length" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                <Grid key="avg_length" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"Avg Length"}
                         value={FormatDurationNumberFlow(getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.average_length || 0)}
                     />
                 </Grid>
 
-                <Grid item key="avg_stars" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
+                <Grid key="avg_stars" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
                     <ProfileHighlight
                         title={"Avg Stars"}
                         value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={getRulesetStatistics(activeRuleset)?.scores_set_by_pp?.average_stars || 0} suffix='★' />}
                     />
                 </Grid>
 
-                <Grid item key="fc_rate" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
+                <Grid key="fc_rate" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
                     <ProfileHighlight
                         title={"FC Rate"}
                         value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={(getRulesetStatistics(activeRuleset)?.scores_set?.fc_rate || 0) * 100} suffix='%' />}
                     />
                 </Grid>
 
-                <Grid item key="completion" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
+                <Grid key="completion" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
                     <ProfileHighlight
                         title={"Completion"}
                         value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={(getRulesetStatistics(activeRuleset)?.completion || 0) * 100.0} suffix="%" />}
                     />
                 </Grid>
 
-                <Grid item key="peak_combo" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
+                <Grid key="peak_combo" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
                     <ProfileHighlight
                         title={"Peak Combo"}
                         value={<NumberFlow value={(getRulesetStatistics(activeRuleset)?.scores_set?.max_combo || 0)} suffix="x" />}
                     />
                 </Grid>
 
-                <Grid item key="xp_2_0" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                <Grid key="xp_2_0" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"XP 2.0"}
                         value={<NumberFlow format={{ maximumFractionDigits: 0 }} value={(getRulesetUser(activeRuleset)?.xp_2_0 || 0)} />}
                     />
                 </Grid>
 
-                <Grid item key="dedi_level" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                <Grid key="dedi_level" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"Level 2.0"}
                         value={<NumberFlow format={{ maximumFractionDigits: 2 }} value={(getRulesetUser(activeRuleset)?.dedication_level || 0)} />}
                     />
                 </Grid>
 
-                <Grid item key="score_per_clear" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                <Grid key="score_per_clear" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"Score per Clear"}
                         value={<NumberFlow format={{ maximumFractionDigits: 0 }} value={getRulesetStatistics(activeRuleset)?.scores_set_by_score?.average_implied_score || 0} />}
                     />
                 </Grid>
 
-                <Grid item key="ranked_score" size={{ xs: 12, sm: 6, md: 6, lg: 1.25 }}>
+                <Grid key="ranked_score" size={{ xs: 12, sm: 6, md: 6, lg: 1.25 }}>
                     <ProfileHighlight
                         title={"Ranked Score"}
                         value={<NumberFlow value={getRulesetUser(activeRuleset)?.ranked_score || 0} />}
                     />
                 </Grid>
 
-                <Grid item key="total_score" size={{ xs: 12, sm: 6, md: 6, lg: 1.25 }}>
+                <Grid key="total_score" size={{ xs: 12, sm: 6, md: 6, lg: 1.25 }}>
                     <ProfileHighlight
                         title={"Total Score"}
                         value={<NumberFlow value={getRulesetUser(activeRuleset)?.total_score || 0} />}
                     />
                 </Grid>
 
-                <Grid item key="lazer_score" size={{ xs: 12, sm: 6, md: 6, lg: 1.5 }}>
+                <Grid key="lazer_score" size={{ xs: 12, sm: 6, md: 6, lg: 1.5 }}>
                     <ProfileHighlight
                         title={"Lazer Score"}
                         value={<NumberFlow value={getRulesetStatistics(activeRuleset)?.scores_set_by_score?.score || 0} />}
                     />
                 </Grid>
 
-                <Grid item key="playtime" size={{ xs: 12, sm: 6, md: 6, lg: 1.25 }}>
+                <Grid key="playtime" size={{ xs: 12, sm: 6, md: 6, lg: 1.25 }}>
                     <ProfileHighlight
                         title={"Playtime"}
                         value={FormatDurationNumberFlow(getRulesetUser(activeRuleset)?.play_time || 0, true, 'days')}
                     />
                 </Grid>
 
-                <Grid item key="sessions" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                <Grid key="sessions" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"Sessions"}
                         value={<NumberFlow value={getRulesetStatistics(activeRuleset)?.scores_set?.sessions.length || 0} />}
                     />
                 </Grid>
 
-                <Grid item key="longest_session" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                <Grid key="longest_session" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"Longest Session"}
                         value={FormatDurationNumberFlow(getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.duration_longest || 0, true, 'days')}
                     />
                 </Grid>
 
-                <Grid item key="average_session" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
+                <Grid key="average_session" size={{ xs: 12, sm: 6, md: 6, lg: 1 }}>
                     <ProfileHighlight
                         title={"Average Session"}
                         value={FormatDurationNumberFlow(getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.duration_average || 0, true, 'days')}
                     />
                 </Grid>
 
-                <Grid item key="badges" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
+                <Grid key="badges" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
                     <ProfileHighlight
                         title={"Badges"}
                         value={<NumberFlow value={getApiUser()?.badges?.length || 0} />}
                     />
                 </Grid>
 
-                <Grid item key="medals" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
+                <Grid key="medals" size={{ xs: 12, sm: 6, md: 6, lg: 0.75 }}>
                     <ProfileHighlight
                         title={"Medals"}
                         value={<NumberFlow value={getApiUser()?.user_achievements?.length || 0} />}
                     />
                 </Grid>
 
-                <Grid item key="daily_challenge" size={{ xs: 12, sm: 6, md: 6, lg: 1.25 }}>
+                <Grid key="daily_challenge" size={{ xs: 12, sm: 6, md: 6, lg: 1.25 }}>
                     <ProfileHighlight
                         title={"Daily Challenge"}
                         value={
