@@ -4,10 +4,11 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import DebouncedTextField from '../components/DebouncedTextField';
 import { useApi } from './ApiProvider';
 import PlayerCard from '../components/PlayerCard';
+import { SearchContextValue } from './ContextTypes';
 
-const SearchContext = createContext();
+const SearchContext = createContext<SearchContextValue | null>(null);
 
-export function SearchProvider({ children }) {
+export function SearchProvider({ children }: { children: React.ReactNode }) {
     const { getUserSearch } = useApi();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isSearching, setIsSearching] = useState(false);

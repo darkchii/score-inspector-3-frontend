@@ -6,18 +6,18 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import './main.css';
 import { BrowserRouter } from 'react-router';
-import { AuthProvider } from './providers/AuthProvider.jsx';
-import { ApiProvider } from './providers/ApiProvider.jsx';
-import { ProfileProvider } from './providers/ProfileProvider.jsx';
-import { ScoreViewProvider } from './providers/ScoreViewProvider.jsx';
-import { SearchProvider } from './providers/SearchProvider.jsx';
+import { AuthProvider } from './providers/AuthProvider';
+import { ApiProvider } from './providers/ApiProvider';
+import { ProfileProvider } from './providers/ProfileProvider';
+import { ScoreViewProvider } from './providers/ScoreViewProvider';
+import { SearchProvider } from './providers/SearchProvider';
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import { pink } from '@mui/material/colors';
 import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers"
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"
 import React from 'react';
-import { TitleProvider } from './providers/TitleProvider.jsx';
-import { ReputationProvider } from './providers/ReputationProvider.jsx';
+import { TitleProvider } from './providers/TitleProvider';
+import { ReputationProvider } from './providers/ReputationProvider';
 
 type ProviderEntry = {
   Provider: React.ComponentType<React.PropsWithChildren<any>>;

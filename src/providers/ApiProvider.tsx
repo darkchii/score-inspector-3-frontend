@@ -1,10 +1,11 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { ApiContextValue } from "./ContextTypes";
 
-const ApiContext = createContext();
+const ApiContext = createContext<ApiContextValue | null>(null);
 const apiAge = 1000 * 60 * 10; //10 minutes
 
-export function ApiProvider({ children }) {
+export function ApiProvider({ children }: { children: React.ReactNode }) {
     // Use useRef instead of useState to prevent re-renders when cache updates
     const apiCacheRef = useRef({});
 
@@ -183,5 +184,10 @@ export function ApiProvider({ children }) {
 }
 
 export function useApi() {
-    return useContext(ApiContext);
+    const context = useContext(ApiContext);
+    if (!context) {
+        throw new Error('useApi must be used within an ApiProvider');
+    }
+
+    return context;
 }

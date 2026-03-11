@@ -2,10 +2,11 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useApi } from "./ApiProvider";
 import { FormatNumber, GetRulesetNameFromId } from "../util/Helper";
 import { BuildProfileStatistics, MapScoreBeatmaps, ProcessBeatmaps, ProcessScores, ProcessUser } from "../util/ProfileHelper";
+import { ProfileContextValue } from "./ContextTypes";
 
-const ProfileContext = createContext();
+const ProfileContext = createContext<ProfileContextValue | null>(null);
 
-export function ProfileProvider({ children }) {
+export function ProfileProvider({ children }: { children: React.ReactNode }) {
     const [userId, setUserId] = useState(null);
     const [userLive, setUserLive] = useState(null);
     const [scoresLive, setScoresLive] = useState(null);

@@ -3,14 +3,15 @@ import { useNavigate } from "react-router";
 import { ShowNotification } from "../util/Helper";
 import { GetAPI } from "../util/ApiHelper";
 import axios from "axios";
+import { AuthContextValue } from "./ContextTypes";
 
-const AuthContext = createContext();
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 const expectedLoginResponseFields = [
     'access_token', 'refresh_token', 'expires_in', 'token_type', 'user_id'
 ]
 
-export function AuthProvider({ children }) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState(null);
     const [userData, setUserData] = useState(null);
     const [token, setToken] = useState(localStorage.getItem("access_token") || "");

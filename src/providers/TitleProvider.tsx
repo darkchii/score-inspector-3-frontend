@@ -1,9 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import Config from '../data/Config.json';
+import { TitleContextValue } from "./ContextTypes";
 
-const TitleContext = createContext();
+const TitleContext = createContext<TitleContextValue | null>(null);
 
-export function TitleProvider({ children, suffixTitle = Config.WEBSITE_NAME }) {
+export function TitleProvider({ children, suffixTitle = Config.WEBSITE_NAME }: { children: React.ReactNode, suffixTitle?: string }) {
     const [title, setTitle] = useState(suffixTitle);
 
     useEffect(() => {
