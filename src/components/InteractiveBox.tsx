@@ -1,7 +1,13 @@
 import { useCallback, useRef, useState } from "react";
 
-function InteractiveBox({ children = null, onClick = null, onLongPress = null, longPressDuration = 500, style = {}, className = "" }) {
-    
+function InteractiveBox({ children = null, onClick = null, onLongPress = null, longPressDuration = 500, style = {}, className = "" }: {
+    children?: React.ReactNode,
+    onClick?: null | ((event: any) => void),
+    onLongPress?: null | ((event: any) => void),
+    longPressDuration?: number,
+    style?: React.CSSProperties,
+    className?: string
+}) {
     const holdEvent = useLongPress((e: any) => {
         if (onLongPress) onLongPress(e);
     }, (e) => {
@@ -61,11 +67,11 @@ const useLongPress = (
     );
 
     return {
-        onMouseDown: e => start(e),
-        onTouchStart: e => start(e),
-        onMouseUp: e => clear(e),
-        onMouseLeave: e => clear(e, false),
-        onTouchEnd: e => clear(e)
+        onMouseDown: (e: React.MouseEvent<HTMLDivElement>) => start(e),
+        onTouchStart: (e: React.TouchEvent<HTMLDivElement>) => start(e),
+        onMouseUp: (e: React.MouseEvent<HTMLDivElement>) => clear(e),
+        onMouseLeave: (e: React.MouseEvent<HTMLDivElement>) => clear(e, false),
+        onTouchEnd: (e: React.TouchEvent<HTMLDivElement>) => clear(e)
     };
 };
 

@@ -14,8 +14,18 @@ import BeatmapListRow from "../components/list/BeatmapListRow";
 import Beatmap from "../types/beatmaps/Beatmap";
 import { grey } from "@mui/material/colors";
 
+interface LeaderboardConfig {
+    title: string;
+    img?: string | string[];
+    category: 'user' | 'beatmap' | 'grades';
+    formatter?: (value: number) => string;
+    suffix?: string;
+    description?: string;
+    hide_value?: boolean; //for fields where the value is already shown in the row (e.g. beatmap difficulty), we can hide the value in the leaderboard and just show the difference
+}
+
 const LIMIT: number = 50;
-const LEADERBOARDS = {
+const LEADERBOARDS: { [key: string]: LeaderboardConfig } = {
     'pp': {
         title: 'Performance',
         suffix: 'pp',
@@ -108,9 +118,9 @@ const LEADERBOARDS = {
         title: 'Play Time',
         category: 'user',
         //given in seconds
-        formatter: (value) => {
+        formatter: (value: number) => {
             const hours = Math.floor(value / 3600);
-            return hours;
+            return hours.toString();
         },
         suffix: 'hrs',
     },
@@ -122,7 +132,7 @@ const LEADERBOARDS = {
     'completion': {
         title: 'Completion',
         category: 'user',
-        formatter: (value) => {
+        formatter: (value: number) => {
             return `${FormatNumberWithPrecision(value, 2)}%`;
         },
     },
@@ -130,7 +140,7 @@ const LEADERBOARDS = {
         title: 'Length',
         category: 'beatmap',
         //show as mm:ss
-        formatter: (value) => {
+        formatter: (value: number) => {
             const minutes = Math.floor(value / 60);
             const seconds = value % 60;
             return `${minutes}:${seconds.toString().padStart(2, '0')}`;
@@ -154,14 +164,14 @@ const LEADERBOARDS = {
     'beatmap_rating': {
         title: 'Rating',
         category: 'beatmap',
-        formatter: (value) => {
+        formatter: (value: number) => {
             return `${FormatNumber(value)}/10`;
         }
     },
     'beatmap_rank_date': {
         title: 'Ranked Date',
         category: 'beatmap',
-        formatter: (value) => {
+        formatter: (value: number) => {
             console.log(value);
             const date = new Date(value);
             return date.toLocaleString();
@@ -170,7 +180,7 @@ const LEADERBOARDS = {
     'beatmap_rank_duration': {
         title: 'Time To Rank',
         category: 'beatmap',
-        formatter: (value) => {
+        formatter: (value: number) => {
             if (!value || value <= 0) {
                 return '0 days';
             }
@@ -207,7 +217,7 @@ const LEADERBOARDS = {
         hide_value: true, //sr is default part of the beatmap row, so no need to show lb_value
     },
 }
-const LEADERBOARDS_CATEGORIES = Object.keys(LEADERBOARDS).reduce((acc, key) => {
+const LEADERBOARDS_CATEGORIES = Object.keys(LEADERBOARDS).reduce((acc: string[], key) => {
     const category = LEADERBOARDS[key].category;
     if (!acc.includes(category)) {
         acc.push(category);
@@ -220,15 +230,15 @@ function RouteLeaderboards() {
     const { getLeaderboard } = useApi();
     const [ruleset, setRuleset] = useState('osu');
     const [statistic, setStatistic] = useState(params.statistic || Object.keys(LEADERBOARDS)[0]);
-    const [page, setPage] = useState(parseInt(params.page) || 1);
+    const [page, setPage] = useState(parseInt(params.page || '1'));
     const [country, setCountry] = useState(params.country || null);
-    const [leaderboardResults, setLeaderboardResults] = useState(null);
+    const [leaderboardResults, setLeaderboardResults] = useState<any | null>(null);
 
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
     const [isWorking, setIsWorking] = useState(false);
 
     const requestLeaderboard = async () => {
-        window.history.replaceState(null, null, `/leaderboards/${ruleset}/${statistic || 'pp'}/page/${page || 1}${country ? `/country/${country}` : ''}`);
+        window.history.replaceState(null, '', `/leaderboards/${ruleset}/${statistic || 'pp'}/page/${page || 1}${country ? `/country/${country}` : ''}`);
         setIsWorking(true);
         try {
             const data = await getLeaderboard(ruleset, statistic, page, "desc", LIMIT, country);
@@ -236,7 +246,7 @@ function RouteLeaderboards() {
             //data.entries[i].value should be moved to data.entries[i].user.osuAlternative.lb_value
             if (data && data.entries) {
                 if (LEADERBOARDS[statistic].category === 'beatmap') {
-                    data.entries = data.entries.map(entry => {
+                    data.entries = data.entries.map((entry: any) => {
                         // entry.beatmap = entry.beatmap || {};
                         const _beatmap = new Beatmap(entry.beatmap);
                         entry.beatmap = _beatmap;
@@ -245,7 +255,7 @@ function RouteLeaderboards() {
                         return entry;
                     });
                 } else {
-                    data.entries = data.entries.map(entry => {
+                    data.entries = data.entries.map((entry: any) => {
                         entry.user.osuAlternative = entry.user.osuAlternative || {};
                         entry.user.osuAlternative.lb_value = entry.value;
                         entry.user.osuAlternative.lb_value_diff = entry.difference_value;
@@ -264,19 +274,19 @@ function RouteLeaderboards() {
         setIsWorking(false);
     }
 
-    const applyStatistic = (statistic) => {
+    const applyStatistic = (statistic: string) => {
         setStatistic(statistic);
         setPage(1);
     }
 
-    const applyCountry = (country) => {
+    const applyCountry = (country: string | null) => {
         setCountry(country);
         setPage(1);
     }
 
     useEffect(() => {
         setStatistic(params.statistic || Object.keys(LEADERBOARDS)[0]);
-        setPage(parseInt(params.page) || 1);
+        setPage(parseInt(params.page || '1'));
         setRuleset(params.ruleset || 'osu');
         setCountry(params.country || null);
     }, [params.statistic, params.page, params.ruleset, params.country]);
@@ -425,12 +435,12 @@ function RouteLeaderboards() {
                                                 <ItemList
                                                     startIndex={(page - 1) * LIMIT}
                                                     showIndex={true}
-                                                    items={leaderboardResults.entries.map(entry => entry.beatmap)}
+                                                    items={leaderboardResults.entries.map((entry: any) => entry.beatmap)}
                                                     isCompact={false}
                                                     truncate={false}
                                                     leaderboardField={!LEADERBOARDS[statistic].hide_value ? 'lb_value' : null}
                                                     secondaryLeaderboardField={!LEADERBOARDS[statistic].hide_value ? 'lb_value_diff' : null}
-                                                    leaderboardFormat={(value) => {
+                                                    leaderboardFormat={(value: any) => {
                                                         return `${LEADERBOARDS[statistic].formatter ? LEADERBOARDS[statistic].formatter(value) : Number(value)}${LEADERBOARDS[statistic].suffix || ''}`;
                                                     }}
                                                     ItemListRowType={BeatmapListRow}
@@ -440,12 +450,12 @@ function RouteLeaderboards() {
                                                 <ItemList
                                                     startIndex={(page - 1) * LIMIT}
                                                     showIndex={true}
-                                                    items={leaderboardResults.entries.map(entry => entry.user)}
+                                                    items={leaderboardResults.entries.map((entry: any) => entry.user)}
                                                     isCompact={false}
                                                     truncate={false}
                                                     leaderboardField={!LEADERBOARDS[statistic].hide_value ? 'osuAlternative.lb_value' : null}
                                                     secondaryLeaderboardField={!LEADERBOARDS[statistic].hide_value ? 'osuAlternative.lb_value_diff' : null}
-                                                    leaderboardFormat={(value) => {
+                                                    leaderboardFormat={(value: any) => {
                                                         return `${LEADERBOARDS[statistic].formatter ? LEADERBOARDS[statistic].formatter(value) : Number(value)}${LEADERBOARDS[statistic].suffix || ''}`;
                                                     }}
                                                     ItemListRowType={PlayerListRow}

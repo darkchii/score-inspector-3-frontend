@@ -23,8 +23,8 @@ function ToolMissingBeatmaps() {
                 setAllBeatmaps(beatmaps);
 
                 //group beatmaps by [.mode][.ranked_raw] => [beatmaps]
-                const grouped = {};
-                beatmaps.forEach(beatmap => {
+                const grouped: Record<string, Record<string, any[]>> = {};
+                beatmaps.forEach((beatmap: any) => {
                     if (!grouped[beatmap.mode]) {
                         grouped[beatmap.mode] = {};
                     }
@@ -44,24 +44,24 @@ function ToolMissingBeatmaps() {
         })();
     }, []);
 
-    const [clientData, setClientData] = useState(null);
+    const [clientData, setClientData] = useState<any>(null);
 
-    const processBeatmaps = (clientBeatmaps, clientData) => {
+    const processBeatmaps = (clientBeatmaps: any[], clientData: any) => {
         //assume clientBeatmaps is an array of { ID, Hash, Status }
 
-        const allBeatmapsMap = {};
-        allBeatmaps.forEach(beatmap => {
+        const allBeatmapsMap: Record<string, any> = {};
+        allBeatmaps.forEach((beatmap: any) => {
             allBeatmapsMap[beatmap.beatmap_id] = beatmap;
         });
 
-        const clientBeatmapsMap = {};
-        clientBeatmaps.forEach(beatmap => {
+        const clientBeatmapsMap: Record<string, any> = {};
+        clientBeatmaps.forEach((beatmap: any) => {
             clientBeatmapsMap[beatmap.ID] = beatmap;
         });
 
         //compare with allBeatmaps, find missing beatmaps by hash, and mismatched status
-        const failedMatches = []; // { beatmap, reason, client, server }
-        allBeatmaps.forEach(beatmap => {
+        const failedMatches: any[] = []; // { beatmap, reason, client, server }
+        allBeatmaps.forEach((beatmap: any) => {
             const clientBeatmap = clientBeatmapsMap[beatmap.beatmap_id];
             if (!clientBeatmap) {
                 failedMatches.push({ beatmap, reason: 'missing', client: null, server: null });
@@ -83,14 +83,14 @@ function ToolMissingBeatmaps() {
         });
     }
 
-    const processLazerRealm = (jsonData) => {
+    const processLazerRealm = (jsonData: any) => {
         if (!jsonData?.beatmapSets) {
             ShowNotification('No beatmap sets found in realm file', 'error');
             return;
         }
 
         //get all beatmaps
-        const clientBeatmaps = jsonData.beatmapSets.flatMap(set => set.Beatmaps.map(beatmap => ({
+        const clientBeatmaps = jsonData.beatmapSets.flatMap((set: any) => set.Beatmaps.map((beatmap: any) => ({
             //only things we care about to match
             ID: beatmap.OnlineID,
             Hash: beatmap.MD5Hash,
@@ -105,7 +105,7 @@ function ToolMissingBeatmaps() {
         });
     }
 
-    const getProcessedOsuDb = async (file) => {
+    const getProcessedOsuDb = async (file: File) => {
         const osuDbData = await readFileAsync(file);
 
         const db = new OsuDb(osuDbData);
@@ -118,7 +118,7 @@ function ToolMissingBeatmaps() {
 
         console.log(db);
 
-        const clientBeatmaps = db.Beatmaps.map(beatmap => ({
+        const clientBeatmaps = db.Beatmaps.map((beatmap: any) => ({
             ID: beatmap.beatmapID,
             Hash: beatmap.MD5Hash,
             Status: beatmap.RankedStatus //db stores only positive integers, but unranked maps are below 0, so offset is 3
@@ -130,7 +130,7 @@ function ToolMissingBeatmaps() {
         });
     }
 
-    const _requestFileUpload = (type) => {
+    const _requestFileUpload = (type: 'osu' | 'realm') => {
         //open file dialog and wait for user to select file, then read the file as array buffer and send to server
         const input = document.createElement('input');
         input.type = 'file';
@@ -146,14 +146,14 @@ function ToolMissingBeatmaps() {
                             processLazerRealm(response);
                             ShowNotification(`Extracted ${response.beatmapSets.length} beatmap sets`, 'success');
                         }
-                    } catch (error) {
+                    } catch (error: any) {
                         console.error('Error processing realm file:', error);
                         ShowNotification(error?.response?.data?.error || 'Error processing realm file', 'error');
                     }
                 } else {
                     try {
                         const response = await getProcessedOsuDb(file);
-                    }catch(error) {
+                    }catch(error: any) {
                         console.error('Error processing osu!.db file:', error);
                         ShowNotification(error?.response?.data?.error || 'Error processing osu!.db file', 'error');
                     }
@@ -228,7 +228,7 @@ function ToolMissingBeatmaps() {
     );
 }
 
-const missingLabelMap = {
+const missingLabelMap: { [key: string]: string } = {
     'missing': 'Missing',
     'hash': 'Hash Mismatch',
     'status': 'Status Mismatch',
@@ -238,44 +238,44 @@ const columns = [
     {
         field: 'id',
         headerName: 'ID',
-        valueGetter: (value, row) => row.beatmap.beatmap_id,
+        valueGetter: (value: any, row: any) => row.beatmap.beatmap_id,
     },
     {
         field: 'name',
         headerName: 'Name',
-        valueGetter: (value, row) => `${row.beatmap.artist} - ${row.beatmap.title} [${row.beatmap.version}]`,
+        valueGetter: (value: any, row: any) => `${row.beatmap.artist} - ${row.beatmap.title} [${row.beatmap.version}]`,
         flex: 1
     },
     {
         field: 'ruleset',
         headerName: 'Ruleset',
-        valueGetter: (value, row) => GetRulesetPrettyNameFromId(row.beatmap.mode),
+        valueGetter: (value: any, row: any) => GetRulesetPrettyNameFromId(row.beatmap.mode),
     },
     {
         field: 'status',
         headerName: 'Status',
-        valueGetter: (value, row) => GetStatusLabelFromInt(row.beatmap.ranked_raw),
+        valueGetter: (value: any, row: any) => GetStatusLabelFromInt(row.beatmap.ranked_raw),
     },
     {
         field: 'reason',
         headerName: 'Reason',
-        valueGetter: (value, row) => missingLabelMap[row.reason] || row.reason,
+        valueGetter: (value: any, row: any) => missingLabelMap[row.reason] || row.reason,
         width: 150
     },
     {
         field: 'clientValue',
         headerName: 'Client Value',
-        valueGetter: (value, row) => row.client || '-',
+        valueGetter: (value: any, row: any) => row.client || '-',
     },
     {
         field: 'serverValue',
         headerName: 'Server Value',
-        valueGetter: (value, row) => row.server || '-',
+        valueGetter: (value: any, row: any) => row.server || '-',
     },
     {
         field: 'link',
         headerName: 'Link',
-        renderCell: (params) => (
+        renderCell: (params: any) => (
             <React.Fragment>
                 <Button variant="outlined" size="small" href={`https://osu.ppy.sh/beatmaps/${params.row.beatmap.beatmap_id}`} target="_blank">
                     osu!
@@ -289,7 +289,7 @@ const columns = [
     },
 ]
 
-function MissingMapVirtualTable({ data }) {
+function MissingMapVirtualTable({ data }: { data: any[] }) {
     return (
         <DataGrid
             rows={data.map((item, index) => ({ id: index, ...item }))}

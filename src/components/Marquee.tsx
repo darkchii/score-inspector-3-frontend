@@ -1,4 +1,4 @@
-function Marquee({ children }) {
+function Marquee({ children }: { children: React.ReactNode }) {
     return (
         <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
             <div style={{ display: 'inline-block', paddingLeft: '100%', animation: 'marquee 15s linear infinite' }}>

@@ -3,9 +3,9 @@ const STORAGE_KEY = "score_filter_presets";
 class FilterStorage {
     loadAll() {
         try {
-            return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []
+            return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
         } catch {
-            return []
+            return [];
         }
     }
 

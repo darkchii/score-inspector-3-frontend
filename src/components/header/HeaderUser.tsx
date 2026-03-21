@@ -7,7 +7,7 @@ import { Link } from "react-router";
 import PlayerLink from "../PlayerLink";
 
 function HeaderUser() {
-    const [showMenu, setShowMenu] = useState(null);
+    const [showMenu, setShowMenu] = useState<null | HTMLElement>(null);
     const { user, userData, loading, logout } = useAuth();
 
     useEffect(() => {

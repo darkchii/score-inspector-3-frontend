@@ -14,43 +14,43 @@ const COMPLETION_DATA = {
         key: 'cs',
         description: 'Completion by Circle Size (CS)',
         extra_info: 'For mania, this represents key count',
-        key_formatter: (key) => `CS ${key}`,
+        key_formatter: (key: any) => `CS ${key}`,
     },
     'ar': {
         title: 'AR Completion',
         key: 'ar',
         description: 'Completion by Approach Rate (AR)',
-        key_formatter: (key) => `AR ${key}`,
+        key_formatter: (key: any) => `AR ${key}`,
     },
     'od': {
         title: 'OD Completion',
         key: 'od',
         description: 'Completion by Overall Difficulty (OD)',
-        key_formatter: (key) => `OD ${key}`,
+        key_formatter: (key: any) => `OD ${key}`,
     },
     'hp': {
         title: 'HP Completion',
         key: 'hp',
         description: 'Completion by Health Points (HP)',
-        key_formatter: (key) => `HP ${key}`,
+        key_formatter: (key: any) => `HP ${key}`,
     },
     'yearly': {
         title: 'Yearly Completion',
         key: 'year',
         description: 'Completion by ranked year',
-        key_formatter: (key) => key, //year as is
+        key_formatter: (key: any) => key, //year as is
     },
     'star_rating': {
         title: 'Stars Completion',
         key: 'star_rating',
         description: 'Completion by star rating brackets',
-        key_formatter: (key) => `${key}★`,
+        key_formatter: (key: any) => `${key}★`,
     },
     'length': {
         title: 'Length Completion',
         key: 'length',
         description: 'Completion by length brackets',
-        key_formatter: (key) => {
+        key_formatter: (key: any) => {
             //if ends with +, show as is
             if (key.endsWith('+')) {
                 return `${key} min`;
@@ -65,7 +65,7 @@ const COMPLETION_DATA = {
         title: 'Combo Completion',
         key: 'combo',
         description: 'Completion by max combo brackets',
-        key_formatter: (key) => {
+        key_formatter: (key: any) => {
             //if ends with +, show as is
             if (key.endsWith('+')) {
                 return `${key} combo`;

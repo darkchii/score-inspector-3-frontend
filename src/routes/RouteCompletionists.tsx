@@ -12,9 +12,9 @@ import CompletionistsCountChart from "../components/completionists/Completionist
 function RouteCompletionists() {
     usePageTitle("Completionists");
     const { getCompletionists } = useApi();
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [data, setData] = useState<{ [key: string]: any[] } | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<any>(null);
 
     useEffect(() => {
         setLoading(true);
@@ -23,7 +23,7 @@ function RouteCompletionists() {
                 const completionistsData = await getCompletionists();
                 //group by mode completionistsData[x].mode
 
-                const groupedData = completionistsData.reduce((acc, curr) => {
+                const groupedData = completionistsData.reduce((acc: { [key: string]: any[] }, curr: any) => {
                     if (!acc[curr.mode]) {
                         acc[curr.mode] = [];
                     }
@@ -32,12 +32,12 @@ function RouteCompletionists() {
                 }, {});
 
                 for (const mode in groupedData) {
-                    groupedData[mode].sort((a, b) => new Date(a.completion_date).getTime() - new Date(b.completion_date).getTime());
+                    groupedData[mode].sort((a: any, b: any) => new Date(a.completion_date).getTime() - new Date(b.completion_date).getTime());
                 }
 
                 //count days between each completionist and the previous one, add that as a field to each item
                 for (const mode in groupedData) {
-                    groupedData[mode] = groupedData[mode].map((item, index, arr) => {
+                    groupedData[mode] = groupedData[mode].map((item: any, index: number, arr: any[]) => {
                         if (index === 0) {
                             return { ...item, days_since_last: null };
                         }
@@ -50,7 +50,7 @@ function RouteCompletionists() {
 
                 //order each mode by completion_date
                 for (const mode in groupedData) {
-                    groupedData[mode].sort((a, b) => new Date(b.completion_date).getTime() - new Date(a.completion_date).getTime());
+                    groupedData[mode].sort((a: any, b: any) => new Date(b.completion_date).getTime() - new Date(a.completion_date).getTime());
                 }
 
                 setData(groupedData);
@@ -77,7 +77,7 @@ function RouteCompletionists() {
                             <CompletionistsCountryMap data={data} />
                             {
                                 //list each mode with all users
-                                Object.keys(data).map(mode => (
+                                data && Object.keys(data).map((mode: string) => (
                                     <Grid key={mode} size={{ xs: 12, md: 3 }}>
                                         <Paper elevation={3} sx={{ padding: 1 }}>
                                             <div style={{
@@ -89,7 +89,7 @@ function RouteCompletionists() {
                                                     <Typography variant="h6">{GetRulesetPrettyNameFromId(mode)}</Typography>
                                                     <Typography variant="body2" color="textSecondary"> Completionists: {data[mode].length} </Typography>
                                                 </div>
-                                                <img src={getCompletionistBadge(mode)} alt="Completionist Badge" style={{ marginLeft: 'auto', height: 40 }} />
+                                                <img src={getCompletionistBadge(mode) || ""} alt="Completionist Badge" style={{ marginLeft: 'auto', height: 40 }} />
                                             </div>
                                             <TableContainer sx={{
                                                 mt: 2,

@@ -3,12 +3,12 @@ import { ReorderMods } from "../util/ModHelper";
 import PerformancePoints from "./performance/PerformancePoints";
 import { BeatmapApplyModsToDifficulty, DetermineIsScoreFC } from "../util/ScoreHelper";
 import ScoreDifficulty from "./ScoreDifficulty";
-import type { IBeatmap, IPerformancePoints, IScore, IScoreDifficulty } from "./types";
+import type { IBeatmap, IPerformancePoints, IScore, IScoreDateStrings, IScoreDifficulty, IScoreMod } from "./types";
 import Beatmap from "./beatmaps/Beatmap";
 
 class Score implements IScore {
-    beatmap: IBeatmap | null;
-    local_beatmap: IBeatmap | null
+    beatmap: IBeatmap;
+    local_beatmap: IBeatmap;
     user: any; //can be User or null
 
     id: number;
@@ -34,21 +34,21 @@ class Score implements IScore {
 
     combo: number;
 
-    maximum_statistics_perfect: number;
-    maximum_statistics_great: number;
-    maximum_statistics_good: number;
-    maximum_statistics_ok: number;
-    maximum_statistics_meh: number;
-    maximum_statistics_miss: number;
-    maximum_statistics_ignore_hit: number;
-    maximum_statistics_ignore_miss: number;
-    maximum_statistics_slider_tail_hit: number;
-    maximum_statistics_legacy_combo_increase: number;
-    maximum_statistics_large_bonus: number;
-    maximum_statistics_large_tick_hit: number
-    maximum_statistics_large_tick_miss: number;
-    maximum_statistics_small_bonus: number;
-    maximum_statistics_small_tick_hit: number;
+    maximum_statistics_perfect: number = 0;
+    maximum_statistics_great: number = 0;
+    maximum_statistics_good: number = 0;
+    maximum_statistics_ok: number = 0;
+    maximum_statistics_meh: number = 0;
+    maximum_statistics_miss: number = 0;
+    maximum_statistics_ignore_hit: number = 0;
+    maximum_statistics_ignore_miss: number = 0;
+    maximum_statistics_slider_tail_hit: number = 0;
+    maximum_statistics_legacy_combo_increase: number = 0;
+    maximum_statistics_large_bonus: number = 0;
+    maximum_statistics_large_tick_hit: number = 0
+    maximum_statistics_large_tick_miss: number = 0;
+    maximum_statistics_small_bonus: number = 0;
+    maximum_statistics_small_tick_hit: number = 0;
 
     ruleset_id: number;
     ruleset: string;
@@ -63,15 +63,15 @@ class Score implements IScore {
     grade: string;
 
     replay: boolean;
-    ended_at: Date | null;
+    ended_at: Date;
     started_at: Date | null
     lchg_time: Date | null;
 
     ended_at_seconds: number | null;
     ended_at_str: {
-        'YYYY-MM-DD'?: string;
-        'YYYY-MM'?: string;
-        'YYYY'?: string;
+        'YYYY-MM-DD': string;
+        'YYYY-MM': string;
+        'YYYY': string;
     };
 
     statistics_perfect: number;
@@ -100,7 +100,7 @@ class Score implements IScore {
     highest_pp: boolean;
     rank: number | null;
 
-    mods: any[];
+    mods: IScoreMod[];
     mod_acronyms: string[];
     mod_speed_change: number | null;
     using_classic_slider_accuracy: boolean;
@@ -113,7 +113,7 @@ class Score implements IScore {
     implied_total_score: number;
     beatmap_attributes: any;
 
-    attr_diff: IScoreDifficulty | null;
+    attr_diff: IScoreDifficulty | null = null;
     attr_recalc: boolean;
 
     diff_missing: boolean;
@@ -123,17 +123,17 @@ class Score implements IScore {
     performance: {
         base: IPerformancePoints | null;
         ss?: IPerformancePoints | null;
-    } | null;
+    } | null = null;
 
-    duration: number | null;
+    duration: number | null = null;
 
     implied_pp: number;
 
-    constructor(api_data, beatmap = null, user = null) {
+    constructor(api_data: any, beatmap: Beatmap, user: any = null) {
         // this.beatmap = beatmap;
         //if beatmap is not of type Beatmap, create it, otherwise use as is
-        this.beatmap = (beatmap instanceof Beatmap) ? beatmap : (beatmap ? new Beatmap(beatmap) : null);
-        this.local_beatmap = this.beatmap ? this.beatmap.clone() : null; //this will contain modified data
+        this.beatmap = (beatmap instanceof Beatmap) ? beatmap : new Beatmap(beatmap);
+        this.local_beatmap = this.beatmap.clone(); //this will contain modified data
         this.user = user;
 
         this.id = Number(api_data.id);
@@ -187,14 +187,14 @@ class Score implements IScore {
 
         this.replay = Boolean(api_data.replay);
 
-        this.ended_at = api_data.ended_at ? new Date(api_data.ended_at) : null;
+        this.ended_at = new Date(api_data.ended_at); //ended_at always exists
         this.started_at = api_data.started_at ? new Date(api_data.started_at) : null;
         this.lchg_time = api_data.lchg_time ? new Date(api_data.lchg_time) : null;
 
-        this.ended_at_seconds = this.ended_at ? Math.floor(this.ended_at.getTime() / 1000) : null;
+        this.ended_at_seconds = Math.floor(this.ended_at.getTime() / 1000);
 
-        let ended_at_iso = this.ended_at ? this.ended_at.toISOString() : null;
-        this.ended_at_str = {};
+        let ended_at_iso = this.ended_at.toISOString();
+        this.ended_at_str = {} as IScoreDateStrings;
         if (ended_at_iso) {
             this.ended_at_str['YYYY-MM-DD'] = ended_at_iso.slice(0, 10);
             this.ended_at_str['YYYY-MM'] = ended_at_iso.slice(0, 7);
@@ -262,7 +262,7 @@ class Score implements IScore {
         this.is_fc = Boolean(api_data.is_fc);
 
         this.is_convert = this.ruleset_id !== this.beatmap?.ruleset_id;
-        this.implied_total_score = this.legacy_total_score > 0 ? this.legacy_total_score : this.classic_total_score;
+        this.implied_total_score = this.legacy_total_score !== null && this.legacy_total_score > 0 ? this.legacy_total_score : this.classic_total_score;
 
         if (this.local_beatmap) {
             this.local_beatmap.bpm_modded = this.local_beatmap.bpm;
@@ -325,7 +325,7 @@ class Score implements IScore {
     getOtherScores() {
         if (!this.beatmap) return [];
 
-        return this.beatmap.getScores(null, 'desc').filter(s => s.id !== this.id);
+        return this.beatmap.getScores(null, 'desc')?.filter(s => s.id !== this.id) || [];
     }
 }
 

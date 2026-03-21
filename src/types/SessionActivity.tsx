@@ -2,11 +2,11 @@ import type { ISessionCollectionActivity, IScore, ISessionBreak } from "./types"
 
 class SessionCollectionActivity implements ISessionCollectionActivity {
     scores: IScore[];
-    start: Date | null;
-    end: Date | null
-    done: boolean;
-    breaks: ISessionBreak[];
-    duration: number;
+    start: Date | null = null;
+    end: Date | null = null;
+    done: boolean = false;
+    breaks: ISessionBreak[] = [];
+    duration: number = 0;
 
     constructor() {
         this.scores = [];

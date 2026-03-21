@@ -16,8 +16,8 @@ function ProfileChartAccuracyDifficulty() {
                         datasets: [
                             {
                                 label: 'Scores',
-                                data: getRulesetStatistics(activeRuleset)?.charts?.accuracyDifficultyScatter.map(item => ({ x: item.x, y: item.y, id: item.id })) || [],
-                                pointBackgroundColor: getRulesetStatistics(activeRuleset)?.charts?.accuracyDifficultyScatter.map(item => item.color) || [],
+                                data: getRulesetStatistics(activeRuleset)?.charts?.accuracyDifficultyScatter.map((item: any) => ({ x: item.x, y: item.y, id: item.id })) || [],
+                                pointBackgroundColor: getRulesetStatistics(activeRuleset)?.charts?.accuracyDifficultyScatter.map((item: any) => item.color) || [],
                                 pointRadius: 2,
                             }
                         ]

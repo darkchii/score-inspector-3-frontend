@@ -17,7 +17,7 @@ const COUNTRY_FILL_COLOR_RANGE = {
     max: "rgb(185, 205, 225)",
 };
 
-function parseRgbColor(color) {
+function parseRgbColor(color: string): [number, number, number] | null {
     const match = color.match(/rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)/i);
     if (!match) {
         return null;
@@ -30,7 +30,7 @@ function parseRgbColor(color) {
     ];
 }
 
-function getCountryFillColor(count, maxCount, colorRange = COUNTRY_FILL_COLOR_RANGE) {
+function getCountryFillColor(count: number, maxCount: number, colorRange: { min: string; max: string } = COUNTRY_FILL_COLOR_RANGE): string {
     if (!count || maxCount <= 0) {
         return "#e7ecf200";
     }
@@ -63,7 +63,7 @@ function CompletionistsCountryMap({ data }: { data: any }) {
                 }
                 const geoJson = await response.json();
                 setWorldGeoJson(geoJson);
-            } catch (e) {
+            } catch (e: any) {
                 if (e.name !== "AbortError") {
                     console.error(e);
                 }
@@ -153,7 +153,7 @@ function CompletionistsCountryMap({ data }: { data: any }) {
                                 />
                                 <AnyGeoJSON
                                     data={worldGeoJson}
-                                    style={(feature) => {
+                                    style={(feature: any) => {
                                         const iso3 = feature?.properties?.["ISO3166-1-Alpha-3"];
                                         const count = iso3 ? (countryCounts[iso3] || 0) : 0;
                                         return {
@@ -164,7 +164,7 @@ function CompletionistsCountryMap({ data }: { data: any }) {
                                             fillOpacity: count ? 0.85 : 0.55,
                                         };
                                     }}
-                                    onEachFeature={(feature, layer) => {
+                                    onEachFeature={(feature: any, layer: any) => {
                                         console.log(feature);
                                         const iso3 = feature?.properties?.["ISO3166-1-Alpha-3"];
                                         const count = iso3 ? (countryCounts[iso3] || 0) : 0;

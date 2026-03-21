@@ -23,7 +23,7 @@ class PerformanceCalculatorFruits extends PerformanceCalculator implements IPerf
         this.numKatu = overrides?.statistics_small_tick_miss ?? score.statistics_small_tick_miss ?? 0;
         this.numMiss = (overrides?.statistics_miss ?? score.statistics_miss ?? 0) + (overrides?.statistics_large_tick_miss ?? score.statistics_large_tick_miss ?? 0);
 
-        let value = Math.pow(5.0 * Math.max(1.0, score.attr_diff.star_rating / 0.0049) - 4.0, 2.0) / 100000.0;
+        let value = Math.pow(5.0 * Math.max(1.0, (score.attr_diff?.star_rating || 0) / 0.0049) - 4.0, 2.0) / 100000.0;
 
         let numTotalHits = this.TotalComboHits();
 
@@ -34,8 +34,8 @@ class PerformanceCalculatorFruits extends PerformanceCalculator implements IPerf
 
         value *= Math.pow(0.97, this.numMiss);
 
-        if (score.attr_diff.max_combo > 0) {
-            value *= Math.min(Math.pow(this.combo, 0.35) / Math.pow(score.attr_diff.max_combo, 0.35), 1.0);
+        if ((score.attr_diff?.max_combo || 0) > 0) {
+            value *= Math.min(Math.pow(this.combo, 0.35) / Math.pow((score.attr_diff?.max_combo || 0), 0.35), 1.0);
         }
 
         this.clockRate = CalculateRateWithMods(0, score.mods, score.attr_diff);

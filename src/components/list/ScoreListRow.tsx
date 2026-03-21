@@ -54,7 +54,7 @@ const ScoreListRow = memo(function ScoreListRow({ item, index, isCompact = false
                         {/* show ruleset icon and grade under each other */}
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                             <img src={GetRulesetIconFromId(item.ruleset_id)} alt={item.grade} width={20} height={20} />
-                            <img src={getGradeIcon(item.grade)} alt={item.grade} width={30} height={20} />
+                            <img src={getGradeIcon(item.grade) || ''} alt={item.grade} width={30} height={20} />
                         </Box>
                     </TableCell> :
                         <React.Fragment>
@@ -66,7 +66,7 @@ const ScoreListRow = memo(function ScoreListRow({ item, index, isCompact = false
                             {/* Grade, should be as small as possible */}
                             <TableCell width={30}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
-                                    <img src={getGradeIcon(item.grade)} alt={item.grade} width={30} height={20} />
+                                    <img src={getGradeIcon(item.grade) || ''} alt={item.grade} width={30} height={20} />
                                 </Box>
                             </TableCell>
                         </React.Fragment>
@@ -95,7 +95,7 @@ const ScoreListRow = memo(function ScoreListRow({ item, index, isCompact = false
                     !isMobile &&
                     <TableCell sx={{ maxWidth: '100px' }}>
                         <Typography sx={{ fontSize: isMobile ? '0.75rem' : '0.85rem', fontWeight: 'bold' }}>{item.total_score.toLocaleString()}</Typography>
-                        <Typography sx={{ fontSize: isMobile ? '0.65rem' : '0.75rem', color: grey[300] }}>{item.implied_total_score.toLocaleString()}</Typography>
+                        <Typography sx={{ fontSize: isMobile ? '0.65rem' : '0.75rem', color: grey[300] }}>{item.implied_total_score?.toLocaleString()}</Typography>
                     </TableCell>
                 }
 
@@ -109,7 +109,7 @@ const ScoreListRow = memo(function ScoreListRow({ item, index, isCompact = false
                                     ? { color: '#4caf50', fontWeight: 'bold' }
                                     : {}
                             )
-                        }}>{item.combo.toLocaleString()}/{(item.attr_diff?.max_combo || item.beatmap.max_combo).toLocaleString()}x</Typography>
+                        }}>{item.combo.toLocaleString()}/{(item.attr_diff?.max_combo || item.beatmap.max_combo)?.toLocaleString()}x</Typography>
                     </TableCell>
                 }
 
@@ -183,7 +183,7 @@ const ScoreListRow = memo(function ScoreListRow({ item, index, isCompact = false
                             <Box sx={{ display: 'flex', gap: 2 }}>
                                 <Box>
                                     <Typography sx={{ fontSize: '0.85rem', fontWeight: 'bold' }}>{item.total_score.toLocaleString()}</Typography>
-                                    <Typography sx={{ fontSize: '0.75rem', color: grey[300] }}>{item.implied_total_score.toLocaleString()}</Typography>
+                                    <Typography sx={{ fontSize: '0.75rem', color: grey[300] }}>{item.implied_total_score?.toLocaleString()}</Typography>
                                 </Box>
                                 <Box>
                                     <Typography sx={{

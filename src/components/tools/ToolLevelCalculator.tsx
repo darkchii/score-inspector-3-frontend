@@ -14,8 +14,8 @@ function ToolLevelCalculator() {
 }
 
 function ToolLevelCalculatorFromScoreSection() {
-    const [score, setScore] = useState(0);
-    const [result, setResult] = useState(null);
+    const [score, setScore] = useState<number>(0);
+    const [result, setResult] = useState<number | null>(null);
 
     return (
         <>
@@ -38,8 +38,8 @@ function ToolLevelCalculatorFromScoreSection() {
 }
 
 function ToolLevelCalculatorFromLevelSection() {
-    const [level, setLevel] = useState(0);
-    const [result, setResult] = useState(null);
+    const [level, setLevel] = useState<number>(0);
+    const [result, setResult] = useState<number | null>(null);
     return (
         <>
             <Typography variant="subtitle2" gutterBottom>Calculate score from level</Typography>

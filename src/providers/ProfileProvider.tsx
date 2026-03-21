@@ -4,32 +4,33 @@ import { FormatNumber, GetRulesetNameFromId } from "../util/Helper";
 import { BuildProfileStatistics, MapScoreBeatmaps, ProcessBeatmaps, ProcessScores, ProcessUser } from "../util/ProfileHelper";
 import type { ProfileContextValue } from "./ContextTypes";
 
-const ProfileContext = createContext<ProfileContextValue | null>(null);
+const ProfileContext = createContext<ProfileContextValue>({} as ProfileContextValue);
 
 export function ProfileProvider({ children }: { children: React.ReactNode }) {
-    const [userId, setUserId] = useState(null);
-    const [userLive, setUserLive] = useState(null);
-    const [scoresLive, setScoresLive] = useState(null);
-    const [beatmapsLive, setBeatmapsLive] = useState(null);
-    const [beatmapPacks, setBeatmapPacks] = useState(null);
-    const [profileStatistics, setProfileStatistics] = useState(null);
+    const [userId, setUserId] = useState<string | number | null>(null);
+    const [userLive, setUserLive] = useState<any>(null);
+    const [scoresLive, setScoresLive] = useState<any>(null);
+    const [beatmapsLive, setBeatmapsLive] = useState<any>(null);
+    const [beatmapPacks, setBeatmapPacks] = useState<any>(null);
+    const [profileStatistics, setProfileStatistics] = useState<any>(null);
     const [errorMessage, setErrorMessage] = useState(false);
     const { getUserLive, getScoresLive, getBeatmapsLive, getBeatmapPacks } = useApi();
-    const [fetchLog, setFetchLog] = useState([]);
+    const [fetchLog, setFetchLog] = useState<any>([]);
     const [isFinished, setIsFinished] = useState(false);
     const [loadDurationMs, setLoadDurationMs] = useState(0);
 
-    const [activeRuleset, setActiveRuleset] = useState(null);
-    const [availableRulesets, setAvailableRulesets] = useState([]);
+    const [activeRuleset, setActiveRuleset] = useState<any>(null);
+    const [availableRulesets, setAvailableRulesets] = useState<any>([]);
+
 
     //lookup map by score id, primarily for charts that should only store score ids
-    const [scoreMap, setScoreMap] = useState({});
+    const [scoreMap, setScoreMap] = useState<{ [key: string]: any }>({});
 
-    const getScoreById = (scoreId) => {
+    const getScoreById = (scoreId: string | number) => {
         return scoreMap[scoreId] || null;
     }
 
-    const getRulesetStatistics = (ruleset, without_loved = false) => {
+    const getRulesetStatistics = (ruleset: string, without_loved = false) => {
         if (!profileStatistics) return null;
 
         const internalId = GetRulesetNameFromId(ruleset);
@@ -39,7 +40,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         return profileStatistics.default.rulesets[internalId];
     }
 
-    const getRulesetUser = (ruleset) => {
+    const getRulesetUser = (ruleset: string) => {
         if (!userLive) return null;
 
         const internalId = GetRulesetNameFromId(ruleset);
@@ -50,7 +51,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         return userLive?.osuApi || null;
     }
 
-    const getUser = async (_userId) => {
+    const getUser = async (_userId: string | number) => {
         let _user = await getUserLive(_userId);
         _user = await ProcessUser(_user);
         setUserLive(_user);
@@ -73,7 +74,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         setScoreMap({});
     }
 
-    const fetchFullProfile = async (_userId) => {
+    const fetchFullProfile = async (_userId: string | number) => {
         //if user id didnt change, keep as is
         if (userId === _userId) {
             return;
@@ -172,7 +173,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
             _fetchLog.push(`%finished% (${((endMs - startMs) / 1000).toFixed(2)}s) Built profile statistics`);
             setFetchLog([..._fetchLog]);
             
-            let _scoreMap = {};
+            let _scoreMap: { [key: string]: any } = {};
             processedScores.forEach(score => {
                 _scoreMap[score.id] = score;
             });
@@ -197,7 +198,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
                 setActiveRuleset('all');
             }
             setIsFinished(true);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error fetching full profile:", error);
             setErrorMessage(error.message || "An unknown error occurred while fetching profile data.");
             setIsFinished(false);

@@ -1,11 +1,18 @@
 import { Box, Collapse, Divider, Grid, List, ListItemButton, ListItemText, Paper, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { usePageTitle } from "../providers/TitleProvider";
 import ToolLevelCalculator from "../components/tools/ToolLevelCalculator";
 import ToolMissingBeatmaps from "../components/tools/ToolMissingBeatmaps";
 
-const TOOLS = [
+interface Tool {
+    name: string;
+    description: string;
+    link: string;
+    component: JSX.Element;
+}
+
+const TOOLS: Tool[] = [
     {
         name: 'Missing Beatmaps',
         description: 'Find missing beatmaps from your osu! install',
@@ -23,10 +30,10 @@ const TOOLS = [
 function RouteTools() {
     const { tool } = useParams();
     const navigate = useNavigate();
-    const [toolData, setToolData] = useState(null);
+    const [toolData, setToolData] = useState<Tool | null>(null);
     usePageTitle(`${toolData ? toolData.name : 'Tools'}`);
 
-    const openTool = (tool) => {
+    const openTool = (tool: Tool) => {
         navigate(tool.link);
     }
 

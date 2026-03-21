@@ -4,7 +4,7 @@ import { FormatNumber, FormatNumberWithPrecision } from "../../util/Helper";
 import { memo } from "react";
 import type { MouseEventHandler, ReactNode } from "react";
 
-export type LeaderboardFormatter = (value: unknown) => ReactNode;
+export type LeaderboardFormatter = (value: any) => ReactNode;
 
 export interface ItemListRowBaseProps<TItem extends object = object> {
     item?: TItem | null;
@@ -19,9 +19,9 @@ export interface ItemListRowBaseProps<TItem extends object = object> {
     secondaryLeaderboardField?: string | null;
     secondaryFieldColor?: string | null;
     leaderboardFormat?: LeaderboardFormatter | null;
-    onClick?: MouseEventHandler<HTMLTableRowElement> | null;
+    onClick?: MouseEventHandler<HTMLTableRowElement> | undefined;
     isCompact?: boolean;
-    children?: ReactNode;
+    children?: ReactNode | ReactNode[];
 }
 
 const getGainColor = (value: number, theme: Theme) => {
@@ -59,7 +59,7 @@ const ItemListRowBase = memo(function ItemListRowBase<TItem extends object>({
     secondaryLeaderboardField = null,
     secondaryFieldColor = null,
     leaderboardFormat = null,
-    onClick = null,
+    onClick = undefined,
     isCompact = false,
     children
 }: ItemListRowBaseProps<TItem>) {

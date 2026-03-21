@@ -1,6 +1,6 @@
 import { Button, CircularProgress } from "@mui/material";
 
-function LoadingButton(props) {
+function LoadingButton(props: any) {
   return (
     <Button
         {...props}

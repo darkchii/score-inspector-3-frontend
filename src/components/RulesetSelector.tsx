@@ -4,7 +4,14 @@ import { GetRulesetColor, GetRulesets } from "../util/Helper";
 import { TextureDatabase } from "../assets/textures/TextureDatabase";
 import { grey } from "@mui/material/colors";
 
-function RulesetSelector({ activeRuleset, onChange, disabled = false, availableRulesets = ['osu', 'taiko', 'fruits', 'mania'], showCombined = true }) {
+function RulesetSelector(
+    { activeRuleset, onChange, disabled = false, availableRulesets = ['osu', 'taiko', 'fruits', 'mania'], showCombined = true }: {
+        activeRuleset: string,
+        onChange: (ruleset: string) => void,
+        disabled?: boolean,
+        availableRulesets?: string[],
+        showCombined?: boolean,
+    }) {
     return (
         <>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>

@@ -7,14 +7,14 @@ type DifficultyBadgeStyleWithVars = React.CSSProperties & {
     '--bg'?: string;
 };
 
-function DifficultyBadge({ difficulty }: { difficulty: number }) {
+function DifficultyBadge({ difficulty }: { difficulty: number | null }) {
     return (
         <div
             style={{ '--bg': getDiffColour(difficulty) } as DifficultyBadgeStyleWithVars}
-            className={`${difficultyBadgeStyles['difficulty-badge']} ${difficulty >= 6.5 ? difficultyBadgeStyles['difficulty-badge--expert-plus'] : ''}`}
+            className={`${difficultyBadgeStyles['difficulty-badge']} ${difficulty !== null && difficulty >= 6.5 ? difficultyBadgeStyles['difficulty-badge--expert-plus'] : ''}`}
         >
             <StarIcon className={difficultyBadgeStyles['difficulty-badge__icon']}/>
-            <span className={difficultyBadgeStyles['difficulty-badge__rating']}>{FormatNumberWithPrecision(difficulty, 2)}</span>
+            <span className={difficultyBadgeStyles['difficulty-badge__rating']}>{difficulty !== null ? FormatNumberWithPrecision(difficulty, 2) : ''}</span>
         </div>
     )
 }

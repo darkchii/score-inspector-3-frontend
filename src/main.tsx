@@ -79,13 +79,6 @@ const theme = createTheme({
   },
 });
 
-// const _providers = [
-//   ApiProvider,
-//   AuthProvider,
-//   ProfileProvider,
-//   ScoreViewProvider,
-//   SearchProvider
-// ]
 const _providers: ProviderEntry[] = [
   {
     Provider: ThemeProvider,
@@ -126,7 +119,7 @@ const _wrapWithProviders = (children: React.ReactNode) => {
   }, children);
 }
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById('root') as HTMLElement).render(
   <BrowserRouter basename='/'>
     {_wrapWithProviders(<React.Fragment>
       <CssBaseline />

@@ -4,12 +4,11 @@ class HitWindows {
         
     }
 
-    SetDifficulty(overallDifficulty) {
+    SetDifficulty(overallDifficulty: number) {
         //abstract method
     }
 
-    WindowFor(result) {
-
+    WindowFor(result: any) {
     }
 }
 

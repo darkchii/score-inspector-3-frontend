@@ -1,11 +1,10 @@
-import { Box, CircularProgress } from "@mui/material"
+import { Box } from "@mui/material"
 import { Route, Routes, useSearchParams } from "react-router";
 import { useAuth } from "./providers/AuthProvider";
-import React, { useEffect, useState, lazy } from "react";
+import React, { useEffect, useState, lazy, JSX } from "react";
 import { ToastContainer } from "react-toastify";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-
 import RouteIndex from "./routes/RouteIndex";
 import RouteProfile from "./routes/RouteProfile";
 import Route404 from "./routes/Route404";
@@ -14,14 +13,15 @@ import RouteCompletionists from "./routes/RouteCompletionists";
 import RouteLeaderboards from "./routes/RouteLeaderboards";
 import RoutePeople from "./routes/RoutePeople";
 import RouteTools from "./routes/RouteTools";
+import type { IRouteObject } from "./types/types";
 
 declare const window: any; //ts fix
 function App() {
-  const [title, setTitle] = useState(null);
+  const [title, setTitle] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const { login } = useAuth();
 
-  window.onTitleChange = (title) => {
+  window.onTitleChange = (title: string) => {
     setTitle(title);
   }
 
@@ -36,7 +36,7 @@ function App() {
     { path: "/leaderboards/:ruleset?/:statistic?/page?/:page?/country?/:country?", element: <RouteLeaderboards /> },
   ];
 
-  const getRoute = (obj, is_child = false) => {
+  const getRoute = (obj: IRouteObject, is_child = false) => {
     return <>
       {
         is_child && <Route

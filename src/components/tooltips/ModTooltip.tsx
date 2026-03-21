@@ -3,6 +3,7 @@ import type { TooltipProps } from "@mui/material";
 import { isValidElement } from "react";
 import { GetModSettingForDisplay } from "../../util/ModHelper";
 import ModDisplay from "../ModDisplay";
+import { IDatabasedMod, IScoreMod } from "../../types/types";
 
 type ModSettingDefinition = {
     Name: string;
@@ -20,7 +21,11 @@ const LocalStyledTooltip = styled(({ className, ...props }: TooltipProps) => (
     },
 });
 
-function ModTooltipContent({ mod, data, ruleset }) {
+function ModTooltipContent({ mod, data, ruleset }: {
+    mod: IScoreMod | null;
+    data: IDatabasedMod;
+    ruleset: any;
+}) {
     const theme = useTheme();
 
     if(!mod) return null;
@@ -62,7 +67,7 @@ function ModTooltipContent({ mod, data, ruleset }) {
                                     <TableBody>
                                         {
                                             Object.entries(data.Settings as Record<string, ModSettingDefinition>).map(([settingKey, settingValue]) => {
-                                                if (mod.settings[settingValue.Name] === undefined || mod.settings[settingValue.Name] === null) return null;
+                                                if (mod.settings?.[settingValue.Name] === undefined || mod.settings?.[settingValue.Name] === null) return null;
                                                 return (
                                                     <TableRow key={settingKey} sx={{ mb: 1 }}>
                                                         <TableCell>
@@ -87,7 +92,7 @@ function ModTooltipContent({ mod, data, ruleset }) {
                 {
                     data.IncompatibleMods.length === 0
                         ? <Typography>None</Typography>
-                        : <ModDisplay ruleset={ruleset} mods={data.IncompatibleMods.map(acronym => ({ acronym }))} />
+                        : <ModDisplay ruleset={ruleset} mods={data.IncompatibleMods.map(acronym => ({ acronym, settings: null }))} />
                 }
             </Box>
         </Box>
@@ -96,8 +101,8 @@ function ModTooltipContent({ mod, data, ruleset }) {
 
 type ModTooltipProps = {
     children: React.ReactNode;
-    mod: any;
-    data: any;
+    mod: IScoreMod | null;
+    data: IDatabasedMod;
     ruleset: any;
     disabled?: boolean;
 };

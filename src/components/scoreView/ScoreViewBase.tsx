@@ -14,11 +14,12 @@ import NumberFlow from '@number-flow/react';
 import React from 'react';
 import { Link } from "react-router";
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import type { IScore } from '../../types/types';
 
-function ScoreViewBase({ score, noBackground = false, compact = false }) {
+function ScoreViewBase({ score, noBackground = false, compact = false }: { score: IScore | null; noBackground?: boolean; compact?: boolean }) {
     const theme = useTheme();
 
-    if (!score.beatmap || !score.user) {
+    if (!score?.beatmap || !score?.user) {
         return (
             <div className={scoreViewStyles['score-view__base']}>
                 <div className={scoreViewStyles['score-view__base__user-data']}>
@@ -59,7 +60,7 @@ function ScoreViewBase({ score, noBackground = false, compact = false }) {
                         <span>{<NumberFlow value={score.total_score} />}</span>
                     </div>
                     <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__subscore']}`}>
-                        <span>{<NumberFlow value={score.implied_total_score} />}</span>
+                        <span>{<NumberFlow value={score.implied_total_score ?? 0} />}</span>
                     </div>
                     {/* row flex */}
                     <div className={scoreInfoStyles['score-info']} style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>

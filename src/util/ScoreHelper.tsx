@@ -7,7 +7,7 @@ import type { IBeatmap, IScore } from "../types/types";
 
 //Helper functions for score data
 export function GetStarRating(score: IScore): number | null {
-    if (!score.diff_missing) {
+    if (!score.diff_missing && score.attr_diff && score.attr_diff.star_rating) {
         return score.attr_diff.star_rating;
     }
 
@@ -165,9 +165,9 @@ export const DetermineIsScoreFC = (score: IScore): boolean => {
     return score.combo >= (score.attr_diff?.max_combo || score.beatmap?.max_combo || 0);
 }
 
-const _localScoreCache = new Map<number, IScore>();
+const _localScoreCache = new Map<number, Score>();
 //Only for singular score fetching like /score/:scoreId
-export const GetScoreFromId = async (scoreId: number): Promise<IScore | null> => {
+export const GetScoreFromId = async (scoreId: number): Promise<Score | null | undefined> => {
     if (_localScoreCache.has(scoreId)) {
         return _localScoreCache.get(scoreId);
     }
@@ -194,7 +194,9 @@ export const GetScoreFromId = async (scoreId: number): Promise<IScore | null> =>
         }
 
         const result = new Score(score, beatmap, user);
-        result.beatmap.attr_diff = new ScoreDifficulty(difficulty_nomod);
+        if(result.beatmap){
+            result.beatmap.attr_diff = new ScoreDifficulty(difficulty_nomod);
+        }
         _localScoreCache.set(scoreId, result);
         return result;
     } catch (error) {

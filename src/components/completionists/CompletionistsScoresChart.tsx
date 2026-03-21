@@ -2,7 +2,7 @@ import { Grid, Paper } from "@mui/material";
 import { Line } from "react-chartjs-2";
 import { FormatNumber, GetRulesetColor, GetRulesetNameFromId, GetRulesetPrettyNameFromId } from "../../util/Helper";
 
-function CompletionistsScoresChart({ data }) {
+function CompletionistsScoresChart({ data }: { data: any }) {
     return (
         <Grid size={{ xs: 12, md: 6 }}>
             <Paper elevation={3} sx={{ padding: 1 }}>
@@ -10,9 +10,9 @@ function CompletionistsScoresChart({ data }) {
                     <Line
                         data={{
                             datasets: [
-                                ...Object.keys(data).map(mode => ({
+                                ...Object.keys(data).map((mode: string) => ({
                                     label: GetRulesetPrettyNameFromId(mode),
-                                    data: data[mode].map(item => ({
+                                    data: data[mode].map((item: any) => ({
                                         x: new Date(item.completion_date).getTime(),
                                         y: item.scores,
                                         data: item,

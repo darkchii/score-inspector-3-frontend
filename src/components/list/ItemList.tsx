@@ -53,10 +53,10 @@ const ItemList = memo(function ItemList<TItem extends object>({
 
     // Debounced resize handler
     useEffect(() => {
-        let timeoutId;
+        let timeoutId: number;
         function handleResize() {
             clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
+            timeoutId = window.setTimeout(() => {
                 const newDimensions = getWindowDimensions();
                 setWindowDimensions(newDimensions);
             }, 150); // Debounce by 150ms

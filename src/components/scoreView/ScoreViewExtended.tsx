@@ -2,6 +2,7 @@ import { useState } from 'react';
 import scoreViewStyles from '../../styles/score-view.module.less';
 import { Collapse, Fade } from '@mui/material';
 import ScoreViewOtherScores from './ScoreViewOtherScores';
+import { IScore } from '../../types/types';
 
 const VIEWS = [
     {
@@ -12,7 +13,7 @@ const VIEWS = [
 ]
 
 //Holds the extra data for a score (extra PP breakdown, replay info, etc)
-function ScoreViewExtended({ score }) {
+function ScoreViewExtended({ score }: { score: IScore }) {
     const [activeView, setActiveView] = useState('other-scores');
 
     return (

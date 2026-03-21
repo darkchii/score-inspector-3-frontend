@@ -1,6 +1,6 @@
 //Static class
 class BeatmapDifficultyInfo {
-    static DifficultyRange(difficulty: number, range = null) {
+    static DifficultyRange(difficulty: number, range: number[] | null = null) : number {
         if(!range) {
             return (difficulty - 5) / 5;
         }

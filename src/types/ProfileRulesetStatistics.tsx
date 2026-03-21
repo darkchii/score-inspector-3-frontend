@@ -7,19 +7,19 @@ const PERIODIC_SUFFIXES = ['daily', 'monthly', 'yearly'];
 const PERIODIC_SUFFIXES_CHARTS = ['monthly', 'yearly'];
 const LIMIT_CHART_SAMPLE_SIZE = 10000;
 
-const DATE_ISO_FORMAT_SLICES = {
+const DATE_ISO_FORMAT_SLICES: { [key: string]: number } = {
     'daily': 10,
     'monthly': 7,
     'yearly': 4,
 }
 
-const DATE_ISO_FORMAT_STR = {
+const DATE_ISO_FORMAT_STR: { [key: string]: string } = {
     'daily': "YYYY-MM-DD",
     'monthly': "YYYY-MM",
     'yearly': "YYYY",
 }
 
-const getUTCDateString = (date, interval) => {
+const getUTCDateString = (date: Date, interval: string) => {
     if (!DATE_ISO_FORMAT_SLICES[interval]) {
         throw new Error(`Invalid interval for date string: ${interval}`);
     }
@@ -27,15 +27,15 @@ const getUTCDateString = (date, interval) => {
 }
 
 // Optimized helper to calculate statistics in a single pass
-const calculateStatsInSinglePass = (scores, extractValue, filterFn = null) => {
+const calculateStatsInSinglePass = (scores: IScore[], extractValue: (score: IScore) => number | null, filterFn: ((score: IScore) => boolean) | null = null) => {
     if (!scores || scores.length === 0) {
         return { max: 0, filteredMax: 0, values: [], filteredValues: [] };
     }
 
     let max = -Infinity;
     let filteredMax = -Infinity;
-    const values = [];
-    const filteredValues = [];
+    const values: number[] = [];
+    const filteredValues: number[] = [];
 
     for (const score of scores) {
         const value = extractValue(score);
@@ -59,7 +59,7 @@ const calculateStatsInSinglePass = (scores, extractValue, filterFn = null) => {
 }
 
 // Calculate median from sorted array
-const getMedian = (sortedArray) => {
+const getMedian = (sortedArray: number[]): number => {
     if (sortedArray.length === 0) return 0;
     const mid = Math.floor(sortedArray.length / 2);
     if (sortedArray.length % 2 === 0) {
@@ -318,7 +318,7 @@ export class ProfileRulesetStatistics implements IProfileRulesetStatistics {
             this.scores_set_by_score.addScore(score);
         }
 
-        this.implied_playtime_seconds += score.duration;
+        this.implied_playtime_seconds += score.duration || 0;
     }
 
     calculate() {
@@ -392,7 +392,7 @@ export class ProfileRulesetStatistics implements IProfileRulesetStatistics {
         //stores only raw number data, so no ProfileRulesetScoreSet (it's too heavy)
 
         //ordered by date string (use Date objects to actually sort it)
-        let ordered_dates = {};
+        let ordered_dates: { [key: string]: any[] } = {};
         for (const interval of PERIODIC_SUFFIXES_CHARTS) {
             ordered_dates[interval] = Object.keys(this.periodic[interval]).sort().map(date_string => {
                 return {
@@ -422,7 +422,7 @@ export class ProfileRulesetStatistics implements IProfileRulesetStatistics {
                 let _incremental_lazer_score_ss = 0;
                 let _incremental_pp = 0;
                 let _incremental_length_seconds = 0;
-                let _incremental_grades = {
+                let _incremental_grades: { [key: string]: number } = {
                     'XH': 0,
                     'X': 0,
                     'SH': 0,
@@ -513,7 +513,7 @@ export class ProfileRulesetStatistics implements IProfileRulesetStatistics {
                 let _cumulative_lazer_score_ss = 0;
                 let _cumulative_pp = 0;
                 let _cumulative_length_seconds = 0;
-                let _cumulative_grades = { 'XH': 0, 'X': 0, 'SH': 0, 'S': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0 }
+                let _cumulative_grades: { [key: string]: number } = { 'XH': 0, 'X': 0, 'SH': 0, 'S': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0 };
 
                 for (const score of _cumulative_scores) {
                     if (!score.beatmap) {
@@ -564,13 +564,13 @@ export class ProfileRulesetStatistics implements IProfileRulesetStatistics {
                 this.periodic_graph_data[interval].average[entry.date_string] = {
                     clears: 0, //incompatible
                     scores: 0, //incompatible
-                    implied_score: this.periodic_graph_data[interval].incremental[entry.date_string].implied_score / (entry.set?.length || 1),
-                    implied_score_ss: this.periodic_graph_data[interval].incremental[entry.date_string].implied_score_ss / (entry.set?.length || 1),
-                    lazer_score: this.periodic_graph_data[interval].incremental[entry.date_string].lazer_score / (entry.set?.length || 1),
-                    lazer_score_ss: this.periodic_graph_data[interval].incremental[entry.date_string].lazer_score_ss / (entry.set?.length || 1),
-                    pp: this.periodic_graph_data[interval].incremental[entry.date_string].pp / (entry.set?.length || 1),
+                    implied_score: (this.periodic_graph_data[interval].incremental[entry.date_string].implied_score || 0) / (entry.set?.length || 1),
+                    implied_score_ss: (this.periodic_graph_data[interval].incremental[entry.date_string].implied_score_ss || 0) / (entry.set?.length || 1),
+                    lazer_score: (this.periodic_graph_data[interval].incremental[entry.date_string].lazer_score || 0) / (entry.set?.length || 1),
+                    lazer_score_ss: (this.periodic_graph_data[interval].incremental[entry.date_string].lazer_score_ss || 0) / (entry.set?.length || 1),
+                    pp: (this.periodic_graph_data[interval].incremental[entry.date_string].pp || 0) / (entry.set?.length || 1),
                     raw_pp: 0, //incompatible
-                    length_seconds: entry.set?.length > 0 ? (entry.set?.reduce((acc, score) => acc + (score.duration || 0), 0) || 0) / entry.set?.length : 0,
+                    length_seconds: entry.set?.length > 0 ? (entry.set?.reduce((acc: number, score: IScore) => acc + (score.duration || 0), 0) || 0) / entry.set?.length : 0,
                     grades_xh: 0, //incompatible
                     grades_x: 0, //incompatible
                     grades_sh: 0, //incompatible
@@ -650,7 +650,7 @@ export class ProfileRulesetStatistics implements IProfileRulesetStatistics {
 
         console.log(`Calculating periodic data sets for interval: ${interval} for ruleset ${this.ruleset}`);
 
-        let _set_data = {};
+        let _set_data: Record<string, IScore[]> = {};
 
         if (sorted_scores.length === 0) {
             return _set_data;
@@ -658,7 +658,7 @@ export class ProfileRulesetStatistics implements IProfileRulesetStatistics {
 
         for (const score of sorted_scores) {
             // const date_string = getUTCDateString(score.ended_at, interval);
-            const date_string = score.ended_at_str[DATE_ISO_FORMAT_STR[interval]];
+            const date_string: string = score.ended_at_str[DATE_ISO_FORMAT_STR[interval] as keyof typeof score.ended_at_str];
 
             if (!_set_data[date_string]) {
                 _set_data[date_string] = [];
@@ -666,9 +666,12 @@ export class ProfileRulesetStatistics implements IProfileRulesetStatistics {
 
             _set_data[date_string].push(score);
         }
+        
+        const firstScore = sorted_scores[0];
+        const lastScore = sorted_scores[sorted_scores.length - 1];
 
-        const firstDate = new Date(Date.UTC(sorted_scores[0].ended_at.getUTCFullYear(), sorted_scores[0].ended_at.getUTCMonth(), interval === 'daily' ? sorted_scores[0].ended_at.getUTCDate() : 1));
-        const lastDate = sorted_scores[sorted_scores.length - 1].ended_at_str[DATE_ISO_FORMAT_STR[interval]];
+        const firstDate = new Date(Date.UTC(firstScore.ended_at.getUTCFullYear(), firstScore.ended_at.getUTCMonth(), interval === 'daily' ? firstScore.ended_at.getUTCDate() : 1));
+        const lastDate = lastScore.ended_at_str[DATE_ISO_FORMAT_STR[interval] as keyof typeof lastScore.ended_at_str];
 
         //the above has small chance of infinite loop if date manipulation fails for some reason, we need to calculate steps needed and loop on that
         let steps = 0;
@@ -710,7 +713,7 @@ export class ProfileRulesetStatistics implements IProfileRulesetStatistics {
 
     calculateCompletionStatistics() {
         //temporary map of beatmap_id = [...scores]
-        const beatmapScoreMap = {};
+        const beatmapScoreMap: Record<number, IScore[]> = {};
 
         for (const score of this.scores_set.scores) {
             if (!beatmapScoreMap[score.beatmap_id]) {
@@ -760,7 +763,7 @@ export class ProfileRulesetStatistics implements IProfileRulesetStatistics {
         ['cs', 'ar', 'od', 'hp'].forEach(statType => {
             this.completion_statistics[statType] = {};
             for (const beatmap of this.beatmaps) {
-                const statValue = Math.floor(beatmap[statType]);
+                const statValue = Math.floor(beatmap[statType as keyof IBeatmap]);
 
                 if (!this.completion_statistics[statType][statValue]) {
                     this.completion_statistics[statType][statValue] = {
@@ -830,7 +833,7 @@ export class ProfileRulesetStatistics implements IProfileRulesetStatistics {
 
     calculateAccuracyDifficultyScatterChart(limit: number = LIMIT_CHART_SAMPLE_SIZE) {
         const data = [];
-        let scores_sorted = this.scores_set.scores.slice().sort((a, b) => b.implied_total_score - a.implied_total_score);
+        let scores_sorted = this.scores_set.scores.slice().sort((a, b) => (b.implied_total_score ?? 0) - (a.implied_total_score ?? 0));
 
         let i = 0;
         for (const score of scores_sorted) {
@@ -890,7 +893,7 @@ export class ProfileRulesetStatistics implements IProfileRulesetStatistics {
         let scores_sorted = this.scores_set_by_score.scores.slice().sort((a, b) => {
             const scoreA = (a.ruleset_id === 3) ? a.total_score : a.implied_total_score;
             const scoreB = (b.ruleset_id === 3) ? b.total_score : b.implied_total_score;
-            return scoreA - scoreB;
+            return (scoreA ?? 0) - (scoreB ?? 0);
         }).reverse();
 
         let i = 0;

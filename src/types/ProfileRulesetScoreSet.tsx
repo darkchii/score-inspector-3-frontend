@@ -105,7 +105,7 @@ export class ProfileRulesetScoreSet implements IProfileRulesetScoreSet {
             }
         }
 
-        if (this.highlighted_scores['top_score'] === null || score.implied_total_score > this.highlighted_scores['top_score'].implied_total_score) {
+        if (this.highlighted_scores['top_score'] === null ||(score.implied_total_score ?? 0) > (this.highlighted_scores['top_score'].implied_total_score ?? 0)) {
             this.highlighted_scores['top_score'] = score;
         }
 
@@ -121,7 +121,7 @@ export class ProfileRulesetScoreSet implements IProfileRulesetScoreSet {
             }
         }
 
-        if (this.highlighted_scores['oldest'] === null || score.ended_at < this.highlighted_scores['oldest'].ended_at) {
+        if (this.highlighted_scores['oldest'] === null || (score.ended_at ?? new Date()) < (this.highlighted_scores['oldest'].ended_at ?? new Date())) {
             this.highlighted_scores['oldest'] = score;
         }
 
@@ -131,11 +131,11 @@ export class ProfileRulesetScoreSet implements IProfileRulesetScoreSet {
         const grade = score.grade;
         this.grades[grade] = (this.grades[grade] || 0) + 1;
 
-        this.implied_total_score += score.implied_total_score;
-        this.score += score.total_score;
+        this.implied_total_score += score.implied_total_score ?? 0;
+        this.score += score.total_score ?? 0;
 
-        this.implied_total_score_ss += score.is_ss ? score.implied_total_score : 0;
-        this.score_ss += score.is_ss ? score.total_score : 0;
+        this.implied_total_score_ss += score.is_ss ? (score.implied_total_score ?? 0) : 0;
+        this.score_ss += score.is_ss ? (score.total_score ?? 0) : 0;
 
         if (score.diff_missing) {
             this.missing_difficulty += 1;

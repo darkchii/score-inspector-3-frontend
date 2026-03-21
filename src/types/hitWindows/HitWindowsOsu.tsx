@@ -2,23 +2,23 @@ import BeatmapDifficultyInfo from "../BeatmapDifficultyInfo";
 import type { IHitWindowsOsu } from "../types";
 import HitWindows from "./HitWindows";
 
-const GREAT_WINDOW_RANGE = [80, 50, 20];
-const OK_WINDOW_RANGE = [140, 100, 60];
-const MEH_WINDOW_RANGE = [200, 150, 100];
+const GREAT_WINDOW_RANGE: number[] = [80, 50, 20];
+const OK_WINDOW_RANGE: number[] = [140, 100, 60];
+const MEH_WINDOW_RANGE: number[] = [200, 150, 100];
 
-const MISS_WINDOW = 400;
+const MISS_WINDOW: number = 400;
 
 class HitWindowsOsu extends HitWindows implements IHitWindowsOsu {
-    great: number | null;
-    ok: number | null;
-    meh: number | null;
+    great: number;
+    ok: number;
+    meh: number;
 
     constructor() {
         super();
 
-        this.great = null;
-        this.ok = null;
-        this.meh = null;
+        this.great = 0;
+        this.ok = 0;
+        this.meh = 0;
     }
 
     SetDifficulty(overallDifficulty: number) {
@@ -27,7 +27,7 @@ class HitWindowsOsu extends HitWindows implements IHitWindowsOsu {
         this.meh = Math.floor(BeatmapDifficultyInfo.DifficultyRange(overallDifficulty, MEH_WINDOW_RANGE)) - 0.5;
     }
 
-    WindowFor(result: 'great' | 'ok' | 'meh' | 'miss') {
+    WindowFor(result: 'great' | 'ok' | 'meh' | 'miss') : number {
         switch(result) {
             case 'great':
                 return this.great;
@@ -38,7 +38,7 @@ class HitWindowsOsu extends HitWindows implements IHitWindowsOsu {
             case 'miss':
                 return MISS_WINDOW;
             default:
-                return null;
+                return 0;
         }
     }
 }

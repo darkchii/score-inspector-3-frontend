@@ -6,16 +6,19 @@ import BetterTooltip from "./tooltips/BetterTooltip";
 import { useNavigate } from "react-router";
 import { GetIconFromLabel } from "../util/Helper";
 
-function PlayerCard({ data, onClick = null }) {
+function PlayerCard({ data, onClick = null }: {
+    data: any,
+    onClick?: ((user: any) => void) | null
+}) {
     const theme = useTheme();
     const navigate = useNavigate();
-    const [username, setUsername] = useState(null);
-    const [apiUser, setApiUser] = useState(null);
-    const [osuAltUser, setOsuAltUser] = useState(null);
-    const [id, setId] = useState(null);
-    const [team, setTeam] = useState(null);
-    const [roles, setRoles] = useState(null);
-    const [isValid, setIsValid] = useState(true);
+    const [username, setUsername] = useState<string | null>(null);
+    const [apiUser, setApiUser] = useState<any | null>(null);
+    const [osuAltUser, setOsuAltUser] = useState<any | null>(null);
+    const [id, setId] = useState<number | null>(null);
+    const [team, setTeam] = useState<any | null>(null);
+    const [roles, setRoles] = useState<any[] | null>(null);
+    const [isValid, setIsValid] = useState<boolean>(true);
 
     useEffect(() => {
         //we can received different data structures, so we need to look in several places
@@ -95,17 +98,17 @@ function PlayerCard({ data, onClick = null }) {
                         {/* country flag img */}
                         <div className={playerCardStyles['player-card__flag']}>
                             <BetterTooltip title={apiUser?.country?.name || 'Unknown Country'}>
-                                <img src={getFlagIcon(apiUser?.country_code)} alt={apiUser?.country_code} />
+                                <img src={getFlagIcon(apiUser?.country_code) || ''} alt={apiUser?.country_code} />
                             </BetterTooltip>
                         </div>
                         {
                             team ?
                                 <span
                                     className={playerCardStyles['player-card__team-tag']}
-                                    style={{ backgroundColor: team.color || '#888', borderRadius: theme.shape.borderRadius }}
+                                    style={{ backgroundColor: team?.color || '#888', borderRadius: theme.shape.borderRadius }}
                                 >
-                                    <BetterTooltip title={team.name || 'Team'}>
-                                        {team.short_name || 'TEAM'}
+                                    <BetterTooltip title={team?.name || 'Team'}>
+                                        {team?.short_name || 'TEAM'}
                                     </BetterTooltip>
                                 </span>
                                 :
@@ -125,7 +128,7 @@ function PlayerCard({ data, onClick = null }) {
                     <div className={playerCardStyles['player-card__roles']}>
                         {
                             roles ?
-                                roles.map((role, index) => {
+                                roles.map((role: any, index: number) => {
                                     if (!role.is_visible) return null;
                                     return (
                                         <span

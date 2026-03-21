@@ -6,7 +6,7 @@ import { Line } from "react-chartjs-2";
 import { GetGradeColor } from "../../util/Helper";
 import BetterTooltip from "../tooltips/BetterTooltip";
 
-const CHART_TYPES = {
+const CHART_TYPES: { [key: string]: { label: string, value: number }[] } = {
     'hours': [
         { label: '24 Hours', value: 24 },
         { label: '48 Hours', value: 24 * 2 },
@@ -38,7 +38,7 @@ const CHART_TYPES = {
     ],
 }
 
-const PERIOD_TIME_FORMATS = {
+const PERIOD_TIME_FORMATS: { [key: string]: string } = {
     'hours': 'MMM D, YYYY, hA',
     'days': 'MMM D, YYYY',
     'months': 'MMM YYYY',
@@ -51,17 +51,22 @@ const STAT_TYPES = [
     { label: 'Total Score', value: 'total_score_sum' },
 ]
 
-function IndexScoreSubmissions({ activeRuleset, setActiveRuleset, isWorking, setIsWorking }) {
+function IndexScoreSubmissions({ activeRuleset, setActiveRuleset, isWorking, setIsWorking }: {
+    activeRuleset: string;
+    setActiveRuleset: (ruleset: string) => void;
+    isWorking: boolean;
+    setIsWorking: (working: boolean) => void;
+}) {
     const theme = useTheme();
     const { getScoreSubmissions } = useApi();
-    const [rawData, setRawData] = useState(null);
-    const [lastUpdated, setLastUpdated] = useState(null);
+    const [rawData, setRawData] = useState<any | null>(null);
+    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<any | null>(null);
 
     const [isTransitioningDataSet, setIsTransitioningDataSet] = useState(false);
 
-    const [selectedDataSet, setSelectedDataSet] = useState(null);
+    const [selectedDataSet, setSelectedDataSet] = useState<any | null>(null);
 
     const [selectedPeriodType, setSelectedPeriodType] = useState('months');
     const [selectedPeriodValue, setSelectedPeriodValue] = useState(-1);
@@ -87,7 +92,7 @@ function IndexScoreSubmissions({ activeRuleset, setActiveRuleset, isWorking, set
         }
     }
 
-    const createCumulativeData = (data) => {
+    const createCumulativeData = (data: any[]) => {
         //add up every field except for period. if it's an array, add up every value in the array, if it's an object, add up every value in the object
         //assume data is already ordered ascending, so we just manipulate the existing data
         data.forEach((entry, index) => {
@@ -125,9 +130,9 @@ function IndexScoreSubmissions({ activeRuleset, setActiveRuleset, isWorking, set
 
         const data = JSON.parse(JSON.stringify(rawData.data[selectedPeriodType]));
         //convert .period to date objects
-        let convertedData = [];
+        let convertedData: { period: Date, [key: string]: any }[] = [];
         //data is also an array
-        data.forEach((entry) => {
+        data.forEach((entry: { period: string, [key: string]: any }) => {
             convertedData.push({
                 ...entry,
                 period: new Date(entry.period),
@@ -135,14 +140,14 @@ function IndexScoreSubmissions({ activeRuleset, setActiveRuleset, isWorking, set
         })
 
         //order by period ascending
-        convertedData.sort((a, b) => a.period - b.period);
+        convertedData.sort((a, b) => a.period.getTime() - b.period.getTime());
 
         if (isCumulative && (cumulativeIncludingOutOfRange)) {
             convertedData = createCumulativeData(convertedData);
         }
 
         //order by period descending
-        convertedData.sort((a, b) => b.period - a.period);
+        convertedData.sort((a, b) => b.period.getTime() - a.period.getTime());
 
         //if value is not -1, filter to the last X hours/days/months/years
         let _data = convertedData;
@@ -167,9 +172,9 @@ function IndexScoreSubmissions({ activeRuleset, setActiveRuleset, isWorking, set
 
         if (isCumulative && !cumulativeIncludingOutOfRange) {
             //first order by period ascending, then create cumulative data, then order by period descending again
-            _data.sort((a, b) => a.period - b.period);
+            _data.sort((a, b) => a.period.getTime() - b.period.getTime());
             _data = createCumulativeData(_data);
-            _data.sort((a, b) => b.period - a.period);
+            _data.sort((a, b) => b.period.getTime() - a.period.getTime());
         }
 
         //if not array

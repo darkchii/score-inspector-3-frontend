@@ -4,12 +4,21 @@ import { useProfile } from "../../../../providers/ProfileProvider";
 import { Line } from "react-chartjs-2";
 import { FormatNumber, FormatNumberWithPrecision, GetGradeColor } from "../../../../util/Helper";
 
-const INCR_CUMUL_CHART_TYPES: any = {
+interface ChartType {
+    name: string;
+    labels: string[];
+    keys: string[];
+    formatter?: (value: number) => string;
+    invalid_aggregations?: string[];
+    colors?: string[] | ((index: number) => string);
+}
+
+const INCR_CUMUL_CHART_TYPES: { [key: string]: ChartType } = {
     'scores': {
         name: 'scores',
         labels: ['Scores', 'Clears'],
         keys: ['scores', 'clears'],
-        formatter: (value) => FormatNumber(value),
+        formatter: (value: number) => FormatNumber(value),
         invalid_aggregations: ['average', 'highest', 'median'],
         colors: ['#3f51b5', '#ff4081'],
     },
@@ -17,14 +26,14 @@ const INCR_CUMUL_CHART_TYPES: any = {
         name: 'score',
         labels: ['Score', 'SS Score'],
         keys: ['implied_score', 'implied_score_ss'],
-        formatter: (value) => FormatNumber(value),
+        formatter: (value: number) => FormatNumber(value),
         colors: ['#3f51b5', '#ff4081'],
     },
     'lazer_score': {
         name: 'lazer_score',
         labels: ['Lazer Score', 'Lazer SS Score'],
         keys: ['lazer_score', 'lazer_score_ss'],
-        formatter: (value) => FormatNumber(value),
+        formatter: (value: number) => FormatNumber(value),
         colors: ['#3f51b5', '#ff4081'],
     },
     'grades': {
@@ -32,8 +41,8 @@ const INCR_CUMUL_CHART_TYPES: any = {
         labels: ['XH', 'X', 'SH', 'S', 'A', 'B', 'C', 'D'],
         keys: ['grades_xh', 'grades_x', 'grades_sh', 'grades_s', 'grades_a', 'grades_b', 'grades_c', 'grades_d'],
         invalid_aggregations: ['average', 'highest', 'median'],
-        formatter: (value) => FormatNumber(value),
-        colors: (index) => {
+        formatter: (value: number) => FormatNumber(value),
+        colors: (index: number) => {
             //get the Label, then use GetGradeColor to get color
             const gradeLabels = ['XH', 'X', 'SH', 'S', 'A', 'B', 'C', 'D'];
             return GetGradeColor(gradeLabels[index]);
@@ -43,13 +52,13 @@ const INCR_CUMUL_CHART_TYPES: any = {
         name: 'pp',
         labels: ['PP'],
         keys: ['pp'],
-        formatter: (value) => FormatNumberWithPrecision(value, 2) + 'pp',
+        formatter: (value: number) => FormatNumberWithPrecision(value, 2) + 'pp',
     },
     'length': {
         name: 'length',
         labels: ['Length'],
         keys: ['length_seconds'],
-        formatter: (value) => {
+        formatter: (value: number) => {
             //value is in seconds
             const hours = Math.floor(value / 3600);
             const minutes = Math.floor((value % 3600) / 60);
@@ -65,7 +74,7 @@ function ProfileChartPeriodic() {
 
     const [activeChartType, setActiveChartType] = useState('scores');
     const [activeInterval, setActiveInterval] = useState('monthly');
-    const [activeAggregation, setActiveAggregation] = useState('cumulative');
+    const [activeAggregation, setActiveAggregation] = useState<'cumulative' | 'incremental'>('cumulative');
     const [activeScaleType, setActiveScaleType] = useState<'linear' | 'logarithmic'>('linear');
 
     const [existingAggregations, setExistingAggregations] = useState(['cumulative', 'incremental']);
@@ -98,7 +107,7 @@ function ProfileChartPeriodic() {
                 labels: Object.keys(graphData),
                 datasets: INCR_CUMUL_CHART_TYPES[activeChartType].keys.map((key, index) => ({
                     label: INCR_CUMUL_CHART_TYPES[activeChartType].labels[index],
-                    data: Object.values(graphData).map(item => item[key] === 0 ? 0.000001 : item[key]), //to avoid log(0) issues, replace 0 with a very small number
+                    data: Object.values(graphData).map((item: any) => item[key] === 0 ? 0.000001 : item[key]), //to avoid log(0) issues, replace 0 with a very small number
                     fill: false,
                     tension: 0.1,
                     pointRadius: 1,
@@ -146,7 +155,7 @@ function ProfileChartPeriodic() {
                                         },
                                         ticks: {
                                             callback: function (value) {
-                                                return INCR_CUMUL_CHART_TYPES[activeChartType].formatter ? INCR_CUMUL_CHART_TYPES[activeChartType].formatter(value) : value;
+                                                return INCR_CUMUL_CHART_TYPES[activeChartType].formatter ? INCR_CUMUL_CHART_TYPES[activeChartType].formatter(value as number) : value;
                                             }
                                         },
                                         type: activeScaleType
@@ -156,7 +165,7 @@ function ProfileChartPeriodic() {
                                     tooltip: {
                                         callbacks: {
                                             label: function (context) {
-                                                return `${context.dataset.label}: ${INCR_CUMUL_CHART_TYPES[activeChartType].formatter ? INCR_CUMUL_CHART_TYPES[activeChartType].formatter(context.parsed.y) : context.parsed.y}`;
+                                                return `${context.dataset.label}: ${INCR_CUMUL_CHART_TYPES[activeChartType].formatter ? INCR_CUMUL_CHART_TYPES[activeChartType].formatter(context.parsed.y as number) : context.parsed.y}`;
                                             }
                                         }
                                     }
@@ -168,7 +177,7 @@ function ProfileChartPeriodic() {
             }
             <ButtonGroup variant="outlined" size="small">
                 {
-                    Object.values(INCR_CUMUL_CHART_TYPES).map((chartType: any) => (
+                    Object.values(INCR_CUMUL_CHART_TYPES).map((chartType: ChartType) => (
                         <Button
                             key={chartType.name}
                             variant={activeChartType === chartType.name ? 'contained' : 'outlined'}
@@ -176,8 +185,8 @@ function ProfileChartPeriodic() {
                                 setActiveChartType(chartType.name);
                                 if (chartType.invalid_aggregations && chartType.invalid_aggregations.includes(activeAggregation)) {
                                     //switch to first valid aggregation
-                                    const firstValidAggregation = existingAggregations.find(agg => !chartType.invalid_aggregations.includes(agg));
-                                    setActiveAggregation(firstValidAggregation);
+                                    const firstValidAggregation = existingAggregations.find(agg => !chartType.invalid_aggregations?.includes(agg));
+                                    setActiveAggregation(firstValidAggregation as 'cumulative' | 'incremental');
                                 }
                             }}
                         >
@@ -190,10 +199,10 @@ function ProfileChartPeriodic() {
                 {
                     existingAggregations.map(aggregation => (
                         <Button
-                            key={aggregation}
+                            key={`aggregation-${aggregation}`}
                             variant={activeAggregation === aggregation ? 'contained' : 'outlined'}
                             onClick={() => {
-                                setActiveAggregation(aggregation);
+                                setActiveAggregation(aggregation as 'cumulative' | 'incremental');
                             }}
                             disabled={INCR_CUMUL_CHART_TYPES[activeChartType].invalid_aggregations && INCR_CUMUL_CHART_TYPES[activeChartType].invalid_aggregations.includes(aggregation)}
                         >
@@ -219,12 +228,12 @@ function ProfileChartPeriodic() {
             </ButtonGroup>
             <ButtonGroup variant="outlined" size="small" sx={{ mt: 1 }}>
                 {
-                    ['linear', 'logarithmic'].map((scaleType: 'linear' | 'logarithmic') => (
+                    ['linear', 'logarithmic'].map((scaleType: string) => (
                         <Button
-                            key={scaleType}
+                            key={`scale-${scaleType}`}
                             variant={activeScaleType === scaleType ? 'contained' : 'outlined'}
                             onClick={() => {
-                                setActiveScaleType(scaleType);
+                                setActiveScaleType(scaleType as 'linear' | 'logarithmic');
                             }}
                         >
                             {scaleType.charAt(0).toUpperCase() + scaleType.slice(1)}

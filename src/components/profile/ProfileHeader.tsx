@@ -91,7 +91,7 @@ function ProfileHeader() {
                                 </Box>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
                                     <img
-                                        src={getFlagIcon(userLive.osuApi.country_code)}
+                                        src={getFlagIcon(userLive.osuApi.country_code) || ''}
                                         alt={userLive.osuApi.country_code}
                                         height={24}
                                     />

@@ -81,7 +81,7 @@ function PlayerTooltip({ data, children }: PlayerTooltipProps) {
                         }}>
                             {/* country flag */}
                             <img
-                                src={getFlagIcon(data?.osuApi?.country_code)} alt={data?.osuApi?.country_code}
+                                src={getFlagIcon(data?.osuApi?.country_code) || ''} alt={data?.osuApi?.country_code}
                                 style={{
                                     height: 24,
                                     width: 'auto',

@@ -49,9 +49,9 @@ class SessionCollection implements ISessionCollection {
     }
 
     static fromScores(scores: IScore[]) {
-        scores.sort((a, b) => a.ended_at_seconds - b.ended_at_seconds);
+        scores.sort((a, b) => (a.ended_at_seconds ?? 0) - (b.ended_at_seconds ?? 0));
 
-        let activities = [];
+        let activities: Session[] = [];
         let currentActivity = new SessionCollectionActivity();
 
         scores.forEach((score, index) => {
@@ -65,7 +65,7 @@ class SessionCollection implements ISessionCollection {
                 if (score.started_at) {
                     currentActivity.start = score.started_at;
                 } else {
-                    currentActivity.start = new Date(score.ended_at.getTime() - score.duration * 1000);
+                    currentActivity.start = new Date((score.ended_at?.getTime() ?? 0) - ((score.duration ?? 0) * 1000));
                 }
             }
 
@@ -73,30 +73,30 @@ class SessionCollection implements ISessionCollection {
 
             if (index < scores.length - 1) {
                 const nextScore = scores[index + 1];
-                const nextScoreStart = nextScore.started_at ? nextScore.started_at : new Date(nextScore.ended_at.getTime() - nextScore.duration * 1000);
-                const diff = (nextScoreStart.getTime() - currentActivity.end.getTime()) / 1000;
+                const nextScoreStart = nextScore.started_at ? nextScore.started_at : new Date((nextScore.ended_at?.getTime() ?? 0) - ((nextScore.duration ?? 0) * 1000));
+                const diff = (nextScoreStart.getTime() - (currentActivity.end?.getTime() ?? 0)) / 1000;
 
                 if (diff >= SESSION_ACTIVITY_THRESHOLD) {
                     currentActivity.end = score.ended_at;
                     currentActivity.done = true;
                 } else if (diff >= SESSION_BREAK_THRESHOLD) {
                     currentActivity.breaks.push(new SessionBreak(
-                        score.ended_at,
+                        score.ended_at ?? new Date(),
                         nextScoreStart,
                         diff
                     ));
                 }
             } else if (index === scores.length - 1) {
-                currentActivity.end = score.ended_at;
+                currentActivity.end = score.ended_at ?? new Date();
                 currentActivity.done = true;
             }
 
             if (currentActivity.done) {
-                currentActivity.duration = (currentActivity.end.getTime() - currentActivity.start.getTime()) / 1000;
+                currentActivity.duration = ((currentActivity.end?.getTime() ?? 0) - (currentActivity.start?.getTime() ?? 0)) / 1000;
                 // activities.push(currentActivity);
                 activities.push(new Session(
                     currentActivity.start,
-                    currentActivity.end,
+                    currentActivity.end ?? new Date(),
                     currentActivity.scores,
                     currentActivity.breaks,
                     currentActivity.duration
@@ -108,6 +108,10 @@ class SessionCollection implements ISessionCollection {
         });
 
         return new SessionCollection(activities);
+    }
+
+    forEach(callback: (session: ISession, index: number) => void): void {
+        this.sessions.forEach(callback);
     }
 }
 

@@ -1,21 +1,23 @@
+import { AxiosProgressEvent } from "axios";
+
 export type ApiContextValue = {
-    getUserLive: (userId: string | number, progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
-    getScoresLive: (userId: string | number, progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
-    getBeatmapsLive: (compact?: boolean, progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
-    getBeatmapPacks: (progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
+    getUserLive: (userId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getScoresLive: (userId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getBeatmapsLive: (compact?: boolean, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getBeatmapPacks: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getCompletionists: () => Promise<any>;
-    getUserSearch: (query: string, progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
-    getLeaderboard: (ruleset: string, statistic: string, page: number, sort_direction?: string, limit?: number, country?: string | null, progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
-    getTodayTopPlayers: (ruleset: string, progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
-    getGlobalStats: (progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
-    getScoreSubmissions: (ruleset: string, progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
-    getActiveUsers: (progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
-    getRoleUsers: (progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
-    getServerInfo: (progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
-    getAlerts: (progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
-    getProcessedRealm: (realmFile: File, progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
-    getScoreRankDates: (ruleset: string, progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
-    getHistoricScoreRanks: (ruleset: string, stat: string, date: string, page: number, progressEvent?: ((progressEvent: any) => void) | null) => Promise<any>;
+    getUserSearch: (query: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getLeaderboard: (ruleset: string, statistic: string, page: number, sort_direction?: string, limit?: number, country?: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getTodayTopPlayers: (ruleset: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getGlobalStats: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getScoreSubmissions: (ruleset: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getActiveUsers: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getRoleUsers: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getServerInfo: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getAlerts: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getProcessedRealm: (realmFile: File, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getScoreRankDates: (ruleset: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getHistoricScoreRanks: (ruleset: string, stat: string, date: string, page: number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
 };
 
 export type AuthContextValue = {
@@ -38,8 +40,8 @@ export type ProfileContextValue = {
     errorMessage: string | boolean;
     fetchLog: any[];
     isFinished: boolean;
-    activeRuleset: string | null;
-    setActiveRuleset: (ruleset: string | null) => void;
+    activeRuleset: string;
+    setActiveRuleset: (ruleset: string) => void;
     getRulesetStatistics: (ruleset: string, without_loved?: boolean) => any;
     getRulesetUser: (ruleset: string) => any;
     availableRulesets: string[];

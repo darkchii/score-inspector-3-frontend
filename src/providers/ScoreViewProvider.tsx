@@ -2,14 +2,15 @@ import { Fade, Modal } from "@mui/material";
 import { createContext, useContext, useState } from "react";
 import ScoreView from "../components/scoreView/ScoreView";
 import type { ScoreViewContextValue } from "./ContextTypes";
+import { IScore } from "../types/types";
 
-const ScoreViewContext = createContext<ScoreViewContextValue | null>(null);
+const ScoreViewContext = createContext<ScoreViewContextValue>({} as ScoreViewContextValue);
 
 export function ScoreViewProvider({ children }: { children: React.ReactNode }) {
-    const [scoreData, setScoreData] = useState(null);
+    const [scoreData, setScoreData] = useState<IScore | null>(null);
     const [enabled, setEnabled] = useState(false);
 
-    const loadScoreView = (score) => {
+    const loadScoreView = (score: IScore) => {
         console.log("Loading score view for score:", score);
         setScoreData(score);
         setEnabled(true);

@@ -8,8 +8,8 @@ import PerformanceCalculatorOsu from "./PerformanceCalculatorOsu";
 import PerformanceCalculatorTaiko from "./PerformanceCalculatorTaiko";
 
 class PerformancePoints implements IPerformancePoints {
-    pp: number;
-    calculator: IPerformanceCalculator;
+    pp: number = 0;
+    calculator: IPerformanceCalculator | null = null;
 
     constructor(score: IScore, options: any = {}) {
         if (score.diff_missing) {
@@ -56,7 +56,7 @@ class PerformancePoints implements IPerformancePoints {
         let overrides: any = {};
         switch (option) {
             case 'ss':
-                overrides.combo = score.attr_diff.max_combo;
+                overrides.combo = score.attr_diff?.max_combo || score.beatmap?.max_combo || 0;
                 overrides.accuracy = 1.0;
                 overrides.statistics_perfect = score.maximum_statistics_perfect || 0;
                 overrides.statistics_great = score.maximum_statistics_great || 0;

@@ -3,8 +3,9 @@ import { displayRank, GetGradeFromAccuracy, rankCutoffs } from '../util/Helper';
 import { animated, useSpring } from '@react-spring/web';
 import { useState } from 'react';
 import dialStyles from '../styles/dial.module.less';
+import { IScore } from '../types/types';
 
-function ScoreDial({ score }) {
+function ScoreDial({ score }: { score: IScore }) {
     const arcGenerator = arc();
     const pieGenerator = pie().sortValues(null);
 
@@ -24,7 +25,6 @@ function ScoreDial({ score }) {
         },
         onChange: (result) => {
             if (!score) return;
-            // setDisplayedRank(rankCutoffs(Mods.hasMod(props.mods, "CL")));
             const rad = result.value.pos[0];
             const progress = rad / (2 * Math.PI);
             const grade = GetGradeFromAccuracy(score, progress);
@@ -62,11 +62,17 @@ function ScoreDial({ score }) {
                                 <animated.path
                                     key={0}
                                     className={`${dialStyles.dial__outer} ${dialStyles[`dial__outer--${0}`]}`}
-                                    d={
-                                        springData.pos.to((accuracy) => {
-                                            return arcGenerator({ innerRadius: 75, outerRadius: 100, startAngle: 0, endAngle: accuracy })
-                                        })
-                                    }
+                                    d={springData.pos.to((accuracy) => {
+                                        const path =
+                                            arcGenerator({
+                                                innerRadius: 75,
+                                                outerRadius: 100,
+                                                startAngle: 0,
+                                                endAngle: accuracy,
+                                            }) ?? ""
+
+                                        return path
+                                    })}
                                 />
                             </>
                         }

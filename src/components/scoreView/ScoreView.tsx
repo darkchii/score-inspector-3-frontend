@@ -1,7 +1,8 @@
 import scoreViewStyles from '../../styles/score-view.module.less';
+import type { IScore } from '../../types/types';
 import ScoreViewBase from './ScoreViewBase';
 
-function ScoreView({ score = null, noBackground = false, compact = false }) {
+function ScoreView({ score, noBackground = false, compact = false }: { score: IScore | null, noBackground?: boolean, compact?: boolean }) {
     return (
         <div className={scoreViewStyles['score-view']}>
             <div className={scoreViewStyles['score-view__backdrop']}>

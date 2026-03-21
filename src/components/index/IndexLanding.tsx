@@ -12,7 +12,16 @@ import { Line } from "react-chartjs-2";
 import Config from "../../data/Config.json";
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 
-function LandingCard({ children, title, isLoading, isError, icon = null, color = null, sx = {}, centerContent = false }) {
+function LandingCard({ children, title, isLoading, isError, icon = null, color = null, sx = {}, centerContent = false }: {
+    children: React.ReactNode,
+    title: string,
+    isLoading: boolean,
+    isError: boolean,
+    icon?: React.ReactNode,
+    color?: string | null,
+    sx?: object,
+    centerContent?: boolean,
+}) {
     const theme = useTheme();
 
     return (
@@ -67,8 +76,8 @@ function IndexLanding() {
     const [numTeams, setNumTeams] = useState(0);
     const [numUsers, setNumUsers] = useState(0);
 
-    const [dataActiveUsers, setDataActiveUsers] = useState(null); //amount of users active in last 24h, each entry is an hour timestamp with the amount of active users in that hour
-    const [dataActiveUsersChart, setDataActiveUsersChart] = useState(null); //data formatted for chartjs, with labels and datasets
+    const [dataActiveUsers, setDataActiveUsers] = useState<{ hour: Date, count: number }[] | null>(null); //amount of users active in last 24h, each entry is an hour timestamp with the amount of active users in that hour
+    const [dataActiveUsersChart, setDataActiveUsersChart] = useState<any | null>(null); //data formatted for chartjs, with labels and datasets
 
     const [loading, setLoading] = useState(true);
     const [isError, setIsError] = useState(false);
@@ -101,14 +110,14 @@ function IndexLanding() {
 
                 if (statsActiveUsers) {
                     //replace string dates to actual dates
-                    const activeUsersData = [];
-                    statsActiveUsers.data.forEach(key => {
+                    const activeUsersData: { hour: Date, count: number }[] = [];
+                    statsActiveUsers.data.forEach((key: { hour: string, count: number }) => {
                         activeUsersData.push({
                             ...key,
                             hour: new Date(key.hour), //convert hour string to date
                         })
                     });
-                    activeUsersData.sort((a, b) => a.hour - b.hour); //sort by hour ascending
+                    activeUsersData.sort((a, b) => a.hour.getTime() - b.hour.getTime()); //sort by hour ascending
                     setDataActiveUsers(activeUsersData);
                     console.log(activeUsersData);
 

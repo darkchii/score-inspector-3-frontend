@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReputationContextValue } from "./ContextTypes";
 
-const ReputationContext = createContext<ReputationContextValue | null>(null);
+const ReputationContext = createContext<ReputationContextValue>({} as ReputationContextValue);
 
 export function ReputationProvider({ children }: { children: React.ReactNode }) {
     return (
@@ -9,7 +9,4 @@ export function ReputationProvider({ children }: { children: React.ReactNode }) 
             {children}
         </ReputationContext.Provider>
     );
-}
-
-export function usePageTitle(title) {
 }

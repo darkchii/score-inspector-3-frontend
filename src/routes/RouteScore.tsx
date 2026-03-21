@@ -9,7 +9,14 @@ import moment from 'moment';
 import ItemList from '../components/list/ItemList';
 import PlayerListRow from '../components/list/PlayerListRow';
 
-const VALID_STATS = {
+interface ValidStats {
+    [key: string]: {
+        name: string;
+        key: string;
+    }
+}
+
+const VALID_STATS: ValidStats = {
     rank: {
         name: 'Rank',
         key: 'rank',
@@ -30,11 +37,11 @@ function RouteScore() {
     const [activeRuleset, setActiveRuleset] = useState(params.ruleset || 'osu');
     const [activeStat, setActiveStat] = useState(params.stat || 'rank');
     const [activeDate, setActiveDate] = useState(params.date ? moment.utc(params.date, 'YYYY-MM-DD', true) : null);
-    const [activePage, setActivePage] = useState(parseInt(params.page) || 1);
-    const [data, setData] = useState(null);
+    const [activePage, setActivePage] = useState(parseInt(params.page || '1'));
+    const [data, setData] = useState<any | null>(null);
 
     //TODO: date selector should grey out dates not in validDates
-    const [validDates, setValidDates] = useState(null);
+    const [validDates, setValidDates] = useState<moment.Moment[] | null>(null);
 
     const [isWorking, setIsWorking] = useState(false);
     const [isLoadingDates, setIsLoadingDates] = useState(false);
@@ -67,7 +74,7 @@ function RouteScore() {
         try {
             const response = await getScoreRankDates(activeRuleset);
             if (response.dates && Array.isArray(response.dates)) {
-                const dateMoments = response.dates.map(date => {
+                const dateMoments = response.dates.map((date: string) => {
                     const m = moment.utc(date, moment.ISO_8601, true);
                     if (m.isValid()) {
                         return m;
@@ -75,13 +82,13 @@ function RouteScore() {
                         console.warn(`Invalid date format received from API: ${date}`);
                         return null;
                     }
-                }).filter(d => d !== null);
+                }).filter((d: moment.Moment | null): d is moment.Moment => d !== null);
 
                 setValidDates(dateMoments);
 
                 // If activeDate is not set from params, set it to the most recent date
                 if (!params.date && dateMoments.length > 0) {
-                    const mostRecentDate = dateMoments.reduce((latest, current) =>
+                    const mostRecentDate = dateMoments.reduce((latest: moment.Moment, current: moment.Moment) =>
                         current.isAfter(latest) ? current : latest
                     );
                     setActiveDate(mostRecentDate);
@@ -107,7 +114,7 @@ function RouteScore() {
         const newRuleset = params.ruleset || 'osu';
         const newStat = params.stat || 'rank';
         const newDate = params.date ? moment.utc(params.date, 'YYYY-MM-DD', true) : null;
-        const newPage = parseInt(params.page) || 1;
+        const newPage = parseInt(params.page || '1', 10);
 
         setActiveRuleset(newRuleset);
         setActiveStat(newStat);
@@ -150,7 +157,7 @@ function RouteScore() {
         <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center', width: '100%' }}>
             <RulesetSelector
                 activeRuleset={activeRuleset}
-                onChange={(ruleset) => setActiveRuleset(ruleset)}
+                onChange={(ruleset: string) => setActiveRuleset(ruleset)}
                 showCombined={false}
             />
 
@@ -159,20 +166,20 @@ function RouteScore() {
             <DatePicker
                 label="Select Date"
                 value={activeDate}
-                onChange={(newValue) => setActiveDate(newValue)}
+                onChange={(newValue: moment.Moment | null) => setActiveDate(newValue)}
                 slotProps={{
                     textField: {
                         fullWidth: false,
                     },
                 }}
                 shouldDisableDate={(date) => {
-                    return !validDates.some((validDate: any) => validDate.isSame(date, 'day'));
+                    return !validDates.some((validDate: moment.Moment) => validDate.isSame(date, 'day'));
                 }}
             />
 
             <ButtonGroup variant="contained">
                 {
-                    Object.values(VALID_STATS).map((stat: any) => (
+                    Object.values(VALID_STATS).map((stat: { name: string; key: string }) => (
                         <Button
                             key={`stat_${stat.key}`}
                             onClick={() => setActiveStat(stat.key)}
@@ -222,7 +229,7 @@ function RouteScore() {
                                 ItemListRowType={PlayerListRow}
                                 leaderboardField={`score_rank.ranked_score`}
                                 secondaryLeaderboardField={`score_rank.gained_score`}
-                                leaderboardFormat={(value: number) => `${FormatNumber(value)}`}
+                                leaderboardFormat={(value: number): string => `${FormatNumber(value)}`}
                             />
                             <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 1, justifyContent: 'center' }}>
                                 <Pagination

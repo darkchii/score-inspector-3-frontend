@@ -25,12 +25,12 @@ class Beatmap implements IBeatmap {
     slider_multiplier: number;
     slider_tick_rate: number;
     bpm: number;
-    bpm_modded: number | null;
+    bpm_modded: number | null = null;
 
     length: number;
-    length_modded: number | null;
+    length_modded: number | null = null;
     drain_time: number;
-    drain_time_modded: number | null;
+    drain_time_modded: number | null = null;
 
     count_circles: number;
     count_sliders: number;
@@ -50,21 +50,21 @@ class Beatmap implements IBeatmap {
     title: string;
     artist: string;
     source: string;
-    tags: string[];
+    tags: string[] = [];
     checksum: string;
     track_id: number | null;
     pack: string | null;
     lchg_time: Date | null;
     attr_diff: any; // for storing difficulty attributes, can be any type depending on ruleset
 
-    scores: Map<number, any> | null; // map of score_id to score object, can be any type depending on ruleset
+    scores: Map<number, any> | null = null; // map of score_id to score object, can be any type depending on ruleset
 
-    lb_value: number | null; // for leaderboards, can be any type depending on statistic
+    lb_value: number | null = null; // for leaderboards, can be any type depending on statistic
 
     is_played: boolean = false; // whether the user has played this beatmap, set externally
     score_data: any = null; // for storing additional score data related to this beatmap, can be any type depending on ruleset/statistic
 
-    constructor(api_data) {
+    constructor(api_data: any) {
         if (api_data === null || api_data === undefined) {
             throw new Error("Invalid api_data for Beatmap");
         }

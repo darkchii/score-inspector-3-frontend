@@ -131,7 +131,7 @@ export function ProcessBeatmaps(beatmaps: IBeatmap[]): IBeatmap[] {
     return beatmaps.map(beatmap => new Beatmap(beatmap));
 }
 
-export async function MapScoreBeatmaps(scores: IScore[], beatmaps: Beatmap[]): Promise<[IScore[], number]> {
+export async function MapScoreBeatmaps(scores: IScore[], beatmaps: IBeatmap[]): Promise<[IScore[], number]> {
     //This function maps beatmaps to all scores
     //We probably need to deep copy each beatmap since every score needs to manipulate its own copy
     // score[x].beatmap = beatmap
@@ -142,24 +142,25 @@ export async function MapScoreBeatmaps(scores: IScore[], beatmaps: Beatmap[]): P
     }
 
     let missingCount = 0;
+    let missingBeatmapIds = new Set<number>();
     for (const score of scores) {
         const beatmap = beatmapMap.get(Number(score.beatmap_id));
         if (beatmap) {
             score.beatmap = beatmap;
         } else {
             missingCount++;
-            score.beatmap = null; // No matching beatmap found
+            // score.beatmap = null; // No matching beatmap found
+            missingBeatmapIds.add(Number(score.beatmap_id));
         }
     }
 
-    //remove scores with missing beatmaps
-    scores = scores.filter(s => s.beatmap !== null && s.beatmap !== undefined);
+    scores = scores.filter(s => !missingBeatmapIds.has(Number(s.beatmap_id)));
 
     return [scores, missingCount];
 }
 
 export async function ProcessScores(scores: IScore[], user: any = null): Promise<IScore[]> {
-    return scores.map(score => new Score(score, score.beatmap, user));
+    return scores.map(score => new Score(score, score.beatmap as Beatmap, user));
 }
 
 export async function BuildProfileStatistics(scores: IScore[], beatmaps: IBeatmap[], packs: any[]): Promise<{ profileStats: ProfileStatistics; profileStatsWithoutLoved: ProfileStatistics }> {

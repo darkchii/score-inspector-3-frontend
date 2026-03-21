@@ -3,7 +3,7 @@ import HitWindowsTaiko from "../hitWindows/HitWindowsTaiko";
 import { CalculateRateWithMods } from "../../util/ModHelper";
 import PerformanceCalculator from "./PerformanceCalculator";
 import Score from "../Score";
-import type { IHitWindowsTaiko } from "../types";
+import type { IHitWindowsTaiko, IScore } from "../types";
 
 class PerformanceCalculatorTaiko extends PerformanceCalculator {
     countGreat: number;
@@ -21,7 +21,7 @@ class PerformanceCalculatorTaiko extends PerformanceCalculator {
     totalPerformance: number;
     hitWindows: IHitWindowsTaiko;
 
-    constructor(score: Score, overrides: any = {}) {
+    constructor(score: IScore, overrides: any = {}) {
         super(score, overrides);
 
         this.countGreat = overrides?.statistics_great ?? score.statistics_great ?? 0;
@@ -42,7 +42,7 @@ class PerformanceCalculatorTaiko extends PerformanceCalculator {
             ? null
             : this.computeDeviationUpperBound(this.countGreat / this.totalHits) * 10;
 
-        this.totalDifficultHits = this.totalHits * score.attr_diff.consistency_factor;
+        this.totalDifficultHits = this.totalHits * (score.attr_diff?.consistency_factor ?? 0);
 
         let isConvert = score.local_beatmap.ruleset_id !== 1;
         let isClassic = score.mods.some(mod => mod.acronym === 'CL');
@@ -52,8 +52,8 @@ class PerformanceCalculatorTaiko extends PerformanceCalculator {
         this.totalPerformance = this.difficultyValue + this.accuracyValue;
     }
 
-    computeAccuracyValue(score, isConvert) {
-        if(this.greatHitWindow <= 0 || this.estimatedUnstableRate === null) {
+    computeAccuracyValue(score: IScore, isConvert: boolean): number {
+        if(this.greatHitWindow <= 0 || this.estimatedUnstableRate === null || !score.attr_diff) {
             return 0.0;
         }
 
@@ -76,8 +76,8 @@ class PerformanceCalculatorTaiko extends PerformanceCalculator {
         return accuracyValue;
     }
 
-    computeDifficultyValue(score, isConvert, isClassic) {
-        if (this.estimatedUnstableRate === null || this.totalDifficultHits === 0) {
+    computeDifficultyValue(score: IScore, isConvert: boolean, isClassic: boolean): number {
+        if (this.estimatedUnstableRate === null || this.totalDifficultHits === 0 || !score.attr_diff) {
             return 0.0;
         }
 
@@ -130,7 +130,7 @@ class PerformanceCalculatorTaiko extends PerformanceCalculator {
         return difficultyValue * Math.pow(DifficultyCalculationUtils.Erf(monoAccScalingShift / (Math.sqrt(2) * this.estimatedUnstableRate)), monoAccScalingExponent);
     }
 
-    computeDeviationUpperBound(accuracy) {
+    computeDeviationUpperBound(accuracy: number): number {
         const z = 2.32634787404;
 
         let n = this.totalHits;

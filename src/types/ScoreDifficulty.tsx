@@ -28,7 +28,7 @@ class ScoreDifficulty implements IScoreDifficulty {
     consistency_factor: number;
     mono_stamina_factor: number;
 
-    constructor(api_data) {
+    constructor(api_data: any) {
         this.max_combo = api_data.max_combo;
         this.star_rating = api_data.star_rating;
 

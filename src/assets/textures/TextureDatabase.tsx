@@ -25,7 +25,7 @@ import { GetRulesetNameFromId } from '../../util/Helper';
 
 //do it here
 
-export function getFlagIcon(country_code){
+export function getFlagIcon(country_code: string | null | undefined){
     //get flag icons (dynamic import)
     if(country_code === null || country_code === undefined){
         country_code = '__';
@@ -44,7 +44,7 @@ export function getFlagIcon(country_code){
     }
 }
 
-export function getGradeIcon(grade){
+export function getGradeIcon(grade: string | null | undefined){
     switch(grade){
         case 'XH':
             return SVGGradeXH;
@@ -69,16 +69,19 @@ export function getGradeIcon(grade){
     }
 }
 
-export function getCompletionistBadge(ruleset){
-    let normalized = GetRulesetNameFromId(ruleset).toLowerCase();
-    switch(normalized){
+export function getCompletionistBadge(ruleset: number | string){
+    switch(ruleset){
         case 'osu':
+        case 0:
             return CompletionistStandard;
         case 'taiko':
+        case 1:
             return CompletionistTaiko;
         case 'fruits':
+        case 2:
             return CompletionistCatch;
         case 'mania':
+        case 3:
             return CompletionistMania;
         default:
             return null;

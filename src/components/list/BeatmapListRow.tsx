@@ -77,7 +77,7 @@ const BeatmapListRow = memo(function BeatmapListRow({
                                 {
                                     item.is_played && (
                                         <>
-                                            <img src={getGradeIcon(item.score_data.grade)} alt={item.score_data.grade} width={30} height={20} />
+                                            <img src={getGradeIcon(item.score_data.grade) ?? ''} alt={item.score_data.grade} width={30} height={20} />
                                             {item.score_data.is_pfc && <span style={{ marginLeft: 4, color: '#ffd700', fontWeight: 'bold' }}>PFC</span>}
                                             {(item.score_data.is_fc && !item.score_data.is_pfc) && <span style={{ marginLeft: 4, color: '#ffd700', fontWeight: 'bold' }}>FC</span>}
                                         </>
@@ -106,7 +106,7 @@ const BeatmapListRow = memo(function BeatmapListRow({
                         {item.artist} - {item.title}
                     </Typography>
                     <Typography noWrap sx={{ fontSize: '0.7rem', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        <span style={{ color: '#ea0' }}>{item.version}</span> <span style={{ opacity: '0.7' }}>{item.status} {TimeAgo(item.ranked_date)}</span>
+                        <span style={{ color: '#ea0' }}>{item.version}</span> <span style={{ opacity: '0.7' }}>{item.status} {item.ranked_date ? TimeAgo(item.ranked_date) : ''}</span>
                     </Typography>
                 </Box>
             </TableCell>

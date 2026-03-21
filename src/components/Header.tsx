@@ -66,13 +66,14 @@ function Header() {
     const theme = useTheme();
 
     //dropdown data
-    const [activeDropdownIndex, setActiveDropdownIndex] = useState(null);
-    const [showDropdown, setShowDropdown] = useState(false);
-    const [anchorElDropdown, setAnchorElDropdown] = useState(null);
-    const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-    const [openMobileGroups, setOpenMobileGroups] = useState({});
+    const [activeDropdownIndex, setActiveDropdownIndex] = useState<number | null>(null);
+    const [showDropdown, setShowDropdown] = useState<boolean>(false);
+    const [anchorElDropdown, setAnchorElDropdown] = useState<HTMLElement | null>(null);
+    const [mobileDrawerOpen, setMobileDrawerOpen] = useState<boolean>(false);
+    const [openMobileGroups, setOpenMobileGroups] = useState<{ [key: number]: boolean }>({});
 
-    const HEADER_NAV_ITEMS = [
+
+    const HEADER_NAV_ITEMS: { label: string, icon: React.ReactNode, to?: string, href?: string, onClick?: () => void, dropdown?: { label: string, to?: string, href?: string, icon?: React.ReactNode, onClick?: () => void }[] }[] = [
         {
             label: 'Search',
             icon: <SearchIcon />,
@@ -157,7 +158,7 @@ function Header() {
             onClose={handleHeaderMenuClose}
         >
             {
-                activeDropdownIndex !== null && HEADER_NAV_ITEMS[activeDropdownIndex].dropdown.map((item: any, index: number) => (
+                activeDropdownIndex !== null && HEADER_NAV_ITEMS[activeDropdownIndex].dropdown?.map((item: any, index: number) => (
                     <Button
                         key={index}
                         component={item.to ? Link : 'button'}
@@ -283,7 +284,7 @@ function Header() {
                                         to={item.to || '#'}
                                         href={item.href || undefined}
                                         target={item.href ? "_blank" : undefined}
-                                        onClick={(e) => {
+                                        onClick={(e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>) => {
                                             if (!item.to && !item.href && !item.onClick) {
                                                 e.preventDefault();
                                             }
@@ -306,7 +307,7 @@ function Header() {
                                     </ListItemButton>
                                     <Collapse in={isOpen} timeout="auto" unmountOnExit>
                                         <List component="div" disablePadding>
-                                            {item.dropdown.map((dropdownItem: any, dropdownIndex: number) => (
+                                            {item.dropdown?.map((dropdownItem: any, dropdownIndex: number) => (
                                                 <ListItemButton
                                                     key={`${index}-${dropdownIndex}`}
                                                     sx={{ pl: 4 }}
@@ -333,7 +334,7 @@ function Header() {
                                 to={item.to || '#'}
                                 href={item.href || undefined}
                                 target={item.href ? "_blank" : undefined}
-                                onClick={(e) => {
+                                onClick={(e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>) => {
                                     if (!item.to && !item.href && !item.onClick) {
                                         e.preventDefault();
                                     }

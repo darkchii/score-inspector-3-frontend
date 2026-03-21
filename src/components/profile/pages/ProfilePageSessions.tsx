@@ -10,17 +10,28 @@ import ItemList from "../../list/ItemList";
 import ScoreListRow from "../../list/ScoreListRow";
 import type { ISession } from "../../../types/types";
 
+type SessionSortField = 'start' | 'duration' | 'score_count' | 'cumulative_pp' | 'cumulative_implied_total_score' | 'cumulative_lazer_score';
+
+type SessionSortFieldDefinition<K extends SessionSortField = SessionSortField> = {
+    label: string;
+    field: K;
+    format?: (value: ISession[K]) => string;
+}
+
+const createSessionSortFieldDefinition = <K extends SessionSortField>(definition: SessionSortFieldDefinition<K>): SessionSortFieldDefinition<K> => definition;
+
 const SESSION_SORT_FIELDS = [
-    { label: 'Date', field: 'start', format: (value) => new Date(value).toLocaleString() },
-    { label: 'Duration', field: 'duration', format: (value) => FormatDuration(value) },
-    { label: 'Scores', field: 'score_count', format: (value) => FormatNumber(value) },
-    { label: 'Performance', field: 'cumulative_pp', format: (value) => FormatNumberWithPrecision(value, 2) + ' pp' },
-    { label: 'Score', field: 'cumulative_implied_total_score', format: (value) => FormatNumber(value) },
-    { label: 'Lazer Score', field: 'cumulative_lazer_score', format: (value) => FormatNumber(value) },
+    createSessionSortFieldDefinition({ label: 'Date', field: 'start', format: (value) => value.toLocaleString() }),
+    createSessionSortFieldDefinition({ label: 'Duration', field: 'duration', format: (value) => String(FormatDuration(value)) }),
+    createSessionSortFieldDefinition({ label: 'Scores', field: 'score_count', format: (value) => FormatNumber(value) }),
+    createSessionSortFieldDefinition({ label: 'Performance', field: 'cumulative_pp', format: (value) => FormatNumberWithPrecision(value, 2) + ' pp' }),
+    createSessionSortFieldDefinition({ label: 'Score', field: 'cumulative_implied_total_score', format: (value) => FormatNumber(value) }),
+    createSessionSortFieldDefinition({ label: 'Lazer Score', field: 'cumulative_lazer_score', format: (value) => FormatNumber(value) }),
+];
 
-]
+const isSessionSortField = (field: string): field is SessionSortField => SESSION_SORT_FIELDS.some(sortField => sortField.field === field);
 
-function SessionDisplay({ session }: { session: ISession }) {
+function SessionDisplay({ session }: { session: ISession | null }) {
     const theme = useTheme();
 
     if (!session) return <Alert severity="info">No session selected.</Alert>;
@@ -182,14 +193,14 @@ function SessionDisplay({ session }: { session: ISession }) {
 const _sessionsPerPage = 10;
 function ProfilePageSessions() {
     const { getRulesetStatistics, activeRuleset } = useProfile();
-    const [selectedSessionId, setSelectedSessionId] = useState(null);
-    const [displaySessionData, setDisplaySessionData] = useState(null);
+    const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+    const [displaySessionData, setDisplaySessionData] = useState<ISession | null>(null);
 
     const [sessionCount, setSessionCount] = useState(0);
     const [sessionSelectorPage, setSessionSelectorPage] = useState(0);
-    const [sessionArray, setSessionArray] = useState(null);
-    const [sessionSorting, setSessionSorting] = useState('start');
-    const [sessionSortingDirection, setSessionSortingDirection] = useState('desc'); //true = descending
+    const [sessionArray, setSessionArray] = useState<ISession[] | null>(null);
+    const [sessionSorting, setSessionSorting] = useState<SessionSortField>('start');
+    const [sessionSortingDirection, setSessionSortingDirection] = useState<'asc' | 'desc'>('desc');
 
     //use session_sort_fields, expanding to add asc and desc options
     const ADJUSTED_SORT_FIELDS = SESSION_SORT_FIELDS.flatMap(field => ([
@@ -202,23 +213,43 @@ function ProfilePageSessions() {
         return getRulesetStatistics(activeRuleset)?.scores_set?.sessions?.getById(selectedSessionId);
     };
 
-    const onSessionSortChange = (field, direction, sessions = null) => {
+    const onSessionSortChange = (field: SessionSortField, direction: 'asc' | 'desc', sessions: ISession[] | null = null) => {
         if (!sessionArray && !sessions) return;
-        const sortedSessions = [...(sessions || sessionArray)];
-        sortedSessions.sort((a, b) => {
+        const sortedSessions: ISession[] = [...(sessions || sessionArray || [])];
+        sortedSessions.sort((a: ISession, b: ISession) => {
             if (direction === 'asc') {
-                if (a[field] < b[field]) return -1;
-                if (a[field] > b[field]) return 1;
+                if (a[field as keyof ISession] < b[field as keyof ISession]) return -1;
+                if (a[field as keyof ISession] > b[field as keyof ISession]) return 1;
                 return 0;
             } else {
-                if (a[field] > b[field]) return -1;
-                if (a[field] < b[field]) return 1;
+                if (a[field as keyof ISession] > b[field as keyof ISession]) return -1;
+                if (a[field as keyof ISession] < b[field as keyof ISession]) return 1;
                 return 0;
             }
         });
         setSessionSorting(field);
         setSessionSortingDirection(direction);
         setSessionArray(sortedSessions);
+    }
+
+    const getSessionSecondaryText = (session: ISession): string => {
+        const selectedSortField = SESSION_SORT_FIELDS.find(field => field.field === sessionSorting);
+        if (!selectedSortField) return '';
+
+        switch (selectedSortField.field) {
+            case 'start':
+                return `${selectedSortField.label}: ${selectedSortField.format ? selectedSortField.format(session.start) : String(session.start)}`;
+            case 'duration':
+                return `${selectedSortField.label}: ${selectedSortField.format ? selectedSortField.format(session.duration) : String(session.duration)}`;
+            case 'score_count':
+                return `${selectedSortField.label}: ${selectedSortField.format ? selectedSortField.format(session.score_count) : String(session.score_count)}`;
+            case 'cumulative_pp':
+                return `${selectedSortField.label}: ${selectedSortField.format ? selectedSortField.format(session.cumulative_pp) : String(session.cumulative_pp)}`;
+            case 'cumulative_implied_total_score':
+                return `${selectedSortField.label}: ${selectedSortField.format ? selectedSortField.format(session.cumulative_implied_total_score) : String(session.cumulative_implied_total_score)}`;
+            case 'cumulative_lazer_score':
+                return `${selectedSortField.label}: ${selectedSortField.format ? selectedSortField.format(session.cumulative_lazer_score) : String(session.cumulative_lazer_score)}`;
+        }
     }
 
     useEffect(() => {
@@ -256,7 +287,8 @@ function ProfilePageSessions() {
                                             value={`${sessionSorting}-${sessionSortingDirection}`}
                                             onChange={(e) => {
                                                 const [field, order] = e.target.value.split('-');
-                                                onSessionSortChange(field, order);
+                                                if (!isSessionSortField(field)) return;
+                                                onSessionSortChange(field, order as 'asc' | 'desc');
                                             }}
                                         >
                                             {ADJUSTED_SORT_FIELDS.map((option) => (
@@ -287,7 +319,7 @@ function ProfilePageSessions() {
                                                 <ListItemText
                                                     primary={`${session.start.toLocaleString()}`}
                                                     // secondary={`Duration: ${FormatDuration(session.duration)}, Scores: ${session.score_count}`} />
-                                                    secondary={`${SESSION_SORT_FIELDS.find(f => f.field === sessionSorting)?.label || ''}: ${SESSION_SORT_FIELDS.find(f => f.field === sessionSorting)?.format ? SESSION_SORT_FIELDS.find(f => f.field === sessionSorting).format(session[sessionSorting]) : session[sessionSorting]}`} />
+                                                    secondary={getSessionSecondaryText(session)} />
                                             </ListItemButton>
                                         ))}
                                     </List>

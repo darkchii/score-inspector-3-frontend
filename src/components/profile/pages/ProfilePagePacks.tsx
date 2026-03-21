@@ -74,8 +74,8 @@ const packGridStyle: GridStyleWithVars = {
 
 const PackSquare = memo(function PackSquare({ pack, onClick }: PackSquareProps) {
     const theme = useTheme();
-    const startSquareColor = HexToRgb('#1a1a1a');
-    const endSquareColor = HexToRgb(theme.palette.primary.main);
+    const startSquareColor = HexToRgb('#1a1a1a') || [26, 26, 26];
+    const endSquareColor = HexToRgb(theme.palette.primary.main) || [0, 123, 255];
 
     const color = useMemo(() => {
         if (pack.is_completed) {

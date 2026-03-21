@@ -3,7 +3,6 @@ import { toast, type ToastOptions } from "react-toastify";
 import { TextureDatabase } from '../assets/textures/TextureDatabase';
 import { blue, green, pink, purple } from '@mui/material/colors';
 import { HasHiddenMod, HasMod } from './ModHelper';
-import ScoreData from '../data/ScoreData.json';
 import NumberFlow from '@number-flow/react';
 import * as Muicon from "@mui/icons-material";
 import { IScore } from '../types/types';
@@ -417,8 +416,25 @@ function differenceBetweenConsecutiveElements(arr: number[]): number[] {
     return result;
 }
 
+const AccuracyCutoffs: { [key: string]: { x: number; s: number; a: number; b: number; c: number } } = {
+    'osu': {
+        "x": 1,
+        "s": 0.95,
+        "a": 0.90,
+        "b": 0.80,
+        "c": 0.70
+    },
+    'fruits': {
+        "x": 1,
+        "s": 0.98,
+        "a": 0.94,
+        "b": 0.9,
+        "c": 0.85
+    }
+};
+
 function GetGradeFromAccuracyBase(accuracy: number, ruleset: string = 'osu'): string {
-    const cutoffs = ScoreData.accuracyCutoffs[ruleset];
+    const cutoffs: { x: number; s: number; a: number; b: number; c: number } = AccuracyCutoffs[ruleset];
     let grade: string;
 
     if (accuracy >= cutoffs.x) {
@@ -520,7 +536,7 @@ export function HexToRgb(hex: string): [number, number, number] | null {
 
 //gets any icon from mui icon by its name
 export function GetIconFromLabel(label: string) {
-    const IconComponent = Muicon[label];
+    const IconComponent = Muicon[label as keyof typeof Muicon];
     return IconComponent ? <IconComponent /> : null;
 }
 

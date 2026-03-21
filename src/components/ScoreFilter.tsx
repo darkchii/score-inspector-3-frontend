@@ -1,10 +1,29 @@
-import { Alert, Autocomplete, Box, Button, Grid, IconButton, MenuItem, Paper, Select, Slider, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Alert, Autocomplete, Box, Button, Grid, IconButton, MenuItem, Paper, Select, SelectChangeEvent, Slider, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
 import { FormatNumber, GetNestedValue } from "../util/Helper";
 import ModData from "../data/Mods.json";
 import ModIcon from "./ModIcon";
+import { IDatabasedMod, IScore, IScoreMod } from "../types/types";
 
-const ORDER_OPTIONS = [
+interface ScoreFilterOrderOption {
+    value: string,
+    label: string,
+};
+
+interface ScoreFilterOption {
+    value: string,
+    label: string,
+    type: string,
+    min?: number,
+    max?: number,
+    steps?: number,
+    format?: (v: number) => string,
+    scale?: (v: number) => number,
+    description?: string,
+    rulesets?: string[], //if provided, only show this filter if current ruleset is in this list
+};
+
+const ORDER_OPTIONS: ScoreFilterOrderOption[] = [
     { value: "implied_pp", label: "PP" },
     { value: "accuracy", label: "Accuracy" },
     { value: "implied_total_score", label: "Score" },
@@ -21,39 +40,39 @@ const ORDER_OPTIONS = [
     { value: "local_beatmap.ranked_date", label: "Date Ranked" },
 ]
 
-const FILTER_OPTIONS = [
+const FILTER_OPTIONS: ScoreFilterOption[] = [
     { value: "local_beatmap.title", label: "Title", type: "text" },
     { value: "local_beatmap.artist", label: "Artist", type: "text" },
     { value: "local_beatmap.mapper", label: "Mapper", type: "text" },
-    { value: "implied_pp", label: "PP", type: "range", min: 0, max: 3000, steps: 1, format: (v) => `${v}pp` },
-    { value: "accuracy", label: "Accuracy", type: "range", min: 0, max: 1, steps: 0.01, format: (v) => `${(v * 100).toFixed(2)}%` },
-    { value: "implied_total_score", label: "Score", type: "range", min: 0, max: 1, steps: 1, scale: (v) => v ** 2 },
+    { value: "implied_pp", label: "PP", type: "range", min: 0, max: 3000, steps: 1, format: (v: number) => `${v}pp` },
+    { value: "accuracy", label: "Accuracy", type: "range", min: 0, max: 1, steps: 0.01, format: (v: number) => `${(v * 100).toFixed(2)}%` },
+    { value: "implied_total_score", label: "Score", type: "range", min: 0, max: 1, steps: 1, scale: (v: number) => v ** 2 },
     { value: "total_score", label: "Lazer Score", type: "range", min: 0, max: 1, steps: 1 },
-    { value: "combo", label: "Combo", type: "range", min: 0, max: 1, steps: 1, format: (v) => `${FormatNumber(v)}x` },
-    { value: "star_rating", label: "Stars", type: "range", min: 0, max: 10, steps: 0.1, format: (v) => `${v}★` },
-    { value: "ended_at", label: "Date Played", type: "date_range", min: 0, max: 1, format: (v) => new Date(v).toLocaleDateString(), steps: 8.64e+7 }, //steps should be days by ms
-    { value: "local_beatmap.ranked_date", label: "Date Ranked", type: "date_range", min: 0, max: 1, format: (v) => new Date(v).toLocaleDateString(), steps: 8.64e+7 }, //steps should be days by ms
+    { value: "combo", label: "Combo", type: "range", min: 0, max: 1, steps: 1, format: (v: number) => `${FormatNumber(v)}x` },
+    { value: "star_rating", label: "Stars", type: "range", min: 0, max: 10, steps: 0.1, format: (v: number) => `${v}★` },
+    { value: "ended_at", label: "Date Played", type: "date_range", min: 0, max: 1, format: (v: number) => new Date(v).toLocaleDateString(), steps: 8.64e+7 }, //steps should be days by ms
+    { value: "local_beatmap.ranked_date", label: "Date Ranked", type: "date_range", min: 0, max: 1, format: (v: number) => new Date(v).toLocaleDateString(), steps: 8.64e+7 }, //steps should be days by ms
     { value: "is_fc", label: "Is FC", type: "boolean" },
     { value: "highest_pp", label: "Highest PP", type: "boolean", description: "Whether the score is the player's highest PP on the beatmap" },
     { value: "highest_score", label: "Highest Score", type: "boolean", description: "Whether the score is the player's highest score on the beatmap" },
-    { value: "mod_speed_change", label: "Speed Adjust", type: "range", min: 0.5, max: 2, steps: 0.1, format: (v) => `${v}x` },
+    { value: "mod_speed_change", label: "Speed Adjust", type: "range", min: 0.5, max: 2, steps: 0.1, format: (v: number) => `${v}x` },
     { value: "is_lazer", label: "Is Lazer", type: "boolean", description: "Whether the score is set in osu!lazer" },
     //reformat length to mm:ss
     {
-        value: "duration", label: "Length", type: "range", min: 0, max: 1, steps: 1, format: (v) => {
+        value: "duration", label: "Length", type: "range", min: 0, max: 1, steps: 1, format: (v: number) => {
             const minutes = Math.floor(v / 60);
             const seconds = Math.floor(v % 60);
             return `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
     },
-    { value: "local_beatmap.bpm_modded", label: "BPM", type: "range", min: 0, max: 1, steps: 1, format: (v) => `${Math.round(v)} BPM` },
+    { value: "local_beatmap.bpm_modded", label: "BPM", type: "range", min: 0, max: 1, steps: 1, format: (v: number) => `${Math.round(v)} BPM` },
     { value: "attr_diff.aim_difficulty", label: "Aim Diff", type: "range", min: 0, max: 10, steps: 0.1, rulesets: ['osu'], description: "Only applicable for osu! mode" },
     { value: "attr_diff.speed_difficulty", label: "Speed Diff", type: "range", min: 0, max: 10, steps: 0.1, rulesets: ['osu'], description: "Only applicable for osu! mode" },
     { value: "attr_diff.rhythm_difficulty", label: "Rhythm Diff", type: "range", min: 0, max: 10, steps: 0.1, rulesets: ['taiko'], description: "Only applicable for Taiko mode" },
     { value: "mods", label: "Mods", type: "mods", description: "Filters to scores that contain all selected mods" },
 ]
 
-const FilterScores = (scores, filter, order, direction) => {
+const FilterScores = (scores: IScore[], filter: any, order: any, direction: string) => {
     let sortedScores = [...scores];
 
     // Filtering
@@ -90,8 +109,8 @@ const FilterScores = (scores, filter, order, direction) => {
                 break;
             case 'mods':
                 sortedScores = sortedScores.filter(score => {
-                    const scoreMods = score.mods ? score.mods.map(mod => mod.acronym) : [];
-                    return value.every(mod => scoreMods.includes(mod.Acronym));
+                    const scoreMods = score.mods ? score.mods.map((mod: IScoreMod) => mod.acronym) : [];
+                    return value.every((mod: IDatabasedMod) => scoreMods.includes(mod.Acronym));
                 });
                 break;
             default:
@@ -102,7 +121,7 @@ const FilterScores = (scores, filter, order, direction) => {
     // Sorting
     if (order && order.value) {
         if (order.value === "grade") {
-            const gradeOrder = { "XH": 7, "X": 6, "SH": 5, "S": 4, "A": 3, "B": 2, "C": 1, "D": 0 };
+            const gradeOrder: { [key: string]: number } = { "XH": 7, "X": 6, "SH": 5, "S": 4, "A": 3, "B": 2, "C": 1, "D": 0 };
             sortedScores.sort((a, b) => {
                 const aValue = gradeOrder[GetNestedValue(a, order.value)] || 0;
                 const bValue = gradeOrder[GetNestedValue(b, order.value)] || 0;
@@ -125,11 +144,15 @@ const FilterScores = (scores, filter, order, direction) => {
 }
 
 //does not do filtering on it's own, just provides the UI and state
-function ScoreFilter({ data, onFiltered, currentRuleset }) {
-    const [sort, setSort] = useState(ORDER_OPTIONS[0]);
+function ScoreFilter({ data, onFiltered, currentRuleset }: {
+    data: IScore[],
+    onFiltered: (filtered: IScore[]) => void,
+    currentRuleset: string,
+}) {
+    const [sort, setSort] = useState<ScoreFilterOrderOption | null>(ORDER_OPTIONS[0]);
     const [direction, setDirection] = useState("desc");
     const [filter, setFilter] = useState({});
-    const [filterSet, setFilterSet] = useState<any>(false); //a local copy to readjust max values to the current score set
+    const [filterSet, setFilterSet] = useState<ScoreFilterOption[] | false>(false); //a local copy to readjust max values to the current score set
 
     useEffect(() => {
         setSort(ORDER_OPTIONS[0]);
@@ -171,7 +194,7 @@ function ScoreFilter({ data, onFiltered, currentRuleset }) {
                     <Select
                         fullWidth
                         value={sort?.value || ""}
-                        onChange={(e) => setSort(ORDER_OPTIONS.find(o => o.value === e.target.value))}
+                        onChange={(e) => setSort(ORDER_OPTIONS.find(o => o.value === e.target.value) || null)}
                         displayEmpty
                         size="small"
                     >
@@ -186,7 +209,7 @@ function ScoreFilter({ data, onFiltered, currentRuleset }) {
                         value={direction}
                         exclusive
                         onChange={(_, newDirection) => setDirection(newDirection)}
-                        disabled={!sort.value}
+                        disabled={!sort?.value}
                         size="small"
                     >
                         <ToggleButton value="asc">Asc</ToggleButton>
@@ -245,16 +268,22 @@ function ScoreFilter({ data, onFiltered, currentRuleset }) {
     )
 }
 
-function FilterSlider({ filter, setFilter, option, disabled, date }) {
-    const [value, setValue] = useState([option.min, option.max]);
+function FilterSlider({ filter, setFilter, option, disabled, date }: {
+    filter: any,
+    setFilter: any,
+    option: ScoreFilterOption,
+    disabled?: boolean,
+    date?: boolean,
+}) {
+    const [value, setValue] = useState<[number, number]>([option.min ?? 0, option.max ?? 0]);
 
     useEffect(() => {
-        setValue([option.min, option.max]);
+        setValue([option.min ?? 0, option.max ?? 0]);
     }, [option]);
 
-    const handleChange = (_, newValue) => {
-        setValue(newValue);
-        setFilter(prev => ({
+    const handleChange = (_: Event, newValue: number | number[]) => {
+        setValue(newValue as [number, number]);
+        setFilter((prev: any) => ({
             ...prev,
             [option.value]: { operator: 'range', value: newValue }
         }));
@@ -288,11 +317,16 @@ function FilterSlider({ filter, setFilter, option, disabled, date }) {
     );
 }
 
-function FilterBoolean({ filter, setFilter, option, disabled }) {
-    const handleChange = (e) => {
-        setFilter(prev => ({
+function FilterBoolean({ filter, setFilter, option, disabled }: {
+    filter: any,
+    setFilter: any,
+    option: ScoreFilterOption,
+    disabled?: boolean,
+}) {
+    const handleChange = (event: SelectChangeEvent): void => {
+        setFilter((prev: any) => ({
             ...prev,
-            [option.value]: { operator: 'boolean', value: e.target.value }
+            [option.value]: { operator: 'boolean', value: (event.target as HTMLInputElement).value }
         }));
     }
 
@@ -312,9 +346,14 @@ function FilterBoolean({ filter, setFilter, option, disabled }) {
     );
 }
 
-function FilterText({ filter, setFilter, option, disabled }) {
-    const handleChange = (e) => {
-        setFilter(prev => ({
+function FilterText({ filter, setFilter, option, disabled }: {
+    filter: any,
+    setFilter: any,
+    option: ScoreFilterOption,
+    disabled?: boolean,
+}) {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFilter((prev: any) => ({
             ...prev,
             [option.value]: { operator: 'text', value: e.target.value }
         }));
@@ -332,17 +371,23 @@ function FilterText({ filter, setFilter, option, disabled }) {
     );
 }
 
-function FilterMods({ filter, setFilter, option, currentRuleset }) {
-    const [allMods, setAllMods] = useState([]);
+function FilterMods({ filter, setFilter, option, currentRuleset }: {
+    filter: any,
+    setFilter: any,
+    option: ScoreFilterOption,
+    currentRuleset: string,
+    disabled?: boolean,
+}) {
+    const [allMods, setAllMods] = useState<IDatabasedMod[]>([]);
 
     useEffect(() => {
-        let rulesets = [0, 1, 2, 3];
+        let rulesets: number[] = [0, 1, 2, 3];
         if (currentRuleset !== 'all') {
-            const rulesetId = { osu: 0, taiko: 1, fruits: 2, mania: 3 }[currentRuleset];
+            const rulesetId: number = { osu: 0, taiko: 1, fruits: 2, mania: 3 }[currentRuleset] || 0;
             rulesets = [rulesetId];
         }
         //combine all mods from all rulesets and remove duplicates
-        const modsSet = {};
+        const modsSet: { [key: string]: IDatabasedMod } = {};
         for (const ruleset of rulesets) {
             for (const mod of ModData[ruleset].Mods) {
                 modsSet[mod.Acronym] = mod;
@@ -351,8 +396,8 @@ function FilterMods({ filter, setFilter, option, currentRuleset }) {
         setAllMods(Object.values(modsSet));
     }, [currentRuleset]);
 
-    const handleChange = (e, newValue) => {
-        setFilter(prev => ({
+    const handleChange = (e: React.SyntheticEvent, newValue: IDatabasedMod[]) => {
+        setFilter((prev: any) => ({
             ...prev,
             [option.value]: { operator: 'mods', value: newValue }
         }));
@@ -376,8 +421,8 @@ function FilterMods({ filter, setFilter, option, currentRuleset }) {
             )}
             //show only mod icons in selected value
             renderTags={(value, getTagProps) =>
-                value.map((mod, index) => (
-                    <Box key={mod.Acronym} {...getTagProps({ index })}>
+                value.map((mod: IDatabasedMod, index: number) => (
+                    <Box {...getTagProps({ index })}>
                         <ModIcon data={mod} />
                     </Box>
                 ))

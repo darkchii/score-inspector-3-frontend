@@ -2,17 +2,19 @@ import { AppBar, Box, Card, Toolbar, Typography } from "@mui/material";
 import Config from "../data/Config.json";
 import { useEffect, useState } from "react";
 import { useApi } from "../providers/ApiProvider";
+import { IConfig } from "../types/types";
+const typedConfig: IConfig = Config;
 
 function Footer() {
     const { getServerInfo } = useApi();
 
-    const [clientVersion, setClientVersion] = useState(null);
-    const [serverVersion, setServerVersion] = useState(null);
-    const [isServerOnline, setIsServerOnline] = useState(true);
-    const [isAltOnline, setIsAltOnline] = useState(true);
+    const [clientVersion, setClientVersion] = useState<string | null>(null);
+    const [serverVersion, setServerVersion] = useState<string | null>(null);
+    const [isServerOnline, setIsServerOnline] = useState<boolean>(true);
+    const [isAltOnline, setIsAltOnline] = useState<boolean>(true);
 
     useEffect(() => {
-        setClientVersion(Config.VERSION);
+        setClientVersion(typedConfig.VERSION);
         (async () => {
             try {
                 const info = await getServerInfo();

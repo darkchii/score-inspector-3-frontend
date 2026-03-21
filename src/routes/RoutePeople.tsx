@@ -8,9 +8,9 @@ function RoutePeople() {
     usePageTitle("People");
 
     const { getRoleUsers } = useApi();
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [data, setData] = useState<{ role: any; users: any[] }[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         (async () => {
@@ -22,8 +22,8 @@ function RoutePeople() {
 
                 const roles = response.roles;
 
-                const roleMap = {};
-                roles.forEach(role => {
+                const roleMap: { [key: string]: { role: any; users: any[] } } = {};
+                roles.forEach((role: any) => {
                     roleMap[role.id] = {
                         role: role,
                         users: []
@@ -31,10 +31,10 @@ function RoutePeople() {
                 });
 
                 const users = response.users;
-                users.forEach(user => {
+                users.forEach((user: any) => {
                     const _roles = user.roles;
                     if (_roles && _roles.length > 0) {
-                        _roles.forEach(role => {
+                        _roles.forEach((role: any) => {
                             if (roleMap[role.id]) {
                                 roleMap[role.id].users.push(user);
                             }
@@ -44,7 +44,7 @@ function RoutePeople() {
 
                 //sort users in each role by amount of roles they have (more roles means higher index)
                 Object.values(roleMap).forEach((role: any) => {
-                    role.users.sort((a, b) => (b.roles ? b.roles.length : 0) - (a.roles ? a.roles.length : 0));
+                    role.users.sort((a: any, b: any) => (b.roles ? b.roles.length : 0) - (a.roles ? a.roles.length : 0));
                 });
 
                 const vals = Object.values(roleMap);

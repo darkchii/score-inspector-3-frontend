@@ -10,7 +10,7 @@ class OsuLegacyScoreMissCalculator implements IOsuLegacyScoreMissCalculator {
     }
 
     calculate() {
-        if(this.score.attr_diff.max_combo === 0 || this.score.legacy_total_score === 0){
+        if(!this.score.attr_diff || this.score.attr_diff?.max_combo === 0 || this.score.legacy_total_score === 0){
             return 0;
         }
 
@@ -39,6 +39,10 @@ class OsuLegacyScoreMissCalculator implements IOsuLegacyScoreMissCalculator {
     }
 
     calculateScoreAtCombo(combo: number, relevantComboPerObject: number, scoreV1Multiplier: number) {
+        if(!this.score.attr_diff || this.score.attr_diff.max_combo === 0){
+            return 0;
+        }
+
         let countGreat = this.overrides?.statistics_great ?? this.score.statistics_great ?? 0;
         let countOk = this.overrides?.statistics_ok ?? this.score.statistics_ok ?? 0;
         let countMeh = this.overrides?.statistics_meh ?? this.score.statistics_meh ?? 0;
@@ -61,10 +65,14 @@ class OsuLegacyScoreMissCalculator implements IOsuLegacyScoreMissCalculator {
     }
 
     calculateMaximumMissCount() {
+        if(!this.score.attr_diff || this.score.attr_diff.max_combo === 0) {
+            return 0;
+        }
+
         let countMiss = this.overrides?.statistics_miss ?? this.score.statistics_miss ?? 0;
         let combo = this.overrides?.combo ?? this.score.combo ?? 0;
 
-        if(this.score.local_beatmap.count_sliders <= 0){
+        if(!this.score.local_beatmap || this.score.local_beatmap.count_sliders <= 0){
             return countMiss;
         }
 
@@ -97,6 +105,10 @@ class OsuLegacyScoreMissCalculator implements IOsuLegacyScoreMissCalculator {
     }
 
     calculateRelevantComboPerObject() {
+        if(!this.score.attr_diff || this.score.attr_diff.max_combo === 0) {
+            return 0;
+        }
+
         let comboScore = this.score.attr_diff.maximum_legacy_combo_score;
 
         comboScore /= 300 / 25 * this.score.attr_diff.legacy_score_base_multiplier;
@@ -108,7 +120,6 @@ class OsuLegacyScoreMissCalculator implements IOsuLegacyScoreMissCalculator {
     }
 
     getLegacyScoreMultiplier() {
-        //bool
         const scoreV2 = this.score.mods.some(mod => mod.acronym === 'SV2');
 
         let multiplier = 1.0;

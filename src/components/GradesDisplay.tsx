@@ -4,11 +4,11 @@ import BetterTooltip from "./tooltips/BetterTooltip";
 import NumberFlow from "@number-flow/react";
 import type { NumberFlowStyleWithVars } from "../types/types";
 
-function _SingularGradeDisplay({ grade, count, overrideCount }) {
+function _SingularGradeDisplay({ grade, count, overrideCount }: { grade: string, count: number, overrideCount?: number }) {
     //only tooltip if overrideCount is given (even if 0)
     return (
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start', gap: 1 }}>
-            <img src={TextureDatabase[`SVGGrade${grade}`]} alt={grade} width={48} height={48} />
+            <img src={TextureDatabase[`SVGGrade${grade}` as keyof typeof TextureDatabase]} alt={grade} width={48} height={48} />
             {/* <BetterTooltip title={overrideCount !== undefined ? `Including overrides: ${FormatNumber(overrideCount)} total` : ''}> */}
             <Box sx={{
                 //reduced spacing between the two values
@@ -32,7 +32,7 @@ function _SingularGradeDisplay({ grade, count, overrideCount }) {
     )
 }
 
-function GradesDisplay({ grades }) {
+function GradesDisplay({ grades }: { grades: { [key: string]: number } }) {
     //assume grades is an object like { XH: 10, XH_override: 2, X: 20, X_override: 5, ... }
 
     return (

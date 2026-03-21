@@ -65,7 +65,7 @@ function ScoreFilterGetFieldValue(score: IScore, field: string): any {
     const fieldParts = field.split('.');
     let fieldValue = score;
     for (const part of fieldParts) {
-        fieldValue = fieldValue ? fieldValue[part] : null;
+        fieldValue = fieldValue ? fieldValue[part as keyof IScore] : null;
     }
     return fieldValue;
 }

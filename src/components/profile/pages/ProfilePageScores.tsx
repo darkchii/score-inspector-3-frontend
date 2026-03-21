@@ -4,18 +4,19 @@ import { useEffect, useState } from "react";
 import ItemList from "../../list/ItemList";
 import ScoreListRow from "../../list/ScoreListRow";
 import ScoreFilter from "../../ScoreFilter";
+import type { IScore } from "../../../types/types";
 
 const _scoresPerPage = 50;
 
 function ProfilePageScores() {
     const { getRulesetStatistics, activeRuleset } = useProfile();
     const [page, setPage] = useState(0);
-    const [displayedScoreDatabase, setDisplayedScoreDatabase] = useState([]); //subsets of scores for pagination, makes it much faster than constantly slicing
+    const [displayedScoreDatabase, setDisplayedScoreDatabase] = useState<IScore[][]>([]); //subsets of scores for pagination, makes it much faster than constantly slicing
     const [scoreCount, setScoreCount] = useState(0);
 
-    const applyFilteredScores = (filteredScores) => {
+    const applyFilteredScores = (filteredScores: IScore[]) => {
         setScoreCount(filteredScores.length);
-        const pages = [];
+        const pages: IScore[][] = [];
         for (let i = 0; i < filteredScores.length; i += _scoresPerPage) {
             pages.push(filteredScores.slice(i, i + _scoresPerPage));
         }
@@ -26,7 +27,7 @@ function ProfilePageScores() {
     useEffect(() => {
         const _scores = getRulesetStatistics(activeRuleset)?.scores_set.scores || [];
         //default sort by implied_pp desc
-        _scores.sort((a, b) => b.implied_pp - a.implied_pp);
+        _scores.sort((a: IScore, b: IScore) => b.implied_pp - a.implied_pp);
         applyFilteredScores(_scores);
     }, [activeRuleset]);
 

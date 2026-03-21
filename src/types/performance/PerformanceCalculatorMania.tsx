@@ -39,7 +39,7 @@ class PerformanceCalculatorMania extends PerformanceCalculator implements IPerfo
     }
 
     computeDifficultyValue(score: IScore) {
-        let difficultyValue = 8.0 * Math.pow(Math.max(score.attr_diff.star_rating - 0.15, 0.05), 2.2)
+        let difficultyValue = 8.0 * Math.pow(Math.max((score.attr_diff?.star_rating || 0) - 0.15, 0.05), 2.2)
             * Math.max(0, 5 * this.accuracy - 4)
             * (1 + 0.1 * Math.min(1, this.totalHits / 1500.0));
         

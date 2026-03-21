@@ -1,5 +1,6 @@
 import { Buffer } from "buffer";
-import React from "react";
+import React, { JSX } from "react";
+import type { Theme, ToastOptions, ToastPosition } from "react-toastify";
 
 export interface IBeatmap {
     beatmap_id: number;
@@ -52,13 +53,13 @@ export interface IBeatmap {
     score_data: any;
 
     addScore(score: IScore): void;
-    getScores(sort: keyof IScore | null, direction: 'asc' | 'desc'): IScore[] | null;
+    getScores(sort?: keyof IScore | null, direction?: 'asc' | 'desc'): IScore[] | null;
     clone(): IBeatmap;
 }
 
 export interface IScore {
-    beatmap: IBeatmap | null;
-    local_beatmap: IBeatmap | null
+    beatmap: IBeatmap;
+    local_beatmap: IBeatmap;
     user: any; //can be User or null
     id: number;
     beatmap_id: number;
@@ -97,15 +98,11 @@ export interface IScore {
     processed: boolean;
     grade: string;
     replay: boolean;
-    ended_at: Date | null;
+    ended_at: Date;
     started_at: Date | null
     lchg_time: Date | null;
     ended_at_seconds: number | null;
-    ended_at_str: {
-        'YYYY-MM-DD'?: string;
-        'YYYY-MM'?: string;
-        'YYYY'?: string;
-    };
+    ended_at_str: IScoreDateStrings;
     statistics_perfect: number;
     statistics_great: number
     statistics_good: number;
@@ -129,7 +126,7 @@ export interface IScore {
     highest_score: boolean;
     highest_pp: boolean;
     rank: number | null;
-    mods: any[];
+    mods: IScoreMod[];
     mod_acronyms: string[];
     mod_speed_change: number | null;
     using_classic_slider_accuracy: boolean;
@@ -138,9 +135,9 @@ export interface IScore {
     is_ss: boolean;
     is_fc: boolean;
     is_convert: boolean;
-    implied_total_score: number;
+    implied_total_score: number | null;
     beatmap_attributes: any;
-    attr_diff: IScoreDifficulty | null;
+    attr_diff?: IScoreDifficulty | null;
     attr_recalc: boolean;
     diff_missing: boolean;
     star_rating: number | null;
@@ -153,6 +150,12 @@ export interface IScore {
     implied_pp: number;
 
     getOtherScores(): IScore[] | null;
+}
+
+export type IScoreDateStrings = {
+    'YYYY-MM-DD': string;
+    'YYYY-MM': string;
+    'YYYY': string;
 }
 
 export type IScoreDifficulty = {
@@ -186,7 +189,7 @@ export type IScoreDifficulty = {
 
 export type IPerformancePoints = {
     pp: number;
-    calculator: IPerformanceCalculator;
+    calculator: IPerformanceCalculator | null;
 }
 
 export type IPerformanceCalculator = {
@@ -264,8 +267,8 @@ export type IPerformanceCalculatorOsu = {
     calculateMissPenalty(missCount: number, difficultStrainCount: number): number;
     calculateEstimatedSliderBreaks(score: IScore, topWeightedSliderFactor: number): number;
     calculateSpeedHighDeviationNerf(score: IScore): number;
-    calculateSpeedDeviation(score: IScore): number;
-    calculateDeviation(relevantCountGreat: number, relevantCountOk: number, relevantCountMeh: number): number;
+    calculateSpeedDeviation(score: IScore): number | null;
+    calculateDeviation(relevantCountGreat: number, relevantCountOk: number, relevantCountMeh: number): number | null;
     CalculateRateAdjustedApproachRate(approachRate: number, clockRate: number): number;
     CalculateRateAdjustedOverallDifficulty(overallDifficulty: number, clockRate: number): number;
     calculateComboBasedEstimatedMissCount(score: IScore): number;
@@ -283,9 +286,9 @@ export type IPerformanceCalculatorTaiko = {
     greatHitWindow: number;
     estimatedUnstableRate: number | null;
     totalDifficultHits: number;
-    difficultyValue: number
-    accuracyValue: number;
-    totalPerformance: number;
+    difficultyValue: number | null;
+    accuracyValue: number | null;
+    totalPerformance: number | null;
     hitWindows: IHitWindowsTaiko;
 }
 
@@ -295,7 +298,7 @@ export type IHitWindowsOsu = {
     meh: number;
 
     SetDifficulty(overallDifficulty: number): void;
-    WindowFor(result: 'great' | 'ok' | 'meh' | 'miss'): number | null;
+    WindowFor(result: 'great' | 'ok' | 'meh' | 'miss'): number;
 }
 
 export type IHitWindowsTaiko = {
@@ -304,7 +307,7 @@ export type IHitWindowsTaiko = {
     miss: number;
 
     SetDifficulty(overallDifficulty: number): void;
-    WindowFor(result: 'great' | 'ok' | 'miss'): number | null;
+    WindowFor(result: 'great' | 'ok' | 'miss'): number;
 }
 
 export type IProfileRulesetScoreSet = {
@@ -566,6 +569,7 @@ export type ISessionCollection = {
 
     get(): ISession[];
     getById(id: string): ISession | undefined;
+    forEach(callback: (session: ISession, index: number) => void): void;
 }
 
 export type ISession = {
@@ -670,3 +674,53 @@ export type IOsuLegacyScoreMissCalculator = {
 export type NumberFlowStyleWithVars = React.CSSProperties & {
     '--number-flow-mask-height'?: string;
 };
+
+export type IConfig = {
+    WEBSITE_NAME: string;
+    VERSION: string;
+    DEV_MODE: boolean;
+    API: {
+        [mode: string]: {
+            API_URL: string;
+            OSU_CLIENT_ID: number;
+            AUTH_REDIRECT: string;
+        }
+    };
+    NOTIFICATIONS: {
+        position: string;
+        theme: string;
+    };
+    WIKI_URL: string;
+    TEAMS_URL: string;
+    DISCORD_URL: string;
+    DISCORD_ID: string;
+    PAYPAL_DONATION_URL: string;
+};
+
+export type IRouteObject = {
+    path: string;
+    element: JSX.Element;
+    children?: IRouteObject[];
+}
+
+export type IAuthUser = {
+    id: number;
+    token_type: string;
+}
+
+export type IScoreMod = {
+    acronym: string;
+    settings: IScoreModSettings | null;
+}
+
+export type IScoreModSettings = {
+    [key: string]: any;
+}
+
+//the mod data from json, these are capitalized and have different data than IScoreMod
+export type IDatabasedMod = {
+    Acronym: string;
+    Name: string;
+    Settings: IScoreModSettings | null;
+    IncompatibleMods: string[];
+}

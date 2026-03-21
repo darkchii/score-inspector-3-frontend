@@ -7,16 +7,16 @@ const OK_WINDOW_RANGE = [120, 80, 50];
 const MISS_WINDOW_RANGE = [135, 95, 70];
 
 class HitWindowsTaiko extends HitWindows implements IHitWindowsTaiko {
-    great: number | null;
-    ok: number | null;
-    miss: number | null;
+    great: number;
+    ok: number;
+    miss: number;
 
     constructor() {
         super();
 
-        this.great = null;
-        this.ok = null;
-        this.miss = null;
+        this.great = 0;
+        this.ok = 0;
+        this.miss = 0;
     }
 
     SetDifficulty(overallDifficulty: number) {
@@ -25,7 +25,7 @@ class HitWindowsTaiko extends HitWindows implements IHitWindowsTaiko {
         this.miss = Math.floor(BeatmapDifficultyInfo.DifficultyRange(overallDifficulty, MISS_WINDOW_RANGE)) - 0.5;
     }
 
-    WindowFor(result: 'great' | 'ok' | 'miss') {
+    WindowFor(result: 'great' | 'ok' | 'miss'): number {
         switch(result) {
             case 'great':
                 return this.great;
@@ -34,7 +34,7 @@ class HitWindowsTaiko extends HitWindows implements IHitWindowsTaiko {
             case 'miss':
                 return this.miss;
             default:
-                return null;
+                return 0;
         }
     }
 }

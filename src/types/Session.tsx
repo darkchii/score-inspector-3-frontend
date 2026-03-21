@@ -65,20 +65,20 @@ class Session implements ISession {
                 this.grades[grade] = 0;
             }
             this.grades[grade] += 1;
-            this.cumulative_implied_total_score += score.implied_total_score;
-            this.cumulative_lazer_score += score.total_score;
-            this.cumulative_pp += score.implied_pp;
+            this.cumulative_implied_total_score += score.implied_total_score || 0;
+            this.cumulative_lazer_score += score.total_score || 0;
+            this.cumulative_pp += score.implied_pp || 0;
             
-            if (score.implied_total_score > this.max_implied_total_score) {
-                this.max_implied_total_score = score.implied_total_score;
+            if ((score.implied_total_score || 0) > this.max_implied_total_score) {
+                this.max_implied_total_score = score.implied_total_score || 0;
             }
 
-            if (score.total_score > this.max_lazer_score) {
-                this.max_lazer_score = score.total_score;
+            if ((score.total_score || 0) > this.max_lazer_score) {
+                this.max_lazer_score = score.total_score || 0;
             }
             
-            if (score.implied_pp > this.max_pp) {
-                this.max_pp = score.implied_pp;
+            if ((score.implied_pp || 0) > this.max_pp) {
+                this.max_pp = score.implied_pp || 0;
             }
         });
 

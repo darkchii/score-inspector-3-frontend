@@ -17,8 +17,8 @@ function PerformanceChartScoreSpread() {
                         datasets: [
                             {
                                 label: 'Scores',
-                                data: getRulesetStatistics(activeRuleset)?.charts?.scoreSpread.map(item => ({ x: item.x, y: item.y, id: item.id })) || [],
-                                pointBackgroundColor: getRulesetStatistics(activeRuleset)?.charts?.scoreSpread.map(item => item.color) || [],
+                                data: getRulesetStatistics(activeRuleset)?.charts?.scoreSpread.map((item: any) => ({ x: item.x, y: item.y, id: item.id })) || [],
+                                pointBackgroundColor: getRulesetStatistics(activeRuleset)?.charts?.scoreSpread.map((item: any) => item.color) || [],
                                 pointRadius: 2,
                             }
                         ]

@@ -3,6 +3,7 @@ import ModData from "../data/Mods.json";
 import { FormatNumber, FormatNumberWithPrecision, GetRulesetId } from "./Helper";
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
+import { IDatabasedMod, IScoreMod } from "../types/types";
 
 const _modDatabase: { [ruleset: string]: { [acronym: string]: any } } = {};
 export function GetModData(ruleset: string, acronym: string) {
@@ -21,7 +22,7 @@ export function GetModSettingForDisplay(ruleset: string, acronym: string, key: s
     const modData = GetModData(ruleset, acronym);
     if (!modData || !modData.Settings) return String(value);
 
-    const settingData = modData.Settings.find(s => s.Name === key);
+    const settingData = modData.Settings.find((s: any) => s.Name === key);
 
     if (!settingData) return String(value);
     // console.log(settingData);
@@ -37,7 +38,7 @@ export function GetModSettingForDisplay(ruleset: string, acronym: string, key: s
     }
 }
 
-export function ReorderMods(ruleset: string, mods: any[]): any[] {
+export function ReorderMods(ruleset: string, mods: IScoreMod[]): IScoreMod[] {
     BuildDatabase();
 
     if (!_modDatabase[ruleset]) return mods;
@@ -48,14 +49,14 @@ export function ReorderMods(ruleset: string, mods: any[]): any[] {
 
         if (!mod_a_from_db || !mod_b_from_db) return 0;
 
-        const index_a = ModData[GetRulesetId(ruleset)].Mods.findIndex((mod: any) => mod.acronym === mod_a_from_db.Acronym);
-        const index_b = ModData[GetRulesetId(ruleset)].Mods.findIndex((mod: any) => mod.acronym === mod_b_from_db.Acronym);
+        const index_a = ModData[GetRulesetId(ruleset)].Mods.findIndex((mod: IDatabasedMod) => mod.Acronym === mod_a_from_db.Acronym);
+        const index_b = ModData[GetRulesetId(ruleset)].Mods.findIndex((mod: IDatabasedMod) => mod.Acronym === mod_b_from_db.Acronym);
 
         return index_a - index_b;
     });
 }
 
-export function GetModExtendedContent(mod: any): string | null {
+export function GetModExtendedContent(mod: IScoreMod): string | null {
     if (!mod) return null;
 
     switch (mod.acronym) {
@@ -70,16 +71,20 @@ export function GetModExtendedContent(mod: any): string | null {
         case 'DA':
             const displayCandidates = {
                 approach_rate: {
-                    acronym: 'AR'
+                    acronym: 'AR',
+                    significantDigits: null
                 },
                 circle_size: {
-                    acronym: 'CS'
+                    acronym: 'CS',
+                    significantDigits: null
                 },
                 drain_rate: {
-                    acronym: 'HP'
+                    acronym: 'HP',
+                    significantDigits: null
                 },
                 overall_difficulty: {
-                    acronym: 'OD'
+                    acronym: 'OD',
+                    significantDigits: null
                 },
                 scroll_speed: {
                     acronym: 'SS',
@@ -103,7 +108,8 @@ export function GetModExtendedContent(mod: any): string | null {
             }
 
             if(displayCandidate != null && displayValue != null) {
-                return `${displayCandidate.acronym} ${FormatNumberWithPrecision(displayValue, displayCandidate.significantDigits || 1)}`;
+                const sigDigits = displayCandidate.significantDigits ?? 1;
+                return `${displayCandidate.acronym} ${FormatNumberWithPrecision(displayValue, sigDigits)}`;
             }
 
             return null;

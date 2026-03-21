@@ -5,7 +5,7 @@ class SessionBreak implements ISessionBreak {
     end: Date;
     duration: number;
 
-    constructor(start: Date, end: Date, duration: number = null) {
+    constructor(start: Date, end: Date, duration: number | null = null) {
         this.start = start;
         this.end = end;
         this.duration = duration !== null ? duration : (end.getTime() - start.getTime()) / 1000;

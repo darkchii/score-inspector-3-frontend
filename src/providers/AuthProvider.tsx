@@ -4,15 +4,16 @@ import { ShowNotification } from "../util/Helper";
 import { GetAPI } from "../util/ApiHelper";
 import axios from "axios";
 import type { AuthContextValue } from "./ContextTypes";
+import { IAuthUser } from "../types/types";
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+const AuthContext = createContext<AuthContextValue>({} as AuthContextValue);
 
 const expectedLoginResponseFields = [
     'access_token', 'refresh_token', 'expires_in', 'token_type', 'user_id'
 ]
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<IAuthUser | null>(null);
     const [userData, setUserData] = useState(null);
     const [token, setToken] = useState(localStorage.getItem("access_token") || "");
     const [refreshToken, setRefreshToken] = useState(localStorage.getItem("refresh_token") || "");
@@ -129,7 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
-    const login = async (code) => {
+    const login = async (code: string) => {
         setLoading(true);
         try{
             if (isValidToken()) {

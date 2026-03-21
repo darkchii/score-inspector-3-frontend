@@ -35,7 +35,10 @@ function RouteProfile() {
         (async () => {
             setIsWorking(true);
             try {
-                await fetchFullProfile(userId);
+                if(!userId) {
+                    throw new Error("No user ID provided");
+                }
+                await fetchFullProfile(userId as string);
                 //brief wait to show the completion
                 if (!errorMessage) {
                     await new Promise(resolve => setTimeout(resolve, 500));
@@ -49,7 +52,7 @@ function RouteProfile() {
 
     useEffect(() => {
         //change url without reloading
-        window.history.replaceState(null, null, `/user/${userId}/${activeRuleset || 'all'}/${activePage || 'main'}`);
+        window.history.replaceState(null, '', `/user/${userId}/${activeRuleset || 'all'}/${activePage || 'main'}`);
 
         console.log({ activeRuleset, activePage });
     }, [activeRuleset, activePage]);
@@ -99,11 +102,11 @@ function RouteProfile() {
                 justifyContent: { xs: 'flex-start', md: 'center' },
                 gap: 2, mb: 0, mt: 1, width: '100%' }}>
                 <Tabs scrollButtons="auto" aria-label='profile-page-tabs' value={activePage} textColor="primary" indicatorColor="primary">
-                    {Object.keys(pageComponents).map((key) => {
+                    {Object.keys(pageComponents).map((key: string) => {
                         return (
                             <Tab
                                 key={`profile-page-tab-${key}`}
-                                label={pageComponents[key].title}
+                                label={pageComponents[key as keyof typeof pageComponents].title}
                                 value={key}
                                 onClick={() => setPage(key)}
                             />
@@ -113,12 +116,12 @@ function RouteProfile() {
             </Box>
 
             {
-                Object.keys(pageComponents).map((key) => {
+                Object.keys(pageComponents).map((key: string) => {
                     return (
                         <Collapse key={key} in={activePage === key} unmountOnExit>
                             <Box>
                                 {(() => {
-                                    const PageComponent = pageComponents[key].component;
+                                    const PageComponent = pageComponents[key as keyof typeof pageComponents].component;
                                     return <PageComponent />;
                                 })()}
                             </Box>

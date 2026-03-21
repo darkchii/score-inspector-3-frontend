@@ -6,7 +6,7 @@ import { useApi } from './ApiProvider';
 import PlayerCard from '../components/PlayerCard';
 import { SearchContextValue } from './ContextTypes';
 
-const SearchContext = createContext<SearchContextValue | null>(null);
+const SearchContext = createContext<SearchContextValue>({} as SearchContextValue);
 
 export function SearchProvider({ children }: { children: React.ReactNode }) {
     const { getUserSearch } = useApi();
@@ -24,7 +24,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
         setIsSearchOpen(false);
     }
 
-    const search = async (query) => {
+    const search = async (query: string) => {
         if (isSearching) {
             return;
         }
@@ -49,7 +49,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 
     //when pressing escape key, close the search modal
     useEffect(() => {
-        const handleKeyDown = (event) => {
+        const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 closeSearch();
             }
@@ -70,7 +70,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     )
 }
 
-function SearchModal({ query = '', open = false, working = false, results = [], onClose = () => { }, onSearch = (query) => { } }) {
+function SearchModal({ query = '', open = false, working = false, results = [], onClose = () => { }, onSearch = (query: string) => { } }: { query: string, open: boolean, working: boolean, results: any[], onClose: () => void, onSearch: (query: string) => void }) {
     return (
         <Modal open={open} onClose={onClose} closeAfterTransition disableEnforceFocus disableRestoreFocus>
             <div className={searchStyles['search-modal']}>

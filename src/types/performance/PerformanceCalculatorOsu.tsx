@@ -37,7 +37,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
     accuracyValue: number;
     flashlightValue: number
     multiplier: number;
-    aimEstimatedSliderBreaks: number;
+    aimEstimatedSliderBreaks: number = 0;
 
     constructor(score: IScore, overrides: any = {}) {
         super(score, overrides);
@@ -51,7 +51,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
         this.countOk = overrides?.statistics_ok ?? score.statistics_ok ?? 0;
         this.countMiss = overrides?.statistics_miss ?? score.statistics_miss ?? 0;
         this.sliderTailHit = overrides?.statistics_slider_tail_hit ?? score.statistics_slider_tail_hit ?? 0;
-        this.countSliderEndsDropped = score.local_beatmap.count_sliders - this.sliderTailHit;
+        this.countSliderEndsDropped = (score.local_beatmap?.count_sliders ?? 0) - this.sliderTailHit;
         this.countSliderTickMiss = overrides?.statistics_large_tick_miss ?? score.statistics_large_tick_miss ?? 0;
         this.effectiveMissCount = this.countMiss;
         this.totalImperfectHits = this.countOk + this.countMeh + this.countMiss;
@@ -64,9 +64,9 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
         this.hitWindows = new HitWindowsOsu();
         this.hitWindows.SetDifficulty(score.beatmap_attributes.od); //temp od
 
-        this.greatHitWindow = this.hitWindows.WindowFor('great') / this.clockRate;
-        this.okHitWindow = this.hitWindows.WindowFor('ok') / this.clockRate;
-        this.mehHitWindow = this.hitWindows.WindowFor('meh') / this.clockRate;
+        this.greatHitWindow = (this.hitWindows.WindowFor('great') ?? 0) / this.clockRate;
+        this.okHitWindow = (this.hitWindows.WindowFor('ok') ?? 0) / this.clockRate;
+        this.mehHitWindow = (this.hitWindows.WindowFor('meh') ?? 0) / this.clockRate;
 
         this.approachRate = this.CalculateRateAdjustedApproachRate(score.beatmap_attributes.ar, this.clockRate);
         this.overallDifficulty = this.CalculateRateAdjustedOverallDifficulty(score.beatmap_attributes.od, this.clockRate);
@@ -74,11 +74,11 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
         this.comboBasedEstimatedMissCount = this.calculateComboBasedEstimatedMissCount(score);
         this.scoreBasedEstimatedMissCount = null;
 
-        if (score.using_classic_slider_accuracy && score.legacy_total_score > 0) {
+        if (score.using_classic_slider_accuracy && (score.legacy_total_score ?? 0) > 0) {
             let legacyScoreMissCalculator = new OsuLegacyScoreMissCalculator(score, overrides);
             this.scoreBasedEstimatedMissCount = legacyScoreMissCalculator.calculate();
 
-            this.effectiveMissCount = this.scoreBasedEstimatedMissCount;
+            this.effectiveMissCount = this.scoreBasedEstimatedMissCount ?? this.comboBasedEstimatedMissCount;
         } else {
             this.effectiveMissCount = this.comboBasedEstimatedMissCount;
         }
@@ -95,7 +95,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
 
         //if so
         if (score.mods.some(mod => mod.acronym === 'SO') && this.totalHits > 0) {
-            this.multiplier *= 1.0 - Math.pow(score.local_beatmap.count_spinners / this.totalHits, 0.85);
+            this.multiplier *= 1.0 - Math.pow((score.local_beatmap?.count_spinners ?? 0) / this.totalHits, 0.85);
         }
 
         //if rx
@@ -123,7 +123,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
     }
 
     computeAimValue(score: IScore) {
-        if (score.mods.some(mod => mod.acronym === 'AP')) {
+        if (score.mods.some(mod => mod.acronym === 'AP') || !score.attr_diff) {
             return 0.0;
         }
 
@@ -175,7 +175,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
     }
 
     computeSpeedValue(score: IScore) {
-        if (score.mods.some(mod => mod.acronym === 'RX') || this.speedDeviation === null) {
+        if (score.mods.some(mod => mod.acronym === 'RX') || this.speedDeviation === null || !score.attr_diff) {
             return 0.0;
         }
 
@@ -254,7 +254,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
     }
 
     computeFlashlightValue(score: IScore) {
-        if (!score.mods.some(mod => mod.acronym === 'FL')) {
+        if (!score.mods.some(mod => mod.acronym === 'FL') || !score.attr_diff) {
             return 0.0;
         }
 
@@ -269,7 +269,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
         return flashlightValue;
     }
 
-    static DifficultyToPerformance(difficulty) {
+    static DifficultyToPerformance(difficulty: number) : number {
         return Math.pow(5.0 * Math.max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
     }
 
@@ -278,7 +278,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
     }
 
     calculateEstimatedSliderBreaks(score: IScore, topWeightedSliderFactor: number) {
-        if (!score.using_classic_slider_accuracy || this.countOk === 0) {
+        if (!score.using_classic_slider_accuracy || this.countOk === 0 || !score.attr_diff) {
             return 0.0;
         }
 
@@ -293,7 +293,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
     }
 
     calculateSpeedHighDeviationNerf(score: IScore){
-        if(this.speedDeviation === null){
+        if(this.speedDeviation === null || !score.attr_diff){
             return 0.0;
         }
 
@@ -314,8 +314,8 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
         return adjustedSpeedValue / speedValue;
     }
 
-    calculateSpeedDeviation(score: IScore) {
-        if (this.totalSuccessfulHits === 0) {
+    calculateSpeedDeviation(score: IScore) : number | null {
+        if (this.totalSuccessfulHits === 0 || !score.attr_diff) {
             return 0.0;
         }
 
@@ -330,7 +330,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
         return this.calculateDeviation(relevantCountGreat, relevantCountOk, relevantCountMeh);
     }
 
-    calculateDeviation(relevantCountGreat: number, relevantCountOk: number, relevantCountMeh: number) {
+    calculateDeviation(relevantCountGreat: number, relevantCountOk: number, relevantCountMeh: number) : number | null {
         if (relevantCountGreat + relevantCountOk + relevantCountMeh <= 0) {
             return null;
         }
@@ -382,9 +382,10 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
         }
 
         let missCount = this.countMiss;
+        let maxCombo = score.attr_diff?.max_combo ?? score.beatmap.max_combo;
 
         if (score.using_classic_slider_accuracy) {
-            let fullComboThreshold = score.attr_diff.max_combo - 0.1 * score.local_beatmap.count_sliders;
+            let fullComboThreshold = maxCombo - 0.1 * score.local_beatmap.count_sliders;
 
             if (this.combo < fullComboThreshold) {
                 missCount = fullComboThreshold / Math.max(1, this.combo);
@@ -392,7 +393,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
 
             missCount = Math.min(missCount, this.totalImperfectHits);
 
-            let maxPossibleSliders = Math.min(score.local_beatmap.count_sliders, (score.attr_diff.max_combo - this.combo) / 2);
+            let maxPossibleSliders = Math.min(score.local_beatmap.count_sliders, (maxCombo - this.combo) / 2);
 
             let sliderBreaks = missCount - this.countMiss;
 
@@ -400,7 +401,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
                 missCount = this.countMiss + maxPossibleSliders;
             }
         } else {
-            let fullComboThreshold = score.attr_diff.max_combo - this.countSliderEndsDropped;
+            let fullComboThreshold = maxCombo - this.countSliderEndsDropped;
 
             if (this.combo < fullComboThreshold) {
                 missCount = fullComboThreshold / Math.max(1, this.combo);
@@ -413,7 +414,8 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
     }
 
     getComboScalingFactor(score: IScore) {
-        return score.attr_diff.max_combo <= 0 ? 1.0 : Math.min(Math.pow(this.combo, 0.8) / Math.pow(score.attr_diff.max_combo, 0.8), 1.0);
+        let max_combo = score.attr_diff?.max_combo ?? score.beatmap.max_combo;
+        return max_combo <= 0 ? 1.0 : Math.min(Math.pow(this.combo, 0.8) / Math.pow(max_combo, 0.8), 1.0);
     }
 }
 

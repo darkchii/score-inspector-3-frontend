@@ -1,8 +1,9 @@
 import { Box } from "@mui/material";
 import ModIcon from "./ModIcon";
 import { GetModData } from "../util/ModHelper";
+import type { IScoreMod } from "../types/types";
 
-function ModDisplay({ ruleset, mods }) {
+function ModDisplay({ ruleset, mods }: { ruleset: string; mods: IScoreMod[] }) {
     return (
         <Box sx={{
             display: 'flex',

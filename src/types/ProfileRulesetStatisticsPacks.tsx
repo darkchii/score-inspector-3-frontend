@@ -5,7 +5,7 @@ export class ProfileRulesetStatisticsPacks implements IProfileRulesetStatisticsP
     packs: any[] = [];
     ruleset: string | null = null;
     
-    constructor(beatmaps: IBeatmap[], packs: any, ruleset = null) {
+    constructor(beatmaps: IBeatmap[], packs: any, ruleset: string | null = null) {
         this.packs = [];
         this.ruleset = ruleset;
 
@@ -16,12 +16,12 @@ export class ProfileRulesetStatisticsPacks implements IProfileRulesetStatisticsP
         //deepcopy packs, they are reused per ruleset and need ruleset-specific data
         let _packs = JSON.parse(JSON.stringify(packs));
 
-        const beatmapIdMap = {};
+        const beatmapIdMap: { [key: number]: IBeatmap } = {};
         for(const beatmap of beatmaps) {
             beatmapIdMap[beatmap.beatmap_id] = beatmap;
         }
 
-        const beatmapSetIdMap = {};
+        const beatmapSetIdMap: { [key: number]: IBeatmap[] } = {};
         for(const beatmap of beatmaps) {
             if(!beatmapSetIdMap[beatmap.beatmapset_id]) {
                 beatmapSetIdMap[beatmap.beatmapset_id] = [];
@@ -46,7 +46,7 @@ export class ProfileRulesetStatisticsPacks implements IProfileRulesetStatisticsP
             //filter beatmap_ids to only those matching the ruleset, if applicable
             if(this.ruleset && this.ruleset !== 'all') {
                 const rulesetId = GetRulesetId(this.ruleset);
-                pack.beatmap_ids = pack.beatmap_ids.filter(bmId => {
+                pack.beatmap_ids = pack.beatmap_ids.filter((bmId: number) => {
                     const bm = beatmapIdMap[bmId];
                     return bm && bm.ruleset_id === rulesetId;
                 });
@@ -63,12 +63,12 @@ export class ProfileRulesetStatisticsPacks implements IProfileRulesetStatisticsP
 
     processScores(scores: IScore[], beatmaps: IBeatmap[]) {
         //first list all unique beatmap ids from scores
-        const playedBeatmapIds = new Set();
+        const playedBeatmapIds = new Set<number>();
         for(const score of scores) {
             playedBeatmapIds.add(score.beatmap_id);
         }
 
-        const beatmapIdScoreMap = {};
+        const beatmapIdScoreMap: { [key: number]: IScore[] } = {};
         for(const score of scores) {
             if(!beatmapIdScoreMap[score.beatmap_id]) {
                 beatmapIdScoreMap[score.beatmap_id] = [];

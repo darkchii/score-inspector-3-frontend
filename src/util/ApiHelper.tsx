@@ -1,19 +1,21 @@
 import Config from '../data/Config.json';
+import type { IConfig } from '../types/types';
+const typedConfig: IConfig = Config;
 
 function GetApiMode() : string {
-    return Config.DEV_MODE ? 'DEVELOPMENT' : 'PRODUCTION';
+    return typedConfig.DEV_MODE ? 'DEVELOPMENT' : 'PRODUCTION';
 }
 
 export function GetAPI() : string {
-    return Config.API[GetApiMode()].API_URL;
+    return typedConfig.API[GetApiMode()].API_URL;
 }
 
-export function GetOsuClientID() : string {
-    return Config.API[GetApiMode()].OSU_CLIENT_ID;
+export function GetOsuClientID() : number {
+    return typedConfig.API[GetApiMode()].OSU_CLIENT_ID;
 }
 
 export function GetOsuApiRedirect() : string {
-    return Config.API[GetApiMode()].AUTH_REDIRECT;
+    return typedConfig.API[GetApiMode()].AUTH_REDIRECT;
 }
 
 export function GetOsuAuthUrl() : string {

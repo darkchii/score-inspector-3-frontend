@@ -4,8 +4,14 @@ import { GetRulesetIconFromId, TimeAgo } from "../util/Helper";
 import { useScoreView } from "../providers/ScoreViewProvider";
 import Marquee from "./Marquee";
 import scoreCardStyles from '../styles/score-card.module.less';
+import { IScore } from "../types/types";
+import { ReactElement } from "react";
 
-function ScoreCard({ score, title = null, value = null }) {
+function ScoreCard({ score, title = null, value = null }: {
+    score: IScore | null,
+    title?: string | ReactElement | null,
+    value?: string | ReactElement | null,
+}) {
     const { loadScoreView } = useScoreView();
 
     if (!score) return (

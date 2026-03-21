@@ -12,12 +12,12 @@ function RouteIndex() {
     usePageTitle(null); //reset to default title
     const { getAlerts } = useApi();
 
-    const [alerts, setAlerts] = useState([]);
+    const [alerts, setAlerts] = useState<any[]>([]);
 
     const [activeRuleset, setActiveRuleset] = useState('osu');
     const [isWorking, setIsWorking] = useState(0);
 
-    const _setIsWorking = (val) => {
+    const _setIsWorking = (val: boolean) => {
         if(val)
             setIsWorking(prev => prev + 1);
         else

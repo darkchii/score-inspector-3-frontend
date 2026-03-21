@@ -1,6 +1,10 @@
 import { Box, Paper } from "@mui/material";
+import { JSX } from "react";
 
-function ProfileHighlight({ title, value }) {
+function ProfileHighlight({ title, value }: {
+    title: string,
+    value: string | number | JSX.Element
+}) {
     return (
         <Paper elevation={3} sx={{ width: '100%', p: 1 }}>
             <Box>

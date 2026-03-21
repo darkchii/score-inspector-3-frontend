@@ -101,7 +101,7 @@ export class OsuBuffer implements IOsuBuffer {
         return this.buffer.readDoubleLE(this.position - 8);
     }
 
-    ReadString(length) {
+    ReadString(length: number) {
         return this.Slice(length, false).toString('utf-8');
     }
 

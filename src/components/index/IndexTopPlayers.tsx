@@ -2,28 +2,32 @@ import { useEffect, useState } from "react";
 import { useApi } from "../../providers/ApiProvider";
 import { Paper, Typography, Collapse, Alert, Box, Fade, ButtonGroup, Button, Grid, TableContainer, Table, TableBody, TableRow, TableCell, tableCellClasses, tableRowClasses, useTheme, CircularProgress } from "@mui/material";
 import RulesetSelector from "../RulesetSelector";
-import { GetRulesetId } from "../../util/Helper";
 import PlayerLink from "../PlayerLink";
 
-const titleMap = {
+const titleMap: { [key: string]: string } = {
     'today': 'today',
     'yesterday': 'yesterday',
     'year': 'this year',
     'last_year': 'last year'
 }
 
-function IndexTopPlayers({ activeRuleset, setActiveRuleset, isWorking, setIsWorking }) {
+function IndexTopPlayers({ activeRuleset, setActiveRuleset, isWorking, setIsWorking }: {
+    activeRuleset: string;
+    setActiveRuleset: (rulesetId: string) => void;
+    isWorking: boolean;
+    setIsWorking: (working: boolean) => void;
+}) {
     const theme = useTheme();
     const { getTodayTopPlayers } = useApi();
-    const [rawData, setRawData] = useState(null);
-    const [error, setError] = useState(null);
-    const [lastUpdated, setLastUpdated] = useState(null);
+    const [rawData, setRawData] = useState<any | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-    const [selectedPeriod, setSelectedPeriod] = useState("today");
+    const [selectedPeriod, setSelectedPeriod] = useState<string>("today");
 
-    const [selectedDataSet, setSelectedDataSet] = useState(null);
+    const [selectedDataSet, setSelectedDataSet] = useState<any | null>(null);
 
-    const [isTransitioningDataSet, setIsTransitioningDataSet] = useState(false);
+    const [isTransitioningDataSet, setIsTransitioningDataSet] = useState<boolean>(false);
 
     const applyDataSet = async () => {
         setIsTransitioningDataSet(true);
@@ -45,7 +49,7 @@ function IndexTopPlayers({ activeRuleset, setActiveRuleset, isWorking, setIsWork
             if (data && data.last_updated) {
                 setLastUpdated(new Date(data.last_updated));
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
             setError(err);
         } finally {
@@ -86,7 +90,7 @@ function IndexTopPlayers({ activeRuleset, setActiveRuleset, isWorking, setIsWork
                 </Box>
             </Collapse>
             <Collapse in={!isWorking}>
-                {error && <Alert severity="error" sx={{ mb: 1 }}>Error loading: {error.message}</Alert>}
+                {error && <Alert severity="error" sx={{ mb: 1 }}>Error loading: {error}</Alert>}
                 {!rawData || Object.keys(rawData).length === 0 ? (
                     <Typography variant="body2">No data available.</Typography>
                 ) : (
@@ -124,7 +128,7 @@ function IndexTopPlayers({ activeRuleset, setActiveRuleset, isWorking, setIsWork
                                                                     }}>
                                                                         <TableBody>
                                                                             {
-                                                                                selectedDataSet[key].map((entry, index) => (
+                                                                                selectedDataSet[key].map((entry: any, index: number) => (
                                                                                     <TableRow>
                                                                                         <TableCell align="right" sx={{ width: '10%' }}><Typography variant="caption">{index + 1}.</Typography></TableCell>
                                                                                         <TableCell><PlayerLink data={entry.user} size={18} /></TableCell>

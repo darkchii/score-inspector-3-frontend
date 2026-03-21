@@ -11,21 +11,23 @@ import InteractiveBox from "../../InteractiveBox";
 import { ProfileRulesetScoreSet } from "../../../types/ProfileRulesetScoreSet";
 import ItemList from "../../list/ItemList";
 import ScoreListRow from "../../list/ScoreListRow";
+import type { IScore } from "../../../types/types";
+import { ProfileRulesetStatistics } from "../../../types/ProfileRulesetStatistics";
 
 //uses periodic_by_year from the ProfileRulesetStatistics type
 function ProfilePageDaily() {
     const { getRulesetStatistics, activeRuleset } = useProfile();
 
-    const [statDatabase, setStatDatabase] = useState(null);
+    const [statDatabase, setStatDatabase] = useState<ProfileRulesetStatistics | null>(null);
     const [yearRange, setYearRange] = useState(5);
     const [activeDisplayYear, setActiveDisplayYear] = useState(new Date().getUTCFullYear());
 
-    const [activeYearData, setActiveYearData] = useState(null);
+    const [activeYearData, setActiveYearData] = useState<ProfileRulesetScoreSet | null>(null);
 
     //this is what determines what statistics are actually shown
-    const [activeDateStart, setActiveDateStart] = useState(null);
-    const [activeDateEnd, setActiveDateEnd] = useState(null);
-    const [activeScoreSet, setActiveScoreSet] = useState(null);
+    const [activeDateStart, setActiveDateStart] = useState<string>('2007-01-01');
+    const [activeDateEnd, setActiveDateEnd] = useState<string | null>(null);
+    const [activeScoreSet, setActiveScoreSet] = useState<ProfileRulesetScoreSet | null>(null);
 
     useEffect(() => {
         const profileStatistics = getRulesetStatistics(activeRuleset);
@@ -46,7 +48,7 @@ function ProfilePageDaily() {
             //find newest entry in .periodic['daily'] to set active date to
             const dailyData = profileStatistics.periodic?.['daily'];
             if (dailyData) {
-                const dailyDates = Object.keys(dailyData).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+                const dailyDates: string[] = Object.keys(dailyData).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
                 if (dailyDates.length > 0) {
                     setActiveDateStart(dailyDates[0]);
                     setActiveDateEnd(null);
@@ -67,7 +69,7 @@ function ProfilePageDaily() {
     }, [activeDisplayYear, activeRuleset]);
 
     useEffect(() => {
-        let _scores_arr = [];
+        let _scores_arr: IScore[] = [];
         if (activeDateStart && statDatabase?.periodic?.['daily']) {
             const dailyData = statDatabase?.periodic?.['daily'];
             const startDate = new Date(activeDateStart);
@@ -99,7 +101,7 @@ function ProfilePageDaily() {
         return <div>No data available.</div>
     }
 
-    const onDateSelected = (dateKey, isSecondary = false) => {
+    const onDateSelected = (dateKey: string, isSecondary = false) => {
         console.log('date selected', dateKey, isSecondary);
         if (!isSecondary || (!activeDateStart && !activeDateEnd)) {
             setActiveDateStart(dateKey);
@@ -200,13 +202,20 @@ function ProfilePageDaily() {
 }
 
 const ABSOLUTE_RANGE_LIMIT = 100;
-function DateGrid({ year, data, activeDateStart = null, activeDateEnd = null, onDateSelected = null, onDateSecondarySelected = null }) {
+function DateGrid({ year, data, activeDateStart = null, activeDateEnd = null, onDateSelected = null, onDateSecondarySelected = null }: {
+    year: number;
+    data: any;
+    activeDateStart?: string | null;
+    activeDateEnd?: string | null;
+    onDateSelected?: ((dateKey: string) => void) | null;
+    onDateSecondarySelected?: ((dateKey: string) => void) | null;
+}) {
     const theme = useTheme();
 
-    const startSquareColor = HexToRgb('#1a1a1a');
-    const endSquareColor = HexToRgb(theme.palette.primary.main);
+    const startSquareColor = HexToRgb('#1a1a1a') || [26, 26, 26];
+    const endSquareColor = HexToRgb(theme.palette.primary.main) || [0, 0, 0];
 
-    const [gridData, setGridData] = useState(null);
+    const [gridData, setGridData] = useState<{ [key: string]: any } | null>(null);
     const [isLeapYear, setIsLeapYear] = useState(false);
     const [dayOffset, setDayOffset] = useState(0);
     const [maxClears, setMaxClears] = useState(0);
@@ -226,15 +235,15 @@ function DateGrid({ year, data, activeDateStart = null, activeDateEnd = null, on
 
     useEffect(() => {
         //reformats it so more easily accessible
-        let temp = {};
+        let temp: { [key: string]: any } = {};
         if (data) {
             let _maxClears = 0;
             for (const dateString in data) {
                 temp[dateString] = data[dateString];
 
                 //find the max clears for color scaling
-                if (data[dateString].length > _maxClears) {
-                    _maxClears = data[dateString].length;
+                if (data[dateString]?.length > _maxClears) {
+                    _maxClears = data[dateString]?.length || 0;
                 }
             }
             setMaxClears(_maxClears);
@@ -318,7 +327,7 @@ function DateGrid({ year, data, activeDateStart = null, activeDateEnd = null, on
                                                         '--target-color': color,
                                                         //if no clears, reset hover
                                                         '&:hover': { cursor: clears > 0 ? 'pointer' : 'default' }
-                                                    }}
+                                                    } as React.CSSProperties}
                                                     // className={`${dateGridStyles['date-grid__square']} ${clears > 0 ? dateGridStyles['date-grid__square--clickable'] : dateGridStyles['date-grid__square--empty']}`}
                                                     className={`${dateGridStyles['date-grid__square']} ${clears > 0 ? dateGridStyles['date-grid__square--clickable'] : dateGridStyles['date-grid__square--empty']} ${isSelected ? dateGridStyles['date-grid__square--active'] : ''}`}
                                                     //clickable if clears > 0

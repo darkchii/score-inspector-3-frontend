@@ -4,8 +4,17 @@ import { useProfile } from "../../../../providers/ProfileProvider";
 import { useScoreView } from "../../../../providers/ScoreViewProvider";
 import { useEffect, useState } from "react";
 import { Button, ButtonGroup, FormControlLabel, FormGroup, Switch } from "@mui/material";
+import type { IProfileRulesetScoreSet, IScore, ISession, ISessionCollection } from "../../../../types/types";
 
-const chartDefinitions = {
+interface ChartDefinition {
+    value: string;
+    nesting: string[]; //path to value in score object, e.g. ['local_beatmap', 'length_modded']
+    label: string;
+    yFormat?: (y: number) => string; //function to format y-axis values and tooltip values
+    max?: number; //optional max value for y-axis
+}
+
+const chartDefinitions: { [key: string]: ChartDefinition } = {
     pp: { value: 'pp', nesting: ['implied_pp'], label: 'Performance', yFormat: (y) => y.toFixed(2) + 'pp' },
     score: { value: 'score', nesting: ['implied_total_score'], label: 'Score', yFormat: (y) => y.toLocaleString('en-US') },
     accuracy: { value: 'accuracy', nesting: ['accuracy'], label: 'Accuracy', yFormat: (y) => (y * 100).toFixed(2) + '%', max: 1 },
@@ -18,7 +27,13 @@ const chartDefinitions = {
     hp: { value: 'hp', nesting: ['beatmap_attributes', 'hp'], label: 'HP', yFormat: (y) => y.toFixed(2) }
 };
 
-function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartEnd = true }) {
+function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartEnd = true }: {
+    scores: IScore[];
+    sessions: ISession[] | ISessionCollection | { sessions: ISession[] } | null;
+    dateStart: string; //in format YYYY-MM-DD
+    dateEnd?: string | null; //in format YYYY-MM-DD
+    displayStartEnd?: boolean;
+}) {
     const { getScoreById } = useProfile();
     const { loadScoreView } = useScoreView();
 
@@ -29,9 +44,11 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartE
     const [_displayStartEnd, setDisplayStartEnd] = useState(displayStartEnd);
 
     useEffect(() => {
-        const annotations = {};
-        if (sessions && sessions?.sessions?.length > 0) {
-            sessions.sessions.forEach((session, index) => {
+        const annotations: any = {};
+        const _sessions = sessions && 'sessions' in sessions ? sessions.sessions : sessions;
+        if (_sessions && _sessions.length > 0) {
+            const sessionArray: ISession[] = Array.isArray(_sessions) ? _sessions : Object.values(_sessions);
+            sessionArray.forEach((session: ISession, index: number) => {
                 const startTime = session.start.getTime() / 1000;
                 const endTime = session.end.getTime() / 1000;
                 //box annotation from start to end
@@ -196,7 +213,7 @@ function ProfileDailyChart({ scores, sessions, dateStart, dateEnd, displayStartE
                                     ...(
                                         (_displayStartEnd && dateEnd && dateEnd !== dateStart) ?
                                             (() => {
-                                                const extraAnnotations = {};
+                                                const extraAnnotations: any = {};
                                                 const startDate = new Date(dateStart);
                                                 const endDate = new Date(dateEnd);
                                                 const dayCount = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
