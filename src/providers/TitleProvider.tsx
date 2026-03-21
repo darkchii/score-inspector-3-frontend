@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import Config from '../data/Config.json';
-import type { TitleContextValue } from "./ContextTypes";
+
+type TitleContextValue = {
+    setTitle: (title: string) => void;
+};
 
 const TitleContext = createContext<TitleContextValue>({} as TitleContextValue);
 

@@ -4,7 +4,12 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import DebouncedTextField from '../components/DebouncedTextField';
 import { useApi } from './ApiProvider';
 import PlayerCard from '../components/PlayerCard';
-import type { SearchContextValue } from './ContextTypes';
+
+type SearchContextValue = {
+    openSearch: () => void;
+    closeSearch: () => void;
+    isSearchOpen: boolean;
+};
 
 const SearchContext = createContext<SearchContextValue>({} as SearchContextValue);
 

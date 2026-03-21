@@ -1,7 +1,26 @@
 import axios from "axios";
 import type { AxiosProgressEvent } from "axios";
 import { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo } from "react";
-import type { ApiContextValue } from "./ContextTypes";
+
+type ApiContextValue = {
+    getUserLive: (userId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getScoresLive: (userId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getBeatmapsLive: (compact?: boolean, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getBeatmapPacks: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getCompletionists: () => Promise<any>;
+    getUserSearch: (query: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getLeaderboard: (ruleset: string, statistic: string, page: number, sort_direction?: string, limit?: number, country?: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getTodayTopPlayers: (ruleset: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getGlobalStats: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getScoreSubmissions: (ruleset: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getActiveUsers: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getRoleUsers: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getServerInfo: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getAlerts: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getProcessedRealm: (realmFile: File, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getScoreRankDates: (ruleset: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getHistoricScoreRanks: (ruleset: string, stat: string, date: string, page: number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+};
 
 const ApiContext = createContext<ApiContextValue>({} as ApiContextValue);
 const apiAge = 1000 * 60 * 10; //10 minutes

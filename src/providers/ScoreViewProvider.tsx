@@ -1,8 +1,13 @@
 import { Fade, Modal } from "@mui/material";
 import { createContext, useContext, useState } from "react";
 import ScoreView from "../components/scoreView/ScoreView";
-import type { ScoreViewContextValue } from "./ContextTypes";
 import type { IScore } from "../types/types";
+
+type ScoreViewContextValue = {
+    loadScoreView: (score: any) => void;
+    unloadScoreView: () => void;
+    enabled: boolean;
+};
 
 const ScoreViewContext = createContext<ScoreViewContextValue>({} as ScoreViewContextValue);
 

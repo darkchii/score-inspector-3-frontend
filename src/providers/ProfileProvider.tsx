@@ -2,7 +2,25 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useApi } from "./ApiProvider";
 import { FormatNumber, GetRulesetNameFromId } from "../util/Helper";
 import { BuildProfileStatistics, MapScoreBeatmaps, ProcessBeatmaps, ProcessScores, ProcessUser } from "../util/ProfileHelper";
-import type { ProfileContextValue } from "./ContextTypes";
+
+type ProfileContextValue = {
+    getUser: (userId: string | number) => Promise<any>;
+    getScoreById: (scoreId: string | number) => any;
+    getApiUser: () => any;
+    userLive: any;
+    scoresLive: any;
+    setUserId: (userId: string | number) => void;
+    fetchFullProfile: (userId: string | number) => Promise<void>;
+    errorMessage: string | boolean;
+    fetchLog: any[];
+    isFinished: boolean;
+    activeRuleset: string;
+    setActiveRuleset: (ruleset: string) => void;
+    getRulesetStatistics: (ruleset: string, without_loved?: boolean) => any;
+    getRulesetUser: (ruleset: string) => any;
+    availableRulesets: string[];
+    loadDurationMs: number;
+};
 
 const ProfileContext = createContext<ProfileContextValue>({} as ProfileContextValue);
 

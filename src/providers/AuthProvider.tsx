@@ -3,8 +3,16 @@ import { useNavigate } from "react-router";
 import { ShowNotification } from "../util/Helper";
 import { GetAPI } from "../util/ApiHelper";
 import axios from "axios";
-import type { AuthContextValue } from "./ContextTypes";
 import type { IAuthUser } from "../types/types";
+
+type AuthContextValue = {
+    user: any;
+    userData: any;
+    token: string;
+    loading: boolean;
+    login: (code: string) => Promise<void>;
+    logout: () => void;
+};
 
 const AuthContext = createContext<AuthContextValue>({} as AuthContextValue);
 

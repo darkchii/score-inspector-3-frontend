@@ -724,3 +724,11 @@ export type IDatabasedMod = {
     Settings: IScoreModSettings | null;
     IncompatibleMods: string[];
 }
+
+export type IReputationEntry = {
+    id: number;
+    user_id: number; // the user who gave the reputation
+    target_id: number; // the ID who received the reputation
+    target_type: string; // the type of the target, 'user', 'score', 'beatmap', only user is currently implemented
+    created_at: Date;
+}
