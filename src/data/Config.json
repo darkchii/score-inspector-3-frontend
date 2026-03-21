@@ -1,0 +1,26 @@
+{
+    "WEBSITE_NAME": "osu! scores inspector",
+    "VERSION": "3.0.0",
+    "DEV_MODE": true,
+    "API": {
+        "PRODUCTION": {
+            "AUTH_REDIRECT": "https://score.kirino.sh/",
+            "API_URL": "https://api.kirino.sh/inspector/",
+            "OSU_CLIENT_ID": 19537
+        },
+        "DEVELOPMENT": {
+            "AUTH_REDIRECT": "http://localhost:3006/",
+            "API_URL": "http://localhost:3863",
+            "OSU_CLIENT_ID": 19559
+        }
+    },
+    "WIKI_URL": "https://osu-wiki.com",
+    "NOTIFICATIONS": {
+        "position": "top-right",
+        "theme": "dark"
+    },
+    "TEAMS_URL": "https://kirino.sh/teams",
+    "DISCORD_URL": "https://discord.gg/VZWRZZXcW4",
+    "DISCORD_ID": "792807563980308481",
+    "PAYPAL_DONATION_URL": "https://www.paypal.com/donate?hosted_button_id=JFRBMAG2BK4GG"
+}
