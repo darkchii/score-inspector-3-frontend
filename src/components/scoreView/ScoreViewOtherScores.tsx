@@ -3,7 +3,7 @@ import React from "react";
 import NumberFlow from "@number-flow/react";
 import ItemList from "../list/ItemList";
 import ScoreListRow from "../list/ScoreListRow";
-import { IScore } from "../../types/types";
+import type { IScore } from "../../types/types";
 
 function ScoreViewOtherScores({ score, active = null }: {
     score: IScore | null,

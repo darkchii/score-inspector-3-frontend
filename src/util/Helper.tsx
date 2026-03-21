@@ -5,7 +5,7 @@ import { blue, green, pink, purple } from '@mui/material/colors';
 import { HasHiddenMod, HasMod } from './ModHelper';
 import NumberFlow from '@number-flow/react';
 import * as Muicon from "@mui/icons-material";
-import { IScore } from '../types/types';
+import type { IScore } from '../types/types';
 
 type DurationParts = {
     years: number;

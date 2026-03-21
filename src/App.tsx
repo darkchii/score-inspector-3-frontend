@@ -1,7 +1,7 @@
 import { Box } from "@mui/material"
 import { Route, Routes, useSearchParams } from "react-router";
 import { useAuth } from "./providers/AuthProvider";
-import React, { useEffect, useState, lazy, JSX } from "react";
+import React, { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import Header from "./components/Header";
 import Footer from "./components/Footer";

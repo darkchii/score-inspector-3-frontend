@@ -16,7 +16,8 @@
         "skipLibCheck": true,
         "strict": true,
         "resolveJsonModule": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "verbatimModuleSyntax": true
     },
     "include": [
         "src",

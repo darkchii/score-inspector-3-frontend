@@ -1,6 +1,6 @@
 import { Buffer } from "buffer";
-import React, { JSX } from "react";
-import type { Theme, ToastOptions, ToastPosition } from "react-toastify";
+import React from "react";
+import type { JSX } from "react";
 
 export interface IBeatmap {
     beatmap_id: number;

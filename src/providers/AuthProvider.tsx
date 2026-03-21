@@ -4,7 +4,7 @@ import { ShowNotification } from "../util/Helper";
 import { GetAPI } from "../util/ApiHelper";
 import axios from "axios";
 import type { AuthContextValue } from "./ContextTypes";
-import { IAuthUser } from "../types/types";
+import type { IAuthUser } from "../types/types";
 
 const AuthContext = createContext<AuthContextValue>({} as AuthContextValue);
 

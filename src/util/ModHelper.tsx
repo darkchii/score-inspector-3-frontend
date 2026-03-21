@@ -1,9 +1,9 @@
 import { green, red } from "@mui/material/colors";
 import ModData from "../data/Mods.json";
-import { FormatNumber, FormatNumberWithPrecision, GetRulesetId } from "./Helper";
+import { FormatNumberWithPrecision, GetRulesetId } from "./Helper";
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
-import { IDatabasedMod, IScoreMod } from "../types/types";
+import type { IDatabasedMod, IScoreMod } from "../types/types";
 
 const _modDatabase: { [ruleset: string]: { [acronym: string]: any } } = {};
 export function GetModData(ruleset: string, acronym: string) {

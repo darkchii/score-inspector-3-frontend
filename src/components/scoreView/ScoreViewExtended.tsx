@@ -2,7 +2,7 @@ import { useState } from 'react';
 import scoreViewStyles from '../../styles/score-view.module.less';
 import { Collapse, Fade } from '@mui/material';
 import ScoreViewOtherScores from './ScoreViewOtherScores';
-import { IScore } from '../../types/types';
+import type { IScore } from '../../types/types';
 
 const VIEWS = [
     {

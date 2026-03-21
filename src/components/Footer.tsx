@@ -2,7 +2,7 @@ import { AppBar, Box, Card, Toolbar, Typography } from "@mui/material";
 import Config from "../data/Config.json";
 import { useEffect, useState } from "react";
 import { useApi } from "../providers/ApiProvider";
-import { IConfig } from "../types/types";
+import type { IConfig } from "../types/types";
 const typedConfig: IConfig = Config;
 
 function Footer() {

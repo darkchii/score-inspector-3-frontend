@@ -1,5 +1,5 @@
 import { Box, Paper } from "@mui/material";
-import { JSX } from "react";
+import type { JSX } from "react";
 
 function ProfileHighlight({ title, value }: {
     title: string,

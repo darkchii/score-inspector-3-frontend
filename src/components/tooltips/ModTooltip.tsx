@@ -3,7 +3,7 @@ import type { TooltipProps } from "@mui/material";
 import { isValidElement } from "react";
 import { GetModSettingForDisplay } from "../../util/ModHelper";
 import ModDisplay from "../ModDisplay";
-import { IDatabasedMod, IScoreMod } from "../../types/types";
+import type { IDatabasedMod, IScoreMod } from "../../types/types";
 
 type ModSettingDefinition = {
     Name: string;

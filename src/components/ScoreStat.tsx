@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import scoreStatsStyles from '../styles/score-info.module.less';
 
 function ScoreStat({ label, value, limitValue = null, color = null, extraValue = null, extraClass = null }: {

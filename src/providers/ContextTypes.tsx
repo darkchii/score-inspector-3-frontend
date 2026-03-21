@@ -1,4 +1,4 @@
-import { AxiosProgressEvent } from "axios";
+import type { AxiosProgressEvent } from "axios";
 
 export type ApiContextValue = {
     getUserLive: (userId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;

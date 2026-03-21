@@ -1,4 +1,5 @@
-import axios, { AxiosProgressEvent } from "axios";
+import axios from "axios";
+import type { AxiosProgressEvent } from "axios";
 import { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo } from "react";
 import type { ApiContextValue } from "./ContextTypes";
 

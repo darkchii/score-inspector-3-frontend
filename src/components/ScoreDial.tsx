@@ -3,7 +3,7 @@ import { displayRank, GetGradeFromAccuracy, rankCutoffs } from '../util/Helper';
 import { animated, useSpring } from '@react-spring/web';
 import { useState } from 'react';
 import dialStyles from '../styles/dial.module.less';
-import { IScore } from '../types/types';
+import type { IScore } from '../types/types';
 
 function ScoreDial({ score }: { score: IScore }) {
     const arcGenerator = arc();

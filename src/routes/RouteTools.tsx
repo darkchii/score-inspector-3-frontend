@@ -1,5 +1,6 @@
 import { Box, Collapse, Divider, Grid, List, ListItemButton, ListItemText, Paper, Typography } from "@mui/material";
-import { JSX, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import type { JSX } from "react";
 import { useNavigate, useParams } from "react-router";
 import { usePageTitle } from "../providers/TitleProvider";
 import ToolLevelCalculator from "../components/tools/ToolLevelCalculator";

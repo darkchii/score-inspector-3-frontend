@@ -1,9 +1,10 @@
-import { Alert, Autocomplete, Box, Button, Grid, IconButton, MenuItem, Paper, Select, SelectChangeEvent, Slider, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
+import { Alert, Autocomplete, Box, Button, Grid, IconButton, MenuItem, Paper, Select, Slider, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import type { SelectChangeEvent } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { FormatNumber, GetNestedValue } from "../util/Helper";
 import ModData from "../data/Mods.json";
 import ModIcon from "./ModIcon";
-import { IDatabasedMod, IScore, IScoreMod } from "../types/types";
+import type { IDatabasedMod, IScore, IScoreMod } from "../types/types";
 
 interface ScoreFilterOrderOption {
     value: string,
