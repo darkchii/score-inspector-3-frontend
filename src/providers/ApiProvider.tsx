@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { AxiosProgressEvent } from "axios";
 import { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo } from "react";
+import type { IAuthUser } from "../types/types";
 
 type ApiContextValue = {
     getUserLive: (userId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
@@ -20,6 +21,8 @@ type ApiContextValue = {
     getProcessedRealm: (realmFile: File, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getScoreRankDates: (ruleset: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getHistoricScoreRanks: (ruleset: string, stat: string, date: string, page: number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    postReputation: (type: string, targetId: string | number, userId: string | number, token: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getTopReputations: (type: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
 };
 
 const ApiContext = createContext<ApiContextValue>({} as ApiContextValue);
@@ -61,12 +64,32 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         return response.data;
     }, [getApiUrl]);
 
-    const apiPost = useCallback(async (endpoint: string, body: any, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+    const apiPost = useCallback(async (endpoint: string, body: any, contentType: string | null = null, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
         const url = `${getApiUrl()}${endpoint}`;
-        const response = await axios.post(url, body, {
-            onUploadProgress: progressEvent || undefined
+        // const response = await axios.post(url, body, {
+        //     onUploadProgress: progressEvent || undefined,
+        // });
+        //use fetch instead
+        const response = await fetch(url, {
+            method: 'POST',
+            body: body,
+            headers: {
+                'Content-Type': contentType || 'application/json',
+            },
         });
-        return response.data;
+        //if not 200-299 throw error (with response data if possible)
+        if (!response.ok) {
+            let errorMessage = `Request failed with status ${response.status}`;
+            try {
+                const errorData = await response.json();
+                errorMessage += `: ${JSON.stringify(errorData)}`;
+            } catch (e) {
+                // ignore JSON parsing errors
+            }
+            throw new Error(errorMessage);
+        }
+        const data = await response.json();
+        return data;
     }, [getApiUrl]);
 
     const getBeatmapsLive = useCallback(async (compact = false, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
@@ -143,7 +166,7 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         const formData = new FormData();
         formData.append('realmFile', realmFile);
 
-        const response = await apiPost(`system/process-realm`, formData, progressEvent);
+        const response = await apiPost(`system/process-realm`, formData, 'multipart/form-data', progressEvent);
         return response;
     }, [apiPost]);
 
@@ -154,6 +177,23 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
 
     const getHistoricScoreRanks = useCallback(async (ruleset: string, stat: string, date: string, page: number, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
         const response = await apiGet(`leaderboard/score-rank/${ruleset}/${stat}/${date}/${page}`, progressEvent);
+        return response;
+    }, [apiGet]);
+
+    const postReputation = useCallback(async (type: string, targetId: string | number, userId: string | number, token: string, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        const data = {
+            type,
+            targetId,
+            userId,
+            token
+        }
+
+        const response = await apiPost(`reputation/`, JSON.stringify(data), 'application/json', progressEvent);
+        return response;
+    }, [apiPost]);
+
+    const getTopReputations = useCallback(async (type: string, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        const response = await apiGet(`reputation/top/${type}`, progressEvent);
         return response;
     }, [apiGet]);
 
@@ -175,7 +215,9 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getAlerts,
         getProcessedRealm,
         getScoreRankDates,
-        getHistoricScoreRanks
+        getHistoricScoreRanks,
+        postReputation,
+        getTopReputations
     }), [
         getUserLive,
         getScoresLive,
@@ -193,7 +235,9 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getAlerts,
         getProcessedRealm,
         getScoreRankDates,
-        getHistoricScoreRanks
+        getHistoricScoreRanks,
+        postReputation,
+        getTopReputations
     ]);
 
     return (

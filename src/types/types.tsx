@@ -729,6 +729,9 @@ export type IReputationEntry = {
     id: number;
     user_id: number; // the user who gave the reputation
     target_id: number; // the ID who received the reputation
-    target_type: string; // the type of the target, 'user', 'score', 'beatmap', only user is currently implemented
+    target_type: ReputationType; // the type of the target, 'user', 'score', 'beatmap', only user is currently implemented
     created_at: Date;
 }
+
+export const reputationTypes = ['user', 'beatmap', 'score'] as const;
+export type ReputationType = typeof reputationTypes[number];

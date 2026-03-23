@@ -3,15 +3,17 @@ import { useNavigate } from "react-router";
 import { ShowNotification } from "../util/Helper";
 import { GetAPI } from "../util/ApiHelper";
 import axios from "axios";
-import type { IAuthUser } from "../types/types";
+import { reputationTypes, type IAuthUser, type ReputationType } from "../types/types";
 
 type AuthContextValue = {
-    user: any;
+    user: IAuthUser | null;
     userData: any;
     token: string;
     loading: boolean;
     login: (code: string) => Promise<void>;
     logout: () => void;
+    setReputationAbility: (type: ReputationType, canGive: boolean) => void;
+    canGiveReputationTo: (type: ReputationType) => boolean;
 };
 
 const AuthContext = createContext<AuthContextValue>({} as AuthContextValue);
@@ -22,7 +24,12 @@ const expectedLoginResponseFields = [
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<IAuthUser | null>(null);
-    const [userData, setUserData] = useState(null);
+    const [userData, setUserData] = useState<any>(null);
+    const [canGiveReputation, setCanGiveReputation] = useState<Record<ReputationType, boolean>>({
+        'user': false,
+        'beatmap': false,
+        'score': false,
+    });
     const [token, setToken] = useState(localStorage.getItem("access_token") || "");
     const [refreshToken, setRefreshToken] = useState(localStorage.getItem("refresh_token") || "");
     const [tokenExpiry, setTokenExpiry] = useState(localStorage.getItem("token_expiry") || "");
@@ -75,6 +82,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 ShowNotification(`Welcome back, ${response.data.osuApi.username}!`, "success");
                 setUser({ id: response.data.osuApi.id, token_type: response.data.token_type });
                 setUserData(response.data);
+
+                // Set reputation abilities based on user data
+                const _repStatus = canGiveReputation;
+                if(response.data.reputation){
+                    Object.keys(response.data.reputation).forEach(type => {
+                        //they keys MAY not be user, beatmap, score, we can skip those
+                        //they may be added during development on live database
+                        if(reputationTypes.includes(type as ReputationType)){
+                            const _date = response.data.reputation[type];
+                            //only if >24 hours ago
+                            const canGive = !_date || (new Date().getTime() - new Date(_date).getTime()) > 24 * 60 * 60 * 1000;
+                            _repStatus[type as ReputationType] = canGive;
+                        }
+                    });
+
+                    //if any of valid keys are not present, we can assume they can give reputation for that type
+                    reputationTypes.forEach(type => {
+                        if(!(type in response.data.reputation)){
+                            _repStatus[type] = true;
+                        }
+                    });
+                }
+
+                console.log("Reputation status:", _repStatus);
+                setCanGiveReputation(_repStatus);
             }catch(error) {
                 console.error("Failed to fetch user data:", error);
                 ShowNotification("Failed to fetch user data. Please log in again.", "error");
@@ -187,8 +219,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         navigate("/");
     };
 
+    const setReputationAbility = (type: 'user' | 'beatmap' | 'score', canGive: boolean) => {
+        setCanGiveReputation(prev => ({ ...prev, [type]: canGive }));
+    }
+
+    const canGiveReputationTo = (type: 'user' | 'beatmap' | 'score'): boolean => {
+        return canGiveReputation[type];
+    }
+
     return (
-        <AuthContext.Provider value={{ user, userData, token, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, userData, token, loading, login, logout, setReputationAbility, canGiveReputationTo }}>
             {children}
         </AuthContext.Provider>
     );

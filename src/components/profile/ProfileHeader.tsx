@@ -1,18 +1,38 @@
-import { Avatar, Box, Container, Fade, Typography, useTheme } from "@mui/material";
+import { Avatar, Box, Button, Container, Fade, Typography, useTheme } from "@mui/material";
 import { useProfile } from "../../providers/ProfileProvider";
 import ProfileRulesetSelector from "./ProfileRulesetSelector";
 import { getFlagIcon } from "../../assets/textures/TextureDatabase";
 import NumberFlow from "@number-flow/react";
-import { getContrastColor } from "../../util/Helper";
+import { getContrastColor, ShowNotification } from "../../util/Helper";
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import { useAuth } from "../../providers/AuthProvider";
+import BetterTooltip from "../tooltips/BetterTooltip";
+import { useApi } from "../../providers/ApiProvider";
 
 const _profileHeaderImageRatio = 20 / 5; //Width / Height (2000x500)
 
 function ProfileHeader() {
+    const { user, userData, token, canGiveReputationTo, setReputationAbility } = useAuth();
     const { userLive, activeRuleset, getRulesetUser } = useProfile();
+    const { postReputation } = useApi();
     const theme = useTheme();
 
     if (!userLive) {
         return null;
+    }
+
+    const giveReputation = async () => {
+        if (!user || !userData) return;
+        
+        try {
+            const response = await postReputation('user', userLive.osuApi.id, user.id, token);
+            console.log("Reputation response:", response);
+            ShowNotification("Reputation given successfully!", "success");
+            setReputationAbility('user', false);
+        }catch(error) {
+            console.error("Error giving reputation:", error);
+            ShowNotification("An error occurred while giving reputation. Please try again later.", "error");
+        }
     }
 
     return (
@@ -31,7 +51,7 @@ function ProfileHeader() {
                     left: 0,
                     width: '100%',
                     height: '100%',
-                    backgroundImage: `url(${userLive.osuApi.cover.url})`,
+                    backgroundImage: `url(${userLive.osuApi.cover?.url || ''})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     zIndex: 0,
@@ -60,17 +80,47 @@ function ProfileHeader() {
                         alignItems: 'flex-end',
                     }}>
                         <Box className="profile-header-content">
-                            <Avatar
-                                src={userLive.osuApi.avatar_url}
-                                alt={userLive.osuApi.username}
-                                // sx={{ width: 160, height: 160 }}
-                                //160 on desktop, 80 on mobile
-                                sx={{
-                                    width: { xs: 80, md: 140 },
-                                    height: { xs: 80, md: 140 },
-                                }}
-                                variant="rounded"
-                            />
+                            <div>
+                                <Avatar
+                                    src={userLive.osuApi.avatar_url}
+                                    alt={userLive.osuApi.username}
+                                    // sx={{ width: 160, height: 160 }}
+                                    //160 on desktop, 80 on mobile
+                                    sx={{
+                                        width: { xs: 80, md: 140 },
+                                        height: { xs: 80, md: 140 },
+                                    }}
+                                    variant="rounded"
+                                />
+                                {
+                                    user && userData && userLive.osuApi.id !== userData.osuApi.id &&
+                                    <BetterTooltip title={
+                                        userLive.osuApi.id === userData.osuApi.id ?
+                                            'You cannot give reputation to yourself.' :
+                                            (canGiveReputationTo('user') ?
+                                                'Give reputation to this user.' :
+                                                'You have already given reputation to a user in the last 24 hours.')
+                                    }>
+                                        <span> {/* span so tooltip renders on disabled button */}
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                sx={{ mt: 0.5 }}
+                                                fullWidth
+                                                startIcon={<ThumbUpIcon />}
+                                                disabled={userLive.osuApi.id === userData.osuApi.id || !canGiveReputationTo('user')}
+                                                onClick={giveReputation}
+                                            >
+                                                {
+                                                    userLive.osuApi.id === userData.osuApi.id ?
+                                                        'This is you!' :
+                                                        '+rep'
+                                                }
+                                            </Button>
+                                        </span>
+                                    </BetterTooltip>
+                                }
+                            </div>
 
                             <Box sx={{ m: '12px' }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
@@ -79,10 +129,10 @@ function ProfileHeader() {
                                         <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: userLive.team.color || '#000000', p: 0.5, borderRadius: `${theme.shape.borderRadius}px` }}>
                                             <Typography
                                                 sx={{
-                                                    color: getContrastColor(userLive.team.color || '#000000'),
+                                                    color: getContrastColor(userLive.team?.color || '#000000'),
                                                     fontSize: { xs: '1.2rem', md: '2rem' },
                                                 }}
-                                            >{userLive.team.short_name}</Typography>
+                                            >{userLive.team?.short_name}</Typography>
                                         </Box>
                                     }
                                     <Typography

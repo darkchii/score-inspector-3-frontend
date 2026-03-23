@@ -25,6 +25,7 @@ type ProfileContextValue = {
 const ProfileContext = createContext<ProfileContextValue>({} as ProfileContextValue);
 
 export function ProfileProvider({ children }: { children: React.ReactNode }) {
+    const { getUserLive, getScoresLive, getBeatmapsLive, getBeatmapPacks } = useApi();
     const [userId, setUserId] = useState<string | number | null>(null);
     const [userLive, setUserLive] = useState<any>(null);
     const [scoresLive, setScoresLive] = useState<any>(null);
@@ -32,7 +33,6 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     const [beatmapPacks, setBeatmapPacks] = useState<any>(null);
     const [profileStatistics, setProfileStatistics] = useState<any>(null);
     const [errorMessage, setErrorMessage] = useState(false);
-    const { getUserLive, getScoresLive, getBeatmapsLive, getBeatmapPacks } = useApi();
     const [fetchLog, setFetchLog] = useState<any>([]);
     const [isFinished, setIsFinished] = useState(false);
     const [loadDurationMs, setLoadDurationMs] = useState(0);
