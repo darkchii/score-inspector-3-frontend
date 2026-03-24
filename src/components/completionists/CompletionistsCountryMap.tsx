@@ -133,7 +133,7 @@ function CompletionistsCountryMap({ data }: { data: any }) {
                         worldGeoJson ? (
                             <AnyMapContainer
                                 center={[20, 0]}
-                                zoom={1.35}
+                                zoom={3}
                                 minZoom={1}
                                 maxZoom={6}
                                 scrollWheelZoom={false}

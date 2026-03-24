@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useApi } from "../providers/ApiProvider";
 import { FormatNumber, GetRulesetPrettyNameFromId, ShowNotification } from "../util/Helper";
-import { Alert, Divider, Grid, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Alert, Box, CircularProgress, Divider, Grid, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import PlayerLink from "../components/PlayerLink";
 import { getCompletionistBadge } from "../assets/textures/TextureDatabase";
 import { usePageTitle } from "../providers/TitleProvider";
@@ -68,7 +68,9 @@ function RouteCompletionists() {
         <div style={{ padding: 16 }}>
             {
                 loading ? (
-                    <div>Loading...</div>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+                        <CircularProgress />
+                    </Box>
                 ) : error ? (
                     <Alert severity="error">Error loading completionists data.</Alert>
                 ) : (
