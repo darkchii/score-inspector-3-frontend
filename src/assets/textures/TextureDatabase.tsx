@@ -73,15 +73,19 @@ export function getCompletionistBadge(ruleset: number | string){
     switch(ruleset){
         case 'osu':
         case 0:
+        case '0':
             return CompletionistStandard;
         case 'taiko':
         case 1:
+        case '1':
             return CompletionistTaiko;
         case 'fruits':
         case 2:
+        case '2':
             return CompletionistCatch;
         case 'mania':
         case 3:
+        case '3':
             return CompletionistMania;
         default:
             return null;

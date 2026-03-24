@@ -257,7 +257,14 @@ function IndexScoreSubmissions({ activeRuleset, setActiveRuleset, isWorking, set
                     <Typography variant="body2">No data available.</Typography>
                 ) : (
                     <Box sx={{ width: '100%' }}>
-                        <Box sx={{ marginBottom: 1, display: 'flex', flexDirection: 'row' }}>
+                        <Box sx={{ 
+                            marginBottom: 1, 
+                            display: 'flex', 
+                            // flexDirection: 'row' 
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            alignItems: { xs: 'stretch', sm: 'center' },
+                            '& > *': { marginBottom: { xs: 1, sm: 0 } },
+                            }}>
                             <ButtonGroup size="small" sx={{ marginRight: 2 }} disabled={isTransitioningDataSet}>
                                 {CHART_TYPES[selectedPeriodType].map((option) => (
                                     <Button key={`period_value_${option.value}`} variant={option.value === selectedPeriodValue ? 'contained' : 'outlined'} onClick={() => setSelectedPeriodValue(option.value)}>
