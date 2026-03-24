@@ -8,6 +8,8 @@ import IndexDonation from "../components/index/IndexDonation";
 import { useEffect, useState } from "react";
 import { useApi } from "../providers/ApiProvider";
 import IndexTopReputations from "../components/index/IndexTopReputations";
+import IndexRecentVisitors from "../components/index/IndexRecentVisitors";
+import IndexCreator from "../components/index/IndexCreator";
 
 function RouteIndex() {
     usePageTitle(null); //reset to default title
@@ -64,6 +66,7 @@ function RouteIndex() {
                 <Grid size={{ xs: 12, md: 3 }}>
                     <Stack spacing={1}>
                         <IndexTopReputations />
+                        <IndexRecentVisitors />
                         <IndexDonation />
                         <IndexDiscordWidget />
                     </Stack>

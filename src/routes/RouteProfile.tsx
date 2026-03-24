@@ -13,6 +13,8 @@ import ProfilePageCharts from "../components/profile/pages/ProfilePageCharts";
 import ProfilePageDaily from "../components/profile/pages/ProfilePageDaily";
 import ProfilePageCompletion from "../components/profile/pages/ProfilePageCompletion";
 import { usePageTitle } from "../providers/TitleProvider";
+import { useApi } from "../providers/ApiProvider";
+import { useAuth } from "../providers/AuthProvider";
 
 const pageComponents = {
     'main': { component: ProfilePageMain, title: 'Overview' },
@@ -25,6 +27,8 @@ const pageComponents = {
 };
 
 function RouteProfile() {
+    const { user, token} = useAuth();
+    const { postRegisterVisitor } = useApi();
     const { fetchFullProfile, errorMessage, activeRuleset, setActiveRuleset, userLive, getRulesetStatistics } = useProfile();
     const { userId, ruleset, page } = useParams();
     const [activePage, setPage] = useState('main');
@@ -47,7 +51,12 @@ function RouteProfile() {
                     setTimeout(() => {
                         const match = matchPath(`/user/${userId}/${activeRuleset || 'all'}/${activePage || 'main'}`, window.location.pathname);
                         if(match){
-                            //do visitor shenanigans
+                            //-1 is guest user
+                            try{
+                                postRegisterVisitor(userId as string, user?.id ?? -1, token ?? null);
+                            }catch(error){
+                                console.error("Error registering visitor:", error);
+                            }
                         }
                     }, 5000);
                 }

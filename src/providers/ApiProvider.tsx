@@ -23,6 +23,8 @@ type ApiContextValue = {
     getHistoricScoreRanks: (ruleset: string, stat: string, date: string, page: number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     postReputation: (type: string, targetId: string | number, userId: string | number, token: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getTopReputations: (type: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    postRegisterVisitor: (targetId: string | number, userId: string | number, token: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getRecentVisitors: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
 };
 
 const ApiContext = createContext<ApiContextValue>({} as ApiContextValue);
@@ -197,6 +199,22 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         return response;
     }, [apiGet]);
 
+    const postRegisterVisitor = useCallback(async (targetId: string | number, userId: string | number, token: string | null, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        const data = {
+            targetId,
+            userId,
+            token
+        }
+
+        const response = await apiPost(`visitor/`, JSON.stringify(data), 'application/json', progressEvent);
+        return response;
+    }, [apiPost]);
+
+    const getRecentVisitors = useCallback(async (progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        const response = await apiGet(`visitor/recent`, progressEvent);
+        return response;
+    }, [apiGet]);
+
     // Memoize the context value to prevent unnecessary re-renders
     const contextValue = useMemo(() => ({
         getUserLive,
@@ -217,7 +235,9 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getScoreRankDates,
         getHistoricScoreRanks,
         postReputation,
-        getTopReputations
+        getTopReputations,
+        postRegisterVisitor,
+        getRecentVisitors
     }), [
         getUserLive,
         getScoresLive,
@@ -237,7 +257,9 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getScoreRankDates,
         getHistoricScoreRanks,
         postReputation,
-        getTopReputations
+        getTopReputations,
+        postRegisterVisitor,
+        getRecentVisitors
     ]);
 
     return (
