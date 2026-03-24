@@ -217,6 +217,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
             }
             setIsFinished(true);
         } catch (error: any) {
+            reset(); //reset all data on error to prevent showing incomplete data
             console.error("Error fetching full profile:", error);
             setErrorMessage(error.message || "An unknown error occurred while fetching profile data.");
             setIsFinished(false);

@@ -57,7 +57,7 @@ function IndexTopReputations() {
                         <TableBody>
                             {
                                 topUserReputations.map((rep, index) => (
-                                    <TableRow>
+                                    <TableRow key={`toprep_${index}`}>
                                         <TableCell align="right" sx={{ width: '10%' }}><Typography variant="caption">{index + 1}.</Typography></TableCell>
                                         <TableCell><PlayerLink data={rep.user} size={18} /></TableCell>
                                         <TableCell>

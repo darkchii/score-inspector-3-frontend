@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { matchPath, useParams } from "react-router";
 import { useProfile } from "../providers/ProfileProvider";
 import { useEffect, useState } from "react";
 import ProfileLoader from "../components/profile/ProfileLoader";
@@ -43,6 +43,13 @@ function RouteProfile() {
                 if (!errorMessage) {
                     await new Promise(resolve => setTimeout(resolve, 500));
                     setIsWorking(false);
+
+                    setTimeout(() => {
+                        const match = matchPath(`/user/${userId}/${activeRuleset || 'all'}/${activePage || 'main'}`, window.location.pathname);
+                        if(match){
+                            //do visitor shenanigans
+                        }
+                    }, 5000);
                 }
             } catch (error) {
                 console.error("Error fetching user profile:", error);

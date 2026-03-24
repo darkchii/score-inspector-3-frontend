@@ -71,7 +71,6 @@ function RulesetSelector(
                                     key={'ruleset_combined'}
                                     onClick={() => onChange('all')}
                                     className={activeRuleset === 'all' ? "profile-selected-ruleset" : ""}
-                                    title="All Rulesets"
                                     disabled={disabled}
                                 >
                                     {/* show a combination of the four ruleset icons, show a corner of each */}

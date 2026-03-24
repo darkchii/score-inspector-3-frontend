@@ -129,7 +129,7 @@ function IndexTopPlayers({ activeRuleset, setActiveRuleset, isWorking, setIsWork
                                                                         <TableBody>
                                                                             {
                                                                                 selectedDataSet[key].map((entry: any, index: number) => (
-                                                                                    <TableRow>
+                                                                                    <TableRow key={`topplayers_${key}_entry_${index}`}>
                                                                                         <TableCell align="right" sx={{ width: '10%' }}><Typography variant="caption">{index + 1}.</Typography></TableCell>
                                                                                         <TableCell><PlayerLink data={entry.user} size={18} /></TableCell>
                                                                                         <TableCell>
