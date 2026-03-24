@@ -188,6 +188,8 @@ export const GetRulesetNameFromId = (rulesetId: number | string) => {
         case '3':
         case 'mania':
             return 'mania';
+        case 4:
+        case '4':
         case 'all':
         case 'total':
             return 'total';

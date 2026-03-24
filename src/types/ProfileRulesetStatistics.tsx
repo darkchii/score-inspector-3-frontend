@@ -648,7 +648,7 @@ export class ProfileRulesetStatistics implements IProfileRulesetStatistics {
             throw new Error(`Invalid periodic interval: ${interval}`);
         }
 
-        console.log(`Calculating periodic data sets for interval: ${interval} for ruleset ${this.ruleset}`);
+        // console.log(`Calculating periodic data sets for interval: ${interval} for ruleset ${this.ruleset}`);
 
         let _set_data: Record<string, IScore[]> = {};
 

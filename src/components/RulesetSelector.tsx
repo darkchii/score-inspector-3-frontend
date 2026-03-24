@@ -41,7 +41,6 @@ function RulesetSelector(
                                 <IconButton
                                     onClick={() => availableRulesets.includes(ruleset.name) && onChange(ruleset.name)}
                                     className={activeRuleset === ruleset.name ? "profile-selected-ruleset" : ""}
-                                    title={ruleset.displayName}
                                     disabled={!availableRulesets.includes(ruleset.name) || disabled}
                                 >
                                     <img
