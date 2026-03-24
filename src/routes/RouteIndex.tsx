@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import { useApi } from "../providers/ApiProvider";
 import IndexTopReputations from "../components/index/IndexTopReputations";
 import IndexRecentVisitors from "../components/index/IndexRecentVisitors";
-import IndexCreator from "../components/index/IndexCreator";
 
 function RouteIndex() {
     usePageTitle(null); //reset to default title
