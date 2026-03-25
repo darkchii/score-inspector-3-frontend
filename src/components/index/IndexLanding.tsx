@@ -7,7 +7,8 @@ import ListIcon from '@mui/icons-material/List';
 import GamesIcon from '@mui/icons-material/Games';
 import PersonIcon from '@mui/icons-material/Person';
 import GroupsIcon from '@mui/icons-material/Groups';
-import { blue, green, purple, red } from "@mui/material/colors";
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import { blue, green, pink, purple, red } from "@mui/material/colors";
 import { Line } from "react-chartjs-2";
 import Config from "../../data/Config.json";
 import ShowChartIcon from '@mui/icons-material/ShowChart';
@@ -16,8 +17,7 @@ import LandingCard from "../LandingCard";
 function IndexLanding() {
     const theme = useTheme();
     const { getGlobalStats, getActiveUsers } = useApi();
-    const [dataBeatmaps, setDataBeatmaps] = useState(null);
-    const [dataScores, setDataScores] = useState(null);
+    const [numReputation, setNumReputation] = useState(0);
     const [numBeatmaps, setNumBeatmaps] = useState(0);
     const [numScores, setNumScores] = useState(0);
     const [numTeams, setNumTeams] = useState(0);
@@ -37,8 +37,7 @@ function IndexLanding() {
                 const statsActiveUsers = await getActiveUsers();
 
                 if (stats) {
-                    setDataBeatmaps(stats.beatmap_counts.data);
-                    setDataScores(stats.score_counts.data.scores);
+                    setNumReputation(stats.reputation_counts.data.total);
                     setNumTeams(stats.team_counts.data.total);
                     setNumUsers(stats.user_counts.data.total);
 
@@ -105,7 +104,20 @@ function IndexLanding() {
                         }}>
                             <Grid size={{ xs: 12, md: 12 }}>
                                 <Grid container spacing={1} sx={{ height: '100%' }}>
-                                    <Grid size={{ xs: 6, md: 3 }}>
+                                    <Grid size={{ xs: 6, md: 12/5 }}>
+                                        <LandingCard
+                                            title="Reputation"
+                                            isLoading={loading}
+                                            isError={isError}
+                                            icon={<ThumbUpIcon />}
+                                            color={pink[500]}
+                                            centerContent
+                                            sx={{ height: '100%' }}
+                                        >
+                                            <Typography variant="h6" component="div">{FormatNumber(numReputation)}</Typography>
+                                        </LandingCard>
+                                    </Grid>
+                                    <Grid size={{ xs: 6, md: 12/5 }}>
                                         <LandingCard
                                             title="Beatmaps"
                                             isLoading={loading}
@@ -118,7 +130,7 @@ function IndexLanding() {
                                             <Typography variant="h6" component="div">{FormatNumber(numBeatmaps)}</Typography>
                                         </LandingCard>
                                     </Grid>
-                                    <Grid size={{ xs: 6, md: 3 }}>
+                                    <Grid size={{ xs: 6, md: 12/5 }}>
                                         <LandingCard
                                             title="Scores"
                                             isLoading={loading}
@@ -131,7 +143,7 @@ function IndexLanding() {
                                             <Typography variant="h6" component="div">{FormatNumber(numScores)}</Typography>
                                         </LandingCard>
                                     </Grid>
-                                    <Grid size={{ xs: 6, md: 3 }}>
+                                    <Grid size={{ xs: 6, md: 12/5 }}>
                                         <LandingCard
                                             title="Users"
                                             isLoading={loading}
@@ -144,7 +156,7 @@ function IndexLanding() {
                                             <Typography variant="h6" component="div">{FormatNumber(numUsers)}</Typography>
                                         </LandingCard>
                                     </Grid>
-                                    <Grid size={{ xs: 6, md: 3 }}>
+                                    <Grid size={{ xs: 6, md: 12/5 }}>
                                         <LandingCard
                                             title="Teams"
                                             isLoading={loading}

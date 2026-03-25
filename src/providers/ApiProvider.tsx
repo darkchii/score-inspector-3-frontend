@@ -75,9 +75,13 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         const response = await fetch(url, {
             method: 'POST',
             body: body,
-            headers: {
-                'Content-Type': contentType || 'application/json',
-            },
+            // headers: {
+            //     'Content-Type': contentType || 'application/json',
+            // },
+            //only add headers if contentType is provided
+            headers: contentType ? {
+                'Content-Type': contentType,
+            } : undefined,
         });
         //if not 200-299 throw error (with response data if possible)
         if (!response.ok) {
@@ -168,7 +172,7 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         const formData = new FormData();
         formData.append('realmFile', realmFile);
 
-        const response = await apiPost(`system/process-realm`, formData, 'multipart/form-data', progressEvent);
+        const response = await apiPost(`system/process-realm`, formData, null, progressEvent);
         return response;
     }, [apiPost]);
 
