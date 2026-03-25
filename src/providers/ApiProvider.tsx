@@ -41,11 +41,16 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         return import.meta.env.VITE_API_BASE_URL;
     }, []);
 
-    const apiGet = useCallback(async (endpoint: string, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+    const apiGet = useCallback(async (
+        endpoint: string, 
+        shouldCache: boolean = true,
+        progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
         const now = Date.now();
-        const cached: { data: any; timestamp: number } | undefined = apiCacheRef.current[endpoint as keyof typeof apiCacheRef.current] as any;
-        if (cached && (now - cached.timestamp < apiAge)) {
-            return cached.data;
+        if(shouldCache) {
+            const cached: { data: any; timestamp: number } | undefined = apiCacheRef.current[endpoint as keyof typeof apiCacheRef.current] as any;
+            if (cached && (now - cached.timestamp < apiAge)) {
+                return cached.data;
+            }
         }
 
         //return both data and progress
@@ -55,13 +60,15 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         });
 
         // Update cache without triggering re-renders
-        apiCacheRef.current = {
-            ...apiCacheRef.current,
-            [endpoint]: {
-                data: response.data,
-                timestamp: now
-            }
-        };
+        if(shouldCache) {
+            apiCacheRef.current = {
+                ...apiCacheRef.current,
+                [endpoint]: {
+                    data: response.data,
+                    timestamp: now
+                }
+            };
+        }
 
         return response.data;
     }, [getApiUrl]);
@@ -99,72 +106,72 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
     }, [getApiUrl]);
 
     const getBeatmapsLive = useCallback(async (compact = false, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`beatmap/all?compact=${compact}`, progressEvent);
+        const response = await apiGet(`beatmap/all?compact=${compact}`, true, progressEvent);
         return response;
     }, [apiGet]);
 
     const getBeatmapPacks = useCallback(async (progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet('beatmappack/all', progressEvent);
+        const response = await apiGet('beatmappack/all', true, progressEvent);
         return response;
     }, [apiGet]);
 
     const getUserLive = useCallback(async (userId: string | number, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`user/${userId}/profile`, progressEvent);
+        const response = await apiGet(`user/${userId}/profile`, true, progressEvent);
         return response;
     }, [apiGet]);
 
     const getScoresLive = useCallback(async (userId: string | number, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`user/${userId}/scores`, progressEvent);
+        const response = await apiGet(`user/${userId}/scores`, true, progressEvent);
         return response;
     }, [apiGet]);
 
     const getCompletionists = useCallback(async () => {
-        const response = await apiGet(`user/completionists`);
+        const response = await apiGet(`user/completionists`, true);
         return response;
     }, [apiGet]);
 
     const getUserSearch = useCallback(async (query: string, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`user/search/${encodeURIComponent(query)}`, progressEvent);
+        const response = await apiGet(`user/search/${encodeURIComponent(query)}`, true, progressEvent);
         return response;
     }, [apiGet]);
 
     const getLeaderboard = useCallback(async (ruleset: string, statistic: string, page: number, sort_direction: string = "desc", limit: number = 50, country: string | null = null, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`leaderboard/${ruleset}/${statistic}/${page}/${sort_direction}/${limit}/${country || ''}`, progressEvent);
+        const response = await apiGet(`leaderboard/${ruleset}/${statistic}/${page}/${sort_direction}/${limit}/${country || ''}`, true, progressEvent);
         return response;
     }, [apiGet]);
 
     const getTodayTopPlayers = useCallback(async(ruleset: string, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`stats/top-day/${ruleset}`, progressEvent);
+        const response = await apiGet(`stats/top-day/${ruleset}`, true, progressEvent);
         return response;
     }, [apiGet]);
 
     const getGlobalStats = useCallback(async(progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`stats/global-stats`, progressEvent);
+        const response = await apiGet(`stats/global-stats`, true, progressEvent);
         return response;
     }, [apiGet]);
 
     const getScoreSubmissions = useCallback(async (ruleset: string, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`stats/score-submissions/${ruleset}`, progressEvent);
+        const response = await apiGet(`stats/score-submissions/${ruleset}`, true, progressEvent);
         return response;
     }, [apiGet]);
 
     const getActiveUsers = useCallback(async (progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`stats/active-users`, progressEvent);
+        const response = await apiGet(`stats/active-users`, true, progressEvent);
         return response;
     }, [apiGet]);
 
     const getRoleUsers = useCallback(async (progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`user/people`, progressEvent);
+        const response = await apiGet(`user/people`, true, progressEvent);
         return response;
     }, [apiGet]);
 
     const getServerInfo = useCallback(async (progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`system/info`, progressEvent);
+        const response = await apiGet(`system/info`, true, progressEvent);
         return response;
     }, [apiGet]);
 
     const getAlerts = useCallback(async (progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`system/alerts`, progressEvent);
+        const response = await apiGet(`system/alerts`, false, progressEvent);
         return response;
     }, [apiGet]);
 
@@ -177,12 +184,12 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
     }, [apiPost]);
 
     const getScoreRankDates = useCallback(async (ruleset: string, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`leaderboard/score-rank/info/${ruleset}`, progressEvent);
+        const response = await apiGet(`leaderboard/score-rank/info/${ruleset}`, true, progressEvent);
         return response;
     }, [apiGet]);
 
     const getHistoricScoreRanks = useCallback(async (ruleset: string, stat: string, date: string, page: number, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`leaderboard/score-rank/${ruleset}/${stat}/${date}/${page}`, progressEvent);
+        const response = await apiGet(`leaderboard/score-rank/${ruleset}/${stat}/${date}/${page}`, true, progressEvent);
         return response;
     }, [apiGet]);
 
@@ -199,7 +206,7 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
     }, [apiPost]);
 
     const getTopReputations = useCallback(async (type: string, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`reputation/top/${type}`, progressEvent);
+        const response = await apiGet(`reputation/top/${type}`, false, progressEvent);
         return response;
     }, [apiGet]);
 
@@ -215,7 +222,7 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
     }, [apiPost]);
 
     const getRecentVisitors = useCallback(async (progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`visitor/recent`, progressEvent);
+        const response = await apiGet(`visitor/recent`, false, progressEvent);
         return response;
     }, [apiGet]);
 
