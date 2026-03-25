@@ -5,6 +5,8 @@ import { useNavigate, useParams } from "react-router";
 import { usePageTitle } from "../providers/TitleProvider";
 import ToolLevelCalculator from "../components/tools/ToolLevelCalculator";
 import ToolMissingBeatmaps from "../components/tools/ToolMissingBeatmaps";
+import BuildIcon from '@mui/icons-material/Build';
+import { grey } from "@mui/material/colors";
 
 interface Tool {
     name: string;
@@ -64,7 +66,10 @@ function RouteTools() {
                         {
                             !tool ? (
                                 <Collapse in={!tool}>
-                                    <Typography variant="h5" align="center">Select a tool from the left</Typography>
+                                    <Box sx={{ py: 4 }}>
+                                        <BuildIcon sx={{ fontSize: 80, display: 'block', mx: 'auto', my: 2, color: grey[800] }} />
+                                        <Typography variant="h5" align="center">Select a tool from the left</Typography>
+                                    </Box>
                                 </Collapse>
                             ) : (
                                 <Collapse in={!!toolData}>
