@@ -109,8 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setCanGiveReputation(_repStatus);
             }catch(error) {
                 console.error("Failed to fetch user data:", error);
-                ShowNotification("Failed to fetch user data. Please log in again.", "error");
-                reset();
+                // ShowNotification("Failed to validate session right now. Keeping you signed in.", "warning");
                 return;
             } finally {
                 setLoading(false);
@@ -119,8 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         fetchUserData().catch((error) => {
             console.error("Error fetching user data:", error);
-            ShowNotification("Error fetching user data. Please log in again.", "error");
-            reset();
+            // ShowNotification("Session check failed. Keeping you signed in.", "warning");
         });
     }, [token, refreshToken, tokenExpiry]);
 
@@ -128,8 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(true);
         try {
             if (!refreshToken) {
-                ShowNotification("No refresh token available. Please log in again.", "error");
-                reset();
+                ShowNotification("No refresh token available right now. Keeping current session state.", "warning");
                 return;
             }
 
@@ -162,9 +159,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             ShowNotification("Token refreshed successfully!", "success");
         } catch (error) {
-            ShowNotification("Failed to refresh token. Please log in again.", "error");
+            // ShowNotification("Failed to refresh token. Keeping you signed in.", "warning");
             console.error("Refresh token error:", error);
-            reset();
         } finally {
             setLoading(false);
         }
@@ -205,7 +201,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem("token_expiry", expiryDate.toISOString());
 
             ShowNotification("Login successful!", "success");
-            //todo: deal with response data
         }catch(error){
             ShowNotification("Login failed. Please try again.", "error");
             console.error("Login error:", error);

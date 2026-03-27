@@ -17,7 +17,6 @@ import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers"
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"
 import React from 'react';
 import { TitleProvider } from './providers/TitleProvider';
-import { ReputationProvider } from './providers/ReputationProvider';
 
 type ProviderEntry = {
   Provider: React.ComponentType<React.PropsWithChildren<any>>;
@@ -98,9 +97,6 @@ const _providers: ProviderEntry[] = [
   },
   {
     Provider: ScoreViewProvider,
-  },
-  {
-    Provider: ReputationProvider,
   },
   {
     Provider: SearchProvider,
