@@ -8,6 +8,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { useAuth } from "../../providers/AuthProvider";
 import BetterTooltip from "../tooltips/BetterTooltip";
 import { useApi } from "../../providers/ApiProvider";
+import { useState } from "react";
 
 const _profileHeaderImageRatio = 20 / 5; //Width / Height (2000x500)
 
@@ -15,6 +16,7 @@ function ProfileHeader() {
     const { user, userData, token, canGiveReputationTo, setReputationAbility } = useAuth();
     const { userLive, activeRuleset, getRulesetUser } = useProfile();
     const { postReputation } = useApi();
+    const [isWorkingReputation, setIsWorkingReputation] = useState(false);
     const theme = useTheme();
 
     if (!userLive) {
@@ -24,6 +26,7 @@ function ProfileHeader() {
     const giveReputation = async () => {
         if (!user || !userData) return;
         
+        setIsWorkingReputation(true);
         try {
             const response = await postReputation('user', userLive.osuApi.id, user.id, token);
             console.log("Reputation response:", response);
@@ -32,6 +35,8 @@ function ProfileHeader() {
         }catch(error) {
             console.error("Error giving reputation:", error);
             ShowNotification("An error occurred while giving reputation. Please try again later.", "error");
+        }finally {
+            setIsWorkingReputation(false);
         }
     }
 
@@ -110,6 +115,7 @@ function ProfileHeader() {
                                                 startIcon={<ThumbUpIcon />}
                                                 disabled={userLive.osuApi.id === userData.osuApi.id || !canGiveReputationTo('user')}
                                                 onClick={giveReputation}
+                                                loading={isWorkingReputation}
                                             >
                                                 {
                                                     userLive.osuApi.id === userData.osuApi.id ?
