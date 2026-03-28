@@ -118,7 +118,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
             setFetchLog([..._fetchLog]);
 
             
-            _fetchLog.push("%working% Fetching scores");
+            _fetchLog.push("%working% Fetching scores (can take a while)");
             setFetchLog([..._fetchLog]);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
@@ -129,7 +129,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
             setFetchLog([..._fetchLog]);
 
             
-            _fetchLog.push("%working% Fetching beatmaps");
+            _fetchLog.push("%working% Fetching beatmaps (can take a while)");
             setFetchLog([..._fetchLog]);
             await new Promise(resolve => setTimeout(resolve, 250));
             startMs = Date.now();
