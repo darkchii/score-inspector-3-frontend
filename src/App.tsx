@@ -8,7 +8,7 @@ import Footer from "./components/Footer";
 import RouteIndex from "./routes/RouteIndex";
 import RouteProfile from "./routes/RouteProfile";
 import Route404 from "./routes/Route404";
-import RouteScore from "./routes/RouteScore";
+import RouteScoreRank from "./routes/RouteScoreRank";
 import RouteCompletionists from "./routes/RouteCompletionists";
 import RouteLeaderboards from "./routes/RouteLeaderboards";
 import RoutePeople from "./routes/RoutePeople";
@@ -31,7 +31,7 @@ function App() {
     { path: "/people", element: <RoutePeople /> },
     { path: "/tools/:tool?", element: <RouteTools /> },
     { path: "/user/:userId/:ruleset?/:page?", element: <RouteProfile /> },
-    { path: "/score/:ruleset?/:stat?/:date?/page?/:page?", element: <RouteScore /> },
+    { path: "/scorerank/:ruleset?/:stat?/:date?/page?/:page?", element: <RouteScoreRank /> },
     { path: "/completionists", element: <RouteCompletionists /> },
     { path: "/leaderboards/:ruleset?/:statistic?/page?/:page?/country?/:country?", element: <RouteLeaderboards /> },
   ];

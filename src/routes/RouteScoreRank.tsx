@@ -8,6 +8,7 @@ import { DatePicker } from '@mui/x-date-pickers';
 import moment from 'moment';
 import ItemList from '../components/list/ItemList';
 import PlayerListRow from '../components/list/PlayerListRow';
+import { usePageTitle } from '../providers/TitleProvider';
 
 interface ValidStats {
     [key: string]: {
@@ -31,7 +32,7 @@ const VALID_STATS: ValidStats = {
     }
 };
 
-function RouteScore() {
+function RouteScoreRank() {
     const params = useParams();
     const { getScoreRankDates, getHistoricScoreRanks } = useApi();
     const [activeRuleset, setActiveRuleset] = useState(params.ruleset || 'osu');
@@ -129,7 +130,7 @@ function RouteScore() {
     useEffect(() => {
         // Update URL when state changes
         if (activeRuleset && activeDate) {
-            const url = `/score/${activeRuleset}/${activeStat}/${activeDate.format('YYYY-MM-DD')}/page/${activePage}`;
+            const url = `/scorerank/${activeRuleset}/${activeStat}/${activeDate.format('YYYY-MM-DD')}/page/${activePage}`;
             window.history.replaceState({}, '', url);
         }
     }, [activeRuleset, activeStat, activeDate, activePage]);
@@ -142,8 +143,10 @@ function RouteScore() {
     }, [activeRuleset, activeStat, activeDate, activePage, isLoadingDates]);
 
     if (!activeRuleset) {
-        return <Navigate to={`/score/osu/rank`} replace />;
+        return <Navigate to={`/scorerank/osu/rank`} replace />;
     }
+
+    usePageTitle(`Score Rank History${activeRuleset ? ` - ${activeRuleset.toUpperCase()}` : ''}${activeDate ? ` - ${activeDate.format('YYYY-MM-DD')}` : ''}`);
 
     const isLoading = isLoadingDates || (isWorking && !data);
 
@@ -255,4 +258,4 @@ function RouteScore() {
     )
 }
 
-export default RouteScore;
+export default RouteScoreRank;

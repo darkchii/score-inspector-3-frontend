@@ -98,7 +98,7 @@ function Header() {
             dropdown: [
                 {
                     label: 'Score Rank History',
-                    to: '/score/',
+                    to: '/scorerank/',
                     icon: <HistoryIcon />
                 }
             ]
