@@ -42,10 +42,10 @@ function IndexLanding() {
                     setNumUsers(stats.user_counts.data.total);
 
                     //calculate total beatmaps and scores
-                    let totalBeatmaps = 0;
-                    Object.keys(stats.beatmap_counts.data).forEach(key => {
-                        totalBeatmaps += stats.beatmap_counts.data[key];
-                    });
+                    let totalBeatmaps = stats.beatmap_counts.data.total;
+                    // Object.keys(stats.beatmap_counts.data).forEach(key => {
+                    //     totalBeatmaps += stats.beatmap_counts.data[key];
+                    // });
                     setNumBeatmaps(totalBeatmaps);
                     let totalScores = 0;
                     Object.keys(stats.score_counts.data.scores).forEach(key => {

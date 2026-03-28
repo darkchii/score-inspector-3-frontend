@@ -143,10 +143,10 @@ function RouteCompletionists() {
                                                                             }
                                                                         })()
                                                                     }
-                                                                    <TableRow key={item.osu_id}>
+                                                                    <TableRow key={item.user_id}>
                                                                         <TableCell>
                                                                             {
-                                                                                !item.user?.osuApi.username ? <>{item.osu_id} (restricted?)</> :
+                                                                                !item.user?.osuApi.username ? <>{item.user_id} (restricted?)</> :
                                                                                     <PlayerLink size={18} data={item.user} />
                                                                             }
                                                                         </TableCell>
