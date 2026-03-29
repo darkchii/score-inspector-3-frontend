@@ -14,6 +14,9 @@ import BeatmapListRow from "../components/list/BeatmapListRow";
 import Beatmap from "../types/beatmaps/Beatmap";
 import { grey } from "@mui/material/colors";
 import TeamListRow from "../components/list/TeamListRow";
+import Config from "../data/Config.json";
+import type { IConfig } from "../types/types";
+const typedConfig: IConfig = Config;
 
 interface LeaderboardConfig {
     title: string;
@@ -480,7 +483,7 @@ function RouteLeaderboards() {
                         })
                     }
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1, flexDirection: 'column', alignItems: 'center' }}>
                     <Collapse in={LEADERBOARDS[statistic].category === 'user' || LEADERBOARDS[statistic].category === 'grades'}>
                         <Autocomplete
                             disablePortal
@@ -499,6 +502,11 @@ function RouteLeaderboards() {
                             disabled={isWorking || (LEADERBOARDS[statistic].category !== 'user' && LEADERBOARDS[statistic].category !== 'grades')}
                             size='small'
                         />
+                    </Collapse>
+                    <Collapse in={LEADERBOARDS[statistic].category === 'team'}>
+                        <Typography variant="body2" sx={{ ml: 2, mr: 1 }}>
+                            For more extensive filtering, visit the dedicated team leaderboards website: <a href={typedConfig.TEAMS_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'white' }}>{typedConfig.TEAMS_URL}</a>
+                        </Typography>
                     </Collapse>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
