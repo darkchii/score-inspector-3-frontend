@@ -13,11 +13,12 @@ import { countries, currencies, languages, timezones, lookup } from 'country-dat
 import BeatmapListRow from "../components/list/BeatmapListRow";
 import Beatmap from "../types/beatmaps/Beatmap";
 import { grey } from "@mui/material/colors";
+import TeamListRow from "../components/list/TeamListRow";
 
 interface LeaderboardConfig {
     title: string;
     img?: string | string[];
-    category: 'user' | 'beatmap' | 'grades';
+    category: 'user' | 'beatmap' | 'grades' | 'team';
     formatter?: (value: number) => string;
     suffix?: string;
     description?: string;
@@ -216,6 +217,87 @@ const LEADERBOARDS: { [key: string]: LeaderboardConfig } = {
         category: 'beatmap',
         hide_value: true, //sr is default part of the beatmap row, so no need to show lb_value
     },
+    'team_id': {
+        title: 'ID',
+        category: 'team',
+        formatter: FormatNumber,
+    },
+    'team_members': {
+        title: 'Members',
+        category: 'team',
+        formatter: FormatNumber,
+    },
+    'team_play_count': {
+        title: 'Play Count',
+        category: 'team',
+        formatter: FormatNumber,
+    },
+    'team_ranked_score': {
+        title: 'Ranked Score',
+        category: 'team',
+        formatter: FormatNumber,
+    },
+    'team_average_score': {
+        title: 'Average Score',
+        category: 'team',
+        formatter: FormatNumber,
+    },
+    'team_total_score': {
+        title: 'Total Score',
+        category: 'team',
+        formatter: FormatNumber,
+    },
+    'team_performance': {
+        title: 'Performance',
+        category: 'team',
+        formatter: (value: number) => {
+            return `${FormatNumber(value)}pp`;
+        },
+    },
+    'team_clears': {
+        title: 'Clears',
+        category: 'team',
+        formatter: FormatNumber,
+    },
+    'team_total_ss': {
+        title: 'Total SS',
+        category: 'team',
+        formatter: FormatNumber,
+    },
+    'team_total_s': {
+        title: 'Total S',
+        category: 'team',
+        formatter: FormatNumber,
+    },
+    'team_total_a': {
+        title: 'Total A',
+        category: 'team',
+        formatter: FormatNumber,
+    },
+    'team_play_time': {
+        title: 'Play Time',
+        category: 'team',
+        formatter: (value: number) => {
+            if (!value || value <= 0) {
+                return '0 seconds';
+            }
+            const years = Math.floor(value / (3600 * 24 * 365));
+            const months = Math.floor((value % (3600 * 24 * 365)) / (3600 * 24 * 30));
+            const days = Math.floor((value % (3600 * 24 * 30)) / (3600 * 24));
+
+            return `${years > 0 ? years + ' years ' : ''}${months > 0 ? months + ' months ' : ''}${days > 0 ? days + ' days' : ''}`;
+        },
+    },
+    'team_total_hits': {
+        title: 'Total Hits',
+        category: 'team',
+        formatter: FormatNumber,
+    },
+    'team_replays_watched': {
+        title: 'Replays Watched',
+        category: 'team',
+        formatter: FormatNumber,
+    }
 }
 const LEADERBOARDS_CATEGORIES = Object.keys(LEADERBOARDS).reduce((acc: string[], key) => {
     const category = LEADERBOARDS[key].category;
@@ -245,22 +327,63 @@ function RouteLeaderboards() {
 
             //data.entries[i].value should be moved to data.entries[i].user.osuAlternative.lb_value
             if (data && data.entries) {
-                if (LEADERBOARDS[statistic].category === 'beatmap') {
-                    data.entries = data.entries.map((entry: any) => {
-                        // entry.beatmap = entry.beatmap || {};
-                        const _beatmap = new Beatmap(entry.beatmap);
-                        entry.beatmap = _beatmap;
-                        entry.beatmap.lb_value = entry.value;
-                        entry.beatmap.lb_value_diff = entry.difference_value;
-                        return entry;
-                    });
-                } else {
-                    data.entries = data.entries.map((entry: any) => {
-                        entry.user.osuAlternative = entry.user.osuAlternative || {};
-                        entry.user.osuAlternative.lb_value = entry.value;
-                        entry.user.osuAlternative.lb_value_diff = entry.difference_value;
-                        return entry;
-                    });
+                // if (LEADERBOARDS[statistic].category === 'beatmap') {
+                //     data.entries = data.entries.map((entry: any) => {
+                //         // entry.beatmap = entry.beatmap || {};
+                //         const _beatmap = new Beatmap(entry.beatmap);
+                //         entry.beatmap = _beatmap;
+                //         entry.beatmap.lb_value = entry.value;
+                //         entry.beatmap.lb_value_diff = entry.difference_value;
+                //         return entry;
+                //     });
+                // } else if (LEADERBOARDS[statistic].category === 'user') {
+                //     data.entries = data.entries.map((entry: any) => {
+                //         entry.user.osuAlternative = entry.user.osuAlternative || {};
+                //         entry.user.osuAlternative.lb_value = entry.value;
+                //         entry.user.osuAlternative.lb_value_diff = entry.difference_value;
+                //         return entry;
+                //     });
+                // }else {
+                //     data.entries = data.entries.map((entry: any) => {
+                //         entry.lb_value = entry.value;
+                //         entry.lb_value_diff = entry.difference_value;
+                //         return entry;
+                //     });
+                // }
+                switch (LEADERBOARDS[statistic].category) {
+                    case 'beatmap':
+                        data.entries = data.entries.map((entry: any) => {
+                            const _beatmap = new Beatmap(entry.beatmap);
+                            entry.beatmap = _beatmap;
+                            entry.beatmap.lb_value = entry.value;
+                            entry.beatmap.lb_value_diff = entry.difference_value;
+                            return entry;
+                        });
+                        break;
+                    case 'user':
+                        data.entries = data.entries.map((entry: any) => {
+                            entry.user.osuAlternative = entry.user.osuAlternative || {};
+                            entry.user.osuAlternative.lb_value = entry.value;
+                            entry.user.osuAlternative.lb_value_diff = entry.difference_value;
+                            return entry;
+                        });
+                        break;
+                    case 'team':
+                        data.entries = data.entries.map((entry: any) => {
+                            const _team = entry.team || {};
+                            entry.team = _team;
+                            entry.team.lb_value = entry.value;
+                            entry.team.lb_value_diff = entry.difference_value;
+                            return entry;
+                        });
+                        break;
+                    default:
+                        data.entries = data.entries.map((entry: any) => {
+                            entry.lb_value = entry.value;
+                            entry.lb_value_diff = entry.difference_value;
+                            return entry;
+                        });
+                        break;
                 }
             }
             console.log(data);
@@ -429,40 +552,7 @@ function RouteLeaderboards() {
                                                 disabled={isWorking}
                                             />
                                         </Box>
-                                        {
-                                            //if beatmap leaderboard, show beatmap info, otherwise show player info
-                                            LEADERBOARDS[statistic].category === 'beatmap' ? (
-                                                <ItemList
-                                                    startIndex={(page - 1) * LIMIT}
-                                                    showIndex={true}
-                                                    items={leaderboardResults.entries.map((entry: any) => entry.beatmap)}
-                                                    isCompact={false}
-                                                    truncate={false}
-                                                    leaderboardField={!LEADERBOARDS[statistic].hide_value ? 'lb_value' : null}
-                                                    secondaryLeaderboardField={!LEADERBOARDS[statistic].hide_value ? 'lb_value_diff' : null}
-                                                    leaderboardFormat={(value: any) => {
-                                                        return `${LEADERBOARDS[statistic].formatter ? LEADERBOARDS[statistic].formatter(value) : Number(value)}${LEADERBOARDS[statistic].suffix || ''}`;
-                                                    }}
-                                                    ItemListRowType={BeatmapListRow}
-                                                    secondaryFieldColor={grey[500]}
-                                                />
-                                            ) : (
-                                                <ItemList
-                                                    startIndex={(page - 1) * LIMIT}
-                                                    showIndex={true}
-                                                    items={leaderboardResults.entries.map((entry: any) => entry.user)}
-                                                    isCompact={false}
-                                                    truncate={false}
-                                                    leaderboardField={!LEADERBOARDS[statistic].hide_value ? 'osuAlternative.lb_value' : null}
-                                                    secondaryLeaderboardField={!LEADERBOARDS[statistic].hide_value ? 'osuAlternative.lb_value_diff' : null}
-                                                    leaderboardFormat={(value: any) => {
-                                                        return `${LEADERBOARDS[statistic].formatter ? LEADERBOARDS[statistic].formatter(value) : Number(value)}${LEADERBOARDS[statistic].suffix || ''}`;
-                                                    }}
-                                                    ItemListRowType={PlayerListRow}
-                                                    secondaryFieldColor={grey[500]}
-                                                />
-                                            )
-                                        }
+                                        <LeaderboardItemList leaderboardResults={leaderboardResults} statistic={statistic} page={page} />
                                         <Box sx={{ display: 'flex', gap: 2, mb: 0, mt: 1, justifyContent: 'center' }}>
                                             <Pagination
                                                 count={leaderboardResults.total_pages}
@@ -481,6 +571,58 @@ function RouteLeaderboards() {
             </div>
         </Box>
     );
+}
+
+function LeaderboardItemList({ leaderboardResults, statistic, page }: { leaderboardResults: any, statistic: string, page: number }) {
+    switch (LEADERBOARDS[statistic].category) {
+        case 'beatmap':
+            return <ItemList
+                startIndex={(page - 1) * LIMIT}
+                showIndex={true}
+                items={leaderboardResults.entries.map((entry: any) => entry.beatmap)}
+                isCompact={false}
+                truncate={false}
+                leaderboardField={!LEADERBOARDS[statistic].hide_value ? 'lb_value' : null}
+                secondaryLeaderboardField={!LEADERBOARDS[statistic].hide_value ? 'lb_value_diff' : null}
+                leaderboardFormat={(value: any) => {
+                    return `${LEADERBOARDS[statistic].formatter ? LEADERBOARDS[statistic].formatter(value) : Number(value)}${LEADERBOARDS[statistic].suffix || ''}`;
+                }}
+                ItemListRowType={BeatmapListRow}
+                secondaryFieldColor={grey[500]}
+            />
+        case 'user':
+            return <ItemList
+                startIndex={(page - 1) * LIMIT}
+                showIndex={true}
+                items={leaderboardResults.entries.map((entry: any) => entry.user)}
+                isCompact={false}
+                truncate={false}
+                leaderboardField={!LEADERBOARDS[statistic].hide_value ? 'osuAlternative.lb_value' : null}
+                secondaryLeaderboardField={!LEADERBOARDS[statistic].hide_value ? 'osuAlternative.lb_value_diff' : null}
+                leaderboardFormat={(value: any) => {
+                    return `${LEADERBOARDS[statistic].formatter ? LEADERBOARDS[statistic].formatter(value) : Number(value)}${LEADERBOARDS[statistic].suffix || ''}`;
+                }}
+                ItemListRowType={PlayerListRow}
+                secondaryFieldColor={grey[500]}
+            />
+        case 'team':
+            return <ItemList
+                startIndex={(page - 1) * LIMIT}
+                showIndex={true}
+                items={leaderboardResults.entries.map((entry: any) => entry.team)}
+                isCompact={false}
+                truncate={false}
+                leaderboardField={!LEADERBOARDS[statistic].hide_value ? 'lb_value' : null}
+                secondaryLeaderboardField={!LEADERBOARDS[statistic].hide_value ? 'lb_value_diff' : null}
+                leaderboardFormat={(value: any) => {
+                    return `${LEADERBOARDS[statistic].formatter ? LEADERBOARDS[statistic].formatter(value) : Number(value)}${LEADERBOARDS[statistic].suffix || ''}`;
+                }}
+                ItemListRowType={TeamListRow}
+                secondaryFieldColor={grey[500]}
+            />
+        default:
+            return <></>;
+    }
 }
 
 export default RouteLeaderboards;

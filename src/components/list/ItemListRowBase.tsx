@@ -126,7 +126,7 @@ const ItemListRowBase = memo(function ItemListRowBase<TItem extends object>({
                     {
                         secondaryLeaderboardField &&
                         <Typography sx={{ fontSize: '0.75rem', color: secondaryFieldColor || getGainColor(Number(secondaryLeaderboardValue ?? 0), theme) }}>
-                            {leaderboardFormat ? leaderboardFormat(secondaryLeaderboardValue) : FormatNumberWithPrecision(Number(secondaryLeaderboardValue ?? 0), 2)}
+                            {Number(secondaryLeaderboardValue ?? 0) > 0 && '+'}{leaderboardFormat ? leaderboardFormat(secondaryLeaderboardValue) : FormatNumberWithPrecision(Number(secondaryLeaderboardValue ?? 0), 2)}
                         </Typography>
                     }
                 </TableCell>
