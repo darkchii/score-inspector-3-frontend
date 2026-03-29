@@ -327,29 +327,6 @@ function RouteLeaderboards() {
 
             //data.entries[i].value should be moved to data.entries[i].user.osuAlternative.lb_value
             if (data && data.entries) {
-                // if (LEADERBOARDS[statistic].category === 'beatmap') {
-                //     data.entries = data.entries.map((entry: any) => {
-                //         // entry.beatmap = entry.beatmap || {};
-                //         const _beatmap = new Beatmap(entry.beatmap);
-                //         entry.beatmap = _beatmap;
-                //         entry.beatmap.lb_value = entry.value;
-                //         entry.beatmap.lb_value_diff = entry.difference_value;
-                //         return entry;
-                //     });
-                // } else if (LEADERBOARDS[statistic].category === 'user') {
-                //     data.entries = data.entries.map((entry: any) => {
-                //         entry.user.osuAlternative = entry.user.osuAlternative || {};
-                //         entry.user.osuAlternative.lb_value = entry.value;
-                //         entry.user.osuAlternative.lb_value_diff = entry.difference_value;
-                //         return entry;
-                //     });
-                // }else {
-                //     data.entries = data.entries.map((entry: any) => {
-                //         entry.lb_value = entry.value;
-                //         entry.lb_value_diff = entry.difference_value;
-                //         return entry;
-                //     });
-                // }
                 switch (LEADERBOARDS[statistic].category) {
                     case 'beatmap':
                         data.entries = data.entries.map((entry: any) => {
@@ -504,23 +481,25 @@ function RouteLeaderboards() {
                     }
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
-                    <Autocomplete
-                        disablePortal
-                        id="country-select"
-                        options={countries.all.map(c => ({ code: c.alpha2, label: c.name, emoji: c.emoji }))}
-                        sx={{ width: 300 }}
-                        value={country ? { code: country, label: lookup.countries({ alpha2: country })[0].name, emoji: lookup.countries({ alpha2: country })[0].emoji } : null}
-                        onChange={(event, newValue) => {
-                            applyCountry(newValue ? newValue.code : null);
-                        }}
-                        getOptionLabel={(option) => {
-                            return `${option.emoji || ''} ${option.label}`;
-                        }}
-                        //selected value should show flag and country name
-                        renderInput={(params) => <TextField {...params} label="Filter by country" />}
-                        disabled={isWorking || (LEADERBOARDS[statistic].category !== 'user' && LEADERBOARDS[statistic].category !== 'grades')}
-                        size='small'
-                    />
+                    <Collapse in={LEADERBOARDS[statistic].category === 'user' || LEADERBOARDS[statistic].category === 'grades'}>
+                        <Autocomplete
+                            disablePortal
+                            id="country-select"
+                            options={countries.all.map(c => ({ code: c.alpha2, label: c.name, emoji: c.emoji }))}
+                            sx={{ width: 300 }}
+                            value={country ? { code: country, label: lookup.countries({ alpha2: country })[0].name, emoji: lookup.countries({ alpha2: country })[0].emoji } : null}
+                            onChange={(event, newValue) => {
+                                applyCountry(newValue ? newValue.code : null);
+                            }}
+                            getOptionLabel={(option) => {
+                                return `${option.emoji || ''} ${option.label}`;
+                            }}
+                            //selected value should show flag and country name
+                            renderInput={(params) => <TextField {...params} label="Filter by country" />}
+                            disabled={isWorking || (LEADERBOARDS[statistic].category !== 'user' && LEADERBOARDS[statistic].category !== 'grades')}
+                            size='small'
+                        />
+                    </Collapse>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                     <Box sx={{
