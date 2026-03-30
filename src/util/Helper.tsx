@@ -264,18 +264,22 @@ export const GetRulesets = () => {
     ]
 }
 
-export const GetStatusLabelFromInt = (status: number) => {
+export const GetStatusLabelFromInt = (status: number | string) => {
     switch (status) {
         default:
         case 0:
             return 'Unranked';
         case 1:
+        case 'ranked':
             return 'Ranked';
         case 2:
+        case 'approved':
             return 'Approved';
         case 3:
+        case 'qualified':
             return 'Qualified';
         case 4:
+        case 'loved':
             return 'Loved';
     }
 }

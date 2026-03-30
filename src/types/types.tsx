@@ -2,6 +2,62 @@ import { Buffer } from "buffer";
 import React from "react";
 import type { JSX } from "react";
 
+//primarily from the actual osu api, not osualt
+//should be interchangable, but osualt has less data
+export interface IBeatmapSet {
+    anime_cover: boolean;
+    covers: IBeatmapSetCovers | null;
+    beatmapset_id: number;
+    artist: string;
+    hype_current: number | null;
+    hype_required: number | null;
+    play_count: number;
+    status: string;
+    title: string;
+    user_id: number;
+    bpm: number;
+    can_be_hyped: boolean;
+    deleted_at: Date | null;
+    discussion_enabled: boolean;
+    discussion_locked: boolean;
+    is_scoreable: boolean;
+    last_updated: Date | null;
+    legacy_thread_url: string | null;
+    ranked: number;
+    storyboard: boolean;
+    tags: string[];
+    description: string | null;
+    preview_url: string | null;
+
+    beatmaps: IBeatmap[];
+    converts: IBeatmap[];
+    all_beatmaps: IBeatmap[];
+    grouped_beatmaps: { [beatmap_id: string | number]: IBeatmap[] };
+
+    genres: IGenre[] | null;
+    languages: ILanguage[] | null;
+
+    ratings: number[] | null;
+
+    //user objects
+    recent_favourites: any[] | null;
+    related_users: any[] | null;
+    related_tags: IUserTag[] | null;
+
+    version_count: number;
+}
+
+export interface IBeatmapSetCovers {
+    cover: string;
+    cover_2x: string;
+    card: string;
+    card_2x: string;
+    list: string;
+    list_2x: string;
+    slimcover: string;
+    slimcover_2x: string;
+}
+
 export interface IBeatmap {
     beatmap_id: number;
     id: number
@@ -51,10 +107,32 @@ export interface IBeatmap {
     lb_value: number | null; // for leaderboards, can be any type depending on statistic
     is_played: boolean; // whether the user has played this beatmap, set externally
     score_data: any;
+    user_tags: IUserTag[] | null;
+    convert: boolean;
+    owners: any[] | null;
 
     addScore(score: IScore): void;
     getScores(sort?: keyof IScore | null, direction?: 'asc' | 'desc'): IScore[] | null;
     clone(): IBeatmap;
+}
+
+export interface IUserTag {
+    id: number;
+    name: string;
+    ruleset_id: number;
+    description: string | null;
+    created_at: Date | null;
+    updated_at: Date | null;
+}
+
+export interface IGenre {
+    id: number;
+    name: string;
+}
+
+export interface ILanguage {
+    id: number;
+    name: string;
 }
 
 export interface IScore {

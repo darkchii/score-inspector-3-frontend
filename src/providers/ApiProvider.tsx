@@ -25,6 +25,8 @@ type ApiContextValue = {
     getTopReputations: (type: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     postRegisterVisitor: (targetId: string | number, userId: string | number, token: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getRecentVisitors: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getBeatmap: (beatmapId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getBeatmapSet: (beatmapsetId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
 };
 
 const ApiContext = createContext<ApiContextValue>({} as ApiContextValue);
@@ -226,6 +228,17 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         return response;
     }, [apiGet]);
 
+    const getBeatmap = useCallback(async (beatmapId: string | number, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        const response = await apiGet(`beatmap/${beatmapId}`, false, progressEvent);
+        return response;
+    }, [apiGet]);
+
+    const getBeatmapSet = useCallback(async (beatmapsetId: string | number, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        const response = await apiGet(`beatmap/set/${beatmapsetId}`, false, progressEvent);
+        return response;
+    }, [apiGet]);
+        
+
     // Memoize the context value to prevent unnecessary re-renders
     const contextValue = useMemo(() => ({
         getUserLive,
@@ -248,7 +261,9 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         postReputation,
         getTopReputations,
         postRegisterVisitor,
-        getRecentVisitors
+        getRecentVisitors,
+        getBeatmap,
+        getBeatmapSet
     }), [
         getUserLive,
         getScoresLive,
@@ -270,7 +285,9 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         postReputation,
         getTopReputations,
         postRegisterVisitor,
-        getRecentVisitors
+        getRecentVisitors,
+        getBeatmap,
+        getBeatmapSet
     ]);
 
     return (

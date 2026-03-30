@@ -1,5 +1,5 @@
 import { GetRulesetNameFromId } from "../../util/Helper";
-import type { IBeatmap, IScore } from "../types";
+import type { IBeatmap, IScore, IUserTag } from "../types";
 
 class Beatmap implements IBeatmap {
     beatmap_id: number;
@@ -64,12 +64,18 @@ class Beatmap implements IBeatmap {
     is_played: boolean = false; // whether the user has played this beatmap, set externally
     score_data: any = null; // for storing additional score data related to this beatmap, can be any type depending on ruleset/statistic
 
-    constructor(api_data: any) {
+    user_tags: IUserTag[] | null = null;
+
+    convert: boolean = false;
+
+    owners: any[] | null = null;
+
+    constructor(api_data: any, related_tags: IUserTag[] | null = null) {
         if (api_data === null || api_data === undefined) {
             throw new Error("Invalid api_data for Beatmap");
         }
 
-        this.beatmap_id = Number(api_data.beatmap_id);
+        this.beatmap_id = Number(api_data.beatmap_id || api_data.id);
         this.id = this.beatmap_id; // alias for id, used in some places
         this.beatmapset_id = Number(api_data.beatmapset_id);
 
@@ -77,18 +83,50 @@ class Beatmap implements IBeatmap {
         this.mapper = api_data.mapper;
 
         //its either .ruleset_id or .mode, test both
-        this.ruleset_id = api_data.ruleset_id !== undefined ? Number(api_data.ruleset_id) : Number(api_data.mode);
+        // this.ruleset_id = api_data.ruleset_id !== undefined ? Number(api_data.ruleset_id) : Number(api_data.mode);
+        //so this is annoying
+        //.ruleset_id is always number
+        //.mode can be number or string
+        this.ruleset_id = 0; // default to osu!standard
+        if (api_data.ruleset_id !== undefined) {
+            this.ruleset_id = Number(api_data.ruleset_id);
+        } else if (api_data.mode !== undefined) {
+            if (typeof api_data.mode === "number") {
+                this.ruleset_id = Number(api_data.mode);
+            } else if (typeof api_data.mode === "string") {
+                //convert mode string to ruleset_id
+                switch (api_data.mode.toLowerCase()) {
+                    case "osu":
+                        this.ruleset_id = 0;
+                        break;
+                    case "taiko":
+                        this.ruleset_id = 1;
+                        break;
+                    case "fruits":
+                    case "catch":
+                        this.ruleset_id = 2;
+                        break;
+                    case "mania":
+                        this.ruleset_id = 3;
+                        break;
+                    default:
+                        throw new Error("Invalid mode string for Beatmap ruleset: " + api_data.mode);
+                }
+            }
+        } else {
+            this.ruleset_id = 0; // default to osu!standard if not provided
+        }
         this.ruleset = GetRulesetNameFromId(this.ruleset_id);
 
         this.status = api_data.status;
         this.is_ranked = this.status === 'ranked' || this.status === 'approved';
 
-        this.stars = Number(api_data.stars);
+        this.stars = Number(api_data.stars || api_data.difficulty_rating);
 
         this.ar = Number(api_data.ar);
         this.cs = Number(api_data.cs);
-        this.hp = Number(api_data.hp);
-        this.od = Number(api_data.od);
+        this.hp = Number(api_data.hp || api_data.drain);
+        this.od = Number(api_data.od || api_data.accuracy);
 
         this.slider_multiplier = 1.4;
         this.slider_tick_rate = 1.0;
@@ -137,6 +175,22 @@ class Beatmap implements IBeatmap {
         this.attr_diff = null;
 
         this.lb_value = null; // for leaderboards, is always set externally
+
+        if(api_data.top_tag_ids && related_tags) {
+            //top_tag_ids is an array iwth {tag_id: number, count: number}
+            const user_tags: IUserTag[] = [];
+            for (const tag_info of api_data.top_tag_ids) {
+                const tag = related_tags.find(t => t.id === tag_info.tag_id);
+                if (tag) {
+                    user_tags.push(tag);
+                }
+            }
+            this.user_tags = user_tags;
+        }
+
+        this.convert = api_data.convert || false;
+
+        this.owners = api_data.owners || null;
     }
 
     addScore(score: IScore) {
