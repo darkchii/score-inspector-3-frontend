@@ -45,6 +45,10 @@ export interface IBeatmapSet {
     related_tags: IUserTag[] | null;
 
     version_count: number;
+
+    mapper: any | null;
+
+    description_user_data: any | null;
 }
 
 export interface IBeatmapSetCovers {

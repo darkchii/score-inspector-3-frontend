@@ -1,4 +1,4 @@
-import { Alert, Box, Card, CardContent, CardHeader, CardMedia, Chip, CircularProgress, Collapse, Container, Divider, Grid, LinearProgress, Stack, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, tableRowClasses, Typography } from "@mui/material";
+import { Alert, Box, Button, ButtonGroup, Card, CardContent, CardHeader, CardMedia, Chip, CircularProgress, Collapse, Container, Divider, Grid, LinearProgress, Paper, Stack, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, tableRowClasses, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { usePageTitle } from "../providers/TitleProvider";
 import type { IBeatmap, IBeatmapSet } from "../types/types";
@@ -9,10 +9,11 @@ import RulesetSelector from "../components/RulesetSelector";
 import DifficultyBadge from "../components/DifficultyBadge";
 import BeatmapUserTag from "../components/BeatmapUserTag";
 import PlayerLink from "../components/PlayerLink";
-import { FormatNumberWithPrecision, GetRulesetIconFromId, GetRulesetPrettyNameFromId, GetStatusLabelFromInt, ShowNotification } from "../util/Helper";
+import { FormatNumber, FormatNumberWithPrecision, GetRulesetIconFromId, GetRulesetNameFromId, GetRulesetPrettyNameFromId, GetStatusLabelFromInt, ShowNotification } from "../util/Helper";
 import BetterTooltip from "../components/tooltips/BetterTooltip";
 import { yellow } from "@mui/material/colors";
 import { getDiffColour } from "../util/DifficultyHelper";
+import HtmlDisplay from "../components/HtmlDisplay";
 
 interface RouteBeatmapResult {
     beatmapSet: IBeatmapSet | null;
@@ -146,62 +147,73 @@ function RouteBeatmap() {
                     <BeatmapSidebarLeft beatmapSet={data.beatmapSet} beatmap={data.beatmap} />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
-                    <Box sx={{
-                        display: 'flex', flexDirection: 'row',
-                        //wrap
-                        flexWrap: 'wrap',
-                    }}>
-                        {/* beatmap switcher */}
-                        {
-                            // data.beatmapSet.all_beatmaps.map((b) => {
-                            Object.values(data.beatmapSet.beatmaps).map((b) => {
-                                const color = getDiffColour(b.stars || 0);
-                                //size by data.beatmapSet.beatmaps array length (most maps have ~6 maps, some have 20+)
-                                const sizeMin = 1.4;
-                                const sizeMax = 2;
-                                //scale by .beatmaps length
-                                const len = data.beatmapSet?.beatmaps.length || 1;
-                                const size = Math.max(sizeMin, Math.min(sizeMax, sizeMax - (len - 6) * 0.1));
+                    <Paper>
+                        <Box sx={{
+                            display: 'flex', flexDirection: 'row',
+                            //wrap
+                            flexWrap: 'wrap',
+                        }}>
+                            {/* beatmap switcher */}
+                            {
+                                // data.beatmapSet.all_beatmaps.map((b) => {
+                                Object.values(data.beatmapSet.beatmaps).map((b) => {
+                                    const color = getDiffColour(b.stars || 0);
+                                    //size by data.beatmapSet.beatmaps array length (most maps have ~6 maps, some have 20+)
+                                    const sizeMin = 1.4;
+                                    const sizeMax = 2;
+                                    //scale by .beatmaps length
+                                    const len = data.beatmapSet?.beatmaps.length || 1;
+                                    const size = Math.max(sizeMin, Math.min(sizeMax, sizeMax - (len - 6) * 0.1));
 
-                                const isActive = b.id === data.beatmap?.id;
-                                return (
-                                    <BetterTooltip key={b.id} title={
-                                        <Box sx={{
-                                            display: 'flex', flexDirection: 'row', alignItems: 'center',
-                                            gap: 1,
-                                        }}>
-                                            <Typography variant="body1">[{b.version}]</Typography>
-                                            <DifficultyBadge difficulty={b.stars} />
-                                        </Box>
-                                    }>
-                                        <Box
-                                            key={b.id}
-                                            sx={{
-                                                // borderBottom: (b.id === data.beatmap?.id && b.ruleset_id === data.beatmap?.ruleset_id) ? `3px solid ${yellow[500]}` : 'none',
-                                                cursor: 'pointer',
-                                                backgroundColor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
-                                                borderRadius: 1,
-                                                padding: 0.3,
-                                            }}
-                                            onClick={() => {
-                                                navigate(generateNavUrl(data.beatmapSet!.beatmapset_id, b.ruleset.toLowerCase(), b.id));
-                                            }}
-                                        >
-                                            <img
-                                                src={GetRulesetIconFromId(b.ruleset_id)}
-                                                style={{
-                                                    width: `${size}em`,
-                                                    height: `${size}em`,
-                                                    verticalAlign: 'middle',
-                                                    filter: `drop-shadow(0 0 2px ${color})`,
+                                    const isActive = b.id === data.beatmap?.id;
+                                    return (
+                                        <BetterTooltip key={b.id} title={
+                                            <Box sx={{
+                                                display: 'flex', flexDirection: 'row', alignItems: 'center',
+                                                gap: 1,
+                                            }}>
+                                                <Typography variant="body1">[{b.version}]</Typography>
+                                                <DifficultyBadge difficulty={b.stars} />
+                                            </Box>
+                                        }>
+                                            <Box
+                                                key={b.id}
+                                                sx={{
+                                                    // borderBottom: (b.id === data.beatmap?.id && b.ruleset_id === data.beatmap?.ruleset_id) ? `3px solid ${yellow[500]}` : 'none',
+                                                    cursor: 'pointer',
+                                                    backgroundColor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                                                    borderRadius: 1,
+                                                    padding: 0.3,
                                                 }}
-                                            />
-                                        </Box>
-                                    </BetterTooltip>
-                                )
-                            })
-                        }
-                    </Box>
+                                                onClick={() => {
+                                                    navigate(generateNavUrl(data.beatmapSet!.beatmapset_id, b.ruleset.toLowerCase(), b.id));
+                                                }}
+                                            >
+                                                <img
+                                                    src={GetRulesetIconFromId(b.ruleset_id)}
+                                                    style={{
+                                                        width: `${size}em`,
+                                                        height: `${size}em`,
+                                                        verticalAlign: 'middle',
+                                                        filter: `drop-shadow(0 0 2px ${color})`,
+                                                    }}
+                                                />
+                                            </Box>
+                                        </BetterTooltip>
+                                    )
+                                })
+                            }
+                        </Box>
+                    </Paper>
+                    <Card sx={{ marginTop: 2 }}>
+                        <CardHeader title="Description" />
+                        <CardContent>
+                            <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
+                                {/* {data.beatmapSet.description || "No description provided."} */}
+                                {data.beatmapSet.description ? <HtmlDisplay html={data.beatmapSet.description} userData={data.beatmapSet.description_user_data} /> : "No description provided."}
+                            </Typography>
+                        </CardContent>
+                    </Card>
                 </Grid>
                 <Grid size={{ xs: 12, md: 3 }}>
                     <BeatmapSidebarRight beatmapSet={data.beatmapSet} beatmap={data.beatmap} />
@@ -223,7 +235,7 @@ function BeatmapSidebarLeft({ beatmapSet, beatmap }: { beatmapSet: IBeatmapSet, 
                 </CardMedia>
                 <Box sx={{
                     position: 'absolute',
-                    top: 8, right: 8,
+                    left: 8, top: 8,
                     display: 'flex', alignItems: 'center',
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
                     padding: '4px 8px',
@@ -292,34 +304,43 @@ function BeatmapSidebarLeft({ beatmapSet, beatmap }: { beatmapSet: IBeatmapSet, 
                                 },
                             }}>
                                 <TableBody>
-                                    <BeatmapStatRow label="AR" value={beatmap.ar} />
+                                    <BeatmapStatRow label="AR" value={beatmap.ar} enabled={beatmap.ruleset_id !== 3} />
                                     <BeatmapStatRow label="OD" value={beatmap.od} />
                                     <BeatmapStatRow label="HP" value={beatmap.hp} />
-                                    <BeatmapStatRow label="CS" value={beatmap.cs} />
+                                    <BeatmapStatRow label={
+                                        //if mania, label is Keys, otherwise CS
+                                        beatmap.ruleset_id === 3 ? "Keys" : "CS"
+                                    } value={beatmap.cs} />
                                 </TableBody>
                             </Table>
                         </TableContainer>
                     </Box>
-                    <Divider sx={{ marginY: 2 }} />
-                    <Box>
-                        {/* tags */}
-                        <Typography variant="h6">User Tags</Typography>
-                        <Box display="flex" flexWrap="wrap">
-                            {
-                                beatmap.user_tags?.map((tag) => (
-                                    <BeatmapUserTag key={tag.id} tag={tag} />
-                                ))
-                            }
-                        </Box>
-                    </Box>
+                    {
+                        (beatmap.user_tags || [])?.length > 0 && (
+                            <>
+                                <Divider sx={{ marginY: 2 }} />
+                                <Box>
+                                    {/* tags */}
+                                    <Typography variant="h6">User Tags</Typography>
+                                    <Box display="flex" flexWrap="wrap">
+                                        {
+                                            (beatmap.user_tags || []).map((tag) => (
+                                                <BeatmapUserTag key={tag.id} tag={tag} />
+                                            ))
+                                        }
+                                    </Box>
+                                </Box>
+                            </>
+                        )
+                    }
                     <Divider sx={{ marginY: 2 }} />
                     <Box>
                         {/* tags */}
                         <Typography variant="h6">Tags</Typography>
                         <Box display="flex" flexWrap="wrap">
                             {
-                                beatmapSet.tags.map((tag) => (
-                                    <Chip key={tag} label={tag} sx={{ margin: 0.5 }} size='small' />
+                                (beatmapSet.tags || []).map((tag) => (
+                                    <Chip key={tag} label={tag} sx={{ margin: 0.25 }} size='small' />
                                 ))
                             }
                         </Box>
@@ -334,10 +355,23 @@ function BeatmapSidebarRight({ beatmapSet, beatmap }: { beatmapSet: IBeatmapSet,
     return (
         <Card sx={{ position: 'relative' }}>
             <CardContent>
+                <Stack spacing={1} direction="column" alignItems="center">
+                    <Button
+                        href={`https://osu.ppy.sh/beatmapsets/${beatmapSet.beatmapset_id}#${GetRulesetNameFromId(beatmap.ruleset_id)}/${beatmap.beatmap_id}`}
+                        target="_blank"
+                        fullWidth>osu! website</Button>
+                    <Button
+                        href={`osu://b/${beatmap.beatmap_id}`}
+                        fullWidth>osu!direct</Button>
+                </Stack>
+                <Divider sx={{ marginY: 2 }} />
                 <Typography variant="h6">Mappers</Typography>
                 {
                     (beatmap.owners?.length ?? 0) > 0 &&
                     <Stack spacing={1}>
+                        <Typography variant="subtitle1" color="text.secondary">Set owner</Typography>
+                        <PlayerLink data={beatmapSet.mapper} />
+                        <Typography variant="subtitle1" color="text.secondary">Difficulty mappers ({FormatNumber(beatmap.owners?.length ?? 0)})</Typography>
                         {
                             beatmap.owners?.map((owner) => (
                                 <PlayerLink key={owner.id} data={owner.user} />
@@ -350,7 +384,11 @@ function BeatmapSidebarRight({ beatmapSet, beatmap }: { beatmapSet: IBeatmapSet,
     )
 }
 
-function BeatmapStatRow({ label, value, limit = 10 }: { label: string, value: number, limit?: number }) {
+function BeatmapStatRow({ label, value, limit = 10, enabled = true }: { label: string, value: number, limit?: number, enabled?: boolean }) {
+    if(!enabled) {
+        return null;
+    }
+    
     return (
         <TableRow>
             <TableCell><Typography variant="body2" color="text.secondary">{label}</Typography></TableCell>

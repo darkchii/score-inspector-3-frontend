@@ -44,6 +44,10 @@ class BeatmapSet implements IBeatmapSet {
     all_beatmaps: IBeatmap[] = [];
     grouped_beatmaps: { [beatmap_id: string]: IBeatmap[];[beatmap_id: number]: IBeatmap[]; } = {};
 
+    mapper: any | null = null;
+
+    description_user_data: any | null = null;
+
     constructor(api_data: any) {
         this.beatmapset_id = api_data.beatmapset_id || api_data.id;
         this.anime_cover = api_data.anime_cover;
@@ -117,6 +121,8 @@ class BeatmapSet implements IBeatmapSet {
         this.recent_favourites = api_data.recent_favourites || null;
         this.related_users = api_data.related_users || null;
 
+        this.mapper = api_data.mapper || null;
+        this.description_user_data = api_data.description_user_data || null;
     }
 }
 

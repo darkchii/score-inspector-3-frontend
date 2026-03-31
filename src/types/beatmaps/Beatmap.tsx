@@ -79,7 +79,7 @@ class Beatmap implements IBeatmap {
         this.id = this.beatmap_id; // alias for id, used in some places
         this.beatmapset_id = Number(api_data.beatmapset_id);
 
-        this.mapper_id = Number(api_data.mapper_id);
+        this.mapper_id = Number(api_data.mapper_id || api_data.user_id);
         this.mapper = api_data.mapper;
 
         //its either .ruleset_id or .mode, test both

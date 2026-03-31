@@ -41,6 +41,16 @@ const LEADERBOARDS: { [key: string]: LeaderboardConfig } = {
         category: 'user',
         formatter: FormatNumber,
     },
+    'lazer_score': {
+        title: 'Lazer Score',
+        category: 'user',
+        formatter: FormatNumber,
+    },
+    'classic_score': {
+        title: 'Classic Score',
+        category: 'user',
+        formatter: FormatNumber,
+    },
     'total_score': {
         title: 'Total Score',
         category: 'user',
@@ -212,6 +222,11 @@ const LEADERBOARDS: { [key: string]: LeaderboardConfig } = {
     },
     'beatmap_objects': {
         title: 'Objects',
+        category: 'beatmap',
+        formatter: FormatNumber,
+    },
+    'beatmap_owners': {
+        title: 'Owners',
         category: 'beatmap',
         formatter: FormatNumber,
     },
