@@ -15,6 +15,7 @@ import RoutePeople from "./routes/RoutePeople";
 import RouteTools from "./routes/RouteTools";
 import type { IRouteObject } from "./types/types";
 import RouteBeatmap from "./routes/RouteBeatmap";
+import { routeData } from "./util/RouteHelper";
 
 declare const window: any; //ts fix
 function App() {
@@ -27,15 +28,15 @@ function App() {
   }
 
   const routes = [
-    { path: "*", element: <Route404 /> },
-    { path: "/", element: <RouteIndex /> },
-    { path: "/people", element: <RoutePeople /> },
-    { path: "/tools/:tool?", element: <RouteTools /> },
-    { path: "/user/:userId/:ruleset?/:page?", element: <RouteProfile /> },
-    { path: "/scorerank/:ruleset?/:stat?/:date?/page?/:page?", element: <RouteScoreRank /> },
-    { path: "/completionists", element: <RouteCompletionists /> },
-    { path: "/leaderboards/:ruleset?/:statistic?/page?/:page?/country?/:country?", element: <RouteLeaderboards /> },
-    { path: "/beatmapsets/:beatmapsetId/:ruleset?/:beatmapId?", element: <RouteBeatmap /> },
+    { path: routeData.route404.path, element: <Route404 /> },
+    { path: routeData.routeIndex.path, element: <RouteIndex /> },
+    { path: routeData.routePeople.path, element: <RoutePeople /> },
+    { path: routeData.routeTools.path, element: <RouteTools /> },
+    { path: routeData.routeProfile.path, element: <RouteProfile /> },
+    { path: routeData.routeScoreRank.path, element: <RouteScoreRank /> },
+    { path: routeData.routeCompletionists.path, element: <RouteCompletionists /> },
+    { path: routeData.routeLeaderboards.path, element: <RouteLeaderboards /> },
+    { path: routeData.routeBeatmapsets.path, element: <RouteBeatmap /> },
   ];
 
   const getRoute = (obj: IRouteObject, is_child = false) => {

@@ -1,4 +1,4 @@
-import { Alert, Box, Button, ButtonGroup, Card, CardContent, CardHeader, CardMedia, Chip, CircularProgress, Collapse, Container, Divider, Grid, LinearProgress, Paper, Stack, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableRow, tableRowClasses, Typography, useTheme } from "@mui/material";
+import { Box, Card, CardContent, CardHeader, CircularProgress, Collapse, Container, Grid, Paper, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { usePageTitle } from "../providers/TitleProvider";
 import type { IBeatmap, IBeatmapSet } from "../types/types";
@@ -7,14 +7,13 @@ import { useApi } from "../providers/ApiProvider";
 import BeatmapSet from "../types/beatmaps/BeatmapSet";
 import RulesetSelector from "../components/RulesetSelector";
 import DifficultyBadge from "../components/DifficultyBadge";
-import BeatmapUserTag from "../components/BeatmapUserTag";
-import PlayerLink from "../components/PlayerLink";
-import { FormatNumber, FormatNumberWithPrecision, GetRulesetIconFromId, GetRulesetNameFromId, GetRulesetPrettyNameFromId, GetStatusLabelFromInt, ShowNotification } from "../util/Helper";
+import { GetRulesetIconFromId, ShowNotification } from "../util/Helper";
 import BetterTooltip from "../components/tooltips/BetterTooltip";
-import { yellow } from "@mui/material/colors";
 import { getDiffColour } from "../util/DifficultyHelper";
 import HtmlDisplay from "../components/HtmlDisplay";
-import YoutubeEmbed from "../components/YoutubeEmbed";
+import BeatmapSidebarLeft from "../components/beatmapsets/BeatmapSidebarLeft";
+import BeatmapSidebarRight from "../components/beatmapsets/BeatmapSidebarRight";
+import { GenerateUrl, routeData, UpdateUrl } from "../util/RouteHelper";
 
 interface RouteBeatmapResult {
     beatmapSet: IBeatmapSet | null;
@@ -22,11 +21,6 @@ interface RouteBeatmapResult {
     ruleset: string;
 }
 
-//used to navigate between beatmaps
-const nav_format = '/beatmapsets/{beatmapsetId}/{ruleset}/{beatmapId}';
-const generateNavUrl = (beatmapsetId: number, ruleset: string, beatmapId: number) => {
-    return nav_format.replace('{beatmapsetId}', beatmapsetId.toString()).replace('{ruleset}', ruleset).replace('{beatmapId}', beatmapId.toString());
-}
 function RouteBeatmap() {
     const navigate = useNavigate();
     const { beatmapsetId, ruleset, beatmapId } = useParams();
@@ -90,8 +84,14 @@ function RouteBeatmap() {
     useEffect(() => {
         //if proper data, adjust the page url
         if (data && data.beatmapSet && data.beatmap) {
-            const newUrl = generateNavUrl(data.beatmapSet.beatmapset_id, data.ruleset, data.beatmap.beatmap_id);
-            window.history.replaceState({}, document.title, newUrl);
+            UpdateUrl(
+                routeData.routeBeatmapsets.path,
+                {
+                    beatmapsetId: data.beatmapSet.beatmapset_id,
+                    ruleset: data.ruleset,
+                    beatmapId: data.beatmap.beatmap_id,
+                }
+            )
         }
     }, [data]);
 
@@ -138,7 +138,11 @@ function RouteBeatmap() {
                                     }
                                     const newBeatmap = data.beatmapSet?.grouped_beatmaps[data.beatmap.beatmap_id]?.find((b) => b.ruleset.toLowerCase() === newRuleset.toLowerCase()) || null;
                                     if (newBeatmap) {
-                                        navigate(generateNavUrl(data.beatmapSet!.beatmapset_id, newRuleset.toLowerCase(), newBeatmap.id));
+                                        navigate(GenerateUrl(routeData.routeBeatmapsets.path, {
+                                            beatmapsetId: data.beatmapSet!.beatmapset_id,
+                                            ruleset: newRuleset.toLowerCase(),
+                                            beatmapId: newBeatmap.id
+                                        }));
                                     }
                                 }}
                                 showCombined={false}
@@ -187,7 +191,11 @@ function RouteBeatmap() {
                                                     padding: 0.3,
                                                 }}
                                                 onClick={() => {
-                                                    navigate(generateNavUrl(data.beatmapSet!.beatmapset_id, b.ruleset.toLowerCase(), b.id));
+                                                    navigate(GenerateUrl(routeData.routeBeatmapsets.path, {
+                                                        beatmapsetId: data.beatmapSet!.beatmapset_id,
+                                                        ruleset: b.ruleset.toLowerCase(),
+                                                        beatmapId: b.id
+                                                    }));
                                                 }}
                                             >
                                                 <img
@@ -222,196 +230,6 @@ function RouteBeatmap() {
             </Grid>
         </Container>
     </Box>
-}
-
-function BeatmapSidebarLeft({ beatmapSet, beatmap }: { beatmapSet: IBeatmapSet, beatmap: IBeatmap }) {
-    return (
-        <>
-            <Card sx={{ position: 'relative' }}>
-                <CardMedia
-                    component="img"
-                    image={beatmapSet.covers ? beatmapSet.covers.card_2x : undefined}
-                    alt={`${beatmapSet.artist} - ${beatmapSet.title}`}
-                >
-                </CardMedia>
-                <Box sx={{
-                    position: 'absolute',
-                    left: 8, top: 8,
-                    display: 'flex', alignItems: 'center',
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    padding: '4px 8px',
-                    borderRadius: '4px',
-                }}>
-                    <Typography variant="body2" color="white" sx={{ marginRight: 1 }}>
-                        {GetStatusLabelFromInt(beatmap.status)}
-                    </Typography>
-                    <BetterTooltip title={`${GetRulesetPrettyNameFromId(beatmap.ruleset_id)}`}>
-                        <img
-                            src={GetRulesetIconFromId(beatmap.ruleset_id)}
-                            style={{ width: '1em', height: '1em', verticalAlign: 'middle', marginRight: '0.3em' }}
-                        />
-                    </BetterTooltip>
-                    <DifficultyBadge difficulty={beatmap.stars} />
-                </Box>
-                {
-                    <Collapse in={beatmap.convert} timeout="auto" unmountOnExit>
-                        <Alert
-                            severity="warning"
-                            sx={{
-                                //center text
-                                verticalAlign: 'middle',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
-                            icon={false}
-                        >
-                            Map is a convert
-                        </Alert>
-                    </Collapse>
-                }
-                <CardContent>
-                    <Box>
-                        <Typography variant="h5" component="div">
-                            {beatmapSet.title}
-                        </Typography>
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {beatmapSet.artist}
-                        </Typography>
-                        <Typography variant="subtitle2" color="text.secondary">
-                            [{beatmap.version}]
-                        </Typography>
-                    </Box>
-                    {/* <Divider sx={{ marginY: 2 }} /> */}
-                    {
-                        beatmapSet.preview_url ?
-                            <Box sx={{ marginY: 2 }}>
-                                <audio controls style={{ width: '100%' }}>
-                                    <source src={beatmapSet.preview_url} type="audio/mpeg" />
-                                    Your browser does not support the audio element.
-                                </audio>
-                            </Box> : <Divider sx={{ marginY: 2 }} />
-                    }
-                    <Box>
-                        <TableContainer>
-                            <Table size="small" sx={{
-                                [`& .${tableCellClasses.root}`]: {
-                                    borderBottom: "none",
-                                    color: 'white !important',
-                                    padding: '2px'
-                                },
-                                [`& .${tableRowClasses.root}`]: {
-                                    borderBottom: "none",
-                                },
-                            }}>
-                                <TableBody>
-                                    <BeatmapStatRow label="AR" value={beatmap.ar} enabled={beatmap.ruleset_id !== 3} />
-                                    <BeatmapStatRow label="OD" value={beatmap.od} />
-                                    <BeatmapStatRow label="HP" value={beatmap.hp} />
-                                    <BeatmapStatRow label={
-                                        //if mania, label is Keys, otherwise CS
-                                        beatmap.ruleset_id === 3 ? "Keys" : "CS"
-                                    } value={beatmap.cs} />
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </Box>
-                    {
-                        (beatmap.user_tags || [])?.length > 0 && (
-                            <>
-                                <Divider sx={{ marginY: 2 }} />
-                                <Box>
-                                    {/* tags */}
-                                    <Typography variant="h6">User Tags</Typography>
-                                    <Box display="flex" flexWrap="wrap">
-                                        {
-                                            (beatmap.user_tags || []).map((tag) => (
-                                                <BeatmapUserTag key={tag.id} tag={tag} />
-                                            ))
-                                        }
-                                    </Box>
-                                </Box>
-                            </>
-                        )
-                    }
-                    <Divider sx={{ marginY: 2 }} />
-                    <Box>
-                        {/* tags */}
-                        <Typography variant="h6">Tags</Typography>
-                        <Box display="flex" flexWrap="wrap">
-                            {
-                                (beatmapSet.tags || []).map((tag) => (
-                                    <Chip key={tag} label={tag} sx={{ margin: 0.25 }} size='small' />
-                                ))
-                            }
-                        </Box>
-                    </Box>
-                </CardContent>
-            </Card>
-        </>
-    )
-}
-
-function BeatmapSidebarRight({ beatmapSet, beatmap }: { beatmapSet: IBeatmapSet, beatmap: IBeatmap }) {
-    const theme = useTheme();
-    return (
-        <Stack spacing={2}>
-            {
-                beatmapSet.media?.youtube_id && (
-                    <YoutubeEmbed videoId={beatmapSet.media.youtube_id} width={"100%"} height={"200px"} />
-                )
-            }
-            <Card sx={{ position: 'relative' }}>
-                <CardContent>
-                    <Stack spacing={1} direction="column" alignItems="center">
-                        <Button
-                            variant="contained"
-                            href={`https://osu.ppy.sh/beatmapsets/${beatmapSet.beatmapset_id}#${GetRulesetNameFromId(beatmap.ruleset_id)}/${beatmap.beatmap_id}`}
-                            target="_blank"
-                            fullWidth>osu! website</Button>
-                        <Button
-                            variant="contained"
-                            href={`osu://b/${beatmap.beatmap_id}`}
-                            fullWidth>osu!direct</Button>
-                    </Stack>
-                    <Divider sx={{ marginY: 2 }} />
-                    <Typography variant="h6">Mappers</Typography>
-                    {
-                        (beatmap.owners?.length ?? 0) > 0 &&
-                        <Stack spacing={1}>
-                            <Typography variant="subtitle1" color="text.secondary">Set owner</Typography>
-                            <PlayerLink data={beatmapSet.mapper} />
-                            <Typography variant="subtitle1" color="text.secondary">Difficulty mappers ({FormatNumber(beatmap.owners?.length ?? 0)})</Typography>
-                            {
-                                beatmap.owners?.map((owner) => (
-                                    <PlayerLink key={owner.id} data={owner.user} />
-                                ))
-                            }
-                        </Stack>
-                    }
-                </CardContent>
-            </Card>
-        </Stack>
-    )
-}
-
-function BeatmapStatRow({ label, value, limit = 10, enabled = true }: { label: string, value: number, limit?: number, enabled?: boolean }) {
-    if (!enabled) {
-        return null;
-    }
-
-    return (
-        <TableRow>
-            <TableCell><Typography variant="body2" color="text.secondary">{label}</Typography></TableCell>
-            <TableCell>{value}</TableCell>
-            <TableCell sx={{ width: '100%' }}>
-                <LinearProgress
-                    variant="determinate"
-                    value={typeof value === 'number' ? Math.min((value / limit) * 100, 100) : 0}
-                />
-            </TableCell>
-        </TableRow>
-    )
 }
 
 export default RouteBeatmap;
