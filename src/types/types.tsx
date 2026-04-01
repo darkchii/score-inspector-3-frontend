@@ -49,6 +49,13 @@ export interface IBeatmapSet {
     mapper: any | null;
 
     description_user_data: any | null;
+
+    media: IBeatmapSetMedia | null;
+}
+
+export interface IBeatmapSetMedia {
+    beatmapset_id: number;
+    youtube_id: string | null;
 }
 
 export interface IBeatmapSetCovers {

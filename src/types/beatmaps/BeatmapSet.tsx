@@ -1,4 +1,4 @@
-import type { IBeatmap, IBeatmapSet, IBeatmapSetCovers, IGenre, ILanguage, IUserTag } from "../types";
+import type { IBeatmap, IBeatmapSet, IBeatmapSetCovers, IBeatmapSetMedia, IGenre, ILanguage, IUserTag } from "../types";
 import UserTag from "../UserTag";
 import Beatmap from "./Beatmap";
 
@@ -47,6 +47,8 @@ class BeatmapSet implements IBeatmapSet {
     mapper: any | null = null;
 
     description_user_data: any | null = null;
+
+    media: IBeatmapSetMedia | null = null;
 
     constructor(api_data: any) {
         this.beatmapset_id = api_data.beatmapset_id || api_data.id;
@@ -123,6 +125,8 @@ class BeatmapSet implements IBeatmapSet {
 
         this.mapper = api_data.mapper || null;
         this.description_user_data = api_data.description_user_data || null;
+
+        this.media = api_data.media || null;
     }
 }
 
