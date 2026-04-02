@@ -14,6 +14,8 @@ import type { ItemListRowBaseProps } from "./ItemListRowBase";
 import { useScoreView } from "../../providers/ScoreViewProvider";
 import { useProfile } from "../../providers/ProfileProvider";
 import type { IBeatmap } from "../../types/types";
+import { useNavigate } from "react-router";
+import { GenerateUrl, routeData } from "../../util/RouteHelper";
 
 type BeatmapListItem = IBeatmap & {
     score_data?: {
@@ -45,6 +47,7 @@ const BeatmapListRow = memo(function BeatmapListRow({
     const theme = useTheme();
     const { getScoreById } = useProfile();
     const { loadScoreView } = useScoreView();
+    const navigate = useNavigate();
 
     if (!item) {
         return null;
@@ -144,7 +147,10 @@ const BeatmapListRow = memo(function BeatmapListRow({
                     variant="text"
                     size="small"
                     onClick={() => {
-                        window.open(`https://osu.ppy.sh/beatmaps/${item.beatmap_id}`, '_blank');
+                        const url = GenerateUrl(routeData.routeBeatmapsets.path, { beatmapsetId: item.beatmapset_id, ruleset: item.ruleset, beatmapId: item.id });
+                        window.open(url, '_blank');
+                        // window.open(`https://osu.ppy.sh/beatmaps/${item.beatmap_id}`, '_blank');
+                        // navigate(`/beatmapset/${item.beatmapset_id}/${item.ruleset}/${item.beatmap_id}`);
                     }}
                 >
                     <LaunchIcon fontSize="small" />

@@ -1,7 +1,7 @@
 import { Box, Card, CardContent, CardHeader, CircularProgress, Collapse, Container, Grid, Paper, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { usePageTitle } from "../providers/TitleProvider";
-import type { IBeatmap, IBeatmapSet } from "../types/types";
+import type { IBeatmap, IBeatmapSet, IRouteBeatmapResult, IScoreDifficulty } from "../types/types";
 import { useEffect, useState } from "react";
 import { useApi } from "../providers/ApiProvider";
 import BeatmapSet from "../types/beatmaps/BeatmapSet";
@@ -15,20 +15,17 @@ import BeatmapSidebarLeft from "../components/beatmapsets/BeatmapSidebarLeft";
 import BeatmapSidebarRight from "../components/beatmapsets/BeatmapSidebarRight";
 import { GenerateUrl, routeData, UpdateUrl } from "../util/RouteHelper";
 
-interface RouteBeatmapResult {
-    beatmapSet: IBeatmapSet | null;
-    beatmap: IBeatmap | null;
-    ruleset: string;
-}
-
-function RouteBeatmap() {
+function RouteBeatmapset() {
     const navigate = useNavigate();
     const { beatmapsetId, ruleset, beatmapId } = useParams();
-    const { getBeatmapSet } = useApi();
-    const [data, setData] = useState<RouteBeatmapResult | null>(null);
+    const { getBeatmapSet, getDifficulty } = useApi();
+    const [data, setData] = useState<IRouteBeatmapResult | null>(null);
     // const { setTitle } = usePageTitle();
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isLoadingDifficulty, setIsLoadingDifficulty] = useState(false);
+
+    const isAnythingLoading = isLoading || isLoadingDifficulty;
 
     useEffect(() => {
         if (!beatmapsetId) return;
@@ -95,14 +92,33 @@ function RouteBeatmap() {
         }
     }, [data]);
 
+    useEffect(() => {
+        (async () => {
+            if (data && data.beatmap) {
+                setIsLoadingDifficulty(true);
+                try {
+                    const difficultyResponse = await getDifficulty(data.beatmap.beatmap_id, data.beatmap.ruleset_id, null);
+                    setData((prev) => prev ? { ...prev, difficulty: difficultyResponse } : prev);
+                    console.log("Loaded difficulty data:", difficultyResponse);
+                }
+                catch (err) {
+                    console.error("Failed to load difficulty data:", err);
+                }
+                finally {
+                    setIsLoadingDifficulty(false);
+                }
+            }
+        })();
+    }, [data?.beatmap, data?.ruleset, data?.beatmap?.ruleset_id]);
+
     if (isLoading) {
-        return <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+        return <Box display="flex" justifyContent="center" alignItems="center" height="200px">
             <CircularProgress />
         </Box>
     }
 
     if (error || !data || !data.beatmapSet || !data.beatmap) {
-        return <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+        return <Box display="flex" justifyContent="center" alignItems="center" height="200px">
             <h2>{error || "Beatmap not found"}</h2>
         </Box>
     }
@@ -146,10 +162,11 @@ function RouteBeatmap() {
                                     }
                                 }}
                                 showCombined={false}
+                                disabled={isAnythingLoading}
                             />
                         </Box>
                     </Collapse>
-                    <BeatmapSidebarLeft beatmapSet={data.beatmapSet} beatmap={data.beatmap} />
+                    <BeatmapSidebarLeft data={data} />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
                     <Paper>
@@ -163,12 +180,11 @@ function RouteBeatmap() {
                                 // data.beatmapSet.all_beatmaps.map((b) => {
                                 Object.values(data.beatmapSet.beatmaps).map((b) => {
                                     const color = getDiffColour(b.stars || 0);
-                                    //size by data.beatmapSet.beatmaps array length (most maps have ~6 maps, some have 20+)
-                                    const sizeMin = 1.4;
-                                    const sizeMax = 2;
-                                    //scale by .beatmaps length
                                     const len = data.beatmapSet?.beatmaps.length || 1;
-                                    const size = Math.max(sizeMin, Math.min(sizeMax, sizeMax - (len - 6) * 0.1));
+                                    let size = 2;
+                                    if(len >= 20) {
+                                        size = 1.4;
+                                    }
 
                                     const isActive = b.id === data.beatmap?.id;
                                     return (
@@ -191,6 +207,10 @@ function RouteBeatmap() {
                                                     padding: 0.3,
                                                 }}
                                                 onClick={() => {
+                                                    if(isAnythingLoading) {
+                                                        ShowNotification("Data is still loading, please wait", "info");
+                                                        return;
+                                                    }
                                                     navigate(GenerateUrl(routeData.routeBeatmapsets.path, {
                                                         beatmapsetId: data.beatmapSet!.beatmapset_id,
                                                         ruleset: b.ruleset.toLowerCase(),
@@ -225,11 +245,11 @@ function RouteBeatmap() {
                     </Card>
                 </Grid>
                 <Grid size={{ xs: 12, md: 3 }}>
-                    <BeatmapSidebarRight beatmapSet={data.beatmapSet} beatmap={data.beatmap} />
+                    <BeatmapSidebarRight data={data} />
                 </Grid>
             </Grid>
         </Container>
     </Box>
 }
 
-export default RouteBeatmap;
+export default RouteBeatmapset;

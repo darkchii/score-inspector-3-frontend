@@ -14,7 +14,7 @@ import RouteLeaderboards from "./routes/RouteLeaderboards";
 import RoutePeople from "./routes/RoutePeople";
 import RouteTools from "./routes/RouteTools";
 import type { IRouteObject } from "./types/types";
-import RouteBeatmap from "./routes/RouteBeatmap";
+import RouteBeatmapset from "./routes/RouteBeatmapset";
 import { routeData } from "./util/RouteHelper";
 
 declare const window: any; //ts fix
@@ -36,7 +36,7 @@ function App() {
     { path: routeData.routeScoreRank.path, element: <RouteScoreRank /> },
     { path: routeData.routeCompletionists.path, element: <RouteCompletionists /> },
     { path: routeData.routeLeaderboards.path, element: <RouteLeaderboards /> },
-    { path: routeData.routeBeatmapsets.path, element: <RouteBeatmap /> },
+    { path: routeData.routeBeatmapsets.path, element: <RouteBeatmapset /> },
   ];
 
   const getRoute = (obj: IRouteObject, is_child = false) => {

@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { AxiosProgressEvent } from "axios";
 import { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo } from "react";
-import type { IAuthUser } from "../types/types";
+import type { IAuthUser, IScoreMod } from "../types/types";
 
 type ApiContextValue = {
     getUserLive: (userId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
@@ -27,6 +27,7 @@ type ApiContextValue = {
     getRecentVisitors: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmap: (beatmapId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapSet: (beatmapsetId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getDifficulty: (beatmapId: string | number, rulesetId?: number, mods?: IScoreMod[] | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
 };
 
 const ApiContext = createContext<ApiContextValue>({} as ApiContextValue);
@@ -237,7 +238,17 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         const response = await apiGet(`beatmap/set/${beatmapsetId}`, false, progressEvent);
         return response;
     }, [apiGet]);
-        
+
+    const getDifficulty = useCallback(async (beatmapId: string | number, rulesetId: number = 0, mods: IScoreMod[] | null = null, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        let endpoint = `difficulty/${rulesetId}/${beatmapId}`;
+
+        const body = {
+            mods
+        };
+
+        const response = await apiPost(endpoint, JSON.stringify(body), 'application/json', progressEvent);
+        return response;
+    }, [apiGet]);
 
     // Memoize the context value to prevent unnecessary re-renders
     const contextValue = useMemo(() => ({
@@ -263,7 +274,8 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         postRegisterVisitor,
         getRecentVisitors,
         getBeatmap,
-        getBeatmapSet
+        getBeatmapSet,
+        getDifficulty
     }), [
         getUserLive,
         getScoresLive,
@@ -287,7 +299,8 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         postRegisterVisitor,
         getRecentVisitors,
         getBeatmap,
-        getBeatmapSet
+        getBeatmapSet,
+        getDifficulty
     ]);
 
     return (

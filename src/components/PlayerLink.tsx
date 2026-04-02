@@ -36,18 +36,18 @@ function PlayerLink({ data, size = 24, hideCountry = false, noTooltip = false, .
         //we can received different data structures, so we need to look in several places
         let api_user = null;
         let team_data = null;
-        if (data.user) {
+        if (data?.user) {
             api_user = data.user;
-        } else if (data.api_user) {
+        } else if (data?.api_user) {
             api_user = data.api_user;
-        } else if (data.osuApi) {
+        } else if (data?.osuApi) {
             api_user = data.osuApi;
         } else {
             setIsValid(false);
             return;
         }
 
-        if (data.osuAlternative) {
+        if (data?.osuAlternative) {
             setHasAltData(true);
         }
 
@@ -60,12 +60,12 @@ function PlayerLink({ data, size = 24, hideCountry = false, noTooltip = false, .
             setIsSelf(user && _id && (String(user.id) === String(_id)));
         }
 
-        if (data.team) {
+        if (data?.team) {
             team_data = data.team;
         }
         setTeam(team_data);
 
-        if (data.roles) {
+        if (data?.roles) {
             setRoles(data.roles);
         }
     }, [data]);
@@ -89,7 +89,7 @@ function PlayerLink({ data, size = 24, hideCountry = false, noTooltip = false, .
                     bgcolor: `${isSelf ? theme.palette.primary.main : '#ffffff'}22`,
                     textDecoration: 'none',
                     color: '#fff',
-                    p: 0.1,
+                    // p: 0.1,
                     pr: 1,
                     width: 'fit-content',
                     alignItems: 'center',
@@ -127,7 +127,9 @@ function PlayerLink({ data, size = 24, hideCountry = false, noTooltip = false, .
                             <span style={{ color: team.color, fontWeight: 'bold' }}>[{team.short_name}] </span>
                         </>
                     }
-                    {username}
+                    {
+                        username !== null ? <>{username}</> : <span style={{ fontStyle: 'italic' }}>Unknown</span>
+                    }
                 </Typography>
                 {
                     !hasAltData && !noTooltip && (

@@ -73,7 +73,7 @@ function replaceWellDiv(node: any, options: any) {
 
     if (classes.includes("well")) {
         return (
-            <Paper elevation={elevation} sx={{ padding: 2, marginY: 2 }}>
+            <Paper elevation={elevation} sx={{ padding: 1, marginY: 1 }}>
                 {domToReact(node.children, options)}
             </Paper>
         );
@@ -115,14 +115,12 @@ function replaceUserLink(node: any, users: any) {
     const userId = extractUserIdFromLink(node);
 
     if (userId && users[userId]) {
-        //keep inline and center
         return <Box
             component="span"
             sx={{
                 display: 'inline-flex',
-                alignItems: 'center',
             }}
-        ><PlayerLink data={users[userId]} /></Box>;
+        ><PlayerLink data={users[userId]} size={18} /></Box>;
     }
 }
 

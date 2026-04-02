@@ -60,7 +60,7 @@ function PlayerTooltip({ data, children }: PlayerTooltipProps) {
                             height: '100%',
                         }}>
                             {
-                                data.team && <>
+                                data?.team && <>
                                     <img src={data.team.flag_url} alt={data.team.short_name}
                                         style={{
                                             height: 24,
@@ -72,7 +72,10 @@ function PlayerTooltip({ data, children }: PlayerTooltipProps) {
                                     <span style={{ color: data.team.color, fontWeight: 'bold', marginRight: 4 }}>[{data.team.short_name}]</span>
                                 </>
                             }
-                            {data?.osuApi?.username || 'Unknown'}
+                            {/* {data?.osuApi?.username || 'Unknown'} */}
+                            {
+                                data?.osuApi?.username ? <span>{data.osuApi.username}</span> : <span style={{ fontStyle: 'italic' }}>Unknown</span>
+                            }
                         </div>
                         <div style={{
                             display: 'flex',

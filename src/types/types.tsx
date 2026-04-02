@@ -824,3 +824,10 @@ export type IReputationEntry = {
 
 export const reputationTypes = ['user', 'beatmap', 'score'] as const;
 export type ReputationType = typeof reputationTypes[number];
+
+export interface IRouteBeatmapResult {
+    beatmapSet: IBeatmapSet | null;
+    beatmap: IBeatmap | null;
+    difficulty?: IScoreDifficulty | null;
+    ruleset: string;
+}
