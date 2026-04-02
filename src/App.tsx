@@ -16,6 +16,7 @@ import RouteTools from "./routes/RouteTools";
 import type { IRouteObject } from "./types/types";
 import RouteBeatmapset from "./routes/RouteBeatmapset";
 import { routeData } from "./util/RouteHelper";
+import RouteBeatmaps from "./routes/RouteBeatmaps";
 
 declare const window: any; //ts fix
 function App() {
@@ -36,6 +37,7 @@ function App() {
     { path: routeData.routeScoreRank.path, element: <RouteScoreRank /> },
     { path: routeData.routeCompletionists.path, element: <RouteCompletionists /> },
     { path: routeData.routeLeaderboards.path, element: <RouteLeaderboards /> },
+    { path: routeData.routeBeatmaps.path, element: <RouteBeatmaps /> },
     { path: routeData.routeBeatmapsets.path, element: <RouteBeatmapset /> },
   ];
 

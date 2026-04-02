@@ -23,6 +23,9 @@ export const routeData = {
     routeLeaderboards: {
         path: "/leaderboards/:ruleset?/:statistic?/page?/:page?/country?/:country?"
     },
+    routeBeatmaps: {
+        path: "/beatmaps/:beatmapId?" //beatmapId is optional and will redirect to sets. otherwise search engine
+    },
     routeBeatmapsets: {
         path: "/beatmapsets/:beatmapsetId/:ruleset?/:beatmapId?"
     }
