@@ -28,7 +28,7 @@ type ApiContextValue = {
     getRecentVisitors: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmap: (beatmapId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapSet: (beatmapsetId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
-    updateBeatmapSetMedia: (beatmapsetId: string | number, accessToken: string, youtubeUrl: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    updateBeatmapSetMedia: (beatmapsetId: string | number, accessToken: string, youtubeUrl: string | null, spotifyUrl?: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getDifficulty: (beatmapId: string | number, rulesetId?: number, mods?: IScoreMod[] | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapUserTags: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapScores: (beatmapId: string | number, ruleset: string | null, mods?: IScoreMod[] | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
@@ -243,10 +243,11 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         return response;
     }, [apiGet]);
 
-    const updateBeatmapSetMedia = useCallback(async (beatmapsetId: string | number, accessToken: string, youtubeUrl: string | null, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+    const updateBeatmapSetMedia = useCallback(async (beatmapsetId: string | number, accessToken: string, youtubeUrl: string | null, spotifyUrl: string | null = null, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
         const body = {
             access_token: accessToken,
             youtube_url: youtubeUrl,
+            spotify_url: spotifyUrl,
         };
 
         const response = await apiPost(`beatmap/set/${beatmapsetId}/media`, JSON.stringify(body), 'application/json', progressEvent);

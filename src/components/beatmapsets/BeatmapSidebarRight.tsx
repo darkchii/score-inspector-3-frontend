@@ -2,6 +2,7 @@ import { useTheme } from "@emotion/react";
 import type { IRouteBeatmapResult } from "../../types/types";
 import { Box, Button, Card, CardContent, Chip, Collapse, Divider, Stack, Typography } from "@mui/material";
 import YoutubeEmbed from "../YoutubeEmbed";
+import SpotifyEmbed from "../SpotifyEmbed";
 import PlayerLink from "../PlayerLink";
 import { FormatNumber, FormatNumberWithPrecision, GetRulesetNameFromId } from "../../util/Helper";
 import difficultyJson from "../../data/difficulty.json";
@@ -31,6 +32,11 @@ function BeatmapSidebarRight({ data, canEditMedia = false, onOpenMediaEditor = n
             {
                 data.beatmapSet.media?.youtube_id && (
                     <YoutubeEmbed videoId={data.beatmapSet.media.youtube_id} width={"100%"} height={"200px"} />
+                )
+            }
+            {
+                data.beatmapSet.media?.spotify_id && (
+                    <SpotifyEmbed embedPath={data.beatmapSet.media.spotify_id} width={"100%"} height={"152px"} />
                 )
             }
             <Card sx={{ position: 'relative' }}>

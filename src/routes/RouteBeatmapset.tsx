@@ -18,6 +18,7 @@ import BeatmapPerformanceTool from "../components/beatmapsets/BeatmapPerformance
 import Score from "../types/Score";
 import { useAuth } from "../providers/AuthProvider";
 import YoutubeEmbed from "../components/YoutubeEmbed";
+import SpotifyEmbed from "../components/SpotifyEmbed";
 
 const EDITOR_ROLE_ID = 5;
 
@@ -63,6 +64,53 @@ function extractYoutubeId(input: string | null | undefined): string | null {
     return null;
 }
 
+function extractSpotifyPath(input: string | null | undefined): string | null {
+    if (!input || typeof input !== "string") {
+        return null;
+    }
+
+    const value = input.trim();
+    if (!value) {
+        return null;
+    }
+
+    const spotifyPathRegex = /^(track|album|playlist|episode|show)\/([a-zA-Z0-9]{22})$/;
+    const spotifyUriRegex = /^spotify:(track|album|playlist|episode|show):([a-zA-Z0-9]{22})$/;
+
+    if (spotifyPathRegex.test(value)) {
+        return value;
+    }
+
+    const uriMatch = value.match(spotifyUriRegex);
+    if (uriMatch) {
+        return `${uriMatch[1]}/${uriMatch[2]}`;
+    }
+
+    try {
+        const parsed = new URL(value);
+        const host = parsed.hostname.toLowerCase();
+        if (!host.includes("spotify.com")) {
+            return null;
+        }
+
+        const pathParts = parsed.pathname.split("/").filter(Boolean);
+        if (pathParts[0] === "embed") {
+            pathParts.shift();
+        }
+
+        if (pathParts.length < 2) {
+            return null;
+        }
+
+        const type = pathParts[0];
+        const id = pathParts[1];
+        const normalized = `${type}/${id}`;
+        return spotifyPathRegex.test(normalized) ? normalized : null;
+    } catch (error) {
+        return null;
+    }
+}
+
 function hasEditorAccess(userData: any): boolean {
     if (!userData?.roles || !Array.isArray(userData.roles)) {
         return false;
@@ -89,11 +137,13 @@ function RouteBeatmapset() {
 
     const [selectedTab, setSelectedTab] = useState(0);
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
-    const [mediaInput, setMediaInput] = useState("");
+    const [youtubeMediaInput, setYoutubeMediaInput] = useState("");
+    const [spotifyMediaInput, setSpotifyMediaInput] = useState("");
     const [isSavingMedia, setIsSavingMedia] = useState(false);
 
     const canEditMedia = hasEditorAccess(userData);
-    const mediaPreviewVideoId = extractYoutubeId(mediaInput);
+    const mediaPreviewVideoId = extractYoutubeId(youtubeMediaInput);
+    const mediaPreviewSpotifyPath = extractSpotifyPath(spotifyMediaInput);
 
     useEffect(() => {
         if (!beatmapsetId) return;
@@ -167,8 +217,10 @@ function RouteBeatmapset() {
         }
 
         const currentYoutubeId = data?.beatmapSet?.media?.youtube_id || "";
-        setMediaInput(currentYoutubeId);
-    }, [isMediaModalOpen, data?.beatmapSet?.media?.youtube_id]);
+        const currentSpotifyId = data?.beatmapSet?.media?.spotify_id || "";
+        setYoutubeMediaInput(currentYoutubeId);
+        setSpotifyMediaInput(currentSpotifyId);
+    }, [isMediaModalOpen, data?.beatmapSet?.media?.youtube_id, data?.beatmapSet?.media?.spotify_id]);
 
     const handleSaveMedia = async () => {
         if (!data?.beatmapSet?.beatmapset_id) {
@@ -181,15 +233,22 @@ function RouteBeatmapset() {
             return;
         }
 
-        const trimmed = mediaInput.trim();
-        if (trimmed.length > 0 && !extractYoutubeId(trimmed)) {
+        const trimmedYoutube = youtubeMediaInput.trim();
+        const trimmedSpotify = spotifyMediaInput.trim();
+
+        if (trimmedYoutube.length > 0 && !extractYoutubeId(trimmedYoutube)) {
             ShowNotification("Please enter a valid YouTube URL or video ID", "error");
+            return;
+        }
+
+        if (trimmedSpotify.length > 0 && !extractSpotifyPath(trimmedSpotify)) {
+            ShowNotification("Please enter a valid Spotify URL, URI, or embed path", "error");
             return;
         }
 
         setIsSavingMedia(true);
         try {
-            const response = await updateBeatmapSetMedia(data.beatmapSet.beatmapset_id, token, trimmed || null);
+            const response = await updateBeatmapSetMedia(data.beatmapSet.beatmapset_id, token, trimmedYoutube || null, trimmedSpotify || null);
             setData((prev) => {
                 if (!prev?.beatmapSet) {
                     return prev;
@@ -202,6 +261,7 @@ function RouteBeatmapset() {
                         media: {
                             beatmapset_id: prev.beatmapSet.beatmapset_id,
                             youtube_id: response?.youtube_id ?? null,
+                            spotify_id: response?.spotify_id ?? null,
                         }
                     }
                 };
@@ -405,8 +465,8 @@ function RouteBeatmapset() {
                     type="text"
                     fullWidth
                     variant="outlined"
-                    value={mediaInput}
-                    onChange={(e) => setMediaInput(e.target.value)}
+                    value={youtubeMediaInput}
+                    onChange={(e) => setYoutubeMediaInput(e.target.value)}
                     placeholder="https://www.youtube.com/watch?v=..."
                     helperText="Accepts full YouTube URLs (youtube.com, youtu.be, shorts, embed) or plain 11-char video IDs. Leave empty to remove the attached video."
                 />
@@ -417,6 +477,28 @@ function RouteBeatmapset() {
                                 Preview
                             </Typography>
                             <YoutubeEmbed videoId={mediaPreviewVideoId} width="100%" height="220px" />
+                        </Box>
+                    )
+                }
+                <TextField
+                    margin="dense"
+                    label="Spotify URL / URI / embed path"
+                    type="text"
+                    fullWidth
+                    variant="outlined"
+                    value={spotifyMediaInput}
+                    onChange={(e) => setSpotifyMediaInput(e.target.value)}
+                    placeholder="https://open.spotify.com/track/..."
+                    helperText="Accepts open.spotify.com URLs, spotify:track:... style URIs, or direct path like track/ID. Leave empty to remove."
+                    sx={{ marginTop: 2 }}
+                />
+                {
+                    mediaPreviewSpotifyPath && (
+                        <Box sx={{ marginTop: 2 }}>
+                            <Typography variant="subtitle2" color="text.secondary" sx={{ marginBottom: 1 }}>
+                                Spotify preview
+                            </Typography>
+                            <SpotifyEmbed embedPath={mediaPreviewSpotifyPath} width="100%" height="152px" />
                         </Box>
                     )
                 }

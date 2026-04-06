@@ -56,6 +56,7 @@ export interface IBeatmapSet {
 export interface IBeatmapSetMedia {
     beatmapset_id: number;
     youtube_id: string | null;
+    spotify_id: string | null;
 }
 
 export interface IBeatmapSetCovers {
