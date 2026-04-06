@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, CardHeader, CircularProgress, Collapse, Container, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Paper, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Card, CardContent, CardHeader, Chip, CircularProgress, Collapse, Container, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, Paper, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { usePageTitle } from "../providers/TitleProvider";
 import type { IBeatmap, IBeatmapSet, IRouteBeatmapResult, IScoreDifficulty } from "../types/types";
@@ -144,6 +144,10 @@ function RouteBeatmapset() {
     const canEditMedia = hasEditorAccess(userData);
     const mediaPreviewVideoId = extractYoutubeId(youtubeMediaInput);
     const mediaPreviewSpotifyPath = extractSpotifyPath(spotifyMediaInput);
+    const trimmedYoutubeInput = youtubeMediaInput.trim();
+    const trimmedSpotifyInput = spotifyMediaInput.trim();
+    const isYoutubeValid = trimmedYoutubeInput.length === 0 || mediaPreviewVideoId !== null;
+    const isSpotifyValid = trimmedSpotifyInput.length === 0 || mediaPreviewSpotifyPath !== null;
 
     useEffect(() => {
         if (!beatmapsetId) return;
@@ -455,59 +459,110 @@ function RouteBeatmapset() {
                 </Grid>
             </Grid>
         </Container>
-        <Dialog open={isMediaModalOpen} onClose={() => !isSavingMedia && setIsMediaModalOpen(false)} fullWidth maxWidth="sm">
-            <DialogTitle>Edit beatmap media</DialogTitle>
-            <DialogContent>
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    label="YouTube URL or video ID"
-                    type="text"
-                    fullWidth
-                    variant="outlined"
-                    value={youtubeMediaInput}
-                    onChange={(e) => setYoutubeMediaInput(e.target.value)}
-                    placeholder="https://www.youtube.com/watch?v=..."
-                    helperText="Accepts full YouTube URLs (youtube.com, youtu.be, shorts, embed) or plain 11-char video IDs. Leave empty to remove the attached video."
-                />
-                {
-                    mediaPreviewVideoId && (
-                        <Box sx={{ marginTop: 2 }}>
-                            <Typography variant="subtitle2" color="text.secondary" sx={{ marginBottom: 1 }}>
-                                Preview
-                            </Typography>
-                            <YoutubeEmbed videoId={mediaPreviewVideoId} width="100%" height="220px" />
-                        </Box>
-                    )
-                }
-                <TextField
-                    margin="dense"
-                    label="Spotify URL / URI / embed path"
-                    type="text"
-                    fullWidth
-                    variant="outlined"
-                    value={spotifyMediaInput}
-                    onChange={(e) => setSpotifyMediaInput(e.target.value)}
-                    placeholder="https://open.spotify.com/track/..."
-                    helperText="Accepts open.spotify.com URLs, spotify:track:... style URIs, or direct path like track/ID. Leave empty to remove."
-                    sx={{ marginTop: 2 }}
-                />
-                {
-                    mediaPreviewSpotifyPath && (
-                        <Box sx={{ marginTop: 2 }}>
-                            <Typography variant="subtitle2" color="text.secondary" sx={{ marginBottom: 1 }}>
-                                Spotify preview
-                            </Typography>
-                            <SpotifyEmbed embedPath={mediaPreviewSpotifyPath} width="100%" height="152px" />
-                        </Box>
-                    )
-                }
+        <Dialog open={isMediaModalOpen} onClose={() => !isSavingMedia && setIsMediaModalOpen(false)} fullWidth maxWidth="md">
+            <DialogTitle sx={{ pb: 1 }}>
+                <Stack spacing={0.5}>
+                    <Typography variant="h6">Edit Beatmap Media</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Attach embeds and verify them live before saving.
+                    </Typography>
+                </Stack>
+            </DialogTitle>
+            <DialogContent dividers>
+                <Stack spacing={2.5} sx={{ pt: 1 }}>
+                    <Alert severity="info" variant="outlined">
+                        Leave a field empty to remove that media entry.
+                    </Alert>
+
+                    <Paper variant="outlined" sx={{ p: 2 }}>
+                        <Stack spacing={1.5}>
+                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>YouTube</Typography>
+                                <Chip
+                                    size="small"
+                                    color={isYoutubeValid ? "success" : "error"}
+                                    label={trimmedYoutubeInput.length === 0 ? "Empty" : isYoutubeValid ? "Valid" : "Invalid"}
+                                />
+                            </Box>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                label="YouTube URL or video ID"
+                                type="text"
+                                fullWidth
+                                variant="outlined"
+                                value={youtubeMediaInput}
+                                onChange={(e) => setYoutubeMediaInput(e.target.value)}
+                                placeholder="https://www.youtube.com/watch?v=..."
+                                error={!isYoutubeValid}
+                                helperText="Supports youtube.com, youtu.be, shorts, embed, and plain 11-char IDs."
+                            />
+                            {
+                                mediaPreviewVideoId && (
+                                    <Box>
+                                        <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
+                                            Preview
+                                        </Typography>
+                                        <YoutubeEmbed videoId={mediaPreviewVideoId} width="100%" height="220px" />
+                                    </Box>
+                                )
+                            }
+                        </Stack>
+                    </Paper>
+
+                    <Paper variant="outlined" sx={{ p: 2 }}>
+                        <Stack spacing={1.5}>
+                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Spotify</Typography>
+                                <Chip
+                                    size="small"
+                                    color={isSpotifyValid ? "success" : "error"}
+                                    label={trimmedSpotifyInput.length === 0 ? "Empty" : isSpotifyValid ? "Valid" : "Invalid"}
+                                />
+                            </Box>
+                            <TextField
+                                margin="dense"
+                                label="Spotify URL / URI / embed path"
+                                type="text"
+                                fullWidth
+                                variant="outlined"
+                                value={spotifyMediaInput}
+                                onChange={(e) => setSpotifyMediaInput(e.target.value)}
+                                placeholder="https://open.spotify.com/track/..."
+                                error={!isSpotifyValid}
+                                helperText="Supports open.spotify.com links, spotify:... URIs, or track/ID style paths."
+                            />
+                            {
+                                mediaPreviewSpotifyPath && (
+                                    <Box>
+                                        <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
+                                            Preview
+                                        </Typography>
+                                        <SpotifyEmbed embedPath={mediaPreviewSpotifyPath} width="100%" height="152px" />
+                                    </Box>
+                                )
+                            }
+                        </Stack>
+                    </Paper>
+                </Stack>
             </DialogContent>
-            <DialogActions>
-                <Button onClick={() => setIsMediaModalOpen(false)} disabled={isSavingMedia}>Cancel</Button>
-                <Button onClick={handleSaveMedia} variant="contained" disabled={isSavingMedia}>
-                    {isSavingMedia ? "Saving..." : "Save"}
+            <DialogActions sx={{ justifyContent: "space-between", px: 3, py: 2 }}>
+                <Button
+                    color="inherit"
+                    onClick={() => {
+                        setYoutubeMediaInput("");
+                        setSpotifyMediaInput("");
+                    }}
+                    disabled={isSavingMedia}
+                >
+                    Clear all
                 </Button>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                    <Button onClick={() => setIsMediaModalOpen(false)} disabled={isSavingMedia}>Cancel</Button>
+                    <Button onClick={handleSaveMedia} variant="contained" disabled={isSavingMedia || !isYoutubeValid || !isSpotifyValid}>
+                    {isSavingMedia ? "Saving..." : "Save"}
+                    </Button>
+                </Box>
             </DialogActions>
         </Dialog>
     </Box>
