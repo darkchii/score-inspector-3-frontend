@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, CardHeader, CircularProgress, Collapse, Container, Grid, Paper, Tab, Tabs, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, CardHeader, CircularProgress, Collapse, Container, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Paper, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { usePageTitle } from "../providers/TitleProvider";
 import type { IBeatmap, IBeatmapSet, IRouteBeatmapResult, IScoreDifficulty } from "../types/types";
@@ -16,11 +16,69 @@ import BeatmapSidebarRight from "../components/beatmapsets/BeatmapSidebarRight";
 import { GenerateUrl, routeData, UpdateUrl } from "../util/RouteHelper";
 import BeatmapPerformanceTool from "../components/beatmapsets/BeatmapPerformanceTool";
 import Score from "../types/Score";
+import { useAuth } from "../providers/AuthProvider";
+import YoutubeEmbed from "../components/YoutubeEmbed";
+
+const EDITOR_ROLE_ID = 5;
+
+function extractYoutubeId(input: string | null | undefined): string | null {
+    if (!input || typeof input !== "string") {
+        return null;
+    }
+
+    const value = input.trim();
+    if (!value) {
+        return null;
+    }
+
+    if (/^[a-zA-Z0-9_-]{11}$/.test(value)) {
+        return value;
+    }
+
+    try {
+        const parsed = new URL(value);
+        const host = parsed.hostname.toLowerCase();
+
+        if (host.includes("youtu.be")) {
+            const candidate = parsed.pathname.split("/").filter(Boolean)[0] || "";
+            return /^[a-zA-Z0-9_-]{11}$/.test(candidate) ? candidate : null;
+        }
+
+        if (host.includes("youtube.com")) {
+            const v = parsed.searchParams.get("v");
+            if (v && /^[a-zA-Z0-9_-]{11}$/.test(v)) {
+                return v;
+            }
+
+            const pathParts = parsed.pathname.split("/").filter(Boolean);
+            if (pathParts[0] === "embed" || pathParts[0] === "shorts") {
+                const candidate = pathParts[1] || "";
+                return /^[a-zA-Z0-9_-]{11}$/.test(candidate) ? candidate : null;
+            }
+        }
+    } catch (error) {
+        return null;
+    }
+
+    return null;
+}
+
+function hasEditorAccess(userData: any): boolean {
+    if (!userData?.roles || !Array.isArray(userData.roles)) {
+        return false;
+    }
+
+    return userData.roles.some((role: any) => {
+        const title = (role?.title || "").toString().toLowerCase();
+        return role?.id === EDITOR_ROLE_ID || role?.role_id === EDITOR_ROLE_ID || title === "editor" || role?.is_editor === true || role?.is_admin === true;
+    });
+}
 
 function RouteBeatmapset() {
     const navigate = useNavigate();
     const { beatmapsetId, ruleset, beatmapId } = useParams();
-    const { getBeatmapSet, getDifficulty, getBeatmapScores } = useApi();
+    const { getBeatmapSet, getDifficulty, getBeatmapScores, updateBeatmapSetMedia } = useApi();
+    const { token, userData } = useAuth();
     const [data, setData] = useState<IRouteBeatmapResult | null>(null);
     // const { setTitle } = usePageTitle();
     const [isLoading, setIsLoading] = useState(true);
@@ -30,6 +88,12 @@ function RouteBeatmapset() {
     const isAnythingLoading = isLoading || isLoadingDifficulty;
 
     const [selectedTab, setSelectedTab] = useState(0);
+    const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
+    const [mediaInput, setMediaInput] = useState("");
+    const [isSavingMedia, setIsSavingMedia] = useState(false);
+
+    const canEditMedia = hasEditorAccess(userData);
+    const mediaPreviewVideoId = extractYoutubeId(mediaInput);
 
     useEffect(() => {
         if (!beatmapsetId) return;
@@ -66,9 +130,10 @@ function RouteBeatmapset() {
                     return;
                 }
 
-                const _data: RouteBeatmapResult = {
+                const _data: IRouteBeatmapResult = {
                     beatmapSet,
                     beatmap,
+                    scores: null,
                     ruleset: _ruleset,
                 }
                 console.log("Loaded beatmap data:", _data);
@@ -95,6 +160,61 @@ function RouteBeatmapset() {
             )
         }
     }, [data]);
+
+    useEffect(() => {
+        if (!isMediaModalOpen) {
+            return;
+        }
+
+        const currentYoutubeId = data?.beatmapSet?.media?.youtube_id || "";
+        setMediaInput(currentYoutubeId);
+    }, [isMediaModalOpen, data?.beatmapSet?.media?.youtube_id]);
+
+    const handleSaveMedia = async () => {
+        if (!data?.beatmapSet?.beatmapset_id) {
+            ShowNotification("Beatmapset not loaded", "error");
+            return;
+        }
+
+        if (!token) {
+            ShowNotification("You must be logged in", "error");
+            return;
+        }
+
+        const trimmed = mediaInput.trim();
+        if (trimmed.length > 0 && !extractYoutubeId(trimmed)) {
+            ShowNotification("Please enter a valid YouTube URL or video ID", "error");
+            return;
+        }
+
+        setIsSavingMedia(true);
+        try {
+            const response = await updateBeatmapSetMedia(data.beatmapSet.beatmapset_id, token, trimmed || null);
+            setData((prev) => {
+                if (!prev?.beatmapSet) {
+                    return prev;
+                }
+
+                return {
+                    ...prev,
+                    beatmapSet: {
+                        ...prev.beatmapSet,
+                        media: {
+                            beatmapset_id: prev.beatmapSet.beatmapset_id,
+                            youtube_id: response?.youtube_id ?? null,
+                        }
+                    }
+                };
+            });
+            setIsMediaModalOpen(false);
+            ShowNotification("Beatmap media updated", "success");
+        } catch (error: any) {
+            console.error("Failed to update beatmap media:", error);
+            ShowNotification("Failed to update beatmap media", "error");
+        } finally {
+            setIsSavingMedia(false);
+        }
+    };
 
     useEffect(() => {
         (async () => {
@@ -271,10 +391,43 @@ function RouteBeatmapset() {
                     </Paper>
                 </Grid>
                 <Grid size={{ xs: 12, md: 3 }}>
-                    <BeatmapSidebarRight data={data} />
+                    <BeatmapSidebarRight data={data} canEditMedia={canEditMedia} onOpenMediaEditor={() => setIsMediaModalOpen(true)} />
                 </Grid>
             </Grid>
         </Container>
+        <Dialog open={isMediaModalOpen} onClose={() => !isSavingMedia && setIsMediaModalOpen(false)} fullWidth maxWidth="sm">
+            <DialogTitle>Edit beatmap media</DialogTitle>
+            <DialogContent>
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    label="YouTube URL or video ID"
+                    type="text"
+                    fullWidth
+                    variant="outlined"
+                    value={mediaInput}
+                    onChange={(e) => setMediaInput(e.target.value)}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    helperText="Accepts full YouTube URLs (youtube.com, youtu.be, shorts, embed) or plain 11-char video IDs. Leave empty to remove the attached video."
+                />
+                {
+                    mediaPreviewVideoId && (
+                        <Box sx={{ marginTop: 2 }}>
+                            <Typography variant="subtitle2" color="text.secondary" sx={{ marginBottom: 1 }}>
+                                Preview
+                            </Typography>
+                            <YoutubeEmbed videoId={mediaPreviewVideoId} width="100%" height="220px" />
+                        </Box>
+                    )
+                }
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => setIsMediaModalOpen(false)} disabled={isSavingMedia}>Cancel</Button>
+                <Button onClick={handleSaveMedia} variant="contained" disabled={isSavingMedia}>
+                    {isSavingMedia ? "Saving..." : "Save"}
+                </Button>
+            </DialogActions>
+        </Dialog>
     </Box>
 }
 

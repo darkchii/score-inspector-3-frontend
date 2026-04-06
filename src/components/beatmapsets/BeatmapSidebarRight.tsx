@@ -21,7 +21,7 @@ interface IDifficultyLabels {
 
 const typedDiff = difficultyJson as IDifficultyLabels;
 
-function BeatmapSidebarRight({ data }: { data: IRouteBeatmapResult | null }) {
+function BeatmapSidebarRight({ data, canEditMedia = false, onOpenMediaEditor = null }: { data: IRouteBeatmapResult | null, canEditMedia?: boolean, onOpenMediaEditor?: (() => void) | null }) {
     const theme = useTheme();
     if (!data || !data.beatmapSet || !data.beatmap) {
         return null;
@@ -36,6 +36,16 @@ function BeatmapSidebarRight({ data }: { data: IRouteBeatmapResult | null }) {
             <Card sx={{ position: 'relative' }}>
                 <CardContent>
                     <Stack spacing={1} direction="column" alignItems="center">
+                        {
+                            canEditMedia && onOpenMediaEditor && (
+                                <Button
+                                    variant="outlined"
+                                    onClick={onOpenMediaEditor}
+                                    fullWidth>
+                                    Edit media
+                                </Button>
+                            )
+                        }
                         <Button
                             variant="contained"
                             href={`https://osu.ppy.sh/beatmapsets/${data.beatmapSet.beatmapset_id}#${GetRulesetNameFromId(data.beatmap.ruleset_id)}/${data.beatmap.beatmap_id}`}

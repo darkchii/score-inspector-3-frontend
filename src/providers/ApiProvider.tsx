@@ -28,6 +28,7 @@ type ApiContextValue = {
     getRecentVisitors: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmap: (beatmapId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapSet: (beatmapsetId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    updateBeatmapSetMedia: (beatmapsetId: string | number, accessToken: string, youtubeUrl: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getDifficulty: (beatmapId: string | number, rulesetId?: number, mods?: IScoreMod[] | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapUserTags: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapScores: (beatmapId: string | number, ruleset: string | null, mods?: IScoreMod[] | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
@@ -242,6 +243,16 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         return response;
     }, [apiGet]);
 
+    const updateBeatmapSetMedia = useCallback(async (beatmapsetId: string | number, accessToken: string, youtubeUrl: string | null, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        const body = {
+            access_token: accessToken,
+            youtube_url: youtubeUrl,
+        };
+
+        const response = await apiPost(`beatmap/set/${beatmapsetId}/media`, JSON.stringify(body), 'application/json', progressEvent);
+        return response;
+    }, [apiPost]);
+
     const getDifficulty = useCallback(async (beatmapId: string | number, rulesetId: number = 0, mods: IScoreMod[] | null = null, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
         let endpoint = `difficulty/${rulesetId}/${beatmapId}`;
 
@@ -301,6 +312,7 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getRecentVisitors,
         getBeatmap,
         getBeatmapSet,
+        updateBeatmapSetMedia,
         getDifficulty,
         getBeatmapUserTags,
         getBeatmapScores
@@ -328,6 +340,7 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getRecentVisitors,
         getBeatmap,
         getBeatmapSet,
+        updateBeatmapSetMedia,
         getDifficulty,
         getBeatmapUserTags,
         getBeatmapScores
