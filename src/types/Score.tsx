@@ -129,7 +129,7 @@ class Score implements IScore {
 
     implied_pp: number;
 
-    constructor(api_data: any, beatmap: Beatmap, user: any = null) {
+    constructor(api_data: any, beatmap: Beatmap | IBeatmap, user: any = null) {
         // this.beatmap = beatmap;
         //if beatmap is not of type Beatmap, create it, otherwise use as is
         this.beatmap = (beatmap instanceof Beatmap) ? beatmap : new Beatmap(beatmap);
@@ -183,7 +183,7 @@ class Score implements IScore {
 
         this.processed = Boolean(api_data.processed);
 
-        this.grade = api_data.grade;
+        this.grade = api_data.grade || api_data.rank;
 
         this.replay = Boolean(api_data.replay);
 

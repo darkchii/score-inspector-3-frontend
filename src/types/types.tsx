@@ -828,6 +828,7 @@ export type ReputationType = typeof reputationTypes[number];
 export interface IRouteBeatmapResult {
     beatmapSet: IBeatmapSet | null;
     beatmap: IBeatmap | null;
-    difficulty?: IScoreDifficulty | null;
+    difficulty?: IScoreDifficulty | null; //beatmap specific
+    scores: IScore[] | null; //beatmap specific
     ruleset: string;
 }

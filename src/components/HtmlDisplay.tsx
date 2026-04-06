@@ -15,11 +15,11 @@ function replaceRegularUrl(node: any) {
     if (node.name !== "a") return;
     const href = node.attribs?.href || "";
 
-    console.log("Found link in description:", href);
+    // console.log("Found link in description:", href);
     try {
         return <Link href={href} target="_blank" rel="noopener noreferrer">{domToReact(node.children)}</Link>;
     } catch(e) {
-        console.error("Error parsing link:", e);
+        // console.error("Error parsing link:", e);
         return;
     }
 }
@@ -48,7 +48,7 @@ function replaceBeatmapUrl(node: any) {
             }
         }
     } catch(e) {
-        console.error("Error parsing beatmap link:", e);
+        // console.error("Error parsing beatmap link:", e);
         return;
     }
 }

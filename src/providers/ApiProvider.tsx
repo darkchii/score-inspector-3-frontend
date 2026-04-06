@@ -2,6 +2,7 @@ import axios from "axios";
 import type { AxiosProgressEvent } from "axios";
 import { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo } from "react";
 import type { IAuthUser, IScoreMod } from "../types/types";
+import Score from "../types/Score";
 
 type ApiContextValue = {
     getUserLive: (userId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
@@ -29,6 +30,7 @@ type ApiContextValue = {
     getBeatmapSet: (beatmapsetId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getDifficulty: (beatmapId: string | number, rulesetId?: number, mods?: IScoreMod[] | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapUserTags: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getBeatmapScores: (beatmapId: string | number, ruleset: string | null, mods?: IScoreMod[] | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
 };
 
 const ApiContext = createContext<ApiContextValue>({} as ApiContextValue);
@@ -256,6 +258,24 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         return response;
     }, [apiGet]);
 
+    const getBeatmapScores = useCallback(async (beatmapId: string | number, ruleset: string | null, mods: IScoreMod[] | null = null, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        let endpoint = `beatmap/${beatmapId}/scores`;
+        if(ruleset) {
+            endpoint += `/${ruleset}`;
+        }
+        const body = {
+            mods
+        };
+        const response = await apiPost(endpoint, JSON.stringify(body), 'application/json', progressEvent);
+
+        // parse some stuff
+        const osu_api_scores = response?.api || [];
+        const osu_alt_scores = response?.alt || []; //these always exclude scores that are given by api
+        const all_scores = [...osu_api_scores, ...osu_alt_scores];
+
+        return all_scores;
+    }, [apiPost]);
+
     // Memoize the context value to prevent unnecessary re-renders
     const contextValue = useMemo(() => ({
         getUserLive,
@@ -282,7 +302,8 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getBeatmap,
         getBeatmapSet,
         getDifficulty,
-        getBeatmapUserTags
+        getBeatmapUserTags,
+        getBeatmapScores
     }), [
         getUserLive,
         getScoresLive,
@@ -308,7 +329,8 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getBeatmap,
         getBeatmapSet,
         getDifficulty,
-        getBeatmapUserTags
+        getBeatmapUserTags,
+        getBeatmapScores
     ]);
 
     return (

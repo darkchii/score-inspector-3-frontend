@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, CardHeader, CircularProgress, Collapse, Container, Grid, Paper, Typography } from "@mui/material";
+import { Box, Card, CardContent, CardHeader, CircularProgress, Collapse, Container, Grid, Paper, Tab, Tabs, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { usePageTitle } from "../providers/TitleProvider";
 import type { IBeatmap, IBeatmapSet, IRouteBeatmapResult, IScoreDifficulty } from "../types/types";
@@ -14,11 +14,13 @@ import HtmlDisplay from "../components/HtmlDisplay";
 import BeatmapSidebarLeft from "../components/beatmapsets/BeatmapSidebarLeft";
 import BeatmapSidebarRight from "../components/beatmapsets/BeatmapSidebarRight";
 import { GenerateUrl, routeData, UpdateUrl } from "../util/RouteHelper";
+import BeatmapPerformanceTool from "../components/beatmapsets/BeatmapPerformanceTool";
+import Score from "../types/Score";
 
 function RouteBeatmapset() {
     const navigate = useNavigate();
     const { beatmapsetId, ruleset, beatmapId } = useParams();
-    const { getBeatmapSet, getDifficulty } = useApi();
+    const { getBeatmapSet, getDifficulty, getBeatmapScores } = useApi();
     const [data, setData] = useState<IRouteBeatmapResult | null>(null);
     // const { setTitle } = usePageTitle();
     const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +28,8 @@ function RouteBeatmapset() {
     const [isLoadingDifficulty, setIsLoadingDifficulty] = useState(false);
 
     const isAnythingLoading = isLoading || isLoadingDifficulty;
+
+    const [selectedTab, setSelectedTab] = useState(0);
 
     useEffect(() => {
         if (!beatmapsetId) return;
@@ -98,8 +102,17 @@ function RouteBeatmapset() {
                 setIsLoadingDifficulty(true);
                 try {
                     const difficultyResponse = await getDifficulty(data.beatmap.beatmap_id, data.beatmap.ruleset_id, null);
-                    setData((prev) => prev ? { ...prev, difficulty: difficultyResponse } : prev);
+                    const scores = await getBeatmapScores(data.beatmap.beatmap_id, data.ruleset, null);
+                    let _scores: Score[] = [];
+                    if (scores?.length > 0) {
+                        let parsedScores = scores.map((s: any) => new Score(s, data.beatmap!));
+                        //sort by classic_total_score
+                        parsedScores.sort((a: Score, b: Score) => b.classic_total_score - a.classic_total_score);
+                        _scores = parsedScores;
+                    }
+                    setData((prev) => prev ? { ...prev, difficulty: difficultyResponse, scores: _scores } : prev);
                     console.log("Loaded difficulty data:", difficultyResponse);
+                    console.log("Loaded scores data:", _scores);
                 }
                 catch (err) {
                     console.error("Failed to load difficulty data:", err);
@@ -182,7 +195,7 @@ function RouteBeatmapset() {
                                     const color = getDiffColour(b.stars || 0);
                                     const len = data.beatmapSet?.beatmaps.length || 1;
                                     let size = 2;
-                                    if(len >= 20) {
+                                    if (len >= 20) {
                                         size = 1.4;
                                     }
 
@@ -207,7 +220,7 @@ function RouteBeatmapset() {
                                                     padding: 0.3,
                                                 }}
                                                 onClick={() => {
-                                                    if(isAnythingLoading) {
+                                                    if (isAnythingLoading) {
                                                         ShowNotification("Data is still loading, please wait", "info");
                                                         return;
                                                     }
@@ -234,15 +247,28 @@ function RouteBeatmapset() {
                             }
                         </Box>
                     </Paper>
-                    <Card sx={{ marginTop: 2 }}>
-                        <CardHeader title="Description" />
-                        <CardContent>
-                            <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
-                                {/* {data.beatmapSet.description || "No description provided."} */}
-                                {data.beatmapSet.description ? <HtmlDisplay html={data.beatmapSet.description} userData={data.beatmapSet.description_user_data} /> : "No description provided."}
-                            </Typography>
-                        </CardContent>
-                    </Card>
+                    <Paper elevation={3} sx={{ marginTop: 2 }}>
+                        <Tabs value={selectedTab} onChange={(e, newValue) => setSelectedTab(newValue)} variant="fullWidth">
+                            <Tab label="Description" />
+                            <Tab label="Scores" />
+                            <Tab label="PP Calculator" />
+                        </Tabs>
+                        <Box sx={{ padding: 2 }}>
+                            <Collapse in={selectedTab === 0} timeout="auto" unmountOnExit>
+                                <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
+                                    {data.beatmapSet.description ? <HtmlDisplay html={data.beatmapSet.description} userData={data.beatmapSet.description_user_data} /> : "No description provided."}
+                                </Typography>
+                            </Collapse>
+                            <Collapse in={selectedTab === 1} timeout="auto" unmountOnExit>
+                                <Typography variant="body1" color="text.secondary">
+                                    Scores tab is a work in progress.
+                                </Typography>
+                            </Collapse>
+                            <Collapse in={selectedTab === 2} timeout="auto" unmountOnExit>
+                                <BeatmapPerformanceTool data={data} />
+                            </Collapse>
+                        </Box>
+                    </Paper>
                 </Grid>
                 <Grid size={{ xs: 12, md: 3 }}>
                     <BeatmapSidebarRight data={data} />
