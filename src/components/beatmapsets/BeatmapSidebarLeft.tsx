@@ -1,4 +1,5 @@
 import { Alert, Box, Card, CardContent, CardMedia, Chip, Collapse, Divider, Table, TableBody, tableCellClasses, TableContainer, tableRowClasses, Typography } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
 import { GetRulesetIconFromId, GetRulesetPrettyNameFromId, GetStatusLabelFromInt } from "../../util/Helper";
 import BetterTooltip from "../tooltips/BetterTooltip";
 import DifficultyBadge from "../DifficultyBadge";
@@ -7,19 +8,70 @@ import BeatmapUserTag from "../BeatmapUserTag";
 import type { IBeatmap, IBeatmapSet, IRouteBeatmapResult } from "../../types/types";
 
 function BeatmapSidebarLeft({ data }: { data: IRouteBeatmapResult | null }) {
+    const [mediaError, setMediaError] = useState(false);
+
     if(!data || !data.beatmapSet || !data.beatmap) {
         return null;
     }
 
+    const cardImageUrl = useMemo(() => {
+        const card2x = data.beatmapSet.covers?.card_2x?.trim();
+        const card = data.beatmapSet.covers?.card?.trim();
+        return card2x || card || "";
+    }, [data.beatmapSet.covers?.card, data.beatmapSet.covers?.card_2x]);
+
+    useEffect(() => {
+        setMediaError(false);
+    }, [cardImageUrl]);
+
+    const hasValidCardImage = Boolean(cardImageUrl) && !mediaError;
+
     return (
         <>
             <Card sx={{ position: 'relative' }}>
-                <CardMedia
-                    component="img"
-                    image={data.beatmapSet.covers ? data.beatmapSet.covers.card_2x : undefined}
-                    alt={`${data.beatmapSet.artist} - ${data.beatmapSet.title}`}
-                >
-                </CardMedia>
+                {
+                    hasValidCardImage ? (
+                        <CardMedia
+                            component="img"
+                            image={cardImageUrl}
+                            alt={`${data.beatmapSet.artist} - ${data.beatmapSet.title}`}
+                            onError={() => setMediaError(true)}
+                            sx={{
+                                aspectRatio: '20 / 7',
+                                objectFit: 'cover',
+                                width: '100%',
+                            }}
+                        />
+                    ) : (
+                        <Box
+                            sx={{
+                                aspectRatio: '20 / 7',
+                                width: '100%',
+                                background: `
+                                    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 35%),
+                                    radial-gradient(circle at 85% 80%, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 35%),
+                                    linear-gradient(135deg, #263238 0%, #37474f 40%, #455a64 100%)
+                                `,
+                                display: 'flex',
+                                alignItems: 'flex-end',
+                                px: 2,
+                                pb: 1.5,
+                            }}
+                        >
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: 'rgba(255, 255, 255, 0.85)',
+                                    letterSpacing: 0.4,
+                                    textTransform: 'uppercase',
+                                    fontWeight: 600,
+                                }}
+                            >
+                                No Cover Available
+                            </Typography>
+                        </Box>
+                    )
+                }
                 <Box sx={{
                     position: 'absolute',
                     left: 8, top: 8,
