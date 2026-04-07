@@ -322,7 +322,11 @@ function RouteBeatmapset() {
 
     return <Box sx={{ position: 'relative' }}>
         <Box sx={{
-            width: '100%', height: '100%', position: 'absolute',
+            width: '100%',
+            height: '100dvh',
+            position: 'fixed',
+            top: 0,
+            left: 0,
             backgroundImage: `url(${data.beatmapSet.covers ? data.beatmapSet.covers.card_2x : undefined})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',

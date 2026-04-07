@@ -1,8 +1,84 @@
 import DOMPurify from 'dompurify';
 import parse, { domToReact } from 'html-react-parser';
 import PlayerLink from './PlayerLink';
-import { Box, Paper, Link } from '@mui/material';
+import { Box, Paper, Link, Collapse, Divider, useTheme } from '@mui/material';
 import { Link as RLink} from 'react-router';
+import { useState } from 'react';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
+function SpoilerBox({ label, children }: { label: React.ReactNode, children: React.ReactNode }) {
+    const [open, setOpen] = useState(false);
+    const theme = useTheme();
+    return (
+        <Paper elevation={2} sx={{ my: 1, overflow: 'hidden' }}>
+            <Box
+                component="button"
+                onClick={() => setOpen(o => !o)}
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    background: 'none',
+                    border: 'none',
+                    px: 1.5,
+                    py: 1,
+                    color: 'text.primary',
+                    textAlign: 'left',
+                    transition: 'background-color 0.15s',
+                    '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' },
+                }}
+            >
+                <Box component="span" sx={{ fontSize: '0.875rem', fontWeight: 500 }}>
+                    {label}
+                </Box>
+                <ExpandMoreIcon
+                    sx={{
+                        fontSize: '1.25rem',
+                        color: theme.palette.primary.main,
+                        flexShrink: 0,
+                        ml: 1,
+                        transition: 'transform 0.2s',
+                        transform: open ? 'rotate(0deg)' : 'rotate(-90deg)',
+                    }}
+                />
+            </Box>
+            <Collapse in={open}>
+                <Divider />
+                <Box sx={{ px: 1.5, py: 1 }}>
+                    {children}
+                </Box>
+            </Collapse>
+        </Paper>
+    );
+}
+
+function replaceSpoilerBox(node: any, options: any) {
+    if (node.name !== "div") return;
+    const className = node.attribs?.class || "";
+    const classes = className.split(/\s+/);
+    if (!classes.includes("bbcode-spoilerbox")) return;
+
+    // Find the toggle link and body children
+    const linkNode = node.children?.find(
+        (c: any) => c.name === "a" && (c.attribs?.class || "").includes("bbcode-spoilerbox__link")
+    );
+    const bodyNode = node.children?.find(
+        (c: any) => c.name === "div" && (c.attribs?.class || "").includes("bbcode-spoilerbox__body")
+    );
+
+    // Strip the icon span from the label so only text remains
+    const labelChildren = linkNode?.children?.filter(
+        (c: any) => !(c.name === "span" && (c.attribs?.class || "").includes("bbcode-spoilerbox__link-icon"))
+    ) ?? [];
+
+    const label = labelChildren.length ? domToReact(labelChildren, options) : "Spoiler";
+    const body = bodyNode ? domToReact(bodyNode.children, options) : null;
+
+    return <SpoilerBox label={label}>{body}</SpoilerBox>;
+}
 
 function fitImage(node: any) {
     if (node.name !== "img") return;
@@ -53,14 +129,31 @@ function replaceBeatmapUrl(node: any) {
     }
 }
 
+function isInsideSpoilerBox(node: any) {
+    let parent = node.parent;
+    while (parent) {
+        const parentClasses = (parent.attribs?.class || "").split(/\s+/);
+        if (parentClasses.includes("bbcode-spoilerbox")) return true;
+        parent = parent.parent;
+    }
+    return false;
+}
+
 function replaceWellDiv(node: any, options: any) {
     if (node.name !== "div") return;
 
     const className = node.attribs?.class || "";
     const classes = className.split(/\s+/);
 
+    if (!classes.includes("well")) return;
+
+    // Don't wrap in Paper if it's already inside a spoilerbox (spoilerbox is the Paper)
+    if (isInsideSpoilerBox(node)) {
+        return <>{domToReact(node.children, options)}</>;
+    }
+
     //count amount of parent wells/papers, elevation based on that
-    let elevation = 2;
+    let elevation = 1;
     let parent = node.parent;
     while (parent) {
         const parentClassName = parent.attribs?.class || "";
@@ -71,13 +164,11 @@ function replaceWellDiv(node: any, options: any) {
         parent = parent.parent;
     }
 
-    if (classes.includes("well")) {
-        return (
-            <Paper elevation={elevation} sx={{ padding: 1, marginY: 1 }}>
-                {domToReact(node.children, options)}
-            </Paper>
-        );
-    }
+    return (
+        <Paper elevation={elevation} sx={{ padding: 1, marginY: 1 }}>
+            {domToReact(node.children, options)}
+        </Paper>
+    );
 }
 
 function extractUserIdFromLink(node: any) {
@@ -101,7 +192,9 @@ function extractUserIdFromLink(node: any) {
     try {
         const url = new URL(href);
         if (url.hostname === "osu.ppy.sh") {
-            const match = url.pathname.match(/^\/users?\/(\d+)/);
+            //if url matches /users/{user_id} or /u/{user_id}
+            const urlRegex = /https?:\/\/osu\.ppy\.sh\/(?:users|u)\/(\d+)/g;
+            const match = urlRegex.exec(href);
             if (match) {
                 return match[1];
             }
@@ -119,6 +212,8 @@ function replaceUserLink(node: any, users: any) {
             component="span"
             sx={{
                 display: 'inline-flex',
+                alignItems: 'center',
+                verticalAlign: 'middle',
             }}
         ><PlayerLink data={users[userId]} size={18} /></Box>;
     }
@@ -130,6 +225,7 @@ function createReplaceHandler(users: any) {
             if (node.type !== "tag") return;
 
             return (
+                replaceSpoilerBox(node, options) ||
                 replaceWellDiv(node, options) ||
                 replaceUserLink(node, users) ||
                 replaceBeatmapUrl(node) ||
