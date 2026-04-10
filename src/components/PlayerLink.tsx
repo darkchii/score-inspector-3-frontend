@@ -154,27 +154,30 @@ function PlayerLink({ data, size = 24, hideCountry = false, noTooltip = false, .
                     )
                 }
                 {
-                    roles?.length > 0 && !noTooltip && roles.map((role, index) => (
-                        <BetterTooltip title={role.title}>
-                            <Avatar
-                                key={index}
-                                sx={{
-                                    width: size * 0.9,
-                                    height: size * 0.9,
-                                    ml: 0.3,
-                                    display: 'inline-flex',
-                                    bgcolor: 'transparent',
-                                }}>
-                                <Box sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}>
-                                    <GetRoleIcon role={role} size={size * 0.9} />
-                                </Box>
-                            </Avatar>
-                        </BetterTooltip>
-                    ))
+                    roles?.length > 0 && !noTooltip && roles.map((role, index) => {
+                        if (!role.is_visible) return null;
+                        return (
+                            <BetterTooltip title={role.title}>
+                                <Avatar
+                                    key={index}
+                                    sx={{
+                                        width: size * 0.9,
+                                        height: size * 0.9,
+                                        ml: 0.3,
+                                        display: 'inline-flex',
+                                        bgcolor: 'transparent',
+                                    }}>
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}>
+                                        <GetRoleIcon role={role} size={size * 0.9} />
+                                    </Box>
+                                </Avatar>
+                            </BetterTooltip>
+                        )
+                    })
                 }
             </Box>
         </PlayerTooltip>
