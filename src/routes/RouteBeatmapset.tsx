@@ -309,13 +309,13 @@ function RouteBeatmapset() {
     }, [data?.beatmap, data?.ruleset, data?.beatmap?.ruleset_id]);
 
     if (isLoading) {
-        return <Box display="flex" justifyContent="center" alignItems="center" height="200px">
+        return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', }}>
             <CircularProgress />
         </Box>
     }
 
     if (error || !data || !data.beatmapSet || !data.beatmap) {
-        return <Box display="flex" justifyContent="center" alignItems="center" height="200px">
+        return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
             <h2>{error || "Beatmap not found"}</h2>
         </Box>
     }

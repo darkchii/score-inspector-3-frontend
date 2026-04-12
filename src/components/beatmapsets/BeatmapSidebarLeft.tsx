@@ -15,10 +15,10 @@ function BeatmapSidebarLeft({ data }: { data: IRouteBeatmapResult | null }) {
     }
 
     const cardImageUrl = useMemo(() => {
-        const card2x = data.beatmapSet.covers?.card_2x?.trim();
-        const card = data.beatmapSet.covers?.card?.trim();
+        const card2x = data.beatmapSet?.covers?.card_2x?.trim();
+        const card = data.beatmapSet?.covers?.card?.trim();
         return card2x || card || "";
-    }, [data.beatmapSet.covers?.card, data.beatmapSet.covers?.card_2x]);
+    }, [data.beatmapSet?.covers?.card, data.beatmapSet?.covers?.card_2x]);
 
     useEffect(() => {
         setMediaError(false);
@@ -161,7 +161,10 @@ function BeatmapSidebarLeft({ data }: { data: IRouteBeatmapResult | null }) {
                                 <Box>
                                     {/* tags */}
                                     <Typography variant="h6">User Tags</Typography>
-                                    <Box display="flex" flexWrap="wrap">
+                                    <Box sx={{
+                                        display: 'flex',
+                                        flexWrap: 'wrap'
+                                    }}>
                                         {
                                             (data.beatmap.user_tags || []).map((tag) => (
                                                 <BeatmapUserTag key={tag.id} tag={tag} />
@@ -176,7 +179,7 @@ function BeatmapSidebarLeft({ data }: { data: IRouteBeatmapResult | null }) {
                     <Box>
                         {/* tags */}
                         <Typography variant="h6">Tags</Typography>
-                        <Box display="flex" flexWrap="wrap">
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
                             {
                                 (data.beatmapSet.tags || []).map((tag) => (
                                     <Chip key={tag} label={tag} sx={{ margin: 0.25 }} size='small' />

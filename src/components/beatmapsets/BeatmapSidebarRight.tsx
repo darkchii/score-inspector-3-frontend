@@ -41,7 +41,7 @@ function BeatmapSidebarRight({ data, canEditMedia = false, onOpenMediaEditor = n
             }
             <Card sx={{ position: 'relative' }}>
                 <CardContent>
-                    <Stack spacing={1} direction="column" alignItems="center">
+                    <Stack spacing={1} direction="column" sx={{ alignItems: 'center' }}>
                         {
                             canEditMedia && onOpenMediaEditor && (
                                 <Button
@@ -147,7 +147,7 @@ function DifficultyRow({ label, value, diffLabel = null }: { label: string, valu
     return (
         <>
             <Typography variant="body1" color="text.secondary">{label}</Typography>
-            <Box component="span" display="flex" alignItems="center" gap={1}>
+            <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{value}</Typography>
                 {
                     diffLabel && (

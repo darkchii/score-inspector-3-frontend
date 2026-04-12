@@ -46,7 +46,7 @@ function HeaderUser() {
                 <Box sx={{ width: '20em' }}>
                     <Stack spacing={1} sx={{ p: 2 }}>
                         {/* big avatar with username underneath, centered */}
-                        <Stack spacing={1} alignItems="center">
+                        <Stack spacing={1} sx={{ alignItems: 'center' }}>
                             <Avatar alt={userData.osuApi.username} src={`https://a.ppy.sh/${user.id}`} sx={{ width: 64, height: 64 }} />
                             {/* <Box>{userData.osuApi.username}</Box> */}
                             <Box><PlayerLink data={userData} noTooltip/></Box>

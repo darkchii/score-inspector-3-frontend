@@ -33,7 +33,7 @@ function ModIcon({ mod, data, ruleset, size = null, disabled = false, interactiv
                 <div
                     className={`
                         ${modStyles.mod__icon} 
-                        ${interactive && !disabled ? modStyles.mod__icon__hoverable : ''} 
+                        ${(interactive && !disabled) ? modStyles.mod__icon__hoverable : ''} 
                         ${disabled ? modStyles.mod__icon__disabled : ''}
                         ${isSelected ? modStyles.mod__icon__selected : ''}
                         ${modStyles[`mod__icon--${data.Acronym}`]}`}

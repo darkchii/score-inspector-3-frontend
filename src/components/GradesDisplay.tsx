@@ -36,7 +36,7 @@ function GradesDisplay({ grades }: { grades: { [key: string]: number } }) {
     //assume grades is an object like { XH: 10, XH_override: 2, X: 20, X_override: 5, ... }
 
     return (
-        <Grid container spacing={{ xs: 0, sm: 2 }} justifyContent="center" alignItems="center">
+        <Grid container spacing={{ xs: 0, sm: 2 }} sx={{ justifyContent: 'center', alignItems: 'center' }}>
             <_SingularGradeDisplay grade="XH" count={grades.XH || 0} overrideCount={grades.XH_override} />
             <_SingularGradeDisplay grade="X" count={grades.X || 0} overrideCount={grades.X_override} />
             <_SingularGradeDisplay grade="SH" count={grades.SH || 0} overrideCount={grades.SH_override} />

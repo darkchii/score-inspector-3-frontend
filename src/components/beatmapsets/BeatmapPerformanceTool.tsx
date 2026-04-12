@@ -1,9 +1,44 @@
-import { useState, type JSX } from "react";
-import type { IDatabasedMod, IRouteBeatmapResult, IScoreMod } from "../../types/types";
-import { Box, FormControlLabel, FormGroup, Grid, Paper, Switch, Typography } from "@mui/material";
+import { useEffect, useState, type JSX } from "react";
+import type { IDatabasedMod, IRouteBeatmapResult, IScore, IScoreMod } from "../../types/types";
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Divider, FormControlLabel, FormGroup, Grid, Paper, Switch, Typography } from "@mui/material";
 import { GetModDatabaseForRuleset, IsModIncompatibleWithMod } from "../../util/ModHelper";
 import ModDisplay from "../ModDisplay";
 import ModIcon from "../ModIcon";
+import NumberField from "../NumberField";
+import NumberSpinner from "../NumberSpinner";
+
+type ModSettingSpecifics = {
+    min: number;
+    max: number;
+    extended_max?: number; //for DA really, only if extended_limits is true
+    step: number;
+    default?: number;
+}
+
+const modSettingIncrements: Record<string, Record<string, ModSettingSpecifics>> = {
+    'HT': {
+        'speed_change': { min: 0.5, max: 0.99, step: 0.01, default: 0.75 }
+    },
+    'DC': {
+        'speed_change': { min: 0.5, max: 0.99, step: 0.01, default: 0.75 }
+    },
+    'DT': {
+        'speed_change': { min: 1.01, max: 2.0, step: 0.01, default: 1.5 }
+    },
+    'NC': {
+        'speed_change': { min: 1.01, max: 2.0, step: 0.01, default: 1.5 }
+    },
+    'EZ': {
+        'retries': { min: 0, max: 10, step: 1, default: 0 }
+    },
+    'AC': {
+        'minimum_accuracy': { min: 0.6, max: 0.999, step: 0.001, default: 0.9 }
+    },
+    'DA': {//no default, reads from maps
+        'drain_rate': { min: 0, max: 10, extended_max: 11, step: 0.1 },
+        'overall_difficulty': { min: 0, max: 10, extended_max: 11, step: 0.1 },
+    }
+};
 
 function BeatmapPerformanceTool({ data }: { data: IRouteBeatmapResult | null }) {
     const [selectedMods, setSelectedMods] = useState<IDatabasedMod[]>([]);
@@ -11,7 +46,9 @@ function BeatmapPerformanceTool({ data }: { data: IRouteBeatmapResult | null }) 
     //IE; adjusted settings will be reflected here, but not above
     //should be an object with mod acronyms with the IScoreMod as value, and another boolean value for selected or not
     //this is so when deselecting, the settings preserve in case of reselect
-    const [selectedModsAdjustable, setSelectedModsAdjustable] = useState<IScoreMod[]>([]);
+    const [selectedModsAdjustable, setSelectedModsAdjustable] = useState<{ mod: IScoreMod, selected: boolean }[]>([]);
+
+    const [generatedScore, setGeneratedScore] = useState<IScore | null>(null);
 
     if (!data || !data.beatmap) {
         return <Typography variant="h6" gutterBottom>
@@ -29,23 +66,37 @@ function BeatmapPerformanceTool({ data }: { data: IRouteBeatmapResult | null }) 
         });
 
         //Match selectedModsAdjustable (either toggle, or add if not existing yet, only if .Settings has entries)
+        //example: [{mod: { acronym: "DT", settings: { speed_change: 1.5 } }, selected: true } ]
         setSelectedModsAdjustable((prev) => {
-            const existing = prev.find(m => m.acronym === mod.Acronym);
-            if (selected) {
-                if (existing) {
-                    return prev.map(m => m.acronym === mod.Acronym ? { ...m, selected: true } : m);
-                } else {
-                    return [...prev, { acronym: mod.Acronym, settings: {}, selected: true }];
+            //if mod doesnt exist yet, add it with default settings if they exist and selected true
+            if (!prev.some(m => m.mod.acronym === mod.Acronym)) {
+                //only set default settings if the setting has default values in modSettingIncrements, otherwise just not add it
+                const defaultSettings: Record<string, any> = {};
+                if (modSettingIncrements[mod.Acronym]) {
+                    for (const [settingKey, settingValue] of Object.entries(modSettingIncrements[mod.Acronym])) {
+                        if (settingValue.default !== undefined) {
+                            defaultSettings[settingKey] = settingValue.default;
+                        }
+                    }
                 }
+                
+                return [...prev, { mod: { acronym: mod.Acronym, settings: defaultSettings }, selected: true }];
             } else {
-                if (existing) {
-                    return prev.map(m => m.acronym === mod.Acronym ? { ...m, selected: false } : m);
-                } else {
-                    return prev;
-                }
+                //otherwise, just toggle selected
+                return prev.map(m => m.mod.acronym === mod.Acronym ? { ...m, selected } : m);
             }
         });
     }
+
+    const onRequestPerformance = () => {
+        //todo, just console log the "score" 
+        console.log(generatedScore);
+    }
+
+    useEffect(() => {
+        console.log("Selected mods:", selectedMods);
+        console.log("Selected mods adjustable:", selectedModsAdjustable);
+    }, [selectedModsAdjustable]);
 
     return (
         <>
@@ -77,89 +128,129 @@ function BeatmapPerformanceTool({ data }: { data: IRouteBeatmapResult | null }) 
                     }
                 </div>
             }
-            <Grid container spacing={2} sx={{ marginTop: '8px' }}>
-                <Grid size={{ xs: 12, md: 6 }}>
-                    {/* mod settings editor */}
-                    <Typography variant="h6" gutterBottom>
-                        Selected Mods:
-                    </Typography>
-                    {selectedMods.filter(mod => Object.keys(mod.Settings ?? {}).length > 0).length === 0 && <Typography variant="body1">No adjustable mods selected.</Typography>}
-                    {selectedMods.filter(mod => Object.keys(mod.Settings ?? {}).length > 0).map(mod => (
-                        <ModSettingEditor key={mod.Acronym} mod={mod} ruleset={data.beatmap?.ruleset} />
-                    ))}
-                </Grid>
-            </Grid>
+            <Box sx={{ marginTop: '8px' }}>
+                <Accordion
+                    disabled={selectedModsAdjustable.filter(mod => mod.selected).length === 0}
+                >
+                    <AccordionSummary>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Typography variant="h6">Selected Mods</Typography>
+                            <ModDisplay
+                                ruleset={data.beatmap.ruleset}
+                                mods={selectedModsAdjustable.filter(mod => mod.selected).map(m => m.mod)}
+                            />
+                        </Box>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        {selectedModsAdjustable.filter(mod => mod.selected).length === 0 && <Typography variant="body1">No adjustable mods selected.</Typography>}
+                        {selectedModsAdjustable.filter(mod => mod.selected).map(mod => (
+                            <ModSettingEditor key={mod.mod.acronym} mod={mod.mod} ruleset={data.beatmap?.ruleset} onUpdate={(setting, value) => {
+                                setSelectedModsAdjustable((prev) => {
+                                    //if updated setting is null, remove it from settings object
+                                    if(value === null) {
+                                        const { [setting]: _, ...newSettings } = mod.mod.settings || {};
+                                        return prev.map(m => m.mod.acronym === mod.mod.acronym ? { ...m, mod: { ...m.mod, settings: newSettings } } : m);
+                                    }
+                                    return prev.map(m => m.mod.acronym === mod.mod.acronym ? { ...m, mod: { ...m.mod, settings: { ...m.mod.settings, [setting]: value } } } : m);
+                                });
+                            }} />
+                        ))}
+                    </AccordionDetails>
+                </Accordion>
+            </Box>
+            <Divider sx={{ my: 2 }} />
+            <Button variant='contained' onClick={onRequestPerformance}>
+                Calculate
+            </Button>
         </>
     )
 }
 
-const modDefaults: Record<string, Record<string, number>> = {
-    'speed_change': {
-        //if EZ: 0.5x, if DT: 1.5x
-        'EZ': 0.5,
-        'DT': 1.5
-    },
-}
-
 //the full Paper component for each mod
-function ModSettingEditor({ mod, ruleset }: { mod: IDatabasedMod, ruleset: any }) {
-    const [cachedMod, setCachedMod] = useState<IScoreMod>({ acronym: mod.Acronym, settings: {} });
+function ModSettingEditor({ mod, ruleset, onUpdate }: { mod: IScoreMod, ruleset: any, onUpdate: (setting: string, value: any) => void }) {
+    const modData = Object.values(GetModDatabaseForRuleset(ruleset) || {}).find(m => m.Acronym === mod.acronym);
 
+    if (modData?.Settings?.length === 0) {
+        return null;
+    }
+
+    const settingIncrements = modSettingIncrements[mod.acronym] || {};
     return (
-        <Paper key={mod.Acronym} sx={{ padding: '8px', marginBottom: '8px' }}>
+        <Paper elevation={3} key={mod.acronym} sx={{ padding: '8px', marginBottom: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <ModIcon mod={cachedMod} data={mod} ruleset={ruleset} size={24} />
-                <Typography variant="subtitle1">{mod.Name}</Typography>
+                <ModIcon mod={mod} data={modData} ruleset={ruleset} size={24} />
+                <Typography variant="subtitle1">{modData?.Name}</Typography>
             </div>
 
             {/* settings UI */}
-            {
-                Object.entries(mod.Settings ?? {}).map(([key, value]) => (
-                    <Paper elevation={4} key={key} sx={{ padding: '8px', marginTop: '8px' }}>
-                        <FormGroup>
-                            <FormControlLabel
-                                control={
-                                    value.Type === 'boolean' ? (
-                                        <Switch
-                                            type="checkbox"
-                                            defaultChecked={cachedMod.settings?.[key] ?? false}
-                                            onChange={(e) => {
-                                                const newValue = e.target.checked;
-                                                setCachedMod((prev) => ({
-                                                    ...prev,
-                                                    settings: {
-                                                        ...prev.settings,
-                                                        [key]: newValue
-                                                    }
-                                                }));
-                                            }}
-                                        />
-                                    ) : value.Type === 'number' ? (
-                                        <input
-                                            type="number"
-                                            value={cachedMod.settings?.[key] ?? modDefaults[key]?.[mod.Acronym] ?? 0}
-                                            onChange={(e) => {
-                                                const newValue = parseFloat(e.target.value);
-                                                setCachedMod((prev) => ({
-                                                    ...prev,
-                                                    settings: {
-                                                        ...prev.settings,
-                                                        [key]: newValue
-                                                    }
-                                                }));
-                                            }}
-                                            //minimum width
-                                            style={{ minWidth: '60px' }}
-                                        />
-                                    ) : (
-                                        <Typography variant="body2">{String(cachedMod.settings?.[key] ?? value.DefaultValue)}</Typography>
-                                    )
-                                } label={value.Label}
-                            />
-                        </FormGroup>
-                    </Paper>
-                ))
-            }
+            <Paper elevation={4} sx={{ padding: '8px', marginTop: '8px' }}>
+                <FormGroup sx={{
+                    px: 1,
+                }}
+                >
+                    {
+                        //sort by Type, then by Label alphabetically
+                        Object.entries(modData?.Settings ?? {}).sort(([keyA, valueA], [keyB, valueB]) => {
+                            if (valueA.Type === valueB.Type) {
+                                return valueA.Name.localeCompare(valueB.Name);
+                            }
+                            return valueA.Type.localeCompare(valueB.Type);
+                        }).map(([key, value]) => {
+                            const settingKey = value.Name;
+                            const defaultValue: any = settingIncrements[settingKey]?.default ?? (value.Type === 'boolean' ? false : value.Type === 'number' ? settingIncrements[settingKey]?.min ?? 0 : '');
+                            const currentValue = mod.settings?.[settingKey] ?? defaultValue;
+                            return (
+                                <FormControlLabel
+                                    key={key}
+                                    control={
+                                        value.Type === 'boolean' ? (
+                                            <Switch
+                                                size='small'
+                                                type="checkbox"
+                                                defaultChecked={currentValue}
+                                                onChange={(e) => {
+                                                    const newValue = e.target.checked;
+                                                    onUpdate(settingKey, newValue);
+                                                }}
+                                            />
+                                        ) : value.Type === 'number' ? (
+                                            <NumberSpinner
+                                                value={currentValue}
+                                                size='small'
+                                                style={{
+                                                    marginRight: '8px',
+                                                }}
+                                                onValueChange={(value) => {
+                                                    const newValue = value || null;
+                                                    onUpdate(settingKey, newValue);
+                                                }}
+                                                min={settingIncrements[settingKey]?.min}
+                                                max={settingIncrements[settingKey]?.extended_max ?? settingIncrements[settingKey]?.max}
+                                                step={settingIncrements[settingKey]?.step}
+                                            />
+                                        ) : value.Type === 'string' ? (
+                                            <input
+                                                type="text"
+                                                value={currentValue}
+                                                onChange={(e) => {
+                                                    const newValue = e.target.value;
+                                                    onUpdate(settingKey, newValue);
+                                                }}
+                                                style={{
+                                                    padding: '4px 8px',
+                                                    fontSize: '14px',
+                                                    borderRadius: '4px',
+                                                    border: '1px solid #ccc',
+                                                }}
+                                            />
+                                        ) : null
+                                    } label={value.Label}
+                                />
+                            )
+                        })
+                    }
+                </FormGroup>
+            </Paper>
         </Paper>
     )
 }
