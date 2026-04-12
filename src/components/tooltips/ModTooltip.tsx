@@ -28,7 +28,19 @@ function ModTooltipContent({ mod, data, ruleset }: {
 }) {
     const theme = useTheme();
 
-    if(!mod) return null;
+    if(!mod) return (
+        <Box sx={{
+            backgroundColor: '#293d2a',
+            maxWidth: '600px',
+            borderRadius: theme.shape.borderRadius,
+            border: `1px solid #334C35`,
+            p: 2,
+        }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                {data.Name} ({data.Acronym})
+            </Typography>
+        </Box>
+    )
 
     return (
         <Box sx={{

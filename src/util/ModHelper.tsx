@@ -5,13 +5,29 @@ import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
 import type { IDatabasedMod, IScoreMod } from "../types/types";
 
-const _modDatabase: { [ruleset: string]: { [acronym: string]: any } } = {};
+const _modDatabase: { [ruleset: string]: { [acronym: string]: IDatabasedMod } } = {};
 export function GetModData(ruleset: string, acronym: string) {
     BuildDatabase();
 
     if (_modDatabase[ruleset] && _modDatabase[ruleset][acronym]) {
         return _modDatabase[ruleset][acronym];
     }
+}
+
+export function GetModDatabaseForRuleset(ruleset: string): { [acronym: string]: IDatabasedMod } | null {
+    BuildDatabase();
+    if (_modDatabase[ruleset]) {
+        return _modDatabase[ruleset];
+    }
+    return null;
+}
+
+export function IsModIncompatibleWithMod(modA: IDatabasedMod, modB: IDatabasedMod): boolean {
+    if(modA.Acronym === modB.Acronym) return false;
+    if (modA.IncompatibleMods.includes(modB.Acronym) || modB.IncompatibleMods.includes(modA.Acronym)) {
+        return true;
+    }
+    return false;
 }
 
 export function GetModSettingForDisplay(ruleset: string, acronym: string, key: string, value: any) {

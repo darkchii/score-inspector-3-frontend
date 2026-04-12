@@ -813,6 +813,17 @@ export type IDatabasedMod = {
     Name: string;
     Settings: IScoreModSettings | null;
     IncompatibleMods: string[];
+    UserPlayable: boolean;
+}
+
+export type IModDatabase = {
+    [ruleset: string]: IRulesetModDatabase;
+}
+
+export type IRulesetModDatabase = {
+    Name: string;
+    RulesetID: number;
+    Mods: IDatabasedMod[];
 }
 
 export type IReputationEntry = {

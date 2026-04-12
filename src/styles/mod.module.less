@@ -29,6 +29,7 @@
         background-size: contain;
         background-position: center;
         background-repeat: no-repeat;
+        transition: all 0.2s;
 
         &::before {
             .full-size();
@@ -50,6 +51,23 @@
             color: var(--type-fg-colour);
             font-weight: 900;
             font-size: 0.4em;
+        }
+
+        &__disabled {
+            filter: grayscale(100%) brightness(50%);
+            scale: 0.9;
+        }
+
+        &__selected {
+            //prominent white background glow
+            filter: drop-shadow(0 0 4px white);
+        }
+
+        //hover (conditional, so an extra class is needed to enable hover effects)
+        &__hoverable:hover {
+            filter: drop-shadow(0 0 2px var(--type-fg-colour));
+            scale: 1.05;
+            cursor: pointer;
         }
 
         .mod-icon-osu(@acronym, @filename) {

@@ -1,9 +1,9 @@
 import { Box } from "@mui/material";
 import ModIcon from "./ModIcon";
 import { GetModData } from "../util/ModHelper";
-import type { IScoreMod } from "../types/types";
+import type { IDatabasedMod, IScoreMod } from "../types/types";
 
-function ModDisplay({ ruleset, mods }: { ruleset: string; mods: IScoreMod[] }) {
+function ModDisplay({ ruleset, mods }: { ruleset: string; mods: IScoreMod[] | IDatabasedMod[] }) {
     return (
         <Box sx={{
             display: 'flex',
@@ -12,9 +12,14 @@ function ModDisplay({ ruleset, mods }: { ruleset: string; mods: IScoreMod[] }) {
             fontSize: '22px',
             overflow: 'hidden',
         }}>
-            {mods.map((mod) => (
-                <ModIcon key={mod.acronym} mod={mod} data={GetModData(ruleset, mod.acronym)} ruleset={ruleset} />
-            ))}
+            {mods.map((mod) => {
+                const isDatabasedMod = (mod as IDatabasedMod).Acronym !== undefined;
+                const acronym = isDatabasedMod ? (mod as IDatabasedMod).Acronym : (mod as IScoreMod).acronym;
+                const modData = isDatabasedMod ? (mod as IDatabasedMod) : GetModData(ruleset, acronym);
+                return (
+                    <ModIcon key={acronym} mod={isDatabasedMod ? null : (mod as IScoreMod)} data={modData} ruleset={ruleset} />
+                )
+            })}
         </Box>
     )
 }
