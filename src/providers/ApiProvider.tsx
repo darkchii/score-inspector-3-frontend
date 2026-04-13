@@ -5,7 +5,7 @@ import type { IAuthUser, IScoreMod } from "../types/types";
 import Score from "../types/Score";
 
 type ApiContextValue = {
-    getUserLive: (userId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getUserLive: (userId: string | number, requireAlt?: boolean, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getScoresLive: (userId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapsLive: (compact?: boolean, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapPacks: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
@@ -123,8 +123,8 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         return response;
     }, [apiGet]);
 
-    const getUserLive = useCallback(async (userId: string | number, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`user/${userId}/profile`, true, progressEvent);
+    const getUserLive = useCallback(async (userId: string | number, requireAlt: boolean = true, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        const response = await apiGet(`user/${userId}/profile?requireAlt=${requireAlt}`, true, progressEvent);
         return response;
     }, [apiGet]);
 

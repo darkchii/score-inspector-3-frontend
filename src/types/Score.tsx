@@ -244,7 +244,7 @@ class Score implements IScore {
                     //default values
                     if(speedMod.acronym === 'DT' || speedMod.acronym === 'NC'){
                         this.mod_speed_change = 1.5;
-                    } else if(speedMod.acronym === 'HT'){
+                    } else if(speedMod.acronym === 'HT' || speedMod.acronym === 'DC'){
                         this.mod_speed_change = 0.75;
                     }
                 }
@@ -261,7 +261,7 @@ class Score implements IScore {
         this.is_ss = Boolean(api_data.is_ss);
         this.is_fc = Boolean(api_data.is_fc);
 
-        this.is_convert = this.ruleset_id !== this.beatmap?.ruleset_id;
+        this.is_convert = this.beatmap.convert !== undefined ? this.beatmap.convert : this.ruleset_id !== this.beatmap?.ruleset_id;
         this.implied_total_score = this.legacy_total_score !== null && this.legacy_total_score > 0 ? this.legacy_total_score : this.classic_total_score;
 
         if (this.local_beatmap) {

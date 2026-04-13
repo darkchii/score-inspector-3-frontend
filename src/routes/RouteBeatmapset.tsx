@@ -196,6 +196,7 @@ function RouteBeatmapset() {
                 console.error(err);
                 setError("Failed to load beatmap");
             } finally {
+                // setSelectedTab(0);
                 setIsLoading(false);
             }
         })();

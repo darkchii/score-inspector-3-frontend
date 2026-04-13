@@ -1,54 +1,71 @@
-import { useEffect, useState, type JSX } from "react";
-import type { IDatabasedMod, IRouteBeatmapResult, IScore, IScoreMod } from "../../types/types";
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Divider, FormControlLabel, FormGroup, Grid, Paper, Switch, Typography } from "@mui/material";
-import { GetModDatabaseForRuleset, IsModIncompatibleWithMod } from "../../util/ModHelper";
-import ModDisplay from "../ModDisplay";
-import ModIcon from "../ModIcon";
-import NumberField from "../NumberField";
-import NumberSpinner from "../NumberSpinner";
+import { useEffect, useRef, useState } from "react";
+import type { IBeatmap, IRouteBeatmapResult, IScore, IScoreDifficulty, IScoreMod } from "../../types/types";
+import { Box, Button, Divider, Typography } from "@mui/material";
+import PerformanceModSelector, { type AdjustableSelectedMod } from "./performanceCalculator/PerformanceModSelector";
+import { ShowNotification } from "../../util/Helper";
+import Score from "../../types/Score";
+import { useApi } from "../../providers/ApiProvider";
+import ScoreViewBase from "../scoreView/ScoreViewBase";
+import { ErrorBoundary, getErrorMessage } from "react-error-boundary";
+import { useScoreView } from "../../providers/ScoreViewProvider";
+import DifficultyBadge from "../DifficultyBadge";
 
-type ModSettingSpecifics = {
-    min: number;
-    max: number;
-    extended_max?: number; //for DA really, only if extended_limits is true
-    step: number;
-    default?: number;
+const defaultScoreData = {
+    user_id: 3,
+    is_lazer: true,
+    has_replay: false,
+    passed: true, //with some settings impossible, but this has no bearing on results
+    pp: 0, //generated pp is stored elsewhere in the score object, this is just api value
+    preserve: true,
+    processed: true,
+    replay: false,
+    type: 'solo_score'
 }
 
-const modSettingIncrements: Record<string, Record<string, ModSettingSpecifics>> = {
-    'HT': {
-        'speed_change': { min: 0.5, max: 0.99, step: 0.01, default: 0.75 }
-    },
-    'DC': {
-        'speed_change': { min: 0.5, max: 0.99, step: 0.01, default: 0.75 }
-    },
-    'DT': {
-        'speed_change': { min: 1.01, max: 2.0, step: 0.01, default: 1.5 }
-    },
-    'NC': {
-        'speed_change': { min: 1.01, max: 2.0, step: 0.01, default: 1.5 }
-    },
-    'EZ': {
-        'retries': { min: 0, max: 10, step: 1, default: 0 }
-    },
-    'AC': {
-        'minimum_accuracy': { min: 0.6, max: 0.999, step: 0.001, default: 0.9 }
-    },
-    'DA': {//no default, reads from maps
-        'drain_rate': { min: 0, max: 10, extended_max: 11, step: 0.1 },
-        'overall_difficulty': { min: 0, max: 10, extended_max: 11, step: 0.1 },
-    }
-};
-
 function BeatmapPerformanceTool({ data }: { data: IRouteBeatmapResult | null }) {
-    const [selectedMods, setSelectedMods] = useState<IDatabasedMod[]>([]);
-    //Adjustable mods match selected mods, but are prepared for being sent to PP calculator
-    //IE; adjusted settings will be reflected here, but not above
-    //should be an object with mod acronyms with the IScoreMod as value, and another boolean value for selected or not
-    //this is so when deselecting, the settings preserve in case of reselect
-    const [selectedModsAdjustable, setSelectedModsAdjustable] = useState<{ mod: IScoreMod, selected: boolean }[]>([]);
+    const { getDifficulty, getUserLive } = useApi();
+    const { loadScoreView } = useScoreView();
+
+    const [resetKey, setResetKey] = useState(0); //used to reset settings when beatmap changes
+    const [selectedModsAdjustable, setSelectedModsAdjustable] = useState<AdjustableSelectedMod[]>([]);
+    const [difficulty, setDifficulty] = useState<number | null>(null);
 
     const [generatedScore, setGeneratedScore] = useState<IScore | null>(null);
+    const [isGenerating, setIsGenerating] = useState(false);
+
+    useEffect(() => {
+        setResetKey((prev) => prev + 1);
+        setSelectedModsAdjustable([]);
+        setGeneratedScore(null);
+    }, [data]);
+
+    useEffect(() => {
+        //create a hash from 'data', so that after fetching difficulty, if data changes, we can ignore it
+        //because otherwise we don't need to wait for this data for any critical functionality
+        //it's only used to display the star rating
+        const dataHash = JSON.stringify({
+            beatmap_id: data?.beatmap?.id,
+            ruleset_id: data?.beatmap?.ruleset_id,
+        });
+        if (data && data.beatmap) {
+            (async () => {
+                try {
+                    const difficultyResponse = await getDifficulty(data.beatmap!.id, data.beatmap!.ruleset_id, selectedModsAdjustable.map(m => m.selected ? m.mod : null).filter(m => m) as IScoreMod[]);
+                    if (JSON.stringify({
+                        beatmap_id: data?.beatmap?.id,
+                        ruleset_id: data?.beatmap?.ruleset_id,
+                    }) !== dataHash) return;
+                    setDifficulty(difficultyResponse?.star_rating || null);
+                }
+                catch (e) {
+                    console.error("Error fetching difficulty:", e);
+                    ShowNotification("Error fetching difficulty", "error");
+                }
+            })();
+        } else {
+            setDifficulty(null);
+        }
+    }, [selectedModsAdjustable, data?.beatmap]);
 
     if (!data || !data.beatmap) {
         return <Typography variant="h6" gutterBottom>
@@ -56,202 +73,71 @@ function BeatmapPerformanceTool({ data }: { data: IRouteBeatmapResult | null }) 
         </Typography>
     }
 
-    const onModClick = (mod: IDatabasedMod, selected: boolean) => {
-        setSelectedMods((prev) => {
-            if (selected) {
-                return [...prev, mod];
-            } else {
-                return prev.filter(m => m.Acronym !== mod.Acronym);
-            }
-        });
-
-        //Match selectedModsAdjustable (either toggle, or add if not existing yet, only if .Settings has entries)
-        //example: [{mod: { acronym: "DT", settings: { speed_change: 1.5 } }, selected: true } ]
-        setSelectedModsAdjustable((prev) => {
-            //if mod doesnt exist yet, add it with default settings if they exist and selected true
-            if (!prev.some(m => m.mod.acronym === mod.Acronym)) {
-                //only set default settings if the setting has default values in modSettingIncrements, otherwise just not add it
-                const defaultSettings: Record<string, any> = {};
-                if (modSettingIncrements[mod.Acronym]) {
-                    for (const [settingKey, settingValue] of Object.entries(modSettingIncrements[mod.Acronym])) {
-                        if (settingValue.default !== undefined) {
-                            defaultSettings[settingKey] = settingValue.default;
-                        }
-                    }
-                }
-                
-                return [...prev, { mod: { acronym: mod.Acronym, settings: defaultSettings }, selected: true }];
-            } else {
-                //otherwise, just toggle selected
-                return prev.map(m => m.mod.acronym === mod.Acronym ? { ...m, selected } : m);
-            }
-        });
-    }
-
     const onRequestPerformance = () => {
-        //todo, just console log the "score" 
-        console.log(generatedScore);
-    }
+        (async () => {
+            setIsGenerating(true);
+            try {
+                const mods = selectedModsAdjustable.map(m => m.selected ? m.mod : null).filter(m => m) as IScoreMod[];
+                const map: IBeatmap = data.beatmap!.clone(); //beatmap always exists here due to check
+                map.mapper = (map.mapper as any)?.osuApi.username || map.mapper; //ensure mapper has username for score generation, this is required for some performance calculators that fetch additional data about the mapper
+                const difficultyResponse = await getDifficulty(map.beatmap_id, map.ruleset_id, mods);
+                const user = await getUserLive(3, false);
+                console.log(user);
+                const _score: IScore = new Score({
+                    mods: mods,
+                    beatmap_id: map.id,
+                    ruleset_id: map.ruleset_id,
+                    accuracy: 1, //TODO: user input
+                    classic_total_score: 0, //TODO: generate? not sure, might not care
+                    legacy_perfect: true, //TODO: determine from stats
+                    //TODO: MAXIMUM HIT STATS, 0 for now
+                    grade: 'X', //TODO: determine from stats
+                    ended_at: new Date(), //no real reason for this to be accurate, just needs to exist
+                    started_at: new Date(), //no real reason for this to be accurate, just needs to exist
+                    //TODO: HIT STATS, 0 for now
+                    total_score: 0, //TODO: generate? not sure, might not care
+                    mod_acronyms: mods.map(m => m.acronym),
+                    attr_diff: difficultyResponse, //TODO: fetch from api
+                    ...defaultScoreData,
+                }, map, user);
+                _score.combo = _score.max_combo || 0; //TODO: determine from stats, for now just set to max combo
+                console.log("Generating performance with score:", _score);
+                setGeneratedScore(_score);
 
-    useEffect(() => {
-        console.log("Selected mods:", selectedMods);
-        console.log("Selected mods adjustable:", selectedModsAdjustable);
-    }, [selectedModsAdjustable]);
+                if (_score) {
+                    loadScoreView(_score);
+                }
+            } catch (e) {
+                console.error("Error generating performance:", e);
+                ShowNotification("Error generating performance", "error");
+            } finally {
+                setIsGenerating(false);
+            }
+        })();
+    }
 
     return (
         <>
-            {
-                GetModDatabaseForRuleset(data.beatmap.ruleset) && <div style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '4px',
-                }}>
-                    {/* <ModDisplay key={data.beatmap.ruleset} ruleset={data.beatmap.ruleset} mods={Object.values(GetModDatabaseForRuleset(data.beatmap.ruleset)!)} /> */}
-                    {
-                        //filter out mods that are not user playable
-                        Object.values(GetModDatabaseForRuleset(data.beatmap.ruleset)!).filter(mod => mod.UserPlayable).map((mod) => {
-                            return (
-                                <ModIcon
-                                    key={mod.Acronym}
-                                    mod={null}
-                                    data={mod}
-                                    ruleset={data.beatmap?.ruleset}
-                                    interactive={true}
-                                    onClick={(selected) => onModClick(mod, selected)}
-                                    disabled={
-                                        selectedMods.some(m => IsModIncompatibleWithMod(m, mod))
-                                    }
-                                    size={30}
-                                />
-                            )
-                        })
-                    }
-                </div>
-            }
-            <Box sx={{ marginTop: '8px' }}>
-                <Accordion
-                    disabled={selectedModsAdjustable.filter(mod => mod.selected).length === 0}
-                >
-                    <AccordionSummary>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Typography variant="h6">Selected Mods</Typography>
-                            <ModDisplay
-                                ruleset={data.beatmap.ruleset}
-                                mods={selectedModsAdjustable.filter(mod => mod.selected).map(m => m.mod)}
-                            />
-                        </Box>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        {selectedModsAdjustable.filter(mod => mod.selected).length === 0 && <Typography variant="body1">No adjustable mods selected.</Typography>}
-                        {selectedModsAdjustable.filter(mod => mod.selected).map(mod => (
-                            <ModSettingEditor key={mod.mod.acronym} mod={mod.mod} ruleset={data.beatmap?.ruleset} onUpdate={(setting, value) => {
-                                setSelectedModsAdjustable((prev) => {
-                                    //if updated setting is null, remove it from settings object
-                                    if(value === null) {
-                                        const { [setting]: _, ...newSettings } = mod.mod.settings || {};
-                                        return prev.map(m => m.mod.acronym === mod.mod.acronym ? { ...m, mod: { ...m.mod, settings: newSettings } } : m);
-                                    }
-                                    return prev.map(m => m.mod.acronym === mod.mod.acronym ? { ...m, mod: { ...m.mod, settings: { ...m.mod.settings, [setting]: value } } } : m);
-                                });
-                            }} />
-                        ))}
-                    </AccordionDetails>
-                </Accordion>
-            </Box>
+            <PerformanceModSelector
+                key={resetKey}
+                ruleset={data.beatmap.ruleset}
+                onSelectionChange={setSelectedModsAdjustable}
+                disabled={isGenerating}
+            />
             <Divider sx={{ my: 2 }} />
-            <Button variant='contained' onClick={onRequestPerformance}>
-                Calculate
-            </Button>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <Button variant='contained' onClick={onRequestPerformance} disabled={isGenerating}>
+                    {isGenerating ? "Calculating..." : "Calculate"}
+                </Button>
+                {
+                    difficulty && (
+                        <DifficultyBadge
+                            difficulty={difficulty}
+                        />
+                    )
+                }
+            </Box>
         </>
-    )
-}
-
-//the full Paper component for each mod
-function ModSettingEditor({ mod, ruleset, onUpdate }: { mod: IScoreMod, ruleset: any, onUpdate: (setting: string, value: any) => void }) {
-    const modData = Object.values(GetModDatabaseForRuleset(ruleset) || {}).find(m => m.Acronym === mod.acronym);
-
-    if (modData?.Settings?.length === 0) {
-        return null;
-    }
-
-    const settingIncrements = modSettingIncrements[mod.acronym] || {};
-    return (
-        <Paper elevation={3} key={mod.acronym} sx={{ padding: '8px', marginBottom: '8px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <ModIcon mod={mod} data={modData} ruleset={ruleset} size={24} />
-                <Typography variant="subtitle1">{modData?.Name}</Typography>
-            </div>
-
-            {/* settings UI */}
-            <Paper elevation={4} sx={{ padding: '8px', marginTop: '8px' }}>
-                <FormGroup sx={{
-                    px: 1,
-                }}
-                >
-                    {
-                        //sort by Type, then by Label alphabetically
-                        Object.entries(modData?.Settings ?? {}).sort(([keyA, valueA], [keyB, valueB]) => {
-                            if (valueA.Type === valueB.Type) {
-                                return valueA.Name.localeCompare(valueB.Name);
-                            }
-                            return valueA.Type.localeCompare(valueB.Type);
-                        }).map(([key, value]) => {
-                            const settingKey = value.Name;
-                            const defaultValue: any = settingIncrements[settingKey]?.default ?? (value.Type === 'boolean' ? false : value.Type === 'number' ? settingIncrements[settingKey]?.min ?? 0 : '');
-                            const currentValue = mod.settings?.[settingKey] ?? defaultValue;
-                            return (
-                                <FormControlLabel
-                                    key={key}
-                                    control={
-                                        value.Type === 'boolean' ? (
-                                            <Switch
-                                                size='small'
-                                                type="checkbox"
-                                                defaultChecked={currentValue}
-                                                onChange={(e) => {
-                                                    const newValue = e.target.checked;
-                                                    onUpdate(settingKey, newValue);
-                                                }}
-                                            />
-                                        ) : value.Type === 'number' ? (
-                                            <NumberSpinner
-                                                value={currentValue}
-                                                size='small'
-                                                style={{
-                                                    marginRight: '8px',
-                                                }}
-                                                onValueChange={(value) => {
-                                                    const newValue = value || null;
-                                                    onUpdate(settingKey, newValue);
-                                                }}
-                                                min={settingIncrements[settingKey]?.min}
-                                                max={settingIncrements[settingKey]?.extended_max ?? settingIncrements[settingKey]?.max}
-                                                step={settingIncrements[settingKey]?.step}
-                                            />
-                                        ) : value.Type === 'string' ? (
-                                            <input
-                                                type="text"
-                                                value={currentValue}
-                                                onChange={(e) => {
-                                                    const newValue = e.target.value;
-                                                    onUpdate(settingKey, newValue);
-                                                }}
-                                                style={{
-                                                    padding: '4px 8px',
-                                                    fontSize: '14px',
-                                                    borderRadius: '4px',
-                                                    border: '1px solid #ccc',
-                                                }}
-                                            />
-                                        ) : null
-                                    } label={value.Label}
-                                />
-                            )
-                        })
-                    }
-                </FormGroup>
-            </Paper>
-        </Paper>
     )
 }
 

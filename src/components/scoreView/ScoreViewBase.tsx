@@ -31,12 +31,14 @@ function ScoreViewBase({ score, noBackground = false, compact = false }: { score
 
     return (
         <div className={scoreViewStyles['score-view__base']}>
-            <div className={scoreViewStyles['score-view__base__user-data']}>
-                <Avatar src={`https://a.ppy.sh/${score.user_id}`} alt="User Avatar" sx={{ width: 96, height: 96 }} variant='rounded' />
-                <div className={scoreViewStyles['score-view__base__user-data__username']}>
-                    <span>{score.user?.osuApi?.username || 'Unknown User'}</span>
+            {!compact &&
+                <div className={scoreViewStyles['score-view__base__user-data']}>
+                    <Avatar src={`https://a.ppy.sh/${score.user_id}`} alt="User Avatar" sx={{ width: 96, height: 96 }} variant='rounded' />
+                    <div className={scoreViewStyles['score-view__base__user-data__username']}>
+                        <span>{score.user?.osuApi?.username || 'Unknown User'}</span>
+                    </div>
                 </div>
-            </div>
+            }
             <div className={scoreViewStyles['score-view__base__content']}>
                 <div className={scoreViewStyles['score-view__base__background']} style={{
                     backgroundImage: noBackground ? undefined : `url(https://assets.ppy.sh/beatmaps/${score.beatmap.beatmapset_id}/covers/fullsize.jpg)`,
