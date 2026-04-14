@@ -740,7 +740,7 @@ function RouteBeatmapset() {
                             <Collapse in={selectedTab === 3} timeout="auto" unmountOnExit>
                                 <Stack spacing={2}>
                                     <Typography variant="body2" color="text.secondary">
-                                        Similar beatmaps are based on artist/title text similarity from the database.
+                                        The media chips indicate shared media between the current set and the given similar map.
                                     </Typography>
 
                                     {
@@ -775,7 +775,7 @@ function RouteBeatmapset() {
                                         && !similarBeatmapsError
                                         && (similarBeatmapsData?.similar_beatmapsets?.length || 0) > 0
                                         && (
-                                            <Stack spacing={1.25}>
+                                            <Stack spacing={1.5}>
                                                 {
                                                     similarBeatmapsData!.similar_beatmapsets.map((item) => {
                                                         const mediaMatches = sharedMediaMatchesByBeatmapsetId.get(item.beatmapset_id) || [];
@@ -785,66 +785,63 @@ function RouteBeatmapset() {
                                                         return (
                                                             <Card
                                                                 key={item.beatmapset_id}
-                                                                variant="outlined"
+                                                                elevation={2}
                                                                 sx={{
                                                                     overflow: "hidden",
-                                                                    borderColor: "rgba(255, 255, 255, 0.16)",
-                                                                    backgroundColor: "rgba(14, 18, 24, 0.58)",
-                                                                    backdropFilter: "blur(4px)",
+                                                                    display: "flex",
+                                                                    flexDirection: { xs: "column", sm: "row" },
+                                                                    cursor: "pointer",
+                                                                    transition: "box-shadow 0.2s",
+                                                                    "&:hover": { boxShadow: 6 },
+                                                                }}
+                                                                onClick={() => {
+                                                                    navigate(GenerateUrl(routeData.routeBeatmapsets.path, {
+                                                                        beatmapsetId: item.beatmapset_id,
+                                                                        ruleset: data.ruleset,
+                                                                    }));
                                                                 }}
                                                             >
+                                                                {/* Thumbnail */}
                                                                 <Box
                                                                     sx={{
-                                                                        display: "grid",
-                                                                        gridTemplateColumns: { xs: "1fr", sm: "220px 1fr" },
+                                                                        width: { xs: "100%", sm: 180 },
+                                                                        minHeight: { xs: 100, sm: "auto" },
+                                                                        flexShrink: 0,
+                                                                        backgroundImage: `url(${thumbnailUrl})`,
+                                                                        backgroundSize: "cover",
+                                                                        backgroundPosition: "center",
                                                                     }}
-                                                                >
-                                                                    <Box
-                                                                        sx={{
-                                                                            minHeight: { xs: 116, sm: "100%" },
-                                                                            backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.06), rgba(0,0,0,0.34)), url(${thumbnailUrl})`,
-                                                                            backgroundSize: "cover",
-                                                                            backgroundPosition: "center",
-                                                                        }}
-                                                                    />
+                                                                />
 
-                                                                    <CardContent sx={{ pb: "14px !important" }}>
-                                                                        <Stack spacing={1.25}>
-                                                                            <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, flexWrap: "wrap", alignItems: "center" }}>
-                                                                                <Box>
-                                                                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-                                                                                        {item.artist} - {item.title}
-                                                                                    </Typography>
-                                                                                    <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap", mt: 0.6 }}>
-                                                                                        <Chip size="small" label={`#${item.beatmapset_id}`} variant="filled" />
-                                                                                        {variantLabel && <Chip size="small" label={variantLabel} variant="outlined" />}
-                                                                                        {
-                                                                                            mediaMatches.map((label) => (
-                                                                                                <Chip key={`${item.beatmapset_id}-${label}`} size="small" color="success" label={label} />
-                                                                                            ))
-                                                                                        }
-                                                                                    </Stack>
-                                                                                </Box>
-                                                                                <Button
-                                                                                    size="small"
-                                                                                    variant="outlined"
-                                                                                    onClick={() => {
-                                                                                        navigate(GenerateUrl(routeData.routeBeatmapsets.path, {
-                                                                                            beatmapsetId: item.beatmapset_id,
-                                                                                            ruleset: data.ruleset,
-                                                                                        }));
-                                                                                    }}
-                                                                                >
-                                                                                    Open
-                                                                                </Button>
-                                                                            </Box>
+                                                                {/* Content */}
+                                                                <CardContent sx={{ flex: 1, py: 1.5, px: 2, "&:last-child": { pb: 1.5 } }}>
+                                                                    <Stack spacing={1} sx={{ height: "100%", justifyContent: "space-between" }}>
+                                                                        <Box>
+                                                                            <Typography
+                                                                                variant="body2"
+                                                                                color="text.secondary"
+                                                                                sx={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: 0.5, mb: 0.25 }}
+                                                                            >
+                                                                                {item.artist}
+                                                                            </Typography>
+                                                                            <Typography variant="subtitle2" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
+                                                                                {item.title}
+                                                                            </Typography>
+                                                                        </Box>
 
-                                                                            <Typography variant="caption" color="text.secondary">
-                                                                                ~{(item.similarity_score * 100).toFixed(0)}% similar
+                                                                        <Stack direction="row" spacing={0.75} useFlexGap sx={{ flexWrap: "wrap", alignItems: "center" }}>
+                                                                            {variantLabel && (
+                                                                                <Chip size="small" label={variantLabel} variant="outlined" />
+                                                                            )}
+                                                                            {mediaMatches.map((label) => (
+                                                                                <Chip key={`${item.beatmapset_id}-${label}`} size="small" color="success" label={label} />
+                                                                            ))}
+                                                                            <Typography variant="caption" color="text.disabled" sx={{ ml: "auto !important" }}>
+                                                                                ~{(item.similarity_score * 100).toFixed(0)}% match
                                                                             </Typography>
                                                                         </Stack>
-                                                                    </CardContent>
-                                                                </Box>
+                                                                    </Stack>
+                                                                </CardContent>
                                                             </Card>
                                                         );
                                                     })
