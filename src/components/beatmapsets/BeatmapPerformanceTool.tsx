@@ -32,6 +32,9 @@ function BeatmapPerformanceTool({ data }: { data: IRouteBeatmapResult | null }) 
 
     const [generatedScore, setGeneratedScore] = useState<IScore | null>(null);
     const [isGenerating, setIsGenerating] = useState(false);
+    const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const inFlightRequestRef = useRef(false);
+    const pendingChangesRef = useRef(false);
 
     useEffect(() => {
         setResetKey((prev) => prev + 1);
@@ -40,32 +43,80 @@ function BeatmapPerformanceTool({ data }: { data: IRouteBeatmapResult | null }) 
     }, [data]);
 
     useEffect(() => {
-        //create a hash from 'data', so that after fetching difficulty, if data changes, we can ignore it
-        //because otherwise we don't need to wait for this data for any critical functionality
-        //it's only used to display the star rating
+        // Mark that we have pending changes
+        pendingChangesRef.current = true;
+
+        // Clear existing debounce timeout
+        if (debounceTimeoutRef.current) {
+            clearTimeout(debounceTimeoutRef.current);
+        }
+
+        // Create a hash from 'data', so that after fetching difficulty, if data changes, we can ignore it
+        // because otherwise we don't need to wait for this data for any critical functionality
+        // it's only used to display the star rating
         const dataHash = JSON.stringify({
             beatmap_id: data?.beatmap?.id,
             ruleset_id: data?.beatmap?.ruleset_id,
         });
+
         if (data && data.beatmap) {
-            (async () => {
-                try {
-                    const difficultyResponse = await getDifficulty(data.beatmap!.id, data.beatmap!.ruleset_id, selectedModsAdjustable.map(m => m.selected ? m.mod : null).filter(m => m) as IScoreMod[]);
-                    if (JSON.stringify({
-                        beatmap_id: data?.beatmap?.id,
-                        ruleset_id: data?.beatmap?.ruleset_id,
-                    }) !== dataHash) return;
-                    setDifficulty(difficultyResponse?.star_rating || null);
+            // Define the fetch function
+            const performFetch = async () => {
+                // If a request is already in flight, don't make a new one yet
+                if (inFlightRequestRef.current) {
+                    return;
                 }
-                catch (e) {
+
+                try {
+                    inFlightRequestRef.current = true;
+                    pendingChangesRef.current = false;
+
+                    const difficultyResponse = await getDifficulty(
+                        data.beatmap!.id,
+                        data.beatmap!.ruleset_id,
+                        selectedModsAdjustable
+                            .map(m => (m.selected ? m.mod : null))
+                            .filter((m): m is IScoreMod => m !== null)
+                    );
+
+                    // Check if data changed while we were fetching
+                    if (
+                        JSON.stringify({
+                            beatmap_id: data?.beatmap?.id,
+                            ruleset_id: data?.beatmap?.ruleset_id,
+                        }) !== dataHash
+                    ) {
+                        return;
+                    }
+
+                    setDifficulty(difficultyResponse?.star_rating || null);
+
+                    // If there were changes while we were fetching, fetch again
+                    if (pendingChangesRef.current) {
+                        pendingChangesRef.current = false;
+                        debounceTimeoutRef.current = setTimeout(performFetch, 0);
+                    }
+                } catch (e) {
                     console.error("Error fetching difficulty:", e);
                     ShowNotification("Error fetching difficulty", "error");
+                } finally {
+                    inFlightRequestRef.current = false;
                 }
-            })();
+            };
+
+            // Set a debounce timeout (300ms)
+            debounceTimeoutRef.current = setTimeout(performFetch, 300);
         } else {
             setDifficulty(null);
+
         }
-    }, [selectedModsAdjustable, data?.beatmap]);
+
+        return () => {
+            if (debounceTimeoutRef.current) {
+                clearTimeout(debounceTimeoutRef.current);
+            }
+        };
+    }, [selectedModsAdjustable, data?.beatmap, getDifficulty]);
 
     if (!data || !data.beatmap) {
         return <Typography variant="h6" gutterBottom>
