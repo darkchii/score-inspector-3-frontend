@@ -12,7 +12,7 @@ type ApiContextValue = {
     getCompletionists: () => Promise<any>;
     getUserSearch: (query: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getLeaderboard: (ruleset: string, statistic: string, page: number, sort_direction?: string, limit?: number, country?: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
-    getTodayTopPlayers: (ruleset: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getTodayTopPlayers: (ruleset: string, user_id?: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getGlobalStats: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getScoreSubmissions: (ruleset: string, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getActiveUsers: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
@@ -148,8 +148,8 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         return response;
     }, [apiGet]);
 
-    const getTodayTopPlayers = useCallback(async(ruleset: string, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
-        const response = await apiGet(`stats/top-day/${ruleset}`, true, progressEvent);
+    const getTodayTopPlayers = useCallback(async(ruleset: string, user_id?: string | number, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        const response = await apiGet(`stats/top-day/${ruleset}${user_id ? `?user_id=${user_id}` : ''}`, true, progressEvent);
         return response;
     }, [apiGet]);
 

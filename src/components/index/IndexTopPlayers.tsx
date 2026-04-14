@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useApi } from "../../providers/ApiProvider";
-import { Paper, Typography, Collapse, Alert, Box, Fade, ButtonGroup, Button, Grid, TableContainer, Table, TableBody, TableRow, TableCell, tableCellClasses, tableRowClasses, useTheme, CircularProgress } from "@mui/material";
+import { Paper, Typography, Collapse, Alert, Box, Fade, ButtonGroup, Button, Grid, TableContainer, Table, TableBody, TableRow, TableCell, tableCellClasses, tableRowClasses, useTheme, CircularProgress, Divider } from "@mui/material";
 import RulesetSelector from "../RulesetSelector";
 import PlayerLink from "../PlayerLink";
+import { useAuth } from "../../providers/AuthProvider";
 
 const titleMap: { [key: string]: string } = {
     'today': 'today',
@@ -20,6 +21,7 @@ function IndexTopPlayers({ activeRuleset, setActiveRuleset, isWorking, setIsWork
     setIsWorking: (working: boolean) => void;
 }) {
     const theme = useTheme();
+    const { user } = useAuth();
     const { getTodayTopPlayers } = useApi();
     const [rawData, setRawData] = useState<any | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -46,14 +48,15 @@ function IndexTopPlayers({ activeRuleset, setActiveRuleset, isWorking, setIsWork
         setError(null);
         setRawData(null);
         try {
-            const data = await getTodayTopPlayers(activeRuleset);
+            //wait for loading to finish if it's still loading
+            const data = await getTodayTopPlayers(activeRuleset, user ? user.id : undefined);
             setRawData(data);
             if (data && data.last_updated) {
                 setLastUpdated(new Date(data.last_updated));
             }
         } catch (err: any) {
             console.error(err);
-            setError(err);
+            setError(err.message || "An error occurred");
         } finally {
             setIsWorking(false);
         }
@@ -61,7 +64,7 @@ function IndexTopPlayers({ activeRuleset, setActiveRuleset, isWorking, setIsWork
 
     useEffect(() => {
         updateData();
-    }, [activeRuleset]);
+    }, [activeRuleset, user]);
 
     useEffect(() => {
         if (rawData && rawData.data) {
@@ -130,23 +133,37 @@ function IndexTopPlayers({ activeRuleset, setActiveRuleset, isWorking, setIsWork
                                                                     }}>
                                                                         <TableBody>
                                                                             {
-                                                                                selectedDataSet[key].map((entry: any, index: number) => (
-                                                                                    <TableRow key={`topplayers_${key}_entry_${index}`}>
-                                                                                        <TableCell align="right" sx={{ width: '10%' }}><Typography variant="caption">{index + 1}.</Typography></TableCell>
-                                                                                        <TableCell><PlayerLink data={entry.user} size={18} /></TableCell>
-                                                                                        <TableCell>
-                                                                                            {/* {entry.clear.toLocaleString()} */}
-                                                                                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                                                                                                {entry.clear.toLocaleString()}
-                                                                                                {
-                                                                                                    (entry.clear !== entry.total && key !== 'score') && (
-                                                                                                        <span style={{ color: 'gray' }}> ({entry.total.toLocaleString()})</span>
-                                                                                                    )
-                                                                                                }
-                                                                                            </Typography>
-                                                                                        </TableCell>
-                                                                                    </TableRow>
-                                                                                ))
+                                                                                selectedDataSet[key].map((entry: any, index: number) => {
+                                                                                    return (
+                                                                                        <React.Fragment key={`topplayers_${key}_entry_${index}`}>
+                                                                                            {
+                                                                                                index > 9 && (
+                                                                                                    //empty row
+                                                                                                    <TableRow>
+                                                                                                        <TableCell colSpan={3} align="center">
+                                                                                                            <Divider />
+                                                                                                        </TableCell>
+                                                                                                    </TableRow>
+                                                                                                )
+                                                                                            }
+                                                                                            <TableRow>
+                                                                                                <TableCell align="right" sx={{ width: '10%' }}><Typography variant="caption">{index <= 9 ? `${index + 1}.` : ''}</Typography></TableCell>
+                                                                                                <TableCell><PlayerLink data={entry.user} size={18} /></TableCell>
+                                                                                                <TableCell>
+                                                                                                    {/* {entry.clear.toLocaleString()} */}
+                                                                                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                                                                                                        {entry.clear.toLocaleString()}
+                                                                                                        {
+                                                                                                            (entry.clear !== entry.total && key !== 'score') && (
+                                                                                                                <span style={{ color: 'gray' }}> ({entry.total.toLocaleString()})</span>
+                                                                                                            )
+                                                                                                        }
+                                                                                                    </Typography>
+                                                                                                </TableCell>
+                                                                                            </TableRow>
+                                                                                        </React.Fragment>
+                                                                                    )
+                                                                                })
                                                                             }
                                                                         </TableBody>
                                                                     </Table>
@@ -212,7 +229,7 @@ function IndexTopPlayers({ activeRuleset, setActiveRuleset, isWorking, setIsWork
                     </Box>
                 )}
             </Collapse>
-        </Paper>
+        </Paper >
     );
 }
 

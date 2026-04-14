@@ -10,6 +10,7 @@ type AuthContextValue = {
     userData: any;
     token: string;
     loading: boolean;
+    getUnsafeUserIdFromStorage: () => string | null;
     login: (code: string) => Promise<void>;
     logout: () => void;
     setReputationAbility: (type: ReputationType, canGive: boolean) => void;
@@ -51,8 +52,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
         localStorage.removeItem("token_expiry");
+        localStorage.removeItem("user_id");
         ShowNotification("Session reset. Please log in again.", "info");
     }
+
+    useEffect(() => {
+        console.log(`Auth loading state changed: ${loading}`);
+    }, [loading]);
 
     useEffect(() => {
         if(!token || !refreshToken || !tokenExpiry) {
@@ -156,6 +162,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem("access_token", access_token);
             localStorage.setItem("refresh_token", refresh_token);
             localStorage.setItem("token_expiry", expiryDate.toISOString());
+            localStorage.setItem("user_id", String(user_id));
 
             ShowNotification("Token refreshed successfully!", "success");
         } catch (error) {
@@ -199,6 +206,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem("access_token", access_token);
             localStorage.setItem("refresh_token", refresh_token);
             localStorage.setItem("token_expiry", expiryDate.toISOString());
+            localStorage.setItem("user_id", String(user_id));
 
             ShowNotification("Login successful!", "success");
         }catch(error){
@@ -222,8 +230,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return canGiveReputation[type];
     }
 
+    const getUnsafeUserIdFromStorage = (): string | null => {
+        //for things that cannot and dont need to wait for actual loading of user data
+        //just pull the user_id from localStorage, it should be there if they are logged in
+        const storedUserId = localStorage.getItem("user_id");
+        console.log("Stored user ID:", storedUserId);
+        if (!storedUserId) return null;
+        return storedUserId;
+    }
+
     return (
-        <AuthContext.Provider value={{ user, userData, token, loading, login, logout, setReputationAbility, canGiveReputationTo }}>
+        <AuthContext.Provider value={{ user, userData, token, loading, getUnsafeUserIdFromStorage, login, logout, setReputationAbility, canGiveReputationTo }}>
             {children}
         </AuthContext.Provider>
     );
