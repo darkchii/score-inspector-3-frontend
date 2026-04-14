@@ -86,6 +86,8 @@ export interface IBeatmapMediaArtistTitleRecommendationResponse {
         beatmapset_id: number | null;
         artist: string;
         title: string;
+        sanitized_title: string;
+        matching_title: string;
     };
     matched_beatmapsets: number;
     matched_media_rows: number;

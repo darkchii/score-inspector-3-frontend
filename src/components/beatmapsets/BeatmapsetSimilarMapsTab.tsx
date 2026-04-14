@@ -38,6 +38,12 @@ function BeatmapsetSimilarMapsTab({
     sharedMediaMatchesByBeatmapsetId,
     onOpenBeatmapset,
 }: Props) {
+    const source = similarBeatmapsData?.source;
+    const sourceOriginalTitle = source?.title || "";
+    const sourceSanitizedTitle = source?.sanitized_title || sourceOriginalTitle;
+    const sourceMatchingTitle = source?.matching_title || sourceSanitizedTitle || sourceOriginalTitle;
+    const hasSanitizedTitleChange = sourceOriginalTitle.length > 0 && sourceMatchingTitle.length > 0 && sourceOriginalTitle !== sourceMatchingTitle;
+
     return (
         <Stack spacing={2}>
             <Typography variant="body2" color="text.secondary">
@@ -79,7 +85,7 @@ function BeatmapsetSimilarMapsTab({
                     <>
                         {/* "header" with amount of similar beatmaps */}
                         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                            {FormatNumber(similarBeatmapsData!.similar_beatmapsets.length)} similar beatmapset{similarBeatmapsData!.similar_beatmapsets.length > 1 ? "s" : ""}
+                            {FormatNumber(similarBeatmapsData!.similar_beatmapsets.length)} similar beatmapset{similarBeatmapsData!.similar_beatmapsets.length > 1 ? "s" : ""} - Matching to title '{sourceMatchingTitle}'
                         </Typography>
 
                         <Stack spacing={1.5}>
