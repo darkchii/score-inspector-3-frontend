@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Card, CardContent, CardHeader, Chip, CircularProgress, Collapse, Container, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, Paper, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Link, Card, CardContent, CardHeader, Chip, CircularProgress, Collapse, Container, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, Paper, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { usePageTitle } from "../providers/TitleProvider";
 import type { IBeatmap, IBeatmapSet, IRouteBeatmapResult, IScoreDifficulty } from "../types/types";
@@ -471,6 +471,15 @@ function RouteBeatmapset() {
                     <Typography variant="body2" color="text.secondary">
                         Attach embeds and verify them live before saving.
                     </Typography>
+                    {/* link to open google search for the exact title */}
+                    <Link
+                        href={`https://www.google.com/search?q=${encodeURIComponent(data?.beatmapSet?.artist + " - " + data?.beatmapSet?.title)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        variant="body2"
+                    >
+                        Search on Google: "{data?.beatmapSet?.artist} - {data?.beatmapSet?.title}"
+                    </Link>
                 </Stack>
             </DialogTitle>
             <DialogContent dividers>
@@ -565,7 +574,7 @@ function RouteBeatmapset() {
                 <Box sx={{ display: "flex", gap: 1 }}>
                     <Button onClick={() => setIsMediaModalOpen(false)} disabled={isSavingMedia}>Cancel</Button>
                     <Button onClick={handleSaveMedia} variant="contained" disabled={isSavingMedia || !isYoutubeValid || !isSpotifyValid}>
-                    {isSavingMedia ? "Saving..." : "Save"}
+                        {isSavingMedia ? "Saving..." : "Save"}
                     </Button>
                 </Box>
             </DialogActions>
