@@ -723,6 +723,7 @@ function RouteBeatmapset() {
                                             placeholder={config.placeholder}
                                             error={!isValid}
                                             helperText={config.helperText}
+                                            size="small"
                                         />
                                         {
                                             isRecommendationLoading[mediaKey] && (
