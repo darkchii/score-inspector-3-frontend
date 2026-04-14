@@ -94,6 +94,9 @@ export interface IBeatmapMediaArtistTitleRecommendationResponse {
         beatmapset_id: number;
         artist: string;
         title: string;
+        mapper: string | null;
+        mapper_id: number | null;
+        mapper_user: any | null;
         artist_similarity: number;
         title_similarity: number;
         similarity_score: number;

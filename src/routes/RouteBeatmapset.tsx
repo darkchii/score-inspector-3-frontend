@@ -15,6 +15,7 @@ import BeatmapSidebarLeft from "../components/beatmapsets/BeatmapSidebarLeft";
 import BeatmapSidebarRight from "../components/beatmapsets/BeatmapSidebarRight";
 import { GenerateUrl, routeData, UpdateUrl } from "../util/RouteHelper";
 import BeatmapPerformanceTool from "../components/beatmapsets/BeatmapPerformanceTool";
+import PlayerLink from "../components/PlayerLink";
 import Score from "../types/Score";
 import { useAuth } from "../providers/AuthProvider";
 import YoutubeEmbed from "../components/YoutubeEmbed";
@@ -816,17 +817,47 @@ function RouteBeatmapset() {
                                                                 {/* Content */}
                                                                 <CardContent sx={{ flex: 1, py: 1.5, px: 2, "&:last-child": { pb: 1.5 } }}>
                                                                     <Stack spacing={1} sx={{ height: "100%", justifyContent: "space-between" }}>
-                                                                        <Box>
-                                                                            <Typography
-                                                                                variant="body2"
-                                                                                color="text.secondary"
-                                                                                sx={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: 0.5, mb: 0.25 }}
-                                                                            >
-                                                                                {item.artist}
-                                                                            </Typography>
-                                                                            <Typography variant="subtitle2" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
-                                                                                {item.title}
-                                                                            </Typography>
+                                                                        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, alignItems: "flex-start", flexWrap: "nowrap" }}>
+                                                                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                                                <Typography
+                                                                                    variant="body2"
+                                                                                    color="text.secondary"
+                                                                                    sx={{
+                                                                                        fontSize: "0.7rem",
+                                                                                        textTransform: "uppercase",
+                                                                                        letterSpacing: 0.5,
+                                                                                        mb: 0.25,
+                                                                                        overflow: "hidden",
+                                                                                        textOverflow: "ellipsis",
+                                                                                        whiteSpace: "nowrap",
+                                                                                    }}
+                                                                                >
+                                                                                    {item.artist}
+                                                                                </Typography>
+                                                                                <Typography
+                                                                                    variant="subtitle2"
+                                                                                    sx={{
+                                                                                        fontWeight: 700,
+                                                                                        lineHeight: 1.3,
+                                                                                        overflow: "hidden",
+                                                                                        textOverflow: "ellipsis",
+                                                                                        whiteSpace: "nowrap",
+                                                                                    }}
+                                                                                >
+                                                                                    {item.title}
+                                                                                </Typography>
+                                                                            </Box>
+                                                                            <Box sx={{ flexShrink: 0 }} onClick={(event) => event.stopPropagation()}>
+                                                                                {
+                                                                                    item.mapper_user ? (
+                                                                                        <PlayerLink data={item.mapper_user} size={18} />
+                                                                                    ) : (
+                                                                                        <Typography variant="caption" color="text.secondary">
+                                                                                            Mapper: {item.mapper || "Unknown"}
+                                                                                        </Typography>
+                                                                                    )
+                                                                                }
+                                                                            </Box>
                                                                         </Box>
 
                                                                         <Stack direction="row" spacing={0.75} useFlexGap sx={{ flexWrap: "wrap", alignItems: "center" }}>
