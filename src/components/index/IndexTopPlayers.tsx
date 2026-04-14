@@ -7,6 +7,8 @@ import PlayerLink from "../PlayerLink";
 const titleMap: { [key: string]: string } = {
     'today': 'today',
     'yesterday': 'yesterday',
+    'this_month': 'this month',
+    'last_month': 'last month',
     'year': 'this year',
     'last_year': 'last year'
 }
@@ -176,6 +178,20 @@ function IndexTopPlayers({ activeRuleset, setActiveRuleset, isWorking, setIsWork
                                     disabled={isWorking || isTransitioningDataSet}
                                 >
                                     This Year
+                                </Button>
+                                <Button
+                                    variant={selectedPeriod === "last_month" ? "contained" : "outlined"}
+                                    onClick={() => setSelectedPeriod("last_month")}
+                                    disabled={isWorking || isTransitioningDataSet}
+                                >
+                                    Last Month
+                                </Button>
+                                <Button
+                                    variant={selectedPeriod === "this_month" ? "contained" : "outlined"}
+                                    onClick={() => setSelectedPeriod("this_month")}
+                                    disabled={isWorking || isTransitioningDataSet}
+                                >
+                                    This Month
                                 </Button>
                                 <Button
                                     variant={selectedPeriod === "yesterday" ? "contained" : "outlined"}
