@@ -1,8 +1,8 @@
 import { Alert, Box, Button, Link, Card, CardContent, CardHeader, Chip, CircularProgress, Collapse, Container, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, Paper, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { usePageTitle } from "../providers/TitleProvider";
-import type { IBeatmap, IBeatmapSet, IRouteBeatmapResult, IScoreDifficulty } from "../types/types";
-import { useEffect, useState } from "react";
+import type { IBeatmap, IBeatmapMediaRecommendationItem, IBeatmapSet, IBeatmapSetMedia, IRouteBeatmapResult, IScoreDifficulty } from "../types/types";
+import { useEffect, useState, type ReactNode } from "react";
 import { useApi } from "../providers/ApiProvider";
 import BeatmapSet from "../types/beatmaps/BeatmapSet";
 import RulesetSelector from "../components/RulesetSelector";
@@ -21,6 +21,49 @@ import YoutubeEmbed from "../components/YoutubeEmbed";
 import SpotifyEmbed from "../components/SpotifyEmbed";
 
 const EDITOR_ROLE_ID = 5;
+type MediaFieldKey = "youtube" | "spotify";
+type MediaInputState = Record<MediaFieldKey, string>;
+type MediaRecommendationState = Partial<Record<MediaFieldKey, IBeatmapMediaRecommendationItem[]>>;
+type MediaLoadingState = Partial<Record<MediaFieldKey, boolean>>;
+type MediaFieldConfig = {
+    label: string;
+    responseField: keyof Pick<IBeatmapSetMedia, "youtube_id" | "spotify_id">;
+    inputLabel: string;
+    placeholder: string;
+    helperText: string;
+    invalidMessage: string;
+    extractNormalizedValue: (input: string | null | undefined) => string | null;
+    renderPreview: (normalizedValue: string) => ReactNode;
+};
+
+const EMPTY_MEDIA_INPUTS: MediaInputState = {
+    youtube: "",
+    spotify: "",
+};
+
+const MEDIA_FIELD_ORDER: MediaFieldKey[] = ["youtube", "spotify"];
+const MEDIA_FIELD_CONFIGS: Record<MediaFieldKey, MediaFieldConfig> = {
+    youtube: {
+        label: "YouTube",
+        responseField: "youtube_id",
+        inputLabel: "YouTube URL or video ID",
+        placeholder: "https://www.youtube.com/watch?v=...",
+        helperText: "Supports youtube.com, youtu.be, shorts, embed, and plain 11-char IDs.",
+        invalidMessage: "Please enter a valid YouTube URL or video ID",
+        extractNormalizedValue: extractYoutubeId,
+        renderPreview: (normalizedValue: string) => <YoutubeEmbed videoId={normalizedValue} width="100%" height="220px" />,
+    },
+    spotify: {
+        label: "Spotify",
+        responseField: "spotify_id",
+        inputLabel: "Spotify URL / URI / embed path",
+        placeholder: "https://open.spotify.com/track/...",
+        helperText: "Supports open.spotify.com links, spotify:... URIs, or track/ID style paths.",
+        invalidMessage: "Please enter a valid Spotify URL, URI, or embed path",
+        extractNormalizedValue: extractSpotifyPath,
+        renderPreview: (normalizedValue: string) => <SpotifyEmbed embedPath={normalizedValue} width="100%" height="152px" />,
+    },
+};
 
 function extractYoutubeId(input: string | null | undefined): string | null {
     if (!input || typeof input !== "string") {
@@ -125,7 +168,7 @@ function hasEditorAccess(userData: any): boolean {
 function RouteBeatmapset() {
     const navigate = useNavigate();
     const { beatmapsetId, ruleset, beatmapId } = useParams();
-    const { getBeatmapSet, getDifficulty, getBeatmapScores, updateBeatmapSetMedia } = useApi();
+    const { getBeatmapSet, getDifficulty, getBeatmapScores, updateBeatmapSetMedia, getBeatmapMediaRecommendations, getBeatmapMediaRecommendationsByArtistTitle } = useApi();
     const { token, userData } = useAuth();
     const [data, setData] = useState<IRouteBeatmapResult | null>(null);
     // const { setTitle } = usePageTitle();
@@ -137,17 +180,157 @@ function RouteBeatmapset() {
 
     const [selectedTab, setSelectedTab] = useState(0);
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
-    const [youtubeMediaInput, setYoutubeMediaInput] = useState("");
-    const [spotifyMediaInput, setSpotifyMediaInput] = useState("");
+    const [mediaInputs, setMediaInputs] = useState<MediaInputState>(EMPTY_MEDIA_INPUTS);
+    const [mediaRecommendations, setMediaRecommendations] = useState<MediaRecommendationState>({});
+    const [isRecommendationLoading, setIsRecommendationLoading] = useState<MediaLoadingState>({});
+    const [hasAttemptedRecommendations, setHasAttemptedRecommendations] = useState<MediaLoadingState>({});
+    const [isArtistTitleRecommendationLoading, setIsArtistTitleRecommendationLoading] = useState(false);
+    const [artistTitleRecommendationStats, setArtistTitleRecommendationStats] = useState<{ matchedBeatmapsets: number; matchedMediaRows: number } | null>(null);
     const [isSavingMedia, setIsSavingMedia] = useState(false);
 
     const canEditMedia = hasEditorAccess(userData);
-    const mediaPreviewVideoId = extractYoutubeId(youtubeMediaInput);
-    const mediaPreviewSpotifyPath = extractSpotifyPath(spotifyMediaInput);
-    const trimmedYoutubeInput = youtubeMediaInput.trim();
-    const trimmedSpotifyInput = spotifyMediaInput.trim();
-    const isYoutubeValid = trimmedYoutubeInput.length === 0 || mediaPreviewVideoId !== null;
-    const isSpotifyValid = trimmedSpotifyInput.length === 0 || mediaPreviewSpotifyPath !== null;
+    const trimmedMediaInputs: MediaInputState = { ...EMPTY_MEDIA_INPUTS };
+    const normalizedMediaInputs: Record<MediaFieldKey, string | null> = { youtube: null, spotify: null };
+    const mediaValidity: Record<MediaFieldKey, boolean> = { youtube: true, spotify: true };
+
+    MEDIA_FIELD_ORDER.forEach((mediaKey) => {
+        trimmedMediaInputs[mediaKey] = mediaInputs[mediaKey].trim();
+        normalizedMediaInputs[mediaKey] = MEDIA_FIELD_CONFIGS[mediaKey].extractNormalizedValue(mediaInputs[mediaKey]);
+        mediaValidity[mediaKey] = trimmedMediaInputs[mediaKey].length === 0 || normalizedMediaInputs[mediaKey] !== null;
+    });
+
+    const resetMediaRecommendations = () => {
+        setMediaRecommendations({});
+        setIsRecommendationLoading({});
+        setHasAttemptedRecommendations({});
+    };
+
+    const updateMediaInput = (mediaKey: MediaFieldKey, value: string) => {
+        setMediaInputs((prev) => ({
+            ...prev,
+            [mediaKey]: value,
+        }));
+    };
+
+    const loadArtistTitleRecommendations = async () => {
+        if (!data?.beatmapSet) {
+            return;
+        }
+
+        setIsArtistTitleRecommendationLoading(true);
+        setArtistTitleRecommendationStats(null);
+
+        try {
+            const response = await getBeatmapMediaRecommendationsByArtistTitle(
+                data.beatmapSet.beatmapset_id,
+                data.beatmapSet.artist,
+                data.beatmapSet.title,
+                8,
+            );
+
+            const recommendationMap: MediaRecommendationState = {};
+            response.recommendation_fields.forEach((field) => {
+                if (field.key === 'youtube' || field.key === 'spotify') {
+                    recommendationMap[field.key] = field.recommendations;
+                }
+            });
+
+            setMediaRecommendations(recommendationMap);
+            setHasAttemptedRecommendations({ youtube: true, spotify: true });
+            setArtistTitleRecommendationStats({
+                matchedBeatmapsets: response.matched_beatmapsets,
+                matchedMediaRows: response.matched_media_rows,
+            });
+        } catch (error) {
+            console.error('Failed to preload media recommendations by artist/title:', error);
+            setMediaRecommendations({});
+            setArtistTitleRecommendationStats(null);
+        } finally {
+            setIsArtistTitleRecommendationLoading(false);
+        }
+    };
+
+    const handleMediaFieldFocus = async (targetKey: MediaFieldKey) => {
+        const sourceCandidates = MEDIA_FIELD_ORDER
+            .filter((mediaKey) => mediaKey !== targetKey)
+            .map((mediaKey) => ({
+                mediaKey,
+                normalizedValue: normalizedMediaInputs[mediaKey],
+            }))
+            .filter((entry): entry is { mediaKey: MediaFieldKey; normalizedValue: string } => entry.normalizedValue !== null);
+
+        setHasAttemptedRecommendations((prev) => ({
+            ...prev,
+            [targetKey]: true,
+        }));
+
+        if (sourceCandidates.length === 0) {
+            setMediaRecommendations((prev) => ({
+                ...prev,
+                [targetKey]: [],
+            }));
+            return;
+        }
+
+        setIsRecommendationLoading((prev) => ({
+            ...prev,
+            [targetKey]: true,
+        }));
+
+        try {
+            const responses = await Promise.all(
+                sourceCandidates.map((entry) => getBeatmapMediaRecommendations(entry.mediaKey, entry.normalizedValue))
+            );
+
+            const recommendationMap = new Map<string, IBeatmapMediaRecommendationItem>();
+            responses.forEach((response) => {
+                const targetField = response.recommendation_fields.find((field) => field.key === targetKey);
+                targetField?.recommendations.forEach((item) => {
+                    const existing = recommendationMap.get(item.value);
+                    if (existing) {
+                        recommendationMap.set(item.value, {
+                            value: item.value,
+                            match_count: existing.match_count + item.match_count,
+                            beatmapset_ids: Array.from(new Set([...existing.beatmapset_ids, ...item.beatmapset_ids])),
+                        });
+                        return;
+                    }
+
+                    recommendationMap.set(item.value, {
+                        ...item,
+                        beatmapset_ids: [...item.beatmapset_ids],
+                    });
+                });
+            });
+
+            const currentValue = normalizedMediaInputs[targetKey] || trimmedMediaInputs[targetKey];
+            const nextRecommendations = Array.from(recommendationMap.values())
+                .filter((item) => item.value !== currentValue)
+                .sort((left, right) => {
+                    if (right.match_count !== left.match_count) {
+                        return right.match_count - left.match_count;
+                    }
+
+                    return left.value.localeCompare(right.value);
+                });
+
+            setMediaRecommendations((prev) => ({
+                ...prev,
+                [targetKey]: nextRecommendations,
+            }));
+        } catch (error) {
+            console.error(`Failed to load ${targetKey} media recommendations:`, error);
+            setMediaRecommendations((prev) => ({
+                ...prev,
+                [targetKey]: [],
+            }));
+        } finally {
+            setIsRecommendationLoading((prev) => ({
+                ...prev,
+                [targetKey]: false,
+            }));
+        }
+    };
 
     useEffect(() => {
         if (!beatmapsetId) return;
@@ -221,10 +404,12 @@ function RouteBeatmapset() {
             return;
         }
 
-        const currentYoutubeId = data?.beatmapSet?.media?.youtube_id || "";
-        const currentSpotifyId = data?.beatmapSet?.media?.spotify_id || "";
-        setYoutubeMediaInput(currentYoutubeId);
-        setSpotifyMediaInput(currentSpotifyId);
+        setMediaInputs({
+            youtube: data?.beatmapSet?.media?.youtube_id || "",
+            spotify: data?.beatmapSet?.media?.spotify_id || "",
+        });
+        resetMediaRecommendations();
+        void loadArtistTitleRecommendations();
     }, [isMediaModalOpen, data?.beatmapSet?.media?.youtube_id, data?.beatmapSet?.media?.spotify_id]);
 
     const handleSaveMedia = async () => {
@@ -238,36 +423,38 @@ function RouteBeatmapset() {
             return;
         }
 
-        const trimmedYoutube = youtubeMediaInput.trim();
-        const trimmedSpotify = spotifyMediaInput.trim();
-
-        if (trimmedYoutube.length > 0 && !extractYoutubeId(trimmedYoutube)) {
-            ShowNotification("Please enter a valid YouTube URL or video ID", "error");
-            return;
-        }
-
-        if (trimmedSpotify.length > 0 && !extractSpotifyPath(trimmedSpotify)) {
-            ShowNotification("Please enter a valid Spotify URL, URI, or embed path", "error");
-            return;
-        }
-
         setIsSavingMedia(true);
         try {
-            const response = await updateBeatmapSetMedia(data.beatmapSet.beatmapset_id, token, trimmedYoutube || null, trimmedSpotify || null);
+            for (const mediaKey of MEDIA_FIELD_ORDER) {
+                if (trimmedMediaInputs[mediaKey].length > 0 && !normalizedMediaInputs[mediaKey]) {
+                    ShowNotification(MEDIA_FIELD_CONFIGS[mediaKey].invalidMessage, "error");
+                    return;
+                }
+            }
+
+            const response = await updateBeatmapSetMedia(
+                data.beatmapSet.beatmapset_id,
+                token,
+                trimmedMediaInputs.youtube || null,
+                trimmedMediaInputs.spotify || null,
+            );
+
             setData((prev) => {
                 if (!prev?.beatmapSet) {
                     return prev;
                 }
 
+                const nextMedia: IBeatmapSetMedia = {
+                    beatmapset_id: prev.beatmapSet.beatmapset_id,
+                    youtube_id: response?.youtube_id ?? null,
+                    spotify_id: response?.spotify_id ?? null,
+                };
+
                 return {
                     ...prev,
                     beatmapSet: {
                         ...prev.beatmapSet,
-                        media: {
-                            beatmapset_id: prev.beatmapSet.beatmapset_id,
-                            youtube_id: response?.youtube_id ?? null,
-                            spotify_id: response?.spotify_id ?? null,
-                        }
+                        media: nextMedia,
                     }
                 };
             });
@@ -291,7 +478,6 @@ function RouteBeatmapset() {
                     let _scores: Score[] = [];
                     if (scores?.length > 0) {
                         let parsedScores = scores.map((s: any) => new Score(s, data.beatmap!));
-                        //sort by classic_total_score
                         parsedScores.sort((a: Score, b: Score) => b.classic_total_score - a.classic_total_score);
                         _scores = parsedScores;
                     }
@@ -488,84 +674,119 @@ function RouteBeatmapset() {
                         Leave a field empty to remove that media entry.
                     </Alert>
 
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                        <Stack spacing={1.5}>
-                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>YouTube</Typography>
-                                <Chip
-                                    size="small"
-                                    color={isYoutubeValid ? "success" : "error"}
-                                    label={trimmedYoutubeInput.length === 0 ? "Empty" : isYoutubeValid ? "Valid" : "Invalid"}
-                                />
-                            </Box>
-                            <TextField
-                                autoFocus
-                                margin="dense"
-                                label="YouTube URL or video ID"
-                                type="text"
-                                fullWidth
-                                variant="outlined"
-                                value={youtubeMediaInput}
-                                onChange={(e) => setYoutubeMediaInput(e.target.value)}
-                                placeholder="https://www.youtube.com/watch?v=..."
-                                error={!isYoutubeValid}
-                                helperText="Supports youtube.com, youtu.be, shorts, embed, and plain 11-char IDs."
-                            />
-                            {
-                                mediaPreviewVideoId && (
-                                    <Box>
-                                        <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
-                                            Preview
-                                        </Typography>
-                                        <YoutubeEmbed videoId={mediaPreviewVideoId} width="100%" height="220px" />
-                                    </Box>
-                                )
-                            }
-                        </Stack>
-                    </Paper>
+                    {
+                        isArtistTitleRecommendationLoading && (
+                            <Alert severity="info" variant="outlined">
+                                Checking similar artist/title beatmaps for media recommendations...
+                            </Alert>
+                        )
+                    }
+                    {
+                        !isArtistTitleRecommendationLoading && artistTitleRecommendationStats && (
+                            <Alert severity="success" variant="outlined">
+                                Found recommendations from {artistTitleRecommendationStats.matchedBeatmapsets} similar beatmapsets ({artistTitleRecommendationStats.matchedMediaRows} media rows).
+                            </Alert>
+                        )
+                    }
 
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                        <Stack spacing={1.5}>
-                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Spotify</Typography>
-                                <Chip
-                                    size="small"
-                                    color={isSpotifyValid ? "success" : "error"}
-                                    label={trimmedSpotifyInput.length === 0 ? "Empty" : isSpotifyValid ? "Valid" : "Invalid"}
-                                />
-                            </Box>
-                            <TextField
-                                margin="dense"
-                                label="Spotify URL / URI / embed path"
-                                type="text"
-                                fullWidth
-                                variant="outlined"
-                                value={spotifyMediaInput}
-                                onChange={(e) => setSpotifyMediaInput(e.target.value)}
-                                placeholder="https://open.spotify.com/track/..."
-                                error={!isSpotifyValid}
-                                helperText="Supports open.spotify.com links, spotify:... URIs, or track/ID style paths."
-                            />
-                            {
-                                mediaPreviewSpotifyPath && (
-                                    <Box>
-                                        <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
-                                            Preview
-                                        </Typography>
-                                        <SpotifyEmbed embedPath={mediaPreviewSpotifyPath} width="100%" height="152px" />
-                                    </Box>
-                                )
-                            }
-                        </Stack>
-                    </Paper>
+                    {
+                        MEDIA_FIELD_ORDER.map((mediaKey, index) => {
+                            const config = MEDIA_FIELD_CONFIGS[mediaKey];
+                            const recommendations = mediaRecommendations[mediaKey] || [];
+                            const isValid = mediaValidity[mediaKey];
+                            const normalizedValue = normalizedMediaInputs[mediaKey];
+                            const hasRecommendations = recommendations.length > 0;
+
+                            return (
+                                <Paper key={mediaKey} variant="outlined" sx={{ p: 2 }}>
+                                    <Stack spacing={1.5}>
+                                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{config.label}</Typography>
+                                            <Chip
+                                                size="small"
+                                                color={isValid ? "success" : "error"}
+                                                label={trimmedMediaInputs[mediaKey].length === 0 ? "Empty" : isValid ? "Valid" : "Invalid"}
+                                            />
+                                        </Box>
+                                        <TextField
+                                            autoFocus={index === 0}
+                                            margin="dense"
+                                            label={config.inputLabel}
+                                            type="text"
+                                            fullWidth
+                                            variant="outlined"
+                                            value={mediaInputs[mediaKey]}
+                                            onChange={(e) => updateMediaInput(mediaKey, e.target.value)}
+                                            onFocus={() => {
+                                                void handleMediaFieldFocus(mediaKey);
+                                            }}
+                                            placeholder={config.placeholder}
+                                            error={!isValid}
+                                            helperText={config.helperText}
+                                        />
+                                        {
+                                            isRecommendationLoading[mediaKey] && (
+                                                <Typography variant="caption" color="text.secondary">
+                                                    Checking matching {config.label} recommendations...
+                                                </Typography>
+                                            )
+                                        }
+                                        {
+                                            !isRecommendationLoading[mediaKey] && hasRecommendations && (
+                                                <Box>
+                                                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
+                                                        Recommendations from matching media entries
+                                                    </Typography>
+                                                    <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap" }}>
+                                                        {
+                                                            recommendations.map((item) => (
+                                                                <Chip
+                                                                    key={`${mediaKey}-${item.value}`}
+                                                                    clickable
+                                                                    variant="outlined"
+                                                                    label={`${item.value} (${item.match_count})`}
+                                                                    onClick={() => updateMediaInput(mediaKey, item.value)}
+                                                                />
+                                                            ))
+                                                        }
+                                                    </Stack>
+                                                </Box>
+                                            )
+                                        }
+                                        {
+                                            !isRecommendationLoading[mediaKey]
+                                            && hasAttemptedRecommendations[mediaKey]
+                                            && !hasRecommendations
+                                            && (
+                                                <Typography variant="caption" color="text.secondary">
+                                                    No recommendations found from the other filled media fields.
+                                                </Typography>
+                                            )
+                                        }
+                                        {
+                                            normalizedValue && (
+                                                <Box>
+                                                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
+                                                        Preview
+                                                    </Typography>
+                                                    {config.renderPreview(normalizedValue)}
+                                                </Box>
+                                            )
+                                        }
+                                    </Stack>
+                                </Paper>
+                            );
+                        })
+                    }
                 </Stack>
             </DialogContent>
             <DialogActions sx={{ justifyContent: "space-between", px: 3, py: 2 }}>
                 <Button
                     color="inherit"
                     onClick={() => {
-                        setYoutubeMediaInput("");
-                        setSpotifyMediaInput("");
+                        setMediaInputs({ ...EMPTY_MEDIA_INPUTS });
+                        resetMediaRecommendations();
+                        setArtistTitleRecommendationStats(null);
                     }}
                     disabled={isSavingMedia}
                 >
@@ -573,7 +794,7 @@ function RouteBeatmapset() {
                 </Button>
                 <Box sx={{ display: "flex", gap: 1 }}>
                     <Button onClick={() => setIsMediaModalOpen(false)} disabled={isSavingMedia}>Cancel</Button>
-                    <Button onClick={handleSaveMedia} variant="contained" disabled={isSavingMedia || !isYoutubeValid || !isSpotifyValid}>
+                    <Button onClick={handleSaveMedia} variant="contained" disabled={isSavingMedia || MEDIA_FIELD_ORDER.some((mediaKey) => !mediaValidity[mediaKey])}>
                         {isSavingMedia ? "Saving..." : "Save"}
                     </Button>
                 </Box>

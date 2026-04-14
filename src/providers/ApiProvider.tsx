@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { AxiosProgressEvent } from "axios";
 import { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo } from "react";
-import type { IAuthUser, IScoreMod } from "../types/types";
+import type { IAuthUser, IBeatmapMediaArtistTitleRecommendationResponse, IBeatmapMediaRecommendationResponse, IScoreMod } from "../types/types";
 import Score from "../types/Score";
 
 type ApiContextValue = {
@@ -29,6 +29,8 @@ type ApiContextValue = {
     getBeatmap: (beatmapId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapSet: (beatmapsetId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     updateBeatmapSetMedia: (beatmapsetId: string | number, accessToken: string, youtubeUrl: string | null, spotifyUrl?: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getBeatmapMediaRecommendations: (sourceType: string, sourceValue: string, limit?: number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<IBeatmapMediaRecommendationResponse>;
+    getBeatmapMediaRecommendationsByArtistTitle: (beatmapsetId: string | number | null, artist: string, title: string, limit?: number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<IBeatmapMediaArtistTitleRecommendationResponse>;
     getBeatmapMediaAudit: (accessToken: string, limit?: number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getDifficulty: (beatmapId: string | number, rulesetId?: number, mods?: IScoreMod[] | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapUserTags: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
@@ -255,6 +257,29 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         return response;
     }, [apiPost]);
 
+    const getBeatmapMediaRecommendations = useCallback(async (sourceType: string, sourceValue: string, limit: number = 5, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        const body = {
+            source_type: sourceType,
+            source_value: sourceValue,
+            limit,
+        };
+
+        const response = await apiPost('beatmap/media/recommendations', JSON.stringify(body), 'application/json', progressEvent);
+        return response as IBeatmapMediaRecommendationResponse;
+    }, [apiPost]);
+
+    const getBeatmapMediaRecommendationsByArtistTitle = useCallback(async (beatmapsetId: string | number | null, artist: string, title: string, limit: number = 5, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        const body = {
+            beatmapset_id: beatmapsetId,
+            artist,
+            title,
+            limit,
+        };
+
+        const response = await apiPost('beatmap/media/recommendations/by-artist-title', JSON.stringify(body), 'application/json', progressEvent);
+        return response as IBeatmapMediaArtistTitleRecommendationResponse;
+    }, [apiPost]);
+
     const getBeatmapMediaAudit = useCallback(async (accessToken: string, limit: number = 100, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
         const body = {
             access_token: accessToken,
@@ -325,6 +350,8 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getBeatmap,
         getBeatmapSet,
         updateBeatmapSetMedia,
+        getBeatmapMediaRecommendations,
+        getBeatmapMediaRecommendationsByArtistTitle,
         getBeatmapMediaAudit,
         getDifficulty,
         getBeatmapUserTags,
@@ -354,6 +381,8 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getBeatmap,
         getBeatmapSet,
         updateBeatmapSetMedia,
+        getBeatmapMediaRecommendations,
+        getBeatmapMediaRecommendationsByArtistTitle,
         getBeatmapMediaAudit,
         getDifficulty,
         getBeatmapUserTags,

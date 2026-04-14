@@ -59,6 +59,47 @@ export interface IBeatmapSetMedia {
     spotify_id: string | null;
 }
 
+export interface IBeatmapMediaRecommendationItem {
+    value: string;
+    match_count: number;
+    beatmapset_ids: number[];
+}
+
+export interface IBeatmapMediaRecommendationField {
+    key: string;
+    label: string;
+    recommendations: IBeatmapMediaRecommendationItem[];
+}
+
+export interface IBeatmapMediaRecommendationResponse {
+    source_field: {
+        key: string;
+        label: string;
+        value: string;
+    };
+    matched_rows: number;
+    recommendation_fields: IBeatmapMediaRecommendationField[];
+}
+
+export interface IBeatmapMediaArtistTitleRecommendationResponse {
+    source: {
+        beatmapset_id: number | null;
+        artist: string;
+        title: string;
+    };
+    matched_beatmapsets: number;
+    matched_media_rows: number;
+    recommendation_fields: IBeatmapMediaRecommendationField[];
+    similar_beatmapsets: {
+        beatmapset_id: number;
+        artist: string;
+        title: string;
+        artist_similarity: number;
+        title_similarity: number;
+        similarity_score: number;
+    }[];
+}
+
 export interface IBeatmapSetCovers {
     cover: string;
     cover_2x: string;
