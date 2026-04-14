@@ -1,8 +1,8 @@
-import { Alert, Box, Button, Link, Card, CardContent, CardHeader, Chip, CircularProgress, Collapse, Container, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, Paper, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Link, Card, CardContent, Chip, CircularProgress, Collapse, Container, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Paper, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { usePageTitle } from "../providers/TitleProvider";
-import type { IBeatmap, IBeatmapMediaRecommendationItem, IBeatmapSet, IBeatmapSetMedia, IRouteBeatmapResult, IScoreDifficulty } from "../types/types";
-import { useEffect, useState, type ReactNode } from "react";
+import type { IBeatmap, IBeatmapMediaArtistTitleRecommendationResponse, IBeatmapMediaRecommendationItem, IBeatmapSet, IBeatmapSetMedia, IRouteBeatmapResult, IScoreDifficulty } from "../types/types";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useApi } from "../providers/ApiProvider";
 import BeatmapSet from "../types/beatmaps/BeatmapSet";
 import RulesetSelector from "../components/RulesetSelector";
@@ -39,6 +39,11 @@ type MediaFieldConfig = {
 const EMPTY_MEDIA_INPUTS: MediaInputState = {
     youtube: "",
     spotify: "",
+};
+
+const MEDIA_MATCH_LABELS: Record<MediaFieldKey, string> = {
+    youtube: "YouTube",
+    spotify: "Spotify",
 };
 
 const MEDIA_FIELD_ORDER: MediaFieldKey[] = ["youtube", "spotify"];
@@ -165,6 +170,26 @@ function hasEditorAccess(userData: any): boolean {
     });
 }
 
+function getBeatmapsetCardCoverUrl(beatmapsetId: number): string {
+    return `https://assets.ppy.sh/beatmaps/${beatmapsetId}/covers/card.jpg`;
+}
+
+// Returns a variant label only when an explicit well-known tag is present in the title.
+function detectSongVariant(title: string): string | null {
+    const t = title.toLowerCase();
+    // TV Size
+    if (/[\[(\s]tv[\s-]*(size|ver\.?|version)[\s\])]|[\[(\s]tv[\s\])]/.test(t)) return "TV Size";
+    // Short / Cut
+    if (/[\[(\s](short|cut)[\s-]*(ver\.?|version|edit)?[\s\])]/.test(t)) return "Cut Ver.";
+    // Full version
+    if (/[\[(\s]full[\s-]*(ver\.?|version)[\s\])]/.test(t)) return "Full Ver.";
+    // Game version
+    if (/[\[(\s]game[\s-]*(ver\.?|version)[\s\])]/.test(t)) return "Game Ver.";
+    // Anime version
+    if (/[\[(\s]anime[\s-]*(ver\.?|version)[\s\])]/.test(t)) return "Anime Ver.";
+    return null;
+}
+
 function RouteBeatmapset() {
     const navigate = useNavigate();
     const { beatmapsetId, ruleset, beatmapId } = useParams();
@@ -187,6 +212,9 @@ function RouteBeatmapset() {
     const [isArtistTitleRecommendationLoading, setIsArtistTitleRecommendationLoading] = useState(false);
     const [artistTitleRecommendationStats, setArtistTitleRecommendationStats] = useState<{ matchedBeatmapsets: number; matchedMediaRows: number } | null>(null);
     const [isSavingMedia, setIsSavingMedia] = useState(false);
+    const [similarBeatmapsData, setSimilarBeatmapsData] = useState<IBeatmapMediaArtistTitleRecommendationResponse | null>(null);
+    const [isSimilarBeatmapsLoading, setIsSimilarBeatmapsLoading] = useState(false);
+    const [similarBeatmapsError, setSimilarBeatmapsError] = useState<string | null>(null);
 
     const canEditMedia = hasEditorAccess(userData);
     const trimmedMediaInputs: MediaInputState = { ...EMPTY_MEDIA_INPUTS };
@@ -249,6 +277,64 @@ function RouteBeatmapset() {
             setIsArtistTitleRecommendationLoading(false);
         }
     };
+
+    const loadSimilarBeatmaps = async () => {
+        if (!data?.beatmapSet) {
+            return;
+        }
+
+        setIsSimilarBeatmapsLoading(true);
+        setSimilarBeatmapsError(null);
+
+        try {
+            const response = await getBeatmapMediaRecommendationsByArtistTitle(
+                data.beatmapSet.beatmapset_id,
+                data.beatmapSet.artist,
+                data.beatmapSet.title,
+                8,
+            );
+
+            setSimilarBeatmapsData(response);
+        } catch (error) {
+            console.error("Failed to load similar beatmaps:", error);
+            setSimilarBeatmapsData(null);
+            setSimilarBeatmapsError("Failed to load similar beatmaps.");
+        } finally {
+            setIsSimilarBeatmapsLoading(false);
+        }
+    };
+
+    const sharedMediaMatchesByBeatmapsetId = useMemo(() => {
+        const map = new Map<number, string[]>();
+
+        if (!similarBeatmapsData?.recommendation_fields || !data?.beatmapSet?.media) {
+            return map;
+        }
+
+        MEDIA_FIELD_ORDER.forEach((mediaKey) => {
+            const mediaField = MEDIA_FIELD_CONFIGS[mediaKey];
+            const sourceValue = data.beatmapSet.media?.[mediaField.responseField];
+            if (!sourceValue) {
+                return;
+            }
+
+            const recommendationField = similarBeatmapsData.recommendation_fields.find((field) => field.key === mediaKey);
+            const matchingEntry = recommendationField?.recommendations.find((item) => item.value === sourceValue);
+            if (!matchingEntry) {
+                return;
+            }
+
+            matchingEntry.beatmapset_ids.forEach((id) => {
+                const existingLabels = map.get(id) || [];
+                const nextLabel = MEDIA_MATCH_LABELS[mediaKey];
+                if (!existingLabels.includes(nextLabel)) {
+                    map.set(id, [...existingLabels, nextLabel]);
+                }
+            });
+        });
+
+        return map;
+    }, [similarBeatmapsData, data?.beatmapSet?.media, data?.beatmapSet?.media?.youtube_id, data?.beatmapSet?.media?.spotify_id]);
 
     const handleMediaFieldFocus = async (targetKey: MediaFieldKey) => {
         const sourceCandidates = MEDIA_FIELD_ORDER
@@ -411,6 +497,14 @@ function RouteBeatmapset() {
         resetMediaRecommendations();
         void loadArtistTitleRecommendations();
     }, [isMediaModalOpen, data?.beatmapSet?.media?.youtube_id, data?.beatmapSet?.media?.spotify_id]);
+
+    useEffect(() => {
+        if (selectedTab !== 3 || !data?.beatmapSet) {
+            return;
+        }
+
+        void loadSimilarBeatmaps();
+    }, [selectedTab, data?.beatmapSet?.beatmapset_id, data?.beatmapSet?.artist, data?.beatmapSet?.title]);
 
     const handleSaveMedia = async () => {
         if (!data?.beatmapSet?.beatmapset_id) {
@@ -627,6 +721,7 @@ function RouteBeatmapset() {
                             <Tab label="Description" />
                             <Tab label="Scores" />
                             <Tab label="PP Calculator" />
+                            <Tab label="Similar Beatmaps" />
                         </Tabs>
                         <Box sx={{ padding: 2 }}>
                             <Collapse in={selectedTab === 0} timeout="auto" unmountOnExit>
@@ -641,6 +736,123 @@ function RouteBeatmapset() {
                             </Collapse>
                             <Collapse in={selectedTab === 2} timeout="auto" unmountOnExit>
                                 <BeatmapPerformanceTool data={data} />
+                            </Collapse>
+                            <Collapse in={selectedTab === 3} timeout="auto" unmountOnExit>
+                                <Stack spacing={2}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Similar beatmaps are based on artist/title text similarity from the database.
+                                    </Typography>
+
+                                    {
+                                        isSimilarBeatmapsLoading && (
+                                            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+                                                <CircularProgress size={28} />
+                                            </Box>
+                                        )
+                                    }
+
+                                    {
+                                        !isSimilarBeatmapsLoading && similarBeatmapsError && (
+                                            <Alert severity="error" variant="outlined">
+                                                {similarBeatmapsError}
+                                            </Alert>
+                                        )
+                                    }
+
+                                    {
+                                        !isSimilarBeatmapsLoading
+                                        && !similarBeatmapsError
+                                        && (similarBeatmapsData?.similar_beatmapsets?.length || 0) === 0
+                                        && (
+                                            <Alert severity="info" variant="outlined">
+                                                No similar beatmaps found yet.
+                                            </Alert>
+                                        )
+                                    }
+
+                                    {
+                                        !isSimilarBeatmapsLoading
+                                        && !similarBeatmapsError
+                                        && (similarBeatmapsData?.similar_beatmapsets?.length || 0) > 0
+                                        && (
+                                            <Stack spacing={1.25}>
+                                                {
+                                                    similarBeatmapsData!.similar_beatmapsets.map((item) => {
+                                                        const mediaMatches = sharedMediaMatchesByBeatmapsetId.get(item.beatmapset_id) || [];
+                                                        const thumbnailUrl = getBeatmapsetCardCoverUrl(item.beatmapset_id);
+                                                        const variantLabel = detectSongVariant(item.title);
+
+                                                        return (
+                                                            <Card
+                                                                key={item.beatmapset_id}
+                                                                variant="outlined"
+                                                                sx={{
+                                                                    overflow: "hidden",
+                                                                    borderColor: "rgba(255, 255, 255, 0.16)",
+                                                                    backgroundColor: "rgba(14, 18, 24, 0.58)",
+                                                                    backdropFilter: "blur(4px)",
+                                                                }}
+                                                            >
+                                                                <Box
+                                                                    sx={{
+                                                                        display: "grid",
+                                                                        gridTemplateColumns: { xs: "1fr", sm: "220px 1fr" },
+                                                                    }}
+                                                                >
+                                                                    <Box
+                                                                        sx={{
+                                                                            minHeight: { xs: 116, sm: "100%" },
+                                                                            backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.06), rgba(0,0,0,0.34)), url(${thumbnailUrl})`,
+                                                                            backgroundSize: "cover",
+                                                                            backgroundPosition: "center",
+                                                                        }}
+                                                                    />
+
+                                                                    <CardContent sx={{ pb: "14px !important" }}>
+                                                                        <Stack spacing={1.25}>
+                                                                            <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, flexWrap: "wrap", alignItems: "center" }}>
+                                                                                <Box>
+                                                                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+                                                                                        {item.artist} - {item.title}
+                                                                                    </Typography>
+                                                                                    <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap", mt: 0.6 }}>
+                                                                                        <Chip size="small" label={`#${item.beatmapset_id}`} variant="filled" />
+                                                                                        {variantLabel && <Chip size="small" label={variantLabel} variant="outlined" />}
+                                                                                        {
+                                                                                            mediaMatches.map((label) => (
+                                                                                                <Chip key={`${item.beatmapset_id}-${label}`} size="small" color="success" label={label} />
+                                                                                            ))
+                                                                                        }
+                                                                                    </Stack>
+                                                                                </Box>
+                                                                                <Button
+                                                                                    size="small"
+                                                                                    variant="outlined"
+                                                                                    onClick={() => {
+                                                                                        navigate(GenerateUrl(routeData.routeBeatmapsets.path, {
+                                                                                            beatmapsetId: item.beatmapset_id,
+                                                                                            ruleset: data.ruleset,
+                                                                                        }));
+                                                                                    }}
+                                                                                >
+                                                                                    Open
+                                                                                </Button>
+                                                                            </Box>
+
+                                                                            <Typography variant="caption" color="text.secondary">
+                                                                                ~{(item.similarity_score * 100).toFixed(0)}% similar
+                                                                            </Typography>
+                                                                        </Stack>
+                                                                    </CardContent>
+                                                                </Box>
+                                                            </Card>
+                                                        );
+                                                    })
+                                                }
+                                            </Stack>
+                                        )
+                                    }
+                                </Stack>
                             </Collapse>
                         </Box>
                     </Paper>

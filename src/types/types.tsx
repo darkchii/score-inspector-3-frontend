@@ -97,6 +97,7 @@ export interface IBeatmapMediaArtistTitleRecommendationResponse {
         artist_similarity: number;
         title_similarity: number;
         similarity_score: number;
+        is_cover: boolean;
     }[];
 }
 
