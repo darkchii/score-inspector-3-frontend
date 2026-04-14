@@ -1,7 +1,6 @@
-import { Alert, Box, Button, Link, Card, CardContent, Chip, CircularProgress, Collapse, Container, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Paper, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Link, Chip, CircularProgress, Collapse, Container, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Paper, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
-import { usePageTitle } from "../providers/TitleProvider";
-import type { IBeatmap, IBeatmapMediaArtistTitleRecommendationResponse, IBeatmapMediaRecommendationItem, IBeatmapSet, IBeatmapSetMedia, IRouteBeatmapResult, IScoreDifficulty } from "../types/types";
+import type { IBeatmap, IBeatmapMediaArtistTitleRecommendationResponse, IBeatmapMediaRecommendationItem, IBeatmapSetMedia, IRouteBeatmapResult } from "../types/types";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useApi } from "../providers/ApiProvider";
 import BeatmapSet from "../types/beatmaps/BeatmapSet";
@@ -13,9 +12,9 @@ import { getDiffColour } from "../util/DifficultyHelper";
 import HtmlDisplay from "../components/HtmlDisplay";
 import BeatmapSidebarLeft from "../components/beatmapsets/BeatmapSidebarLeft";
 import BeatmapSidebarRight from "../components/beatmapsets/BeatmapSidebarRight";
+import BeatmapsetSimilarMapsTab from "../components/beatmapsets/BeatmapsetSimilarMapsTab";
 import { GenerateUrl, routeData, UpdateUrl } from "../util/RouteHelper";
 import BeatmapPerformanceTool from "../components/beatmapsets/BeatmapPerformanceTool";
-import PlayerLink from "../components/PlayerLink";
 import Score from "../types/Score";
 import { useAuth } from "../providers/AuthProvider";
 import YoutubeEmbed from "../components/YoutubeEmbed";
@@ -169,26 +168,6 @@ function hasEditorAccess(userData: any): boolean {
         const title = (role?.title || "").toString().toLowerCase();
         return role?.id === EDITOR_ROLE_ID || role?.role_id === EDITOR_ROLE_ID || title === "editor" || role?.is_editor === true || role?.is_admin === true;
     });
-}
-
-function getBeatmapsetCardCoverUrl(beatmapsetId: number): string {
-    return `https://assets.ppy.sh/beatmaps/${beatmapsetId}/covers/card.jpg`;
-}
-
-// Returns a variant label only when an explicit well-known tag is present in the title.
-function detectSongVariant(title: string): string | null {
-    const t = title.toLowerCase();
-    // TV Size
-    if (/[\[(\s]tv[\s-]*(size|ver\.?|version)[\s\])]|[\[(\s]tv[\s\])]/.test(t)) return "TV Size";
-    // Short / Cut
-    if (/[\[(\s](short|cut)[\s-]*(ver\.?|version|edit)?[\s\])]/.test(t)) return "Cut Ver.";
-    // Full version
-    if (/[\[(\s]full[\s-]*(ver\.?|version)[\s\])]/.test(t)) return "Full Ver.";
-    // Game version
-    if (/[\[(\s]game[\s-]*(ver\.?|version)[\s\])]/.test(t)) return "Game Ver.";
-    // Anime version
-    if (/[\[(\s]anime[\s-]*(ver\.?|version)[\s\])]/.test(t)) return "Anime Ver.";
-    return null;
 }
 
 function RouteBeatmapset() {
@@ -739,148 +718,18 @@ function RouteBeatmapset() {
                                 <BeatmapPerformanceTool data={data} />
                             </Collapse>
                             <Collapse in={selectedTab === 3} timeout="auto" unmountOnExit>
-                                <Stack spacing={2}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        The media chips indicate shared media between the current set and the given similar map.
-                                    </Typography>
-
-                                    {
-                                        isSimilarBeatmapsLoading && (
-                                            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                                                <CircularProgress size={28} />
-                                            </Box>
-                                        )
-                                    }
-
-                                    {
-                                        !isSimilarBeatmapsLoading && similarBeatmapsError && (
-                                            <Alert severity="error" variant="outlined">
-                                                {similarBeatmapsError}
-                                            </Alert>
-                                        )
-                                    }
-
-                                    {
-                                        !isSimilarBeatmapsLoading
-                                        && !similarBeatmapsError
-                                        && (similarBeatmapsData?.similar_beatmapsets?.length || 0) === 0
-                                        && (
-                                            <Alert severity="info" variant="outlined">
-                                                No similar beatmaps found yet.
-                                            </Alert>
-                                        )
-                                    }
-
-                                    {
-                                        !isSimilarBeatmapsLoading
-                                        && !similarBeatmapsError
-                                        && (similarBeatmapsData?.similar_beatmapsets?.length || 0) > 0
-                                        && (
-                                            <Stack spacing={1.5}>
-                                                {
-                                                    similarBeatmapsData!.similar_beatmapsets.map((item) => {
-                                                        const mediaMatches = sharedMediaMatchesByBeatmapsetId.get(item.beatmapset_id) || [];
-                                                        const thumbnailUrl = getBeatmapsetCardCoverUrl(item.beatmapset_id);
-                                                        const variantLabel = detectSongVariant(item.title);
-
-                                                        return (
-                                                            <Card
-                                                                key={item.beatmapset_id}
-                                                                elevation={2}
-                                                                sx={{
-                                                                    overflow: "hidden",
-                                                                    display: "flex",
-                                                                    flexDirection: { xs: "column", sm: "row" },
-                                                                    cursor: "pointer",
-                                                                    transition: "box-shadow 0.2s",
-                                                                    "&:hover": { boxShadow: 6 },
-                                                                }}
-                                                                onClick={() => {
-                                                                    navigate(GenerateUrl(routeData.routeBeatmapsets.path, {
-                                                                        beatmapsetId: item.beatmapset_id,
-                                                                        ruleset: data.ruleset,
-                                                                    }));
-                                                                }}
-                                                            >
-                                                                {/* Thumbnail */}
-                                                                <Box
-                                                                    sx={{
-                                                                        width: { xs: "100%", sm: 180 },
-                                                                        minHeight: { xs: 100, sm: "auto" },
-                                                                        flexShrink: 0,
-                                                                        backgroundImage: `url(${thumbnailUrl})`,
-                                                                        backgroundSize: "cover",
-                                                                        backgroundPosition: "center",
-                                                                    }}
-                                                                />
-
-                                                                {/* Content */}
-                                                                <CardContent sx={{ flex: 1, py: 1.5, px: 2, "&:last-child": { pb: 1.5 } }}>
-                                                                    <Stack spacing={1} sx={{ height: "100%", justifyContent: "space-between" }}>
-                                                                        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, alignItems: "flex-start", flexWrap: "nowrap" }}>
-                                                                            <Box sx={{ flex: 1, minWidth: 0 }}>
-                                                                                <Typography
-                                                                                    variant="body2"
-                                                                                    color="text.secondary"
-                                                                                    sx={{
-                                                                                        fontSize: "0.7rem",
-                                                                                        textTransform: "uppercase",
-                                                                                        letterSpacing: 0.5,
-                                                                                        mb: 0.25,
-                                                                                        overflow: "hidden",
-                                                                                        textOverflow: "ellipsis",
-                                                                                        whiteSpace: "nowrap",
-                                                                                    }}
-                                                                                >
-                                                                                    {item.artist}
-                                                                                </Typography>
-                                                                                <Typography
-                                                                                    variant="subtitle2"
-                                                                                    sx={{
-                                                                                        fontWeight: 700,
-                                                                                        lineHeight: 1.3,
-                                                                                        overflow: "hidden",
-                                                                                        textOverflow: "ellipsis",
-                                                                                        whiteSpace: "nowrap",
-                                                                                    }}
-                                                                                >
-                                                                                    {item.title}
-                                                                                </Typography>
-                                                                            </Box>
-                                                                            <Box sx={{ flexShrink: 0 }} onClick={(event) => event.stopPropagation()}>
-                                                                                {
-                                                                                    item.mapper_user ? (
-                                                                                        <PlayerLink data={item.mapper_user} size={18} />
-                                                                                    ) : (
-                                                                                        <Typography variant="caption" color="text.secondary">
-                                                                                            Mapper: {item.mapper || "Unknown"}
-                                                                                        </Typography>
-                                                                                    )
-                                                                                }
-                                                                            </Box>
-                                                                        </Box>
-
-                                                                        <Stack direction="row" spacing={0.75} useFlexGap sx={{ flexWrap: "wrap", alignItems: "center" }}>
-                                                                            {variantLabel && (
-                                                                                <Chip size="small" label={variantLabel} variant="outlined" />
-                                                                            )}
-                                                                            {mediaMatches.map((label) => (
-                                                                                <Chip key={`${item.beatmapset_id}-${label}`} size="small" color="success" label={label} />
-                                                                            ))}
-                                                                            <Typography variant="caption" color="text.disabled" sx={{ ml: "auto !important" }}>
-                                                                                ~{(item.similarity_score * 100).toFixed(0)}% match
-                                                                            </Typography>
-                                                                        </Stack>
-                                                                    </Stack>
-                                                                </CardContent>
-                                                            </Card>
-                                                        );
-                                                    })
-                                                }
-                                            </Stack>
-                                        )
-                                    }
-                                </Stack>
+                                <BeatmapsetSimilarMapsTab
+                                    isLoading={isSimilarBeatmapsLoading}
+                                    error={similarBeatmapsError}
+                                    similarBeatmapsData={similarBeatmapsData}
+                                    sharedMediaMatchesByBeatmapsetId={sharedMediaMatchesByBeatmapsetId}
+                                    onOpenBeatmapset={(targetBeatmapsetId) => {
+                                        navigate(GenerateUrl(routeData.routeBeatmapsets.path, {
+                                            beatmapsetId: targetBeatmapsetId,
+                                            ruleset: data.ruleset,
+                                        }));
+                                    }}
+                                />
                             </Collapse>
                         </Box>
                     </Paper>
