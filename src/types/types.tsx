@@ -828,7 +828,6 @@ export type IConfig = {
         theme: string;
     };
     WIKI_URL: string;
-    TEAMS_URL: string;
     DISCORD_URL: string;
     DISCORD_ID: string;
     PAYPAL_DONATION_URL: string;

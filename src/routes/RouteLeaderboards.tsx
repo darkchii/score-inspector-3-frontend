@@ -234,87 +234,6 @@ const LEADERBOARDS: { [key: string]: LeaderboardConfig } = {
         title: 'Difficulty',
         category: 'beatmap',
         hide_value: true, //sr is default part of the beatmap row, so no need to show lb_value
-    },
-    'team_id': {
-        title: 'ID',
-        category: 'team',
-        formatter: FormatNumber,
-    },
-    'team_members': {
-        title: 'Members',
-        category: 'team',
-        formatter: FormatNumber,
-    },
-    'team_play_count': {
-        title: 'Play Count',
-        category: 'team',
-        formatter: FormatNumber,
-    },
-    'team_ranked_score': {
-        title: 'Ranked Score',
-        category: 'team',
-        formatter: FormatNumber,
-    },
-    'team_average_score': {
-        title: 'Average Score',
-        category: 'team',
-        formatter: FormatNumber,
-    },
-    'team_total_score': {
-        title: 'Total Score',
-        category: 'team',
-        formatter: FormatNumber,
-    },
-    'team_performance': {
-        title: 'Performance',
-        category: 'team',
-        formatter: (value: number) => {
-            return `${FormatNumber(value)}pp`;
-        },
-    },
-    'team_clears': {
-        title: 'Clears',
-        category: 'team',
-        formatter: FormatNumber,
-    },
-    'team_total_ss': {
-        title: 'Total SS',
-        category: 'team',
-        formatter: FormatNumber,
-    },
-    'team_total_s': {
-        title: 'Total S',
-        category: 'team',
-        formatter: FormatNumber,
-    },
-    'team_total_a': {
-        title: 'Total A',
-        category: 'team',
-        formatter: FormatNumber,
-    },
-    'team_play_time': {
-        title: 'Play Time',
-        category: 'team',
-        formatter: (value: number) => {
-            if (!value || value <= 0) {
-                return '0 seconds';
-            }
-            const years = Math.floor(value / (3600 * 24 * 365));
-            const months = Math.floor((value % (3600 * 24 * 365)) / (3600 * 24 * 30));
-            const days = Math.floor((value % (3600 * 24 * 30)) / (3600 * 24));
-
-            return `${years > 0 ? years + ' years ' : ''}${months > 0 ? months + ' months ' : ''}${days > 0 ? days + ' days' : ''}`;
-        },
-    },
-    'team_total_hits': {
-        title: 'Total Hits',
-        category: 'team',
-        formatter: FormatNumber,
-    },
-    'team_replays_watched': {
-        title: 'Replays Watched',
-        category: 'team',
-        formatter: FormatNumber,
     }
 }
 const LEADERBOARDS_CATEGORIES = Object.keys(LEADERBOARDS).reduce((acc: string[], key) => {
@@ -517,11 +436,6 @@ function RouteLeaderboards() {
                             disabled={isWorking || (LEADERBOARDS[statistic].category !== 'user' && LEADERBOARDS[statistic].category !== 'grades')}
                             size='small'
                         />
-                    </Collapse>
-                    <Collapse in={LEADERBOARDS[statistic].category === 'team'}>
-                        <Typography variant="body2" sx={{ ml: 2, mr: 1 }}>
-                            For more extensive filtering, visit the dedicated team leaderboards website: <a href={typedConfig.TEAMS_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'white' }}>{typedConfig.TEAMS_URL}</a>
-                        </Typography>
                     </Collapse>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>

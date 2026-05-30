@@ -6,6 +6,7 @@ import BetterTooltip from "./tooltips/BetterTooltip";
 import * as Muicon from "@mui/icons-material";
 import PlayerTooltip from "./tooltips/PlayerTooltip";
 import { getFlagIcon } from "../assets/textures/TextureDatabase";
+import { TeamColorGenerator } from "../util/ColorUtils";
 
 function GetRoleIcon({ role, size = 16 }: {
     role: any,
@@ -60,8 +61,8 @@ function PlayerLink({ data, size = 24, hideCountry = false, noTooltip = false, .
             setIsSelf(user && _id && (String(user.id) === String(_id)));
         }
 
-        if (data?.team) {
-            team_data = data.team;
+        if (api_user.team) {
+            team_data = api_user.team;
         }
         setTeam(team_data);
 
@@ -124,7 +125,7 @@ function PlayerLink({ data, size = 24, hideCountry = false, noTooltip = false, .
                 <Typography variant="body2" sx={{ fontWeight: isSelf ? 'bold' : 'normal' }}>
                     {
                         team && <>
-                            <span style={{ color: team.color, fontWeight: 'bold' }}>[{team.short_name}] </span>
+                            <span style={{ color: team.color || TeamColorGenerator(team.id, team.name), fontWeight: 'bold' }}>[{team.short_name}] </span>
                         </>
                     }
                     {

@@ -109,12 +109,6 @@ function Header() {
             to: '/tools',
         },
         {
-            label: 'Teams',
-            icon: <GroupsIcon />,
-            // to: '/teams',
-            href: Config.TEAMS_URL,
-        },
-        {
             label: 'Wiki',
             icon: <InfoIcon />,
             href: Config.WIKI_URL

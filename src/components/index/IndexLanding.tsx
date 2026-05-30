@@ -20,7 +20,6 @@ function IndexLanding() {
     const [numReputation, setNumReputation] = useState(0);
     const [numBeatmaps, setNumBeatmaps] = useState(0);
     const [numScores, setNumScores] = useState(0);
-    const [numTeams, setNumTeams] = useState(0);
     const [numUsers, setNumUsers] = useState(0);
 
     const [dataActiveUsers, setDataActiveUsers] = useState<{ hour: Date, count: number }[] | null>(null); //amount of users active in last 24h, each entry is an hour timestamp with the amount of active users in that hour
@@ -38,7 +37,6 @@ function IndexLanding() {
 
                 if (stats) {
                     setNumReputation(stats.reputation_counts.data.total);
-                    setNumTeams(stats.team_counts.data.total);
                     setNumUsers(stats.user_counts.data.total);
 
                     //calculate total beatmaps and scores
@@ -104,7 +102,7 @@ function IndexLanding() {
                         }}>
                             <Grid size={{ xs: 12, md: 12 }}>
                                 <Grid container spacing={1} sx={{ height: '100%' }}>
-                                    <Grid size={{ xs: 6, md: 12/5 }}>
+                                    <Grid size={{ xs: 6, md: 12/4 }}>
                                         <LandingCard
                                             title="Reputation"
                                             isLoading={loading}
@@ -117,7 +115,7 @@ function IndexLanding() {
                                             <Typography variant="h6" component="div">{FormatNumber(numReputation)}</Typography>
                                         </LandingCard>
                                     </Grid>
-                                    <Grid size={{ xs: 6, md: 12/5 }}>
+                                    <Grid size={{ xs: 6, md: 12/4 }}>
                                         <LandingCard
                                             title="Beatmaps"
                                             isLoading={loading}
@@ -130,7 +128,7 @@ function IndexLanding() {
                                             <Typography variant="h6" component="div">{FormatNumber(numBeatmaps)}</Typography>
                                         </LandingCard>
                                     </Grid>
-                                    <Grid size={{ xs: 6, md: 12/5 }}>
+                                    <Grid size={{ xs: 6, md: 12/4 }}>
                                         <LandingCard
                                             title="Scores"
                                             isLoading={loading}
@@ -143,7 +141,7 @@ function IndexLanding() {
                                             <Typography variant="h6" component="div">{FormatNumber(numScores)}</Typography>
                                         </LandingCard>
                                     </Grid>
-                                    <Grid size={{ xs: 6, md: 12/5 }}>
+                                    <Grid size={{ xs: 6, md: 12/4 }}>
                                         <LandingCard
                                             title="Users"
                                             isLoading={loading}
@@ -154,19 +152,6 @@ function IndexLanding() {
                                             sx={{ height: '100%' }}
                                         >
                                             <Typography variant="h6" component="div">{FormatNumber(numUsers)}</Typography>
-                                        </LandingCard>
-                                    </Grid>
-                                    <Grid size={{ xs: 6, md: 12/5 }}>
-                                        <LandingCard
-                                            title="Teams"
-                                            isLoading={loading}
-                                            isError={isError}
-                                            icon={<GroupsIcon />}
-                                            color={purple[500]}
-                                            centerContent
-                                            sx={{ height: '100%' }}
-                                        >
-                                            <Typography variant="h6" component="div">{FormatNumber(numTeams)}</Typography>
                                         </LandingCard>
                                     </Grid>
                                 </Grid>

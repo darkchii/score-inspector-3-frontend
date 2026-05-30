@@ -23,7 +23,6 @@ function PlayerCard({ data, onClick = null }: {
     useEffect(() => {
         //we can received different data structures, so we need to look in several places
         let api_user = null;
-        let team_data = null;
         if (data.user) {
             api_user = data.user;
         } else if (data.api_user) {
@@ -39,10 +38,6 @@ function PlayerCard({ data, onClick = null }: {
             setOsuAltUser(data.osuAlternative);
         }
 
-        if (data.team) {
-            team_data = data.team;
-        }
-
         if (api_user) {
             const _username = api_user.username || api_user.name || "Unknown";
             const _id = api_user.id || api_user.user_id || null;
@@ -50,7 +45,7 @@ function PlayerCard({ data, onClick = null }: {
             setUsername(_username);
             setApiUser(api_user);
             setId(_id);
-            setTeam(team_data);
+            setTeam(api_user.team || null);
             setRoles(data.roles || null);
             console.log(api_user);
         }
