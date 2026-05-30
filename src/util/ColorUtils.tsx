@@ -15,13 +15,3 @@ export function GetColorInterpolation(value: number, min: number, max: number, r
 
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
-
-const minColorOffset = 100;
-export function TeamColorGenerator(teamId: number | string, teamName: string): string {
-    //create a light-colored color based on "{teamId}-{teamName}-extrasalt"
-    const hash = `${teamId}-${teamName}-extrasalt`.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const r = (hash * 123) % (255 - minColorOffset) + minColorOffset; //ensure it's between minColorOffset and 255
-    const g = (hash * 321) % (255 - minColorOffset) + minColorOffset;
-    const b = (hash * 213) % (255 - minColorOffset) + minColorOffset;
-    return `rgb(${r}, ${g}, ${b})`;
-}

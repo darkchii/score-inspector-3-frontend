@@ -2,7 +2,7 @@ import { Avatar, styled, Tooltip, tooltipClasses } from "@mui/material";
 import type { TooltipProps } from "@mui/material";
 import { isValidElement } from "react";
 import { getFlagIcon } from "../../assets/textures/TextureDatabase";
-import { TeamColorGenerator } from "../../util/ColorUtils";
+import { GetTeamColor } from "../../util/TeamHelper";
 
 //use styled components
 const LocalStyledTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -70,7 +70,7 @@ function PlayerTooltip({ data, children }: PlayerTooltipProps) {
                                             marginRight: 4,
                                         }}
                                     />
-                                    <span style={{ color: data.osuApi.team.color || TeamColorGenerator(data.osuApi.team.id, data.osuApi.team.name), fontWeight: 'bold', marginRight: 4 }}>[{data.osuApi.team.short_name}]</span>
+                                    <span style={{ color: data.osuApi.team.color || GetTeamColor(data.osuApi.team), fontWeight: 'bold', marginRight: 4 }}>[{data.osuApi.team.short_name}]</span>
                                 </>
                             }
                             {/* {data?.osuApi?.username || 'Unknown'} */}

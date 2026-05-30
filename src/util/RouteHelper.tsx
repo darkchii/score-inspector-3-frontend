@@ -31,6 +31,9 @@ export const routeData = {
     },
     routeBeatmapsets: {
         path: "/beatmapsets/:beatmapsetId/:ruleset?/:beatmapId?"
+    },
+    routeTeam: {
+        path: "/team/:teamId/:ruleset?"
     }
 }
 

@@ -890,3 +890,38 @@ export interface IRouteBeatmapResult {
     scores: IScore[] | null; //beatmap specific
     ruleset: string;
 }
+
+export interface ITeam {
+    id: number;
+    flag_url: string | null;
+    name: string;
+    short_name: string;
+
+    //extended team data
+    cover_url?: string | null;
+    created_at?: Date;
+    default_ruleset_id?: number;
+    description?: string | null;
+    is_open?: boolean;
+
+    //optional extra team data
+    empty_slots?: number | null;
+    leader: any | null;
+    members: any[] | null;
+    statistics: ITeamStatistics | null;
+
+    //custom data (not from osu!api)
+    color?: string | null;
+    youtube_id?: string | null;
+    spotify_id?: string | null;
+    discord_invite_id?: string | null;
+}
+
+export interface ITeamStatistics {
+    play_count: number;
+    ranked_score: number;
+    performance: number;
+    rank?: number | null;
+    ruleset_id: number;
+    team_id: number;
+}

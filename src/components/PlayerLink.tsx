@@ -6,7 +6,8 @@ import BetterTooltip from "./tooltips/BetterTooltip";
 import * as Muicon from "@mui/icons-material";
 import PlayerTooltip from "./tooltips/PlayerTooltip";
 import { getFlagIcon } from "../assets/textures/TextureDatabase";
-import { TeamColorGenerator } from "../util/ColorUtils";
+import type { ITeam } from "../types/types";
+import { GetTeamColor } from "../util/TeamHelper";
 
 function GetRoleIcon({ role, size = 16 }: {
     role: any,
@@ -26,7 +27,7 @@ function PlayerLink({ data, size = 24, hideCountry = false, noTooltip = false, .
     const { user } = useAuth();
     const [username, setUsername] = useState<string | null>(null);
     const [id, setId] = useState<string | null>(null);
-    const [team, setTeam] = useState<any | null>(null);
+    const [team, setTeam] = useState<ITeam | null>(null);
     const [roles, setRoles] = useState<any[]>([]);
     const [isSelf, setIsSelf] = useState(false);
     const [isValid, setIsValid] = useState(true);
@@ -125,7 +126,7 @@ function PlayerLink({ data, size = 24, hideCountry = false, noTooltip = false, .
                 <Typography variant="body2" sx={{ fontWeight: isSelf ? 'bold' : 'normal' }}>
                     {
                         team && <>
-                            <span style={{ color: team.color || TeamColorGenerator(team.id, team.name), fontWeight: 'bold' }}>[{team.short_name}] </span>
+                            <span style={{ color: team.color || GetTeamColor(team), fontWeight: 'bold' }}>[{team.short_name}] </span>
                         </>
                     }
                     {

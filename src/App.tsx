@@ -18,6 +18,7 @@ import RouteBeatmapset from "./routes/RouteBeatmapset";
 import { routeData } from "./util/RouteHelper";
 import RouteBeatmaps from "./routes/RouteBeatmaps";
 import RouteAdmin from "./routes/RouteAdmin";
+import RouteTeam from "./routes/RouteTeam";
 
 declare const window: any; //ts fix
 function App() {
@@ -41,6 +42,7 @@ function App() {
     { path: routeData.routeAdmin.path, element: <RouteAdmin /> },
     { path: routeData.routeBeatmaps.path, element: <RouteBeatmaps /> },
     { path: routeData.routeBeatmapsets.path, element: <RouteBeatmapset /> },
+    { path: routeData.routeTeam.path, element: <RouteTeam /> },
   ];
 
   const getRoute = (obj: IRouteObject, is_child = false) => {

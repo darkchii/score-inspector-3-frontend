@@ -35,6 +35,7 @@ type ApiContextValue = {
     getDifficulty: (beatmapId: string | number, rulesetId?: number, mods?: IScoreMod[] | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapUserTags: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapScores: (beatmapId: string | number, ruleset: string | null, mods?: IScoreMod[] | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getTeam: (teamId: string | number, ruleset: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
 };
 
 const ApiContext = createContext<ApiContextValue>({} as ApiContextValue);
@@ -324,6 +325,15 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         return all_scores;
     }, [apiPost]);
 
+    const getTeam = useCallback(async (teamId: string | number, ruleset: string | null, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        let endpoint = `team/${teamId}`;
+        if(ruleset) {
+            endpoint += `/${ruleset}`;
+        }
+        const response = await apiGet(endpoint, false, progressEvent);
+        return response;
+    }, [apiGet]);
+
     // Memoize the context value to prevent unnecessary re-renders
     const contextValue = useMemo(() => ({
         getUserLive,
@@ -355,7 +365,8 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getBeatmapMediaAudit,
         getDifficulty,
         getBeatmapUserTags,
-        getBeatmapScores
+        getBeatmapScores,
+        getTeam
     }), [
         getUserLive,
         getScoresLive,
@@ -386,7 +397,8 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getBeatmapMediaAudit,
         getDifficulty,
         getBeatmapUserTags,
-        getBeatmapScores
+        getBeatmapScores,
+        getTeam
     ]);
 
     return (

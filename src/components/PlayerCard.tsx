@@ -5,6 +5,8 @@ import { getFlagIcon } from "../assets/textures/TextureDatabase";
 import BetterTooltip from "./tooltips/BetterTooltip";
 import { useNavigate } from "react-router";
 import { GetIconFromLabel } from "../util/Helper";
+import type { ITeam } from "../types/types";
+import { GetTeamColor } from "../util/TeamHelper";
 
 function PlayerCard({ data, onClick = null }: {
     data: any,
@@ -16,7 +18,7 @@ function PlayerCard({ data, onClick = null }: {
     const [apiUser, setApiUser] = useState<any | null>(null);
     const [osuAltUser, setOsuAltUser] = useState<any | null>(null);
     const [id, setId] = useState<number | null>(null);
-    const [team, setTeam] = useState<any | null>(null);
+    const [team, setTeam] = useState<ITeam | null>(null);
     const [roles, setRoles] = useState<any[] | null>(null);
     const [isValid, setIsValid] = useState<boolean>(true);
 
@@ -100,7 +102,7 @@ function PlayerCard({ data, onClick = null }: {
                             team ?
                                 <span
                                     className={playerCardStyles['player-card__team-tag']}
-                                    style={{ backgroundColor: team?.color || '#888', borderRadius: theme.shape.borderRadius }}
+                                    style={{ backgroundColor: team?.color || GetTeamColor(team), borderRadius: theme.shape.borderRadius }}
                                 >
                                     <BetterTooltip title={team?.name || 'Team'}>
                                         {team?.short_name || 'TEAM'}
