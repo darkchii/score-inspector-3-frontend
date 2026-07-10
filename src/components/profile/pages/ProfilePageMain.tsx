@@ -35,14 +35,14 @@ function ProfilePageMain() {
                     <Grid size={{ xs: 12, sm: 12, md: 6, lg: 12 / 5 }}>
                         <ScoreCard
                             title="Top stars FC"
-                            value={<div style={{ display: 'flex' }}><DifficultyBadge difficulty={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_fc']?.attr_diff?.star_rating || getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_fc']?.beatmap?.stars} /></div>}
+                            value={<div style={{ display: 'flex' }}><DifficultyBadge difficulty={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_fc']?.attr_diff?.star_rating || getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_fc']?.beatmap?.stars} original_difficulty={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_fc']?.beatmap?.stars} /></div>}
                             score={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_fc']}
                         />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 12, md: 6, lg: 12 / 5 }}>
                         <ScoreCard
                             title="Top stars SS"
-                            value={<div style={{ display: 'flex' }}><DifficultyBadge difficulty={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_ss']?.attr_diff?.star_rating || getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_ss']?.beatmap?.stars} /></div>}
+                            value={<div style={{ display: 'flex' }}><DifficultyBadge difficulty={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_ss']?.attr_diff?.star_rating || getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_ss']?.beatmap?.stars} original_difficulty={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_ss']?.beatmap?.stars} /></div>}
                             score={getRulesetStatistics(activeRuleset)?.scores_set?.highlighted_scores?.['top_stars_ss']}
                         />
                     </Grid>

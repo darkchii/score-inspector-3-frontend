@@ -293,7 +293,7 @@ function RouteBeatmapset() {
 
         MEDIA_FIELD_ORDER.forEach((mediaKey) => {
             const mediaField = MEDIA_FIELD_CONFIGS[mediaKey];
-            const sourceValue = data.beatmapSet.media?.[mediaField.responseField];
+            const sourceValue = data.beatmapSet!.media?.[mediaField.responseField];
             if (!sourceValue) {
                 return;
             }
@@ -759,10 +759,6 @@ function RouteBeatmapset() {
             </DialogTitle>
             <DialogContent dividers>
                 <Stack spacing={2.5} sx={{ pt: 1 }}>
-                    <Alert severity="info" variant="outlined">
-                        Leave a field empty to remove that media entry.
-                    </Alert>
-
                     {
                         isArtistTitleRecommendationLoading && (
                             <Alert severity="info" variant="outlined">

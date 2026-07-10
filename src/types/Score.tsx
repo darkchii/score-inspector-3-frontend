@@ -293,13 +293,13 @@ class Score implements IScore {
         }
 
 
-        if (api_data.attr_diff) {
-            this.attr_diff = new ScoreDifficulty(api_data.attr_diff);
+        if (api_data?.scoreAttribute?.attr_diff) {
+            this.attr_diff = new ScoreDifficulty(api_data.scoreAttribute.attr_diff);
         }
-        this.attr_recalc = Boolean(api_data.attr_recalc);
+        this.attr_recalc = Boolean(api_data?.scoreAttribute?.attr_recalc);
 
         //if attr_diff is missing or attr_recalc is true
-        this.diff_missing = !api_data.attr_diff || this.attr_recalc;
+        this.diff_missing = !api_data?.scoreAttribute?.attr_diff || this.attr_recalc;
 
         this.is_fc = DetermineIsScoreFC(this);
 

@@ -42,7 +42,7 @@ function RouteTeam() {
         }
     }, [teamId, ruleset])
 
-    if (teamId && !teamData && !error && !isLoading) {
+    if (teamId && isLoading) {
         return <PageLoader />
     }
 

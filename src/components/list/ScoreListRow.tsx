@@ -117,7 +117,7 @@ const ScoreListRow = memo(function ScoreListRow({ item, index, isCompact = false
                     !isMobile &&
                     <TableCell>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'left' }}>
-                            <DifficultyBadge difficulty={GetStarRating(item)} />
+                            <DifficultyBadge difficulty={GetStarRating(item)} original_difficulty={item.beatmap.stars} />
                             {
                                 item.beatmap.status === 'loved' &&
                                 <BetterTooltip title="Loved">
@@ -170,7 +170,7 @@ const ScoreListRow = memo(function ScoreListRow({ item, index, isCompact = false
                         {/* score and combo */}
                         <TableCell colSpan={2}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'left' }}>
-                                <DifficultyBadge difficulty={GetStarRating(item)} />
+                                <DifficultyBadge difficulty={GetStarRating(item)} original_difficulty={item.beatmap.stars} />
                                 {
                                     item.beatmap.status === 'loved' &&
                                     <BetterTooltip title="Loved">

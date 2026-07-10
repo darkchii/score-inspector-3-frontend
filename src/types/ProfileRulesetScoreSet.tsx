@@ -137,7 +137,7 @@ export class ProfileRulesetScoreSet implements IProfileRulesetScoreSet {
         this.implied_total_score_ss += score.is_ss ? (score.implied_total_score ?? 0) : 0;
         this.score_ss += score.is_ss ? (score.total_score ?? 0) : 0;
 
-        if (score.diff_missing) {
+        if (score.diff_missing || score?.attr_diff?.star_rating === undefined || score?.attr_diff?.star_rating === 0) {
             this.missing_difficulty += 1;
         }
     }

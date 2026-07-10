@@ -13,10 +13,14 @@ import { Line } from "react-chartjs-2";
 import Config from "../../data/Config.json";
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import LandingCard from "../LandingCard";
+import { useAuth } from "../../providers/AuthProvider";
+// import { Link } from "react-router";
+import { Link as RouterLink } from "react-router";
 
 function IndexLanding() {
     const theme = useTheme();
     const { getGlobalStats, getActiveUsers } = useApi();
+    const { userData } = useAuth();
     const [numReputation, setNumReputation] = useState(0);
     const [numBeatmaps, setNumBeatmaps] = useState(0);
     const [numScores, setNumScores] = useState(0);
@@ -45,11 +49,7 @@ function IndexLanding() {
                     //     totalBeatmaps += stats.beatmap_counts.data[key];
                     // });
                     setNumBeatmaps(totalBeatmaps);
-                    let totalScores = 0;
-                    Object.keys(stats.score_counts.data.scores).forEach(key => {
-                        totalScores += stats.score_counts.data.scores[key];
-                    });
-                    setNumScores(totalScores);
+                    setNumScores(stats.score_counts.data.scores.total || 0);
                 }
 
                 if (statsActiveUsers) {
@@ -102,7 +102,7 @@ function IndexLanding() {
                         }}>
                             <Grid size={{ xs: 12, md: 12 }}>
                                 <Grid container spacing={1} sx={{ height: '100%' }}>
-                                    <Grid size={{ xs: 6, md: 12/4 }}>
+                                    <Grid size={{ xs: 6, md: 12 / (userData?.osuApi?.team ? 5 : 4) }}>
                                         <LandingCard
                                             title="Reputation"
                                             isLoading={loading}
@@ -115,7 +115,7 @@ function IndexLanding() {
                                             <Typography variant="h6" component="div">{FormatNumber(numReputation)}</Typography>
                                         </LandingCard>
                                     </Grid>
-                                    <Grid size={{ xs: 6, md: 12/4 }}>
+                                    <Grid size={{ xs: 6, md: 12 / (userData?.osuApi?.team ? 5 : 4) }}>
                                         <LandingCard
                                             title="Beatmaps"
                                             isLoading={loading}
@@ -128,7 +128,7 @@ function IndexLanding() {
                                             <Typography variant="h6" component="div">{FormatNumber(numBeatmaps)}</Typography>
                                         </LandingCard>
                                     </Grid>
-                                    <Grid size={{ xs: 6, md: 12/4 }}>
+                                    <Grid size={{ xs: 6, md: 12 / (userData?.osuApi?.team ? 5 : 4) }}>
                                         <LandingCard
                                             title="Scores"
                                             isLoading={loading}
@@ -141,7 +141,7 @@ function IndexLanding() {
                                             <Typography variant="h6" component="div">{FormatNumber(numScores)}</Typography>
                                         </LandingCard>
                                     </Grid>
-                                    <Grid size={{ xs: 6, md: 12/4 }}>
+                                    <Grid size={{ xs: 6, md: 12 / (userData?.osuApi?.team ? 5 : 4) }}>
                                         <LandingCard
                                             title="Users"
                                             isLoading={loading}
@@ -154,6 +154,65 @@ function IndexLanding() {
                                             <Typography variant="h6" component="div">{FormatNumber(numUsers)}</Typography>
                                         </LandingCard>
                                     </Grid>
+                                    {
+                                        userData?.osuApi?.team && (
+                                            <Grid size={{ xs: 6, md: 12 / 5 }}>
+                                                <Box sx={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    position: 'relative',
+                                                }}>
+                                                    <Box sx={{
+                                                        backgroundImage: `url(${userData?.osuApi?.team?.flag_url})`,
+                                                        backgroundSize: 'cover',
+                                                        backgroundPosition: 'center',
+                                                        borderRadius: 1,
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        position: 'absolute',
+                                                    }}></Box>
+                                                    <Box sx={{
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        display: 'flex',
+                                                        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                                                        borderRadius: 1,
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        flexDirection: 'column',
+                                                    }}>
+                                                        {/* something along the lines "visit your team" */}
+                                                        <Typography variant="h6" component="div" sx={{ color: 'white', textAlign: 'center', width: '100%' }}>
+                                                            Team {userData.osuApi.team.short_name}
+                                                        </Typography>
+                                                        <Typography variant="body2" component="div" sx={{ color: 'white', textAlign: 'center', width: '100%' }}>
+                                                            Visit your team page!
+                                                        </Typography>
+                                                    </Box>
+                                                    <Box
+                                                        //links to /team/{id}
+                                                        component={RouterLink}
+                                                        to={`/team/${userData.osuApi.team.id}`}                                                        
+                                                        sx={{
+                                                            borderRadius: 1,
+                                                            width: '100%',
+                                                            height: '100%',
+                                                            position: 'absolute',
+                                                            backgroundColor: 'rgba(255, 255, 255, 0)',
+                                                            '&:hover': {
+                                                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                                                cursor: 'pointer',
+                                                                transition: 'background-color 0.3s',
+                                                            },
+                                                            transition: 'background-color 0.3s',
+                                                        }}></Box>
+                                                </Box>
+                                            </Grid>
+                                        )
+                                    }
                                 </Grid>
                             </Grid>
                         </Grid>

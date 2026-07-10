@@ -66,7 +66,7 @@ function ScoreViewBase({ score, noBackground = false, compact = false }: { score
                     </div>
                     {/* row flex */}
                     <div className={scoreInfoStyles['score-info']} style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
-                        <DifficultyBadge difficulty={GetStarRating(score)} />
+                        <DifficultyBadge difficulty={GetStarRating(score)} original_difficulty={score.beatmap.stars} />
                         {
                             score.beatmap.status === 'loved' &&
                             <BetterTooltip title="Loved">
