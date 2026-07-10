@@ -5,6 +5,7 @@ import { FormatNumber, GetNestedValue } from "../util/Helper";
 import ModData from "../data/Mods.json";
 import ModIcon from "./ModIcon";
 import type { IDatabasedMod, IScore, IScoreMod } from "../types/types";
+import { getGradeIcon } from "../assets/textures/TextureDatabase";
 
 interface ScoreFilterOrderOption {
     value: string,
@@ -37,6 +38,8 @@ const ORDER_OPTIONS: ScoreFilterOrderOption[] = [
     { value: "attr_diff.aim_difficulty", label: "Aim Diff" },
     { value: "attr_diff.speed_difficulty", label: "Speed Diff" },
     { value: "attr_diff.rhythm_difficulty", label: "Rhythm Diff" },
+    { value: "attr_diff.flashlight_difficulty", label: "Flashlight Diff" },
+    { value: "attr_diff.reading_difficulty", label: "Reading Diff" },
     { value: "ended_at", label: "Date Played" },
     { value: "local_beatmap.ranked_date", label: "Date Ranked" },
 ]
@@ -69,8 +72,12 @@ const FILTER_OPTIONS: ScoreFilterOption[] = [
     { value: "local_beatmap.bpm_modded", label: "BPM", type: "range", min: 0, max: 1, steps: 1, format: (v: number) => `${Math.round(v)} BPM` },
     { value: "attr_diff.aim_difficulty", label: "Aim Diff", type: "range", min: 0, max: 10, steps: 0.1, rulesets: ['osu'], description: "Only applicable for osu! mode" },
     { value: "attr_diff.speed_difficulty", label: "Speed Diff", type: "range", min: 0, max: 10, steps: 0.1, rulesets: ['osu'], description: "Only applicable for osu! mode" },
+    { value: "attr_diff.flashlight_difficulty", label: "Flashlight Diff", type: "range", min: 0, max: 10, steps: 0.1, rulesets: ['osu'], description: "Only applicable for osu! mode" },
+    { value: "attr_diff.reading_difficulty", label: "Reading Diff", type: "range", min: 0, max: 10, steps: 0.1, rulesets: ['osu'], description: "Only applicable for osu! mode" },
     { value: "attr_diff.rhythm_difficulty", label: "Rhythm Diff", type: "range", min: 0, max: 10, steps: 0.1, rulesets: ['taiko'], description: "Only applicable for Taiko mode" },
     { value: "mods", label: "Mods", type: "mods", description: "Filters to scores that contain all selected mods" },
+    { value: "grade", label: "Grades", type: "grades", description: "Filters to scores that contain all selected grades" },
+    { value: "diff_missing", label: "Missing Attributes", type: "boolean", description: "Whether the score is missing beatmap attributes (e.g. star rating, difficulty values)" },
 ]
 
 const FilterScores = (scores: IScore[], filter: any, order: any, direction: string) => {
@@ -112,6 +119,12 @@ const FilterScores = (scores: IScore[], filter: any, order: any, direction: stri
                 sortedScores = sortedScores.filter(score => {
                     const scoreMods = score.mods ? score.mods.map((mod: IScoreMod) => mod.acronym) : [];
                     return value.every((mod: IDatabasedMod) => scoreMods.includes(mod.Acronym));
+                });
+                break;
+            case 'grades':
+                sortedScores = sortedScores.filter(score => {
+                    const scoreGrade = score.grade;
+                    return value.includes(scoreGrade);
                 });
                 break;
             default:
@@ -244,11 +257,20 @@ function ScoreFilter({ data, onFiltered, currentRuleset }: {
                                     <FilterText disabled={option.rulesets && !option.rulesets.includes(currentRuleset) && currentRuleset !== 'all'} filter={filter} setFilter={setFilter} option={option} />
                                 )}
                             </Box>
-                            {option.type === "mods" && (
-                                <Box sx={{ mt: 1, width: '100%' }}>
-                                    <FilterMods filter={filter} setFilter={setFilter} option={option} currentRuleset={currentRuleset} />
-                                </Box>
-                            )}
+                            {
+                                option.type === "mods" && (
+                                    <Box sx={{ mt: 1, width: '100%' }}>
+                                        <FilterMods filter={filter} setFilter={setFilter} option={option} currentRuleset={currentRuleset} />
+                                    </Box>
+                                )
+                            }
+                            {
+                                option.type === "grades" && (
+                                    <Box sx={{ mt: 1, width: '100%' }}>
+                                        <FilterGrades filter={filter} setFilter={setFilter} option={option} />
+                                    </Box>
+                                )
+                            }
                             {
                                 option.description && (
                                     <Typography variant="caption" color="text.secondary">
@@ -425,6 +447,55 @@ function FilterMods({ filter, setFilter, option, currentRuleset }: {
                 value.map((mod: IDatabasedMod, index: number) => (
                     <Box {...getTagProps({ index })}>
                         <ModIcon data={mod} />
+                    </Box>
+                ))
+            }
+            disableCloseOnSelect
+            sx={{
+                width: '100%',
+            }}
+        />
+    );
+}
+
+function FilterGrades({ filter, setFilter, option, disabled }: {
+    filter: any,
+    setFilter: any,
+    option: ScoreFilterOption,
+    disabled?: boolean,
+}) {
+    //same as FilterMods, but with osu grades
+    const grades = ["XH", "X", "SH", "S", "A", "B", "C", "D"];
+
+    const handleChange = (e: React.SyntheticEvent, newValue: string[]) => {
+        setFilter((prev: any) => ({
+            ...prev,
+            [option.value]: { operator: 'grades', value: newValue }
+        }));
+    }
+
+    return (
+        <Autocomplete
+            multiple
+            options={grades}
+            value={filter[option.value]?.value || []}
+            onChange={handleChange}
+            renderInput={(params) => <TextField {...params} size="small" placeholder="Filter by Grades" />}
+            //show only grade in options
+            renderOption={(props, grade) => (
+                <li {...props} key={grade}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
+                        <img src={getGradeIcon(grade) || ''} alt={grade} width={30} height={20} />
+                    </Box>
+                </li>
+            )}
+            //show only grade in selected value
+            renderTags={(value, getTagProps) =>
+                value.map((grade: string, index: number) => (
+                    <Box {...getTagProps({ index })}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
+                            <img src={getGradeIcon(grade) || ''} alt={grade} width={30} height={20} />
+                        </Box>
                     </Box>
                 ))
             }
