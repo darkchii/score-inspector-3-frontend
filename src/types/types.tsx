@@ -317,6 +317,8 @@ export type IScoreDifficulty = {
     speed_top_weighted_slider_factor: number;
     legacy_score_base_multiplier: number
     flashlight_difficulty: number;
+    reading_difficulty: number;
+    reading_difficult_note_count: number;
 
     //taiko
     rhythm_difficulty: number;
