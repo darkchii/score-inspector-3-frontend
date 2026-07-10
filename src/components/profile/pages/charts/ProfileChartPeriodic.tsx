@@ -31,7 +31,7 @@ const INCR_CUMUL_CHART_TYPES: { [key: string]: ChartType } = {
     },
     'lazer_score': {
         name: 'lazer_score',
-        labels: ['Lazer Score', 'Lazer SS Score'],
+        labels: ['Standardised Score', 'Standardised SS Score'],
         keys: ['lazer_score', 'lazer_score_ss'],
         formatter: (value: number) => FormatNumber(value),
         colors: ['#3f51b5', '#ff4081'],

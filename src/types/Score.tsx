@@ -262,7 +262,8 @@ class Score implements IScore {
         this.is_fc = Boolean(api_data.is_fc);
 
         this.is_convert = this.beatmap.convert !== undefined ? this.beatmap.convert : this.ruleset_id !== this.beatmap?.ruleset_id;
-        this.implied_total_score = this.legacy_total_score !== null && this.legacy_total_score > 0 ? this.legacy_total_score : this.classic_total_score;
+        // this.implied_total_score = this.legacy_total_score !== null && this.legacy_total_score > 0 ? this.legacy_total_score : this.classic_total_score;
+        this.implied_total_score = this.classic_total_score; // I think it's fine to abandon legacy_total_score at this point
 
         if (this.local_beatmap) {
             this.local_beatmap.bpm_modded = this.local_beatmap.bpm;

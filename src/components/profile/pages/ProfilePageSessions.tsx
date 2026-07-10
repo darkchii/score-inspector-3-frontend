@@ -113,15 +113,15 @@ function SessionDisplay({ session }: { session: ISession | null }) {
                             </TableRow>
                             <Grid sx={{ mt: theme.spacing(2), }} />
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Lazer Score</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Standardised Score</TableCell>
                                 <TableCell><NumberFlow format={{ maximumFractionDigits: 0 }} value={session.cumulative_lazer_score} /></TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Average Lazer Score</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Average Standardised Score</TableCell>
                                 <TableCell><NumberFlow format={{ maximumFractionDigits: 0 }} value={session.average_lazer_score} /></TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Highest Lazer Score</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Highest Standardised Score</TableCell>
                                 <TableCell><NumberFlow format={{ maximumFractionDigits: 0 }} value={session.max_lazer_score} /></TableCell>
                             </TableRow>
                             <Grid sx={{ mt: theme.spacing(2), }} />

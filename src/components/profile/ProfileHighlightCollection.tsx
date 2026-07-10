@@ -132,7 +132,7 @@ function ProfileHighlightCollection() {
 
                 <Grid key="lazer_score" size={{ xs: 12, sm: 6, md: 6, lg: 1.5 }}>
                     <ProfileHighlight
-                        title={"Lazer Score"}
+                        title={"Standardised Score"}
                         value={<NumberFlow value={getRulesetStatistics(activeRuleset)?.scores_set_by_score?.score || 0} />}
                     />
                 </Grid>

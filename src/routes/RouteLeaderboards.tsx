@@ -42,7 +42,7 @@ const LEADERBOARDS: { [key: string]: LeaderboardConfig } = {
         formatter: FormatNumber,
     },
     'lazer_score': {
-        title: 'Lazer Score',
+        title: 'Standardised Score',
         category: 'user',
         formatter: FormatNumber,
     },

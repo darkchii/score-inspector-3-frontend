@@ -28,7 +28,7 @@ const ORDER_OPTIONS: ScoreFilterOrderOption[] = [
     { value: "implied_pp", label: "PP" },
     { value: "accuracy", label: "Accuracy" },
     { value: "implied_total_score", label: "Score" },
-    { value: "total_score", label: "Lazer Score" },
+    { value: "total_score", label: "Standardised Score" },
     { value: "combo", label: "Combo" },
     { value: "star_rating", label: "Stars" },
     { value: "duration", label: "Length" },
@@ -48,7 +48,7 @@ const FILTER_OPTIONS: ScoreFilterOption[] = [
     { value: "implied_pp", label: "PP", type: "range", min: 0, max: 3000, steps: 1, format: (v: number) => `${v}pp` },
     { value: "accuracy", label: "Accuracy", type: "range", min: 0, max: 1, steps: 0.01, format: (v: number) => `${(v * 100).toFixed(2)}%` },
     { value: "implied_total_score", label: "Score", type: "range", min: 0, max: 1, steps: 1, scale: (v: number) => v ** 2 },
-    { value: "total_score", label: "Lazer Score", type: "range", min: 0, max: 1, steps: 1 },
+    { value: "total_score", label: "Standardised Score", type: "range", min: 0, max: 1, steps: 1 },
     { value: "combo", label: "Combo", type: "range", min: 0, max: 1, steps: 1, format: (v: number) => `${FormatNumber(v)}x` },
     { value: "star_rating", label: "Stars", type: "range", min: 0, max: 10, steps: 0.1, format: (v: number) => `${v}★` },
     { value: "ended_at", label: "Date Played", type: "date_range", min: 0, max: 1, format: (v: number) => new Date(v).toLocaleDateString(), steps: 8.64e+7 }, //steps should be days by ms
