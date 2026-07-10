@@ -1,9 +1,8 @@
-import DifficultyCalculationUtils from "../../util/DifficultyCalculationUtils";
 import HitWindowsTaiko from "../hitWindows/HitWindowsTaiko";
 import { CalculateRateWithMods } from "../../util/ModHelper";
 import PerformanceCalculator from "./PerformanceCalculator";
-import Score from "../Score";
 import type { IHitWindowsTaiko, IScore } from "../types";
+import { DiffUtils } from "./DiffUtils";
 
 class PerformanceCalculatorTaiko extends PerformanceCalculator {
     countGreat: number;
@@ -84,9 +83,9 @@ class PerformanceCalculatorTaiko extends PerformanceCalculator {
         let rhythmExpectedUnstableRate = this.computeDeviationUpperBound(1.0) * 10;
         let rhythmMaximumUnstableRate = this.computeDeviationUpperBound(0.8) * 10;
 
-        let rhythmFactor = DifficultyCalculationUtils.ReverseLerp(score.attr_diff.rhythm_difficulty / score.attr_diff.star_rating, 0.15, 0.4);
+        let rhythmFactor = DiffUtils.ReverseLerp(score.attr_diff.rhythm_difficulty / score.attr_diff.star_rating, 0.15, 0.4);
 
-        let rhythmPentalty = 1 - DifficultyCalculationUtils.Logistic(
+        let rhythmPentalty = 1 - DiffUtils.Logistic(
             this.estimatedUnstableRate,
             (rhythmExpectedUnstableRate + rhythmMaximumUnstableRate) / 2,
             10 / (rhythmMaximumUnstableRate - rhythmExpectedUnstableRate),
@@ -127,7 +126,7 @@ class PerformanceCalculatorTaiko extends PerformanceCalculator {
         let monoAccScalingExponent = 2 + score.attr_diff.mono_stamina_factor;
         let monoAccScalingShift = 500 - 100 * (score.attr_diff.mono_stamina_factor * 3);
 
-        return difficultyValue * Math.pow(DifficultyCalculationUtils.Erf(monoAccScalingShift / (Math.sqrt(2) * this.estimatedUnstableRate)), monoAccScalingExponent);
+        return difficultyValue * Math.pow(DiffUtils.Erf(monoAccScalingShift / (Math.sqrt(2) * this.estimatedUnstableRate)), monoAccScalingExponent);
     }
 
     computeDeviationUpperBound(accuracy: number): number {
@@ -139,7 +138,7 @@ class PerformanceCalculatorTaiko extends PerformanceCalculator {
 
         let pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.sqrt(n * p * (1 - p) + z * z / 4);
 
-        return this.greatHitWindow / (Math.sqrt(2) * DifficultyCalculationUtils.ErfInv(pLowerBound));
+        return this.greatHitWindow / (Math.sqrt(2) * DiffUtils.ErfInv(pLowerBound));
     }
 }
 
