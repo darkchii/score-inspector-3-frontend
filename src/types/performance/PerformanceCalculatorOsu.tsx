@@ -41,6 +41,7 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
     accuracyValue: number;
     flashlightValue: number;
     readingValue: number;
+    cognitionValue: number;
     multiplier: number;
     aimEstimatedSliderBreaks: number = 0;
     speedEstimatedSliderBreaks: number = 0;
@@ -126,13 +127,21 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
         this.flashlightValue = this.computeFlashlightValue(score);
         this.readingValue = this.computeReadingValue(score);
 
-        this.totalPerformance = Math.pow(
-            Math.pow(this.aimValue, 1.1) +
-            Math.pow(this.speedValue, 1.1) +
-            Math.pow(this.accuracyValue, 1.1) +
-            Math.pow(this.flashlightValue, 1.1),
-            1.0 / 1.1
-        ) * this.multiplier;
+        this.cognitionValue = this.SumCognitionDifficulty(this.readingValue, this.flashlightValue);
+
+        // this.totalPerformance = Math.pow(
+        //     Math.pow(this.aimValue, 1.1) +
+        //     Math.pow(this.speedValue, 1.1) +
+        //     Math.pow(this.accuracyValue, 1.1) +
+        //     Math.pow(this.flashlightValue, 1.1),
+        //     1.0 / 1.1
+        // ) * this.multiplier;
+        this.totalPerformance = DiffUtils.Norm(PERFORMANCE_NORM_EXPONENT, [
+            this.aimValue,
+            this.speedValue,
+            this.accuracyValue,
+            this.cognitionValue
+        ]) * this.multiplier;
     }
 
     computeAimValue(score: IScore) {
@@ -442,6 +451,22 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
         }
 
         return traceableBonus;
+    }
+
+    SumCognitionDifficulty(readingValue: number, flashlightValue: number): number {
+        if(readingValue <= 0){
+            return flashlightValue;
+        }
+
+        if(flashlightValue <= 0){
+            return readingValue;
+        }
+
+        return DiffUtils.Norm(PERFORMANCE_NORM_EXPONENT, [
+            readingValue,
+            flashlightValue * Math.min(Math.max(flashlightValue / readingValue, 0.25), 1.0)
+        ]
+        )
     }
 }
 

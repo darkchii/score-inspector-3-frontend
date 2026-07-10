@@ -70,4 +70,14 @@ export class DiffUtils {
     static Logistic(x: number, midPointOffset: number, multiplier: number, maxValue: number = 1): number {
         return maxValue / (1 + Math.exp(multiplier * (midPointOffset - x)));
     }
+
+    static Norm(p: number, values: number[]): number {
+        let sum = 0;
+
+        for (let i = 0; i < values.length; i++) {
+            sum += Math.pow(values[i], p);
+        }
+        
+        return Math.pow(sum, 1 / p);
+    }
 }

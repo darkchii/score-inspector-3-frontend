@@ -395,7 +395,9 @@ export type IPerformanceCalculatorOsu = {
     aimValue: number;
     speedValue: number;
     accuracyValue: number;
-    flashlightValue: number
+    flashlightValue: number;
+    readingValue: number;
+    cognitionValue: number;
     multiplier: number;
     aimEstimatedSliderBreaks: number;
 
@@ -403,6 +405,7 @@ export type IPerformanceCalculatorOsu = {
     computeSpeedValue(score: IScore): number;
     computeAccuracyValue(score: IScore): number;
     computeFlashlightValue(score: IScore): number;
+    computeReadingValue(score: IScore): number;
     calculateMissPenalty(missCount: number, difficultStrainCount: number): number;
     calculateEstimatedSliderBreaks(score: IScore, topWeightedSliderFactor: number): number;
     calculateSpeedHighDeviationNerf(score: IScore): number;
