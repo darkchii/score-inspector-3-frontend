@@ -1,6 +1,7 @@
 import Beatmap from "../types/beatmaps/Beatmap";
 import { ProfileStatistics } from "../types/ProfileStatistics";
 import Score from "../types/Score";
+import { GetScoreMultiplierCalculator } from "../types/ScoreMultiplierCalculator";
 import type { IBeatmap, IScore } from "../types/types";
 
 export async function ProcessUser(user: any): Promise<any> {
@@ -160,7 +161,14 @@ export async function MapScoreBeatmaps(scores: IScore[], beatmaps: IBeatmap[]): 
 }
 
 export async function ProcessScores(scores: IScore[], user: any = null): Promise<IScore[]> {
-    return scores.map(score => new Score(score, score.beatmap as Beatmap, user));
+    let _scores: IScore[] = scores.map(score => new Score(score, score.beatmap as Beatmap, user));
+    _scores.forEach(score => {
+        const multiCalculator = GetScoreMultiplierCalculator(score);
+        const [multiplier, breakdown] = multiCalculator.Calculate();
+        score.score_multiplier = multiplier;
+        score.score_multiplier_breakdown = breakdown;
+    });
+    return _scores;
 }
 
 export async function BuildProfileStatistics(scores: IScore[], beatmaps: IBeatmap[], packs: any[]): Promise<{ profileStats: ProfileStatistics; profileStatsWithoutLoved: ProfileStatistics }> {

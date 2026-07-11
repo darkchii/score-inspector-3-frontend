@@ -285,6 +285,8 @@ export interface IScore {
     } | null;
     duration: number | null;
     implied_pp: number;
+    score_multiplier: number | null;
+    score_multiplier_breakdown: { [key: string]: number } | null;
 
     getOtherScores(): IScore[] | null;
 }
@@ -929,4 +931,52 @@ export interface ITeamStatistics {
     rank?: number | null;
     ruleset_id: number;
     team_id: number;
+}
+
+export interface IScoreMultiplierContext {
+    beatmap: IBeatmap;
+    score: IScore;
+}
+
+export interface IScoreMultiplierCalculator {
+    context: IScoreMultiplierContext;
+
+    combinationMultipliers: Map<string[], ((mods: IScoreMod[]) => number)>;
+    singleMultipliers: Map<string, ((mod: IScoreMod) => number)>;
+
+    Single(acronym: string, hasMultiplier: number | ((mod: IScoreMod) => number)): void;
+    Combination(acronyms: string[], hasMultiplier: number | ((mods: IScoreMod[]) => number)): void;
+
+    Calculate(): [number, { [key: string]: number }];
+}
+
+export interface IOsuScoreMultiplierCalculatorV1 extends IScoreMultiplierCalculator {
+    rateAdjustMultiplier: (speedChange: number) => number;
+}
+
+export interface IOsuScoreMultiplierCalculatorV2 extends IScoreMultiplierCalculator {
+    easyMultiplier: (easyMod: IScoreMod) => number;
+    halfTimeMultiplier: (speedChange: number) => number;
+    doubleTimeMultiplier: (speedChange: number) => number;
+    hiddenMultiplier: (hiddenMod: IScoreMod, otherModsProvideTimingInfo: boolean) => number;
+    flashlightMultiplier: (flashlightMod: IScoreMod) => number;
+    difficultyAdjustMultiplier: (difficultyAdjustMod: IScoreMod, beatmap: IBeatmap) => number;
+    timeRampMultiplier: (timeRampMod: IScoreMod) => number;
+    deflateMultiplier: (deflateMod: IScoreMod) => number;
+}
+
+export interface ITaikoScoreMultiplierCalculator extends IScoreMultiplierCalculator {
+    rateAdjustMultiplier: (speedChange: number) => number;
+    classicMultiplier: (score?: IScore) => number;
+}
+
+export interface IFruitsScoreMultiplierCalculator extends IScoreMultiplierCalculator {
+    rateAdjustMultiplier: (speedChange: number) => number;
+    classicMultiplier: (score?: IScore) => number;
+}
+
+export interface IManiaScoreMultiplierCalculator extends IScoreMultiplierCalculator {
+    rateAdjustMultiplier: (speedChange: number) => number;
+    classicMultiplier: (score?: IScore) => number;
+    keyModMultiplier: (score?: IScore) => number;
 }

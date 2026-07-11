@@ -129,6 +129,9 @@ class Score implements IScore {
 
     implied_pp: number;
 
+    score_multiplier: number | null;
+    score_multiplier_breakdown: { [key: string]: number } | null;
+
     constructor(api_data: any, beatmap: Beatmap | IBeatmap, user: any = null) {
         // this.beatmap = beatmap;
         //if beatmap is not of type Beatmap, create it, otherwise use as is
@@ -320,6 +323,9 @@ class Score implements IScore {
         }
 
         this.implied_pp = this.performance?.base?.pp || this.pp || 0;
+
+        this.score_multiplier = 0;
+        this.score_multiplier_breakdown = {};
     }
 
     // Gives an array of other scores on the same beatmap
