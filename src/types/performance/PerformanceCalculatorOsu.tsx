@@ -283,7 +283,8 @@ class PerformanceCalculatorOsu extends PerformanceCalculator implements IPerform
     }
 
     static DifficultyToPerformance(difficulty: number) : number {
-        return Math.pow(5.0 * Math.max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
+        // return Math.pow(5.0 * Math.max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
+        return 4.0 * Math.pow(difficulty, 3.0);
     }
 
     calculateMissPenalty(missCount: number, difficultStrainCount: number) {

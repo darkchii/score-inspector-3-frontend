@@ -74,12 +74,12 @@ export class OsuScoreMultiplierCalculatorV1 extends ScoreMultiplierCalculator im
         this.Single("DC", (mod: IScoreMod) => { return this.rateAdjustMultiplier(mod.settings?.speed_change ?? 0.75) });
 
         // Diff Increase
-        this.Single("HR", (mod: IScoreMod) => { return mod.settings?.uses_default_configuration ? 1.06 : 1.0 });
+        this.Single("HR", (mod: IScoreMod) => { return !mod.settings ? 1.06 : 1.0 });
         this.Single("DT", (mod: IScoreMod) => { return this.rateAdjustMultiplier(mod.settings?.speed_change ?? 1.5) });
         this.Single("NC", (mod: IScoreMod) => { return this.rateAdjustMultiplier(mod.settings?.speed_change ?? 1.5) });
-        this.Single("HD", (mod: IScoreMod) => { return mod.settings?.uses_default_configuration ? 1.06 : 1.0 });
-        this.Single("FL", (mod: IScoreMod) => { return mod.settings?.uses_default_configuration ? 1.12 : 1.0 });
-        this.Single("BL", (mod: IScoreMod) => { return mod.settings?.uses_default_configuration ? 1.12 : 1.0 });
+        this.Single("HD", (mod: IScoreMod) => { return !mod.settings ? 1.06 : 1.0 });
+        this.Single("FL", (mod: IScoreMod) => { return !mod.settings ? 1.12 : 1.0 });
+        this.Single("BL", (mod: IScoreMod) => { return !mod.settings ? 1.12 : 1.0 });
 
         // Conversion
         this.Single("TP", 0.1);
@@ -255,11 +255,11 @@ export class TaikoScoreMultiplierCalculator extends ScoreMultiplierCalculator im
         this.Single("SR", 0.6);
 
         // Diff Increase
-        this.Single("HR", (mod: IScoreMod) => { return mod.settings?.uses_default_configuration ? 1.06 : 1.0 });
+        this.Single("HR", (mod: IScoreMod) => { return !mod.settings ? 1.06 : 1.0 });
         this.Single("DT", (mod: IScoreMod) => this.rateAdjustMultiplier(mod.settings?.speed_change ?? 1.5));
         this.Single("NC", (mod: IScoreMod) => this.rateAdjustMultiplier(mod.settings?.speed_change ?? 1.5));
-        this.Single("HD", (mod: IScoreMod) => { return mod.settings?.uses_default_configuration ? 1.06 : 1.0 });
-        this.Single("FL", (mod: IScoreMod) => { return mod.settings?.uses_default_configuration ? 1.12 : 1.0 });
+        this.Single("HD", (mod: IScoreMod) => { return !mod.settings ? 1.06 : 1.0 });
+        this.Single("FL", (mod: IScoreMod) => { return !mod.settings ? 1.12 : 1.0 });
 
         // Conversion
         this.Single("DA", 0.5);
@@ -306,11 +306,11 @@ export class FruitsScoreMultiplierCalculator extends ScoreMultiplierCalculator i
         this.Single("DC", (mod: IScoreMod) => this.rateAdjustMultiplier(mod.settings?.speed_change ?? 0.75));
 
         // Diff Increase
-        this.Single("HR", (mod: IScoreMod) => { return mod.settings?.uses_default_configuration ? 1.12 : 1.0 });
+        this.Single("HR", (mod: IScoreMod) => { return !mod.settings ? 1.12 : 1.0 });
         this.Single("DT", (mod: IScoreMod) => this.rateAdjustMultiplier(mod.settings?.speed_change ?? 1.5));
         this.Single("NC", (mod: IScoreMod) => this.rateAdjustMultiplier(mod.settings?.speed_change ?? 1.5));
-        this.Single("HD", (mod: IScoreMod) => { return mod.settings?.uses_default_configuration ? 1.06 : 1.0 });
-        this.Single("FL", (mod: IScoreMod) => { return mod.settings?.uses_default_configuration ? 1.12 : 1.0 });
+        this.Single("HD", (mod: IScoreMod) => { return !mod.settings ? 1.06 : 1.0 });
+        this.Single("FL", (mod: IScoreMod) => { return !mod.settings ? 1.12 : 1.0 });
 
         // Conversion
         this.Single("DA", 0.5);
