@@ -144,6 +144,9 @@
         &__tab-content {
             flex: 1 1 auto;
             overflow-y: auto;
+            overflow-x: hidden;
+            background-color: fade(@gray-dark, 80%);
+            border-radius: 10px;
         }
     }
 
@@ -157,11 +160,14 @@
         user-select: none;
         transition: all 0.3s ease;
         color: white;
+        border-top-right-radius: @score-view-radius;
+        border-bottom-right-radius: @score-view-radius;
 
         //on hover
         &:hover {
             text-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white;
             transition: all 0.3s ease;
+            background-color: fade(@gray-dark, 60%);
         }
     }
 }

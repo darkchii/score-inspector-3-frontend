@@ -3,8 +3,20 @@ import scoreViewStyles from '../../styles/score-view.module.less';
 import { Collapse, Fade } from '@mui/material';
 import ScoreViewOtherScores from './ScoreViewOtherScores';
 import type { IScore } from '../../types/types';
+import ScoreViewAttributes from './ScoreViewAttributes';
+import ScoreViewScoreMultiplier from './ScoreViewScoreMultiplier';
 
 const VIEWS = [
+    {
+        id: 'diff-attributes',
+        name: 'Difficulty and Performance',
+        component: ScoreViewAttributes
+    },
+    {
+        id: 'score-multiplier',
+        name: 'Score Multiplier',
+        component: ScoreViewScoreMultiplier
+    },
     {
         id: 'other-scores',
         name: 'Other Scores',
@@ -13,8 +25,12 @@ const VIEWS = [
 ]
 
 //Holds the extra data for a score (extra PP breakdown, replay info, etc)
-function ScoreViewExtended({ score }: { score: IScore }) {
-    const [activeView, setActiveView] = useState('other-scores');
+function ScoreViewExtended({ score }: { score: IScore | null }) {
+    const [activeView, setActiveView] = useState('diff-attributes');
+
+    if (!score) {
+        return null;
+    }
 
     return (
         <div className={scoreViewStyles['score-view__extended']}>

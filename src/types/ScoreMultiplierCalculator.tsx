@@ -163,13 +163,13 @@ export class OsuScoreMultiplierCalculatorV2 extends ScoreMultiplierCalculator im
         this.Single("WU", (mod: IScoreMod) => this.timeRampMultiplier(mod));
         this.Single("WD", (mod: IScoreMod) => this.timeRampMultiplier(mod));
         this.Single("AD", 0.7);
-        this.Single("MG", (mod: IScoreMod) => 0.7 - mod.settings?.attraction_strength * 0.6);
+        this.Single("MG", (mod: IScoreMod) => 0.7 - ((mod.settings?.attraction_strength ?? 0.5) * 0.6));
         this.Single("AS", 0.1);
         this.Single("SY", 0.99);
     }
 
     easyMultiplier(mod: IScoreMod): number {
-        let value = 0.8 - Math.max(0, 0.1 * (mod.settings?.retries - 2));
+        let value = 0.8 - Math.max(0, 0.1 * ((mod.settings?.retries ?? 2) - 2));
         return Math.max(0.4, value);
     }
 

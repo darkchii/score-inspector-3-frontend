@@ -42,6 +42,7 @@ const ORDER_OPTIONS: ScoreFilterOrderOption[] = [
     { value: "attr_diff.reading_difficulty", label: "Reading Diff" },
     { value: "ended_at", label: "Date Played" },
     { value: "local_beatmap.ranked_date", label: "Date Ranked" },
+    { value: "mods.length", label: "Mod Count" },
 ]
 
 const FILTER_OPTIONS: ScoreFilterOption[] = [

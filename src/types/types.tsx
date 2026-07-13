@@ -337,7 +337,7 @@ export type IPerformanceCalculator = {
     totalPerformance: number;
 }
 
-export type IPerformanceCalculatorFruits = {
+export type IPerformanceCalculatorFruits = IPerformanceCalculator & {
     combo: number;
     num300: number;
     num100: number;
@@ -353,7 +353,7 @@ export type IPerformanceCalculatorFruits = {
     TotalComboHits(): number;
 }
 
-export type IPerformanceCalculatorMania = {
+export type IPerformanceCalculatorMania = IPerformanceCalculator & {
     countPerfect: number;
     countGreat: number;
     countGood: number;
@@ -369,7 +369,7 @@ export type IPerformanceCalculatorMania = {
     calculateCustomAccuracy(): number;
 }
 
-export type IPerformanceCalculatorOsu = {
+export type IPerformanceCalculatorOsu = IPerformanceCalculator & {
     usingScoreV2: boolean;
     accuracy: number
     combo: number;
@@ -419,7 +419,7 @@ export type IPerformanceCalculatorOsu = {
     getComboScalingFactor(score: IScore): number;
 }
 
-export type IPerformanceCalculatorTaiko = {
+export type IPerformanceCalculatorTaiko = IPerformanceCalculator & {
     countGreat: number;
     countOk: number;
     countMeh: number;
