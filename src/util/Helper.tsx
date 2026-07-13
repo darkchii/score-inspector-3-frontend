@@ -139,16 +139,24 @@ export const FormatDurationNumberFlow = (seconds: number, spacing: boolean = tru
     return formatted;
 }
 
-export const GetRulesetIconFromId = (rulesetId: number) => {
+export const GetRulesetIconFromId = (rulesetId: number | string) => {
     switch (rulesetId) {
         default:
         case 0:
+        case '0':
+        case 'osu':
             return TextureDatabase.RulesetOsuIcon;
         case 1:
+        case '1':
+        case 'taiko':
             return TextureDatabase.RulesetTaikoIcon;
         case 2:
+        case '2':
+        case 'fruits':
             return TextureDatabase.RulesetCatchIcon;
         case 3:
+        case '3':
+        case 'mania':
             return TextureDatabase.RulesetManiaIcon;
     }
 }
