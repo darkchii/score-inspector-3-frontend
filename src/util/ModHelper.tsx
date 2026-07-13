@@ -22,6 +22,11 @@ export function GetModDatabaseForRuleset(ruleset: string): { [acronym: string]: 
     return null;
 }
 
+export function GetModDatabase(): { [ruleset: string]: { [acronym: string]: IDatabasedMod } } {
+    BuildDatabase();
+    return _modDatabase;
+}
+
 export function IsModIncompatibleWithMod(modA: IDatabasedMod, modB: IDatabasedMod): boolean {
     if(modA.Acronym === modB.Acronym) return false;
     if (modA.IncompatibleMods.includes(modB.Acronym) || modB.IncompatibleMods.includes(modA.Acronym)) {
@@ -143,6 +148,13 @@ function BuildDatabase() {
         for (const mod of ModData[ruleset].Mods) {
             _modDatabase[ModData[ruleset].Name][mod.Acronym] = mod;
         }
+    }
+}
+
+export function ConvertDatabasedToScoreMod(mod: IDatabasedMod): IScoreMod {
+    return {
+        acronym: mod.Acronym,
+        settings: null
     }
 }
 

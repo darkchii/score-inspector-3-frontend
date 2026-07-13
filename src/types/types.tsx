@@ -867,6 +867,8 @@ export type IDatabasedMod = {
     Settings: IScoreModSettings | null;
     IncompatibleMods: string[];
     UserPlayable: boolean;
+    Description: string;
+    Type: string;
 }
 
 export type IModDatabase = {

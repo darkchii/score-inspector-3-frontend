@@ -7,6 +7,7 @@ import ToolLevelCalculator from "../components/tools/ToolLevelCalculator";
 import ToolMissingBeatmaps from "../components/tools/ToolMissingBeatmaps";
 import BuildIcon from '@mui/icons-material/Build';
 import { grey } from "@mui/material/colors";
+import ToolModBrowser from "../components/tools/ToolModBrowser";
 
 interface Tool {
     name: string;
@@ -16,17 +17,23 @@ interface Tool {
 }
 
 const TOOLS: Tool[] = [
-    {
-        name: 'Missing Beatmaps',
-        description: 'Find missing beatmaps from your osu! install',
-        link: '/tools/missing-beatmaps',
-        component: <ToolMissingBeatmaps />
-    },
+    // {
+    //     name: 'Missing Beatmaps',
+    //     description: 'Find missing beatmaps from your osu! install',
+    //     link: '/tools/missing-beatmaps',
+    //     component: <ToolMissingBeatmaps />
+    // },
     {
         name: 'Level Calculator',
         description: 'Total score and level calculator',
         link: '/tools/level-calculator',
         component: <ToolLevelCalculator />
+    },
+    {
+        name: 'Mod Browser',
+        description: 'Discover all the mods osu! has to offer',
+        link: '/tools/mod-browser',
+        component: <ToolModBrowser />
     }
 ]
 
