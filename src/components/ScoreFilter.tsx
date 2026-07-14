@@ -188,6 +188,12 @@ function ScoreFilter({ data, onFiltered, currentRuleset }: {
     }, [data]);
 
     const applyFilter = () => {
+        const _rulesetScores = data;
+        if(currentRuleset !== 'all') {
+            const rulesetId: number = { osu: 0, taiko: 1, fruits: 2, mania: 3 }[currentRuleset] || 0;
+            const filteredScores = _rulesetScores.filter(score => score.ruleset_id === rulesetId);
+            return FilterScores(filteredScores, filter, sort, direction);
+        }
         return FilterScores(data, filter, sort, direction);
     }
 

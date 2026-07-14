@@ -207,4 +207,8 @@ export class ProfileRulesetScoreSet implements IProfileRulesetScoreSet {
     getById(id: string): IScore | undefined {
         return this.scores_map[id];
     }
+
+    getByIds(ids: string[]): IScore[] {
+        return ids.map(id => this.scores_map[id]).filter(score => score !== undefined) as IScore[];
+    }
 }

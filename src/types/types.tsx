@@ -508,6 +508,7 @@ export type IProfileRulesetScoreSet = {
     reorder(param: keyof IScore, descending?: boolean): void;
     calculate(): void;
     getById(id: string): IScore | undefined;
+    getByIds(ids: string[]): IScore[];
 }
 
 export type IProfileRulesetStatisticsPacks = {

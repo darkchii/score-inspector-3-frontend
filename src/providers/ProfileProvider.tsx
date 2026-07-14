@@ -20,6 +20,8 @@ type ProfileContextValue = {
     getRulesetUser: (ruleset: string) => any;
     availableRulesets: string[];
     loadDurationMs: number;
+    getScoresByIds: (scoreIds: (string | number)[]) => any[];
+    getAllScores: () => any[];
 };
 
 const ProfileContext = createContext<ProfileContextValue>({} as ProfileContextValue);
@@ -46,6 +48,10 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
 
     const getScoreById = (scoreId: string | number) => {
         return scoreMap[scoreId] || null;
+    }
+
+    const getScoresByIds = (scoreIds: (string | number)[]) => {
+        return scoreIds.map(scoreId => scoreMap[scoreId] || null).filter(score => score !== null);
     }
 
     const getRulesetStatistics = (ruleset: string, without_loved = false) => {
@@ -75,6 +81,10 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         setUserLive(_user);
         setUserId(_userId);
         return _user;
+    }
+
+    const getAllScores = () => {
+        return scoresLive || [];
     }
 
     const reset = () => {
@@ -225,7 +235,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <ProfileContext.Provider value={{ getUser, getScoreById, getApiUser, userLive, scoresLive, setUserId, fetchFullProfile, errorMessage, fetchLog, isFinished, activeRuleset, setActiveRuleset, getRulesetStatistics, getRulesetUser, availableRulesets, loadDurationMs }}>
+        <ProfileContext.Provider value={{ getUser, getScoreById, getApiUser, userLive, scoresLive, setUserId, fetchFullProfile, errorMessage, fetchLog, isFinished, activeRuleset, setActiveRuleset, getRulesetStatistics, getRulesetUser, availableRulesets, loadDurationMs, getScoresByIds, getAllScores }}>
             {children}
         </ProfileContext.Provider>
     )
