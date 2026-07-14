@@ -2,13 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import type { IBeatmap, IRouteBeatmapResult, IScore, IScoreDifficulty, IScoreMod } from "../../types/types";
 import { Box, Button, Divider, Typography } from "@mui/material";
 import PerformanceModSelector, { type AdjustableSelectedMod } from "./performanceCalculator/PerformanceModSelector";
-import { ShowNotification } from "../../util/Helper";
+import { GetRulesetNameFromId, ShowNotification } from "../../util/Helper";
 import Score from "../../types/Score";
 import { useApi } from "../../providers/ApiProvider";
 import ScoreViewBase from "../scoreView/ScoreViewBase";
 import { ErrorBoundary, getErrorMessage } from "react-error-boundary";
 import { useScoreView } from "../../providers/ScoreViewProvider";
 import DifficultyBadge from "../DifficultyBadge";
+import { GetScoreMultiplierCalculator } from "../../types/ScoreMultiplierCalculator";
+import { ConvertStandardisedToClassic } from "../../util/ScoreHelper";
 
 const defaultScoreData = {
     user_id: 3,
@@ -23,7 +25,7 @@ const defaultScoreData = {
 }
 
 function BeatmapPerformanceTool({ data }: { data: IRouteBeatmapResult | null }) {
-    const { getDifficulty, getUserLive } = useApi();
+    const { getDifficulty, getUserLive, getBeatmapMaxStatistics } = useApi();
     const { loadScoreView } = useScoreView();
 
     const [resetKey, setResetKey] = useState(0); //used to reset settings when beatmap changes
@@ -132,12 +134,15 @@ function BeatmapPerformanceTool({ data }: { data: IRouteBeatmapResult | null }) 
                 const map: IBeatmap = data.beatmap!.clone(); //beatmap always exists here due to check
                 map.mapper = (map.mapper as any)?.osuApi.username || map.mapper; //ensure mapper has username for score generation, this is required for some performance calculators that fetch additional data about the mapper
                 const difficultyResponse = await getDifficulty(map.beatmap_id, map.ruleset_id, mods);
+                const maxStatisticsResponse = await getBeatmapMaxStatistics(map.beatmap_id, GetRulesetNameFromId(map.ruleset_id));
                 const user = await getUserLive(3, false);
                 console.log(user);
-                const _score: IScore = new Score({
+                const _scoreBase = {
+                    build_id: 50000, //force use of V2 score multiplier calculator
                     mods: mods,
                     beatmap_id: map.id,
                     ruleset_id: map.ruleset_id,
+                    ruleset: map.ruleset,
                     accuracy: 1, //TODO: user input
                     classic_total_score: 0, //TODO: generate? not sure, might not care
                     legacy_perfect: true, //TODO: determine from stats
@@ -148,11 +153,41 @@ function BeatmapPerformanceTool({ data }: { data: IRouteBeatmapResult | null }) 
                     //TODO: HIT STATS, 0 for now
                     total_score: 0, //TODO: generate? not sure, might not care
                     mod_acronyms: mods.map(m => m.acronym),
-                    attr_diff: difficultyResponse, //TODO: fetch from api
+                    // attr_diff: difficultyResponse, //TODO: fetch from api
+                    scoreAttribute: {
+                        attr_diff: difficultyResponse,
+                    },
+                    statistics: {
+                        great: maxStatisticsResponse?.great || 0,
+                    },
+                    combo: map.max_combo || 0, //TODO: determine from stats, for now just set to max combo
                     ...defaultScoreData,
-                }, map, user);
-                _score.combo = _score.max_combo || 0; //TODO: determine from stats, for now just set to max combo
-                console.log("Generating performance with score:", _score);
+                };
+                if (maxStatisticsResponse) {
+                    for (const key in maxStatisticsResponse) {
+                        if (Object.prototype.hasOwnProperty.call(maxStatisticsResponse, key)) {
+                            const value = maxStatisticsResponse[key];
+                            (_scoreBase as any)[`statistics_${key}`] = value;
+                            (_scoreBase as any)[`maximum_statistics_${key}`] = value;
+                        }
+                    }
+                }
+
+                //todo; adjustable statistics and combo settings. For now we go for SS
+
+                const _score: IScore = new Score(_scoreBase, map, user);
+                //get all keys from 'maxStatisticsResponse',
+                //and set score[statistics_{key}] = maxStatisticsResponse[key]
+                const multiCalculator = GetScoreMultiplierCalculator(_score);
+                const [multiplier, breakdown] = multiCalculator.Calculate();
+                _score.score_multiplier = isNaN(multiplier) ? 1 : multiplier;
+                _score.score_multiplier_breakdown = breakdown;
+                
+                //emulate ss score for now
+                const standardisedScore = 1_000_000 * (_score.score_multiplier || 1);
+                _score.total_score = standardisedScore;
+                _score.implied_total_score = ConvertStandardisedToClassic(_score.ruleset_id, standardisedScore, map.count_circles + map.count_sliders + map.count_spinners); //convert to classic
+
                 setGeneratedScore(_score);
 
                 if (_score) {

@@ -28,10 +28,10 @@ const modSettingIncrements: Record<string, Record<string, ModSettingSpecifics>> 
         speed_change: { min: 0.5, max: 0.99, step: 0.01, default: 0.75 },
     },
     DT: {
-        speed_change: { min: 1.01, max: 2.0, step: 0.01, default: 1.5 },
+        speed_change: { min: 1.01, max: 10.0, step: 0.01, default: 1.5 },
     },
     NC: {
-        speed_change: { min: 1.01, max: 2.0, step: 0.01, default: 1.5 },
+        speed_change: { min: 1.01, max: 10.0, step: 0.01, default: 1.5 },
     },
     EZ: {
         retries: { min: 0, max: 10, step: 1, default: 0 },

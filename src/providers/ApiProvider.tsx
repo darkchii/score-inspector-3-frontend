@@ -32,6 +32,7 @@ type ApiContextValue = {
     getBeatmapMediaRecommendations: (sourceType: string, sourceValue: string, limit?: number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<IBeatmapMediaRecommendationResponse>;
     getBeatmapMediaRecommendationsByArtistTitle: (beatmapsetId: string | number | null, artist: string, title: string, limit?: number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<IBeatmapMediaArtistTitleRecommendationResponse>;
     getBeatmapMediaAudit: (accessToken: string, limit?: number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getBeatmapMaxStatistics: (beatmapId: string | number, ruleset: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getDifficulty: (beatmapId: string | number, rulesetId?: number, mods?: IScoreMod[] | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapUserTags: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapScores: (beatmapId: string | number, ruleset: string | null, mods?: IScoreMod[] | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
@@ -291,6 +292,12 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         return response;
     }, [apiPost]);
 
+    const getBeatmapMaxStatistics = useCallback(async (beatmapId: string | number, ruleset: string | null, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        let endpoint = `beatmap/${beatmapId}/max-statistics/${ruleset || ''}`;
+        const response = await apiGet(endpoint, false, progressEvent);
+        return response;
+    }, [apiGet]);
+
     const getDifficulty = useCallback(async (beatmapId: string | number, rulesetId: number = 0, mods: IScoreMod[] | null = null, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
         let endpoint = `difficulty/${rulesetId}/${beatmapId}`;
 
@@ -363,6 +370,7 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getBeatmapMediaRecommendations,
         getBeatmapMediaRecommendationsByArtistTitle,
         getBeatmapMediaAudit,
+        getBeatmapMaxStatistics,
         getDifficulty,
         getBeatmapUserTags,
         getBeatmapScores,
@@ -395,6 +403,7 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getBeatmapMediaRecommendations,
         getBeatmapMediaRecommendationsByArtistTitle,
         getBeatmapMediaAudit,
+        getBeatmapMaxStatistics,
         getDifficulty,
         getBeatmapUserTags,
         getBeatmapScores,

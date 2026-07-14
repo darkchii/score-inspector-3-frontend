@@ -194,7 +194,7 @@ export const GetScoreFromId = async (scoreId: number): Promise<Score | null | un
         }
 
         const result = new Score(score, beatmap, user);
-        if(result.beatmap){
+        if (result.beatmap) {
             result.beatmap.attr_diff = new ScoreDifficulty(difficulty_nomod);
         }
         _localScoreCache.set(scoreId, result);
@@ -244,5 +244,19 @@ function getLevel(score: number): number {
             return i - 1;
         }
         i++;
+    }
+}
+
+export function ConvertStandardisedToClassic(ruleset_id: number, standardised_score: number, object_count: number) {
+    switch (ruleset_id) {
+        case 0:
+            return Math.round((Math.pow(object_count,2) * 32.57 + 100000) * standardised_score / 1_000_000);
+        case 1:
+            return Math.round((object_count * 1109 + 100000) * standardised_score / 1_000_000);
+        case 2:
+            return Math.round(Math.pow(standardised_score / 1_000_000 * object_count, 2) * 21.62 + standardised_score / 10);
+        case 3:
+        default:
+            return standardised_score;
     }
 }
