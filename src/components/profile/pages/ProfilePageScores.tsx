@@ -28,27 +28,12 @@ function ProfilePageScores() {
     }
 
     useEffect(() => {
-        if(isWorking) return;
-        console.log(`Active ruleset changed to ${activeRuleset}, updating displayed scores...`);
-        (async () => {
-            setIsWorking(true);
-            console.log(`Emptying currently displayed scores...`);
-            applyFilteredScores([]);
-
-            console.log(`Sleeping for 250ms to allow the UI to update before doing the heavy lifting...`);
-            //brief pause to allow the UI to update before doing the heavy lifting
-            await new Promise(resolve => setTimeout(resolve, 250));
-
-            console.log(`Fetching scores for ruleset ${activeRuleset}...`);
-            const _scores = getRulesetStatistics(activeRuleset)?.scores_set.scores || [];
-            //default sort by implied_pp desc
-            console.log(`Sorting scores by implied_pp desc...`);
-            _scores.sort((a: IScore, b: IScore) => b.implied_pp - a.implied_pp);
-            console.log(`Applying filtered scores...`);
-            applyFilteredScores(_scores);
-            console.log(`Done updating displayed scores for ruleset ${activeRuleset}.`);
-            setIsWorking(false);
-        })();
+        applyFilteredScores([]);
+        const _scores = getRulesetStatistics(activeRuleset)?.scores_set.scores || [];
+        //default sort by implied_pp desc
+        _scores.sort((a: IScore, b: IScore) => b.implied_pp - a.implied_pp);
+        applyFilteredScores(_scores);
+        setIsWorking(false);
     }, [activeRuleset]);
 
     useEffect(() => {
