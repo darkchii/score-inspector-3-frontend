@@ -28,7 +28,7 @@ type ApiContextValue = {
     getRecentVisitors: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmap: (beatmapId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapSet: (beatmapsetId: string | number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
-    updateBeatmapSetMedia: (beatmapsetId: string | number, accessToken: string, youtubeUrl: string | null, spotifyUrl?: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    updateBeatmapSetMedia: (beatmapsetId: string | number, userId: string | number, accessToken: string, youtubeUrl: string | null, spotifyUrl?: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapMediaRecommendations: (sourceType: string, sourceValue: string, limit?: number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<IBeatmapMediaRecommendationResponse>;
     getBeatmapMediaRecommendationsByArtistTitle: (beatmapsetId: string | number | null, artist: string, title: string, limit?: number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<IBeatmapMediaArtistTitleRecommendationResponse>;
     getBeatmapMediaAudit: (accessToken: string, limit?: number, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
@@ -37,6 +37,7 @@ type ApiContextValue = {
     getBeatmapUserTags: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getBeatmapScores: (beatmapId: string | number, ruleset: string | null, mods?: IScoreMod[] | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getTeam: (teamId: string | number, ruleset: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    updateTeam: (teamId: string | number, userId: string | number, accessToken: string, color?: string | null, youtubeUrl?: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
 };
 
 const ApiContext = createContext<ApiContextValue>({} as ApiContextValue);
@@ -248,8 +249,9 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         return response;
     }, [apiGet]);
 
-    const updateBeatmapSetMedia = useCallback(async (beatmapsetId: string | number, accessToken: string, youtubeUrl: string | null, spotifyUrl: string | null = null, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+    const updateBeatmapSetMedia = useCallback(async (beatmapsetId: string | number, userId: string | number, accessToken: string, youtubeUrl: string | null, spotifyUrl: string | null = null, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
         const body = {
+            user_id: userId,
             access_token: accessToken,
             youtube_url: youtubeUrl,
             spotify_url: spotifyUrl,
@@ -341,6 +343,17 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         return response;
     }, [apiGet]);
 
+    const updateTeam = useCallback(async (teamId: string | number, userId: string | number, accessToken: string, color: string | null = null, youtubeUrl: string | null = null, progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        const body = {
+            user_id: userId,
+            access_token: accessToken,
+            color,
+            youtube_url: youtubeUrl,
+        };
+        const response = await apiPost(`team/${teamId}/update`, JSON.stringify(body), 'application/json', progressEvent);
+        return response;
+    }, [apiPost]);
+
     // Memoize the context value to prevent unnecessary re-renders
     const contextValue = useMemo(() => ({
         getUserLive,
@@ -374,7 +387,8 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getDifficulty,
         getBeatmapUserTags,
         getBeatmapScores,
-        getTeam
+        getTeam,
+        updateTeam
     }), [
         getUserLive,
         getScoresLive,
@@ -407,7 +421,8 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getDifficulty,
         getBeatmapUserTags,
         getBeatmapScores,
-        getTeam
+        getTeam,
+        updateTeam
     ]);
 
     return (

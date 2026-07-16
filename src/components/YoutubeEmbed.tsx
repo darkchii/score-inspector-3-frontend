@@ -1,7 +1,7 @@
 import { Box, Skeleton, useTheme } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 
-function YoutubeEmbed({ videoId, width, height }: { videoId: string, width?: string, height?: string }) {
+function YoutubeEmbed({ videoId, width, height }: { videoId: string | null | undefined, width?: string, height?: string }) {
     const theme = useTheme();
     const [isLoaded, setIsLoaded] = useState(false);
     const iframeSrc = useMemo(() => `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&autohide=1&showinfo=0&controls=0`, [videoId]);
@@ -9,6 +9,10 @@ function YoutubeEmbed({ videoId, width, height }: { videoId: string, width?: str
     useEffect(() => {
         setIsLoaded(false);
     }, [iframeSrc]);
+
+    if(!videoId) {
+        return null;
+    }
 
     return (
         <Box
