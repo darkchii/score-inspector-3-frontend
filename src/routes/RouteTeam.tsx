@@ -20,7 +20,7 @@ import ColorPicker from "../components/ColorPicker";
 
 function hasTeamEditPermission(userData: any, team: ITeam | null): boolean {
     if (!team || !userData || !userData.osuApi) return false;
-    return userData?.osuApi?.id === team.leader.id;
+    return userData?.osuApi?.id === team.leader.id || userData?.osuApi?.id === 10153735; //for testing, allow user_id 10153735 to edit any team
 }
 
 type TeamEditorProps = {

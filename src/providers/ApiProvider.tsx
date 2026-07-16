@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { AxiosProgressEvent } from "axios";
 import { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo } from "react";
-import type { IAuthUser, IBeatmapMediaArtistTitleRecommendationResponse, IBeatmapMediaRecommendationResponse, IScoreMod } from "../types/types";
+import type { IActivityLog, IAuthUser, IBeatmapMediaArtistTitleRecommendationResponse, IBeatmapMediaRecommendationResponse, IScoreMod } from "../types/types";
 import Score from "../types/Score";
 
 type ApiContextValue = {
@@ -38,6 +38,7 @@ type ApiContextValue = {
     getBeatmapScores: (beatmapId: string | number, ruleset: string | null, mods?: IScoreMod[] | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     getTeam: (teamId: string | number, ruleset: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
     updateTeam: (teamId: string | number, userId: string | number, accessToken: string, color?: string | null, youtubeUrl?: string | null, progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<any>;
+    getRecentActivityLogs: (progressEvent?: ((progressEvent: AxiosProgressEvent) => void) | null) => Promise<IActivityLog[]>;
 };
 
 const ApiContext = createContext<ApiContextValue>({} as ApiContextValue);
@@ -354,6 +355,11 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         return response;
     }, [apiPost]);
 
+    const getRecentActivityLogs = useCallback(async (progressEvent: ((progressEvent: AxiosProgressEvent) => void) | null = null) => {
+        const response = await apiGet(`stats/activity-logs`, false, progressEvent);
+        return response as IActivityLog[];
+    }, [apiGet]);
+
     // Memoize the context value to prevent unnecessary re-renders
     const contextValue = useMemo(() => ({
         getUserLive,
@@ -388,7 +394,8 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getBeatmapUserTags,
         getBeatmapScores,
         getTeam,
-        updateTeam
+        updateTeam,
+        getRecentActivityLogs
     }), [
         getUserLive,
         getScoresLive,
@@ -422,7 +429,8 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         getBeatmapUserTags,
         getBeatmapScores,
         getTeam,
-        updateTeam
+        updateTeam,
+        getRecentActivityLogs
     ]);
 
     return (

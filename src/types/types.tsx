@@ -983,3 +983,23 @@ export interface IManiaScoreMultiplierCalculator extends IScoreMultiplierCalcula
     classicMultiplier: (score?: IScore) => number;
     keyModMultiplier: (score?: IScore) => number;
 }
+
+export interface IActivityLog {
+    id: number;
+    data: IActivityLogData;
+    created_at: Date;
+}
+
+export interface IActivityLogData {
+    type: string;
+    user: any | null;
+    user_id?: number;
+    username?: string;
+    beatmapset_id?: number;
+    beatmapset_title?: string;
+    beatmapset_artist?: string;
+    team_id?: number;
+    team_name?: string;
+    team_short?: string;
+    data?: any;
+}
