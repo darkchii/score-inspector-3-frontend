@@ -1,4 +1,4 @@
-import { Box } from "@mui/material"
+import { Box, Divider, Button } from "@mui/material"
 import { Route, Routes, useSearchParams } from "react-router";
 import { useAuth } from "./providers/AuthProvider";
 import React, { useEffect, useState } from "react";
@@ -13,18 +13,42 @@ import RouteCompletionists from "./routes/RouteCompletionists";
 import RouteLeaderboards from "./routes/RouteLeaderboards";
 import RoutePeople from "./routes/RoutePeople";
 import RouteTools from "./routes/RouteTools";
-import type { IRouteObject } from "./types/types";
+import type { IConfig, IRouteObject } from "./types/types";
 import RouteBeatmapset from "./routes/RouteBeatmapset";
 import { routeData } from "./util/RouteHelper";
 import RouteBeatmaps from "./routes/RouteBeatmaps";
 import RouteAdmin from "./routes/RouteAdmin";
 import RouteTeam from "./routes/RouteTeam";
+import { useApi } from "./providers/ApiProvider";
+import ErrorIcon from '@mui/icons-material/Error';
+import Config from "./data/Config.json";
+
+const typedConfig: IConfig = Config;
 
 declare const window: any; //ts fix
 function App() {
   const [title, setTitle] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const { login } = useAuth();
+  const { getServerInfo } = useApi();
+  const [isServerOnline, setIsServerOnline] = useState<boolean | null>(true); //so it doesn't flash the downtime message on first load
+  const [serverDownCause, setServerDownCause] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async() => {
+      try {
+        const serverInfo = await getServerInfo();
+        setIsServerOnline(serverInfo.altDbAccessible);
+        if(!serverInfo.altDbAccessible) {
+          setServerDownCause("osu! alternative database is down. Please try again later.");
+        }
+      }catch (error) {
+        console.error("Error fetching server info:", error);
+        setIsServerOnline(false);
+        setServerDownCause("osu! score inspector server is down. Please try again later.");
+      }
+    })();
+  }, [getServerInfo]);
 
   window.onTitleChange = (title: string) => {
     setTitle(title);
@@ -84,6 +108,22 @@ function App() {
       })();
     }
   }, [searchParams]);
+
+  if(!isServerOnline || serverDownCause) {
+    return (
+      //full screen downtime message, modern design with an large centered icon and text
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', textAlign: 'center', p: 2 }}>
+        <ErrorIcon sx={{ fontSize: 100, mb: 2 }} color="error" />
+        <h1>Server is down</h1>
+        <p>{serverDownCause}</p>
+        <Divider sx={{ my: 2 }} />
+        {/* discord join button */}
+        <Button variant="contained" color="primary" href={typedConfig.DISCORD_URL} target="_blank">
+          Join the osu!alternative Discord
+        </Button>
+      </Box>
+    )
+  }
 
   return (
     <React.Fragment>
