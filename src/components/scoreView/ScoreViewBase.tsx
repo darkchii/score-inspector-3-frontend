@@ -172,7 +172,9 @@ function ScoreViewBase({ score, noBackground = false, compact = false }: { score
                         <span>Played on {DateToString(score.ended_at)}</span>
                     </div>
                     <div className={`${scoreInfoStyles['score-info']} ${scoreInfoStyles['score-info__rankdate']}`}>
-                        <Link className={`${scoreViewStyles['score-view__base__link']}`} to={`/score/${score.id}`} target="_blank">ID: {score.id}</Link>
+                        {/* <Link className={`${scoreViewStyles['score-view__base__link']}`} to={`/score/${score.id}`} target="_blank">ID: {score.id}</Link> */}
+                        {/* go to the osu website instead (/scores/id) */}
+                        <Link className={`${scoreViewStyles['score-view__base__link']}`} to={`https://osu.ppy.sh/scores/${score.id}`} target="_blank">ID: {score.id}</Link>
                     </div>
                 </Box>
             </div>

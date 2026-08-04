@@ -6,6 +6,10 @@ import { useState } from "react";
 import ProfileChartPeriodic from "./charts/ProfileChartPeriodic";
 
 const CHART_PAGES = {
+    ['periodic']: {
+        name: "Periodic Charts",
+        component: ProfileChartPeriodic,
+    },
     ['accuracy-difficulty']: {
         name: "Accuracy vs Difficulty",
         component: ProfileChartAccuracyDifficulty,
@@ -18,14 +22,10 @@ const CHART_PAGES = {
         name: "Score Spread",
         component: ProfileChartScoreSpread,
     },
-    ['periodic']: {
-        name: "Periodic Charts",
-        component: ProfileChartPeriodic,
-    },
 }
 
 function ProfilePageCharts() {
-    const [activeChartPage, setActiveChartPage] = useState('accuracy-difficulty');
+    const [activeChartPage, setActiveChartPage] = useState('periodic');
 
     return (
         <Box sx={{ padding: 2 }}>
