@@ -1,0 +1,152 @@
+import { matchPath, useParams } from "react-router";
+import { useProfile } from "../providers/ProfileProvider";
+import { useEffect, useState } from "react";
+import ProfileLoader from "../components/profile/ProfileLoader";
+import ProfileHeader from "../components/profile/ProfileHeader";
+import { Box, Collapse, Fade, Tab, Tabs, useTheme } from "@mui/material";
+import ProfilePageMain from "../components/profile/pages/ProfilePageMain";
+import ProfilePageSessions from "../components/profile/pages/ProfilePageSessions";
+import ProfilePageScores from "../components/profile/pages/ProfilePageScores";
+import ProfilePagePacks from "../components/profile/pages/ProfilePagePacks";
+import NumberFlow from "@number-flow/react";
+import ProfilePageCharts from "../components/profile/pages/ProfilePageCharts";
+import ProfilePageDaily from "../components/profile/pages/ProfilePageDaily";
+import ProfilePageCompletion from "../components/profile/pages/ProfilePageCompletion";
+import { usePageTitle } from "../providers/TitleProvider";
+import { useApi } from "../providers/ApiProvider";
+import { useAuth } from "../providers/AuthProvider";
+
+const pageComponents = {
+    'main': { component: ProfilePageMain, title: 'Overview' },
+    'daily': { component: ProfilePageDaily, title: 'Daily' },
+    'sessions': { component: ProfilePageSessions, title: 'Sessions' },
+    'scores': { component: ProfilePageScores, title: 'Scores' },
+    'charts': { component: ProfilePageCharts, title: 'Charts' },
+    'completion': { component: ProfilePageCompletion, title: 'Completion' },
+    'packs': { component: ProfilePagePacks, title: 'Packs' },
+};
+
+function RouteProfile() {
+    const { user, token} = useAuth();
+    const { postRegisterVisitor } = useApi();
+    const { fetchFullProfile, errorMessage, activeRuleset, setActiveRuleset, userLive, getRulesetStatistics } = useProfile();
+    const { userId, ruleset, page } = useParams();
+    const [activePage, setPage] = useState('main');
+    const [isWorking, setIsWorking] = useState(false);
+    const theme = useTheme();
+
+    useEffect(() => {
+        (async () => {
+            setIsWorking(true);
+            try {
+                if(!userId) {
+                    throw new Error("No user ID provided");
+                }
+                await fetchFullProfile(userId as string);
+                //brief wait to show the completion
+                if (!errorMessage) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    setIsWorking(false);
+
+                    setTimeout(() => {
+                        const match = matchPath(`/user/${userId}/${activeRuleset || 'all'}/${activePage || 'main'}`, window.location.pathname);
+                        if(match){
+                            //-1 is guest user
+                            try{
+                                postRegisterVisitor(userId as string, user?.id ?? -1, token ?? null);
+                            }catch(error){
+                                console.error("Error registering visitor:", error);
+                            }
+                        }
+                    }, 5000);
+                }
+            } catch (error) {
+                console.error("Error fetching user profile:", error);
+            }
+        })();
+    }, [userId]);
+
+    useEffect(() => {
+        //change url without reloading
+        window.history.replaceState(null, '', `/user/${userId}/${activeRuleset || 'all'}/${activePage || 'main'}`);
+
+        console.log({ activeRuleset, activePage });
+    }, [activeRuleset, activePage]);
+
+    useEffect(() => {
+        if (ruleset !== activeRuleset) {
+            setActiveRuleset(ruleset || 'all');
+        }
+    }, [ruleset]);
+
+    useEffect(() => {
+        if (page !== activePage) {
+            setPage(page || 'main');
+        }
+    }, [page]);
+
+    usePageTitle(userLive?.osuApi?.username ? `${userLive.osuApi.username}` : "Profile");
+
+    if (isWorking || errorMessage) {
+        return (<>
+            <ProfileLoader />
+        </>)
+    }
+
+    return (<>
+        <Box sx={{width: '100%' }}>
+            {
+                userLive?.is_sync === false &&
+                <Box sx={{ width: '100%', p: 1, bgcolor: theme.palette.error.main, color: theme.palette.error.contrastText, textAlign: 'center' }}>
+                    <strong>Warning:</strong> User is not yet synced. Data may be incomplete or outdated.
+                </Box>
+            }
+
+            {
+                getRulesetStatistics(activeRuleset)?.scores_set?.missing_difficulty > 0 &&
+                <Box sx={{ width: '100%', p: 1, bgcolor: theme.palette.warning.main, color: theme.palette.warning.contrastText, textAlign: 'center' }}>
+                    <strong>Warning:</strong> <NumberFlow value={getRulesetStatistics(activeRuleset)?.scores_set?.missing_difficulty} /> scores have no or outdated difficulty attributes. They will likely show incorrect data. They will be processed soon.
+                </Box>
+            }
+
+            {/* header */}
+            <ProfileHeader />
+
+            {/* page selection */}
+            <Box sx={{ 
+                display: { xs: 'block', md: 'flex' },
+                justifyContent: { xs: 'flex-start', md: 'center' },
+                gap: 2, mb: 0, mt: 1, width: '100%' }}>
+                <Tabs scrollButtons="auto" aria-label='profile-page-tabs' value={activePage} textColor="primary" indicatorColor="primary">
+                    {Object.keys(pageComponents).map((key: string) => {
+                        return (
+                            <Tab
+                                key={`profile-page-tab-${key}`}
+                                label={pageComponents[key as keyof typeof pageComponents].title}
+                                value={key}
+                                onClick={() => setPage(key)}
+                            />
+                        );
+                    })}
+                </Tabs>
+            </Box>
+
+            {
+                Object.keys(pageComponents).map((key: string) => {
+                    return (
+                        <Collapse key={key} in={activePage === key} unmountOnExit>
+                            <Box>
+                                {(() => {
+                                    const PageComponent = pageComponents[key as keyof typeof pageComponents].component;
+                                    return <PageComponent />;
+                                })()}
+                            </Box>
+                        </Collapse>
+                    )
+                })
+            }
+        </Box>
+    </>)
+}
+
+export default RouteProfile;

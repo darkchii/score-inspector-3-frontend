@@ -1,0 +1,181 @@
+@import '../styles/variables.module.less';
+@import '../styles/functions.module.less';
+@import '../styles/colors.module.less';
+
+.mod {
+    font-size: var(--mod-height, @mod-height-normal);
+    height: 1em;
+    display: flex;
+    position: relative;
+
+    .mod-type(@name, @colour) {
+        &--type-@{name} {
+            --type-bg-colour: @colour;
+            --type-fg-colour: color-mix(in srgb-linear, black, @colour 10%);
+            --type-extender-colour: color-mix(in srgb, black, @colour 26.3%);
+        }
+    }
+
+    .mod-type(Automation, @osu-colour-blue-1);
+    .mod-type(Conversion, @osu-colour-purple-1);
+    .mod-type(DifficultyIncrease, @osu-colour-red-1);
+    .mod-type(DifficultyReduction, @osu-colour-lime-1);
+    .mod-type(Fun, @osu-colour-pink-1);
+    .mod-type(System, @yellow);
+
+    &__icon {
+        position: relative;
+        width: 1.42em;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition: all 0.2s;
+
+        &::before {
+            .full-size();
+            background-color: var(--type-bg-colour);
+            mask-image: url("/images/mods/blanks/mod-icon.svg");
+            mask-size: contain;
+            mask-position: center;
+            mask-repeat: no-repeat;
+            content: "";
+            display: flex;
+        }
+
+        &::after {
+            .full-size();
+            content: attr(data-acronym);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--type-fg-colour);
+            font-weight: 900;
+            font-size: 0.4em;
+        }
+
+        &__disabled {
+            filter: grayscale(100%) brightness(50%);
+            scale: 0.9;
+        }
+
+        &__selected {
+            //prominent white background glow
+            filter: drop-shadow(0 0 4px white);
+        }
+
+        //hover (conditional, so an extra class is needed to enable hover effects)
+        &__hoverable:hover {
+            // filter: drop-shadow(0 0 2px var(--type-fg-colour));
+            scale: 1.05;
+            cursor: pointer;
+        }
+
+        .mod-icon-osu(@acronym, @filename) {
+
+            &--@{acronym}::after {
+                background-color: var(--type-fg-colour);
+                mask-image: url("/images/mods/mod-@{filename}.svg");
+                mask-position: center;
+                mask-size: contain;
+                mask-repeat: no-repeat;
+                content: "";
+                margin: 0;
+            }
+        }
+
+        .mod-icon-osu(NM, no-mod);
+
+        .mod-icon-osu(10K, ten-keys);
+        .mod-icon-osu(1K, one-key);
+        .mod-icon-osu(2K, two-keys);
+        .mod-icon-osu(3K, three-keys);
+        .mod-icon-osu(4K, four-keys);
+        .mod-icon-osu(5K, five-keys);
+        .mod-icon-osu(6K, six-keys);
+        .mod-icon-osu(7K, seven-keys);
+        .mod-icon-osu(8K, eight-keys);
+        .mod-icon-osu(9K, nine-keys);
+        .mod-icon-osu(AC, accuracy-challenge);
+        .mod-icon-osu(AD, approach-different);
+        .mod-icon-osu(AL, alternate);
+        .mod-icon-osu(AP, autopilot);
+        .mod-icon-osu(AS, adaptive-speed);
+        .mod-icon-osu(AT, autoplay);
+        .mod-icon-osu(BL, blinds);
+        .mod-icon-osu(BM, bloom);
+        .mod-icon-osu(BR, barrel-roll);
+        .mod-icon-osu(BU, bubbles);
+        .mod-icon-osu(CL, classic);
+        .mod-icon-osu(CN, cinema);
+        .mod-icon-osu(CO, cover);
+        .mod-icon-osu(CS, constant-speed);
+        .mod-icon-osu(DA, difficulty-adjust);
+        .mod-icon-osu(DC, daycore);
+        .mod-icon-osu(DF, deflate);
+        .mod-icon-osu(DP, depth);
+        .mod-icon-osu(DS, dual-stages);
+        .mod-icon-osu(DT, double-time);
+        .mod-icon-osu(EZ, easy);
+        .mod-icon-osu(FF, floating-fruits);
+        .mod-icon-osu(FI, fade-in);
+        .mod-icon-osu(FL, flashlight);
+        .mod-icon-osu(FR, freeze-frame);
+        .mod-icon-osu(GR, grow);
+        .mod-icon-osu(HD, hidden);
+        .mod-icon-osu(HO, hold-off);
+        .mod-icon-osu(HR, hard-rock);
+        .mod-icon-osu(HT, half-time);
+        .mod-icon-osu(IN, invert);
+        .mod-icon-osu(MF, moving-fast);
+        .mod-icon-osu(MG, magnetised);
+        .mod-icon-osu(MR, mirror);
+        .mod-icon-osu(MU, muted);
+        .mod-icon-osu(NC, nightcore);
+        .mod-icon-osu(NF, no-fail);
+        .mod-icon-osu(NR, no-release);
+        .mod-icon-osu(NS, no-scope);
+        .mod-icon-osu(PF, perfect);
+        .mod-icon-osu(RD, random);
+        .mod-icon-osu(RP, repel);
+        .mod-icon-osu(RX, relax);
+        .mod-icon-osu(SD, sudden-death);
+        .mod-icon-osu(SG, single-tap);
+        .mod-icon-osu(SI, spin-in);
+        .mod-icon-osu(SO, spun-out);
+        .mod-icon-osu(SR, simplified-rhythm);
+        .mod-icon-osu(ST, strict-tracking);
+        .mod-icon-osu(SV2, score-v2);
+        .mod-icon-osu(SW, swap);
+        .mod-icon-osu(SY, synesthesia);
+        .mod-icon-osu(TC, traceable);
+        .mod-icon-osu(TD, touch-device);
+        .mod-icon-osu(TP, target-practice);
+        .mod-icon-osu(TR, transform);
+        .mod-icon-osu(WD, wind-down);
+        .mod-icon-osu(WG, wiggle);
+        .mod-icon-osu(WU, wind-up);
+    }
+
+    &__extender {
+        width: 2.2em;
+        background-color: var(--type-extender-colour);
+        mask-image: url("/images/mods/blanks/mod-icon-extender.svg");
+        mask-size: contain;
+        mask-position: center;
+        mask-repeat: no-repeat;
+        margin-left: -0.5em;
+        padding-left: 0.5em;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--type-bg-colour);
+        // slight adjustments for small sizes
+        padding-right: 3px;
+        padding-bottom: 1px;
+
+        span {
+            font-size: 0.5em;
+        }
+    }
+}

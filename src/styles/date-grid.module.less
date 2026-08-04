@@ -1,0 +1,91 @@
+@import '../styles/colors.module.less';
+
+.date-grid {
+    --square-size: 15px;
+    --square-gap: 5px;
+    --week-width: calc(var(--square-size) + var(--square-gap));
+
+    display: inline-grid;
+    grid-template-areas: "empty months"
+        "days squares";
+    grid-template-columns: auto 1fr;
+    grid-gap: 10px;
+    list-style-type: none;
+    font-weight: 300;
+    font-size: 12px;
+    color: @light-gray;
+
+    &__months {
+        grid-area: months;
+        display: grid;
+        grid-template-columns: calc(var(--week-width) * 4)
+            /* Jan */
+            calc(var(--week-width) * 4)
+            /* Feb */
+            calc(var(--week-width) * 4)
+            /* Mar */
+            calc(var(--week-width) * 5)
+            /* Apr */
+            calc(var(--week-width) * 4)
+            /* May */
+            calc(var(--week-width) * 4)
+            /* Jun */
+            calc(var(--week-width) * 5)
+            /* Jul */
+            calc(var(--week-width) * 4)
+            /* Aug */
+            calc(var(--week-width) * 4)
+            /* Sep */
+            calc(var(--week-width) * 5)
+            /* Oct */
+            calc(var(--week-width) * 4)
+            /* Nov */
+            calc(var(--week-width) * 5)
+            /* Dec */
+        ;
+    }
+
+    &__days {
+        grid-area: days;
+        display: grid;
+        grid-gap: var(--square-gap);
+        grid-template-rows: repeat(7, var(--square-size));
+    }
+
+    &__squares {
+        grid-area: squares;
+        display: grid;
+        grid-gap: var(--square-gap);
+        grid-template-rows: repeat(7, var(--square-size));
+        grid-auto-flow: column;
+        grid-auto-columns: var(--square-size);
+    }
+
+    &__square {
+        position: relative;
+        border-radius: 5px;
+        width: var(--square-size);
+        height: var(--square-size);
+        margin: 2px;
+        background-color: var(--target-color, @gray-dark);
+        transition: all 0.2s ease-in-out;
+
+        &--clickable {
+            &:hover {
+                filter: brightness(1.2);
+                scale: 1.2;
+                transition: all 0.2s ease-in-out;
+                cursor: pointer;
+            }
+
+            &:not(:hover) {
+                transition: all 0.2s ease-in-out;
+            }
+        }
+
+        &--active {
+            border: 2px solid @osu-colour-blue-2;
+            transition: all 0.2s ease-in-out;
+        }
+    }
+}

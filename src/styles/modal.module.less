@@ -1,0 +1,46 @@
+@import '../styles/colors.module.less';
+
+@mobile-width: 900px;
+
+.modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-height: 90vh;
+    height: 90vh;
+    min-width: 80%;
+    box-shadow: 24px;
+    border-radius: 3px;
+
+    &:focus {
+        outline: none;
+    }
+
+    //on mobile, make modal take full screen
+    @media (max-width: @mobile-width) {
+        width: 100vw;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    &__content {
+        position: relative;
+        overflow-y: auto;
+        overflow-x: auto;
+        width: 100%;
+        height: 100%;
+
+        &__background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            filter: blur(8px);
+        }
+    }
+}

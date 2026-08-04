@@ -1,0 +1,77 @@
+@import '../styles/variables.module.less';
+@import '../styles/functions.module.less';
+@import '../styles/colors.module.less';
+
+.dial {
+    .center-content();
+    width: 200px;
+    height: 200px;
+
+    &__layer {
+        .full-size();
+
+        &__grade {
+            .center-content();
+            font-family: @font-grade;
+            font-size: @font-size--extra-large;
+            padding-top: 0.15em;
+
+            //bright glow
+            text-shadow:
+                0 0 5px rgba(255, 255, 255, 0.8),
+                0 0 10px rgba(255, 255, 255, 0.6),
+                0 0 15px rgba(255, 255, 255, 0.4),
+                0 0 20px rgba(255, 255, 255, 0.2);
+        }
+    }
+
+    &__outer_gradient {
+        &--end {
+            stop-color: @osu-colour-lime-1;
+        }
+
+        &--start {
+            stop-color: @osu-colour-blue-1;
+        }
+    }
+
+    &__inner {
+        stroke: none;
+
+        &--0 {
+            fill: @colour-rank-d;
+        }
+
+        &--1 {
+            fill: @colour-rank-c;
+        }
+
+        &--2 {
+            fill: @colour-rank-b;
+        }
+
+        &--3 {
+            fill: @colour-rank-a;
+        }
+
+        &--4 {
+            fill: @colour-rank-s;
+        }
+
+        &--5 {
+            fill: @colour-rank-ss;
+        }
+    }
+
+    &__outer {
+        stroke: none;
+
+        &--0 {
+            fill: url(#dial-outer);
+        }
+
+        &--1 {
+            fill: hsl(var(--hsl-b6))
+        }
+    }
+}

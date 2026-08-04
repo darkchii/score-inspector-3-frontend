@@ -1,0 +1,100 @@
+@font-face {
+    font-family: "Venera";
+    src: local('Venera-500'),
+        url('./assets/fonts/Venera-500.otf') format('opentype');
+}
+
+@font-face {
+    font-family: "Torus";
+    font-weight: 100;
+    src: local('Torus-Thin'),
+        url('./assets/fonts/Torus-Thin.otf') format('opentype');
+}
+
+@font-face {
+    font-family: "Torus";
+    font-weight: 600;
+    src: local('Torus-SemiBold'),
+        url('./assets/fonts/Torus-SemiBold.otf') format('opentype');
+}
+
+@font-face {
+    font-family: "Torus";
+    font-weight: 700;
+    src: local('Torus-SemiBold'),
+        url('./assets/fonts/Torus-SemiBold.otf') format('opentype');
+}
+
+@font-face {
+    font-family: "Torus";
+    font-weight: 400;
+    src: local('Torus-Regular'),
+        url('./assets/fonts/Torus-Regular.otf') format('opentype');
+}
+
+@font-face {
+    font-family: "Torus";
+    font-weight: 300;
+    src: local('Torus-Light'),
+        url('./assets/fonts/Torus-Light.otf') format('opentype');
+}
+
+@font-face {
+    font-family: "Torus";
+    font-weight: 900;
+    src: local('Torus-Heavy'),
+        url('./assets/fonts/Torus-Heavy.otf') format('opentype');
+}
+
+@font-face {
+    font-family: "Torus";
+    font-weight: 800;
+    src: local('Torus-Bold'),
+        url('./assets/fonts/Torus-Bold.otf') format('opentype');
+}
+
+:root {
+    --mod-automation:
+}
+
+body {
+    font-family: "Torus" !important;
+    line-height: 1.35 !important;
+}
+
+.profile-header-content {
+    align-items: flex-end;
+    display: flex;
+    width: 100%;
+}
+
+.profile-header-actions {
+    margin-left: auto;
+    padding: 15px 0;
+    user-select: none;
+}
+
+.profile-ruleset-icon {
+    transition: all 0.2s ease-in-out;
+
+    /* 0.7 alpha */
+    filter: opacity(0.7);
+    -webkit-filter: opacity(0.7);
+}
+
+.profile-selected-ruleset {
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+    -webkit-filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}
+
+.profile-selected-ruleset img {
+    transform: scale(1.2);
+    -webkit-transform: scale(1.2);
+    filter: opacity(1);
+    -webkit-filter: opacity(1);
+    transition: all 0.2s ease-in-out;
+}
+
+.leaflet-container {
+  background: none !important;
+}

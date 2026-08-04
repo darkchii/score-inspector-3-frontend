@@ -1,0 +1,35 @@
+import { createContext, useContext, useEffect, useState } from "react";
+import Config from '../data/Config.json';
+
+type TitleContextValue = {
+    setTitle: (title: string) => void;
+};
+
+const TitleContext = createContext<TitleContextValue>({} as TitleContextValue);
+
+export function TitleProvider({ children, suffixTitle = Config.WEBSITE_NAME }: { children: React.ReactNode, suffixTitle?: string }) {
+    const [title, setTitle] = useState(suffixTitle);
+
+    useEffect(() => {
+        document.title = title;
+    }, [title]);
+
+    return (
+        <TitleContext.Provider value={{ setTitle }}>
+            {children}
+        </TitleContext.Provider>
+    );
+}
+
+export function usePageTitle(title: string | null) {
+  const { setTitle } = useContext(TitleContext);
+
+  useEffect(() => {
+    // setTitle(title);
+    if (title) {
+      setTitle(`${title} - ${Config.WEBSITE_NAME}`);
+    } else {
+      setTitle(Config.WEBSITE_NAME);
+    }
+  }, [title, setTitle]);
+}
