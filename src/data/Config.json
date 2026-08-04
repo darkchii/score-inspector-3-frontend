@@ -4,8 +4,8 @@
     "DEV_MODE": true,
     "API": {
         "PRODUCTION": {
-            "AUTH_REDIRECT": "https://score.kirino.sh/",
-            "API_URL": "https://api.kirino.sh/inspector/",
+            "AUTH_REDIRECT": "https://osualternative.com/",
+            "API_URL": "https://api.osualternative.com/",
             "OSU_CLIENT_ID": 19537
         },
         "DEVELOPMENT": {
