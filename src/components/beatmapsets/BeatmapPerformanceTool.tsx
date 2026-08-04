@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { IBeatmap, IRouteBeatmapResult, IScore, IScoreDifficulty, IScoreMod } from "../../types/types";
-import { Box, Button, Divider, Typography } from "@mui/material";
+import { Alert, Box, Button, Divider, Typography } from "@mui/material";
 import PerformanceModSelector, { type AdjustableSelectedMod } from "./performanceCalculator/PerformanceModSelector";
 import { GetRulesetNameFromId, ShowNotification } from "../../util/Helper";
 import Score from "../../types/Score";
@@ -182,7 +182,7 @@ function BeatmapPerformanceTool({ data }: { data: IRouteBeatmapResult | null }) 
                 const [multiplier, breakdown] = multiCalculator.Calculate();
                 _score.score_multiplier = isNaN(multiplier) ? 1 : multiplier;
                 _score.score_multiplier_breakdown = breakdown;
-                
+
                 //emulate ss score for now
                 const standardisedScore = 1_000_000 * (_score.score_multiplier || 1);
                 _score.total_score = standardisedScore;
@@ -211,6 +211,9 @@ function BeatmapPerformanceTool({ data }: { data: IRouteBeatmapResult | null }) 
                 disabled={isGenerating}
             />
             <Divider sx={{ my: 2 }} />
+            <Alert severity="info" sx={{ mb: 2 }}>
+                Ability to adjust score statistics and combo will be implemented later.
+            </Alert>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Button variant='contained' onClick={onRequestPerformance} disabled={isGenerating}>
                     {isGenerating ? "Calculating..." : "Calculate"}

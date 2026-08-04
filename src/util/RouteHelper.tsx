@@ -27,10 +27,10 @@ export const routeData = {
         path: "/admin/:tab?"
     },
     routeBeatmaps: {
-        path: "/beatmaps/:beatmapId" //beatmapId for now required, will be optional later when implementing a search engine
+        path: "/beatmap/:beatmapId" //beatmapId for now required, will be optional later when implementing a search engine
     },
     routeBeatmapsets: {
-        path: "/beatmapsets/:beatmapsetId/:ruleset?/:beatmapId?"
+        path: "/beatmapset/:beatmapsetId/:ruleset?/:beatmapId?"
     },
     routeTeam: {
         path: "/team/:teamId/:ruleset?"

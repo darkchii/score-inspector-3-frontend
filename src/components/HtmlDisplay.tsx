@@ -118,9 +118,9 @@ function replaceBeatmapUrl(node: any) {
                 if (hashMatch) {
                     const mode = hashMatch[1];
                     const beatmapId = hashMatch[2];
-                    return <RLink to={`/beatmapsets/${setId}/${mode}/${beatmapId}`}>{domToReact(node.children)}</RLink>;
+                    return <RLink to={`/beatmapset/${setId}/${mode}/${beatmapId}`}>{domToReact(node.children)}</RLink>;
                 }
-                return <RLink to={`/beatmapsets/${setId}`}>{domToReact(node.children)}</RLink>;
+                return <RLink to={`/beatmapset/${setId}`}>{domToReact(node.children)}</RLink>;
             }
         }
     } catch(e) {

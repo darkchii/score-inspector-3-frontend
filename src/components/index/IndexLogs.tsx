@@ -54,7 +54,7 @@ function IndexLogs() {
                                 output = (
                                     <>
                                         <Box sx={{ display: 'flex' }}>{TimeAgo(log.created_at)} &nbsp;{userLink}</Box>
-                                        Updated media on <strong><RLink to={`/beatmapsets/${log.data.beatmapset_id}`}>{log.data.beatmapset_artist} - {log.data.beatmapset_title}</RLink></strong>
+                                        Updated media on <strong><RLink to={`/beatmapset/${log.data.beatmapset_id}`}>{log.data.beatmapset_artist} - {log.data.beatmapset_title}</RLink></strong>
                                     </>
                                 );
                                 break;
@@ -62,7 +62,7 @@ function IndexLogs() {
                                 output = (
                                     <>
                                         <Box sx={{ display: 'flex' }}>{TimeAgo(log.created_at)} &nbsp;{userLink}</Box>
-                                        Updated team data for <strong><RLink to={`/teams/${log.data.team_id}`}>{log.data.team_name}</RLink></strong>
+                                        Updated team data for <strong><RLink to={`/team/${log.data.team_id}`}>{log.data.team_name}</RLink></strong>
                                     </>
                                 );
                                 break;
