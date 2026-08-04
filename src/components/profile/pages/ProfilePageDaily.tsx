@@ -174,6 +174,7 @@ function ProfilePageDaily() {
                                 <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
                                     Viewing {activeDateStart} {activeDateEnd ? `- ${activeDateEnd}` : ''}
                                 </Typography>
+                                <Divider sx={{ width: '100%', my: 2 }} />
                                 <ProfileDailyChart
                                     sessions={activeScoreSet.sessions}
                                     scores={activeScoreSet.scores}
@@ -322,22 +323,24 @@ function DateGrid({ year, data, activeDateStart = null, activeDateEnd = null, on
 
                                         squares.push(
                                             <BetterTooltip key={dateKey} title={`${dateKey}: ${clears} clears`} placement='top' disableInteractive={true}>
-                                                <InteractiveBox
-                                                    style={{
-                                                        '--target-color': color,
-                                                        //if no clears, reset hover
-                                                        '&:hover': { cursor: clears > 0 ? 'pointer' : 'default' }
-                                                    } as React.CSSProperties}
-                                                    // className={`${dateGridStyles['date-grid__square']} ${clears > 0 ? dateGridStyles['date-grid__square--clickable'] : dateGridStyles['date-grid__square--empty']}`}
-                                                    className={`${dateGridStyles['date-grid__square']} ${clears > 0 ? dateGridStyles['date-grid__square--clickable'] : dateGridStyles['date-grid__square--empty']} ${isSelected ? dateGridStyles['date-grid__square--active'] : ''}`}
-                                                    //clickable if clears > 0
-                                                    onClick={() => {
-                                                        clears > 0 && onDateSelected && onDateSelected(dateKey);
-                                                    }}
-                                                    onLongPress={() => {
-                                                        clears > 0 && onDateSecondarySelected && onDateSecondarySelected(dateKey);
-                                                    }}
-                                                />
+                                                <span>
+                                                    <InteractiveBox
+                                                        style={{
+                                                            '--target-color': color,
+                                                            //if no clears, reset hover
+                                                            '&:hover': { cursor: clears > 0 ? 'pointer' : 'default' }
+                                                        } as React.CSSProperties}
+                                                        // className={`${dateGridStyles['date-grid__square']} ${clears > 0 ? dateGridStyles['date-grid__square--clickable'] : dateGridStyles['date-grid__square--empty']}`}
+                                                        className={`${dateGridStyles['date-grid__square']} ${clears > 0 ? dateGridStyles['date-grid__square--clickable'] : dateGridStyles['date-grid__square--empty']} ${isSelected ? dateGridStyles['date-grid__square--active'] : ''}`}
+                                                        //clickable if clears > 0
+                                                        onClick={() => {
+                                                            clears > 0 && onDateSelected && onDateSelected(dateKey);
+                                                        }}
+                                                        onLongPress={() => {
+                                                            clears > 0 && onDateSecondarySelected && onDateSecondarySelected(dateKey);
+                                                        }}
+                                                    />
+                                                </span>
                                             </BetterTooltip>
                                         );
                                     }
@@ -349,9 +352,14 @@ function DateGrid({ year, data, activeDateStart = null, activeDateEnd = null, on
                 </div>
             </Box>
             <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div>Legend (scores)</div>
+                {/* <p>Legend (scores)</div> */}
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                    Legend (scores)
+                </Typography>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <p>0</p>
+                    <Typography variant="body2" sx={{ mr: 1 }}>
+                        0
+                    </Typography>
                     <div
                         style={{
                             width: '14px',
@@ -381,7 +389,10 @@ function DateGrid({ year, data, activeDateStart = null, activeDateEnd = null, on
                         }}
                     />
                     {/* <p>{maxClears > ABSOLUTE_RANGE_LIMIT ? `${ABSOLUTE_RANGE_LIMIT}+` : maxClears}</p> */}
-                    <p><NumberFlow value={maxClears > ABSOLUTE_RANGE_LIMIT ? ABSOLUTE_RANGE_LIMIT : maxClears} suffix={maxClears > ABSOLUTE_RANGE_LIMIT ? '+' : ''} /></p>
+                    {/* <p><NumberFlow value={maxClears > ABSOLUTE_RANGE_LIMIT ? ABSOLUTE_RANGE_LIMIT : maxClears} suffix={maxClears > ABSOLUTE_RANGE_LIMIT ? '+' : ''} /></p> */}
+                    <Typography variant="body2">
+                        <NumberFlow value={maxClears > ABSOLUTE_RANGE_LIMIT ? ABSOLUTE_RANGE_LIMIT : maxClears} suffix={maxClears > ABSOLUTE_RANGE_LIMIT ? '+' : ''} />
+                    </Typography>
                 </div>
             </Box>
         </>
