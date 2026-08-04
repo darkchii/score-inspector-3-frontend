@@ -1,34 +1,11 @@
-import { AppBar, Box, Card, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Card, Toolbar, Typography, useTheme } from "@mui/material";
 import Config from "../data/Config.json";
-import { useEffect, useState } from "react";
-import { useApi } from "../providers/ApiProvider";
 import type { IConfig } from "../types/types";
 const typedConfig: IConfig = Config;
+import { Link } from "react-router";
 
 function Footer() {
-    const { getServerInfo } = useApi();
-
-    const [clientVersion, setClientVersion] = useState<string | null>(null);
-    const [serverVersion, setServerVersion] = useState<string | null>(null);
-    const [isServerOnline, setIsServerOnline] = useState<boolean>(true);
-    const [isAltOnline, setIsAltOnline] = useState<boolean>(true);
-
-    useEffect(() => {
-        setClientVersion(typedConfig.VERSION);
-        (async () => {
-            try {
-                const info = await getServerInfo();
-                setServerVersion(info.version);
-                setIsAltOnline(info.altDbAccessable);
-                setIsServerOnline(true);
-            }
-            catch (error) {
-                console.error("Failed to fetch server info:", error);
-                setIsServerOnline(false);
-            }
-        })();
-    }, []);
-
+    const theme = useTheme();
     return (
         <>
             <Box>
@@ -39,46 +16,12 @@ function Footer() {
                 }}>
                     <Toolbar>
                         <Typography>
-                            Website made by Amayakase
+                            Website made by Miorii
+                        </Typography>
+                        <Typography sx={{ ml: 1 }}>
+                            <Link style={{ color: theme.palette.primary.main }} to={typedConfig.GITHUB_URL} target="_blank" rel="noopener noreferrer">Source Code</Link>
                         </Typography>
                         <Box sx={{ flexGrow: 1 }} />
-                        <Typography variant="caption" color="text.secondary">
-                            {`Client version: ${clientVersion || "Loading..."}`}
-                        </Typography>
-                        <Box sx={{ width: 16 }} />
-                        <Typography variant="caption" color={isServerOnline ? "text.secondary" : "error.main"}>
-                            {isServerOnline ? `Server version: ${serverVersion || "Loading..."}` : "Server offline"}
-                        </Typography>
-                        {
-                            <Box component="span"
-                                sx={{
-                                    display: 'inline-block',
-                                    width: 8,
-                                    height: 8,
-                                    borderRadius: '50%',
-                                    backgroundColor: isServerOnline ? 'success.main' : 'error.main',
-                                    ml: 0.5,
-                                    mb: '2px',
-                                }}
-                            />
-                        }
-                        <Box sx={{ width: 16 }} />
-                        <Typography variant="caption" color={isAltOnline ? "text.secondary" : "error.main"}>
-                            osu!alternative
-                        </Typography>
-                        {
-                            <Box component="span"
-                                sx={{
-                                    display: 'inline-block',
-                                    width: 8,
-                                    height: 8,
-                                    borderRadius: '50%',
-                                    backgroundColor: isAltOnline ? 'success.main' : 'error.main',
-                                    ml: 0.5,
-                                    mb: '2px',
-                                }}
-                            />
-                        }
                     </Toolbar>
                 </AppBar>
             </Box>

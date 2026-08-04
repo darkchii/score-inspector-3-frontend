@@ -839,6 +839,8 @@ export type IConfig = {
     DISCORD_URL: string;
     DISCORD_ID: string;
     PAYPAL_DONATION_URL: string;
+    OSU_PROFILE_URL: string;
+    GITHUB_URL: string;
 };
 
 export type IRouteObject = {
