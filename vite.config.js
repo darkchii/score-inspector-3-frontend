@@ -12,7 +12,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      output: {
+      output: { 
         // manualChunks: {
         //   // Split vendor chunks for better caching
         //   'react-vendor': ['react', 'react-dom', 'react-router', 'react-router-dom'],
