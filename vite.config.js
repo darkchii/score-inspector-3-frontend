@@ -13,16 +13,16 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Split vendor chunks for better caching
-          'react-vendor': ['react', 'react-dom', 'react-router', 'react-router-dom'],
-          'mui-core': ['@mui/material', '@emotion/react', '@emotion/styled'],
-          'mui-icons': ['@mui/icons-material'],
-          'mui-charts': ['@mui/x-charts', '@mui/x-data-grid', '@mui/x-date-pickers'],
-          'charts': ['chart.js', 'react-chartjs-2', 'chartjs-adapter-moment', 'chartjs-plugin-annotation'],
-          'd3': ['d3'],
-          'utils': ['axios', 'moment'],
-        },
+        // manualChunks: {
+        //   // Split vendor chunks for better caching
+        //   'react-vendor': ['react', 'react-dom', 'react-router', 'react-router-dom'],
+        //   'mui-core': ['@mui/material', '@emotion/react', '@emotion/styled'],
+        //   'mui-icons': ['@mui/icons-material'],
+        //   'mui-charts': ['@mui/x-charts', '@mui/x-data-grid', '@mui/x-date-pickers'],
+        //   'charts': ['chart.js', 'react-chartjs-2', 'chartjs-adapter-moment', 'chartjs-plugin-annotation'],
+        //   'd3': ['d3'],
+        //   'utils': ['axios', 'moment'],
+        // },
       },
     },
     // Increase chunk size warning limit (optional, helps identify large chunks)
