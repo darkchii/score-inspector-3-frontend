@@ -5,8 +5,7 @@ import YoutubeEmbed from "../YoutubeEmbed";
 import SpotifyEmbed from "../SpotifyEmbed";
 import PlayerLink from "../PlayerLink";
 import { FormatNumber, FormatNumberWithPrecision, GetRulesetNameFromId } from "../../util/Helper";
-import difficultyJson from "../../data/difficulty.json";
-import type { JSX } from "react";
+import difficultyJson from "../../data/Difficulty.json";
 
 interface IDifficultyLabel {
     rating: number;
