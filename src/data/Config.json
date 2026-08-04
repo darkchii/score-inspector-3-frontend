@@ -1,7 +1,7 @@
 {
     "WEBSITE_NAME": "osu! scores inspector",
     "VERSION": "3.0.0",
-    "DEV_MODE": true,
+    "DEV_MODE": false,
     "API": {
         "PRODUCTION": {
             "AUTH_REDIRECT": "https://osualternative.com/",
