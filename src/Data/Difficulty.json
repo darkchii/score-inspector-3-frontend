@@ -1,0 +1,52 @@
+{
+    "osu": {
+        "stars": [
+            { "rating": 0,      "name": "Low",      "color": "#4CAF50" },
+            { "rating": 4,      "name": "Medium",   "color": "#2196F3" },
+            { "rating": 6.5,    "name": "High",     "color": "#FF9800" },
+            { "rating": 9,      "name": "Extreme",  "color": "#F44336" }
+        ],
+        "aim": [
+            { "rating": 0,      "name": "Low",      "color": "#4CAF50" },
+            { "rating": 2,      "name": "Medium",   "color": "#2196F3" },
+            { "rating": 4,      "name": "High",     "color": "#FF9800" },
+            { "rating": 6,      "name": "Extreme",  "color": "#F44336" }
+        ],
+        "speed": [
+            { "rating": 0,      "name": "Low",      "color": "#4CAF50" },
+            { "rating": 2,      "name": "Medium",   "color": "#2196F3" },
+            { "rating": 4,      "name": "High",     "color": "#FF9800" },
+            { "rating": 6,      "name": "Extreme",  "color": "#F44336" }
+        ]
+    },
+    "taiko": {
+        "stars": [
+            { "rating": 0,      "name": "Low",      "color": "#4CAF50" },
+            { "rating": 3,      "name": "Medium",   "color": "#2196F3" },
+            { "rating": 5,      "name": "High",     "color": "#FF9800" },
+            { "rating": 7.5,    "name": "Extreme",  "color": "#F44336" }
+        ],
+        "rhythm": [
+            { "rating": 0,      "name": "Low",      "color": "#4CAF50" },
+            { "rating": 2,      "name": "Medium",   "color": "#2196F3" },
+            { "rating": 4,      "name": "High",     "color": "#FF9800" },
+            { "rating": 6,      "name": "Extreme",  "color": "#F44336" }
+        ]
+    },
+    "catch": {
+        "stars": [
+            { "rating": 0,      "name": "Low",      "color": "#4CAF50" },
+            { "rating": 2.5,    "name": "Medium",   "color": "#2196F3" },
+            { "rating": 4,      "name": "High",     "color": "#FF9800" },
+            { "rating": 6,      "name": "Extreme",  "color": "#F44336" }
+        ]
+    },
+    "mania": {
+        "stars": [
+            { "rating": 0,      "name": "Low",      "color": "#4CAF50" },
+            { "rating": 3,      "name": "Medium",   "color": "#2196F3" },
+            { "rating": 5,      "name": "High",     "color": "#FF9800" },
+            { "rating": 7.5,    "name": "Extreme",  "color": "#F44336" }
+        ]
+    }
+}
