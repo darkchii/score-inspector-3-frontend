@@ -34,7 +34,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     const [beatmapsLive, setBeatmapsLive] = useState<any>(null);
     const [beatmapPacks, setBeatmapPacks] = useState<any>(null);
     const [profileStatistics, setProfileStatistics] = useState<any>(null);
-    const [errorMessage, setErrorMessage] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | boolean>(false);
     const [fetchLog, setFetchLog] = useState<any>([]);
     const [isFinished, setIsFinished] = useState(false);
     const [loadDurationMs, setLoadDurationMs] = useState(0);
@@ -87,14 +87,16 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         return scoresLive || [];
     }
 
-    const reset = () => {
+    const reset = (keep_log = false) => {
         setUserId(null);
         setUserLive(null);
         setScoresLive(null);
         setBeatmapsLive(null);
         setProfileStatistics(null);
         setErrorMessage(false);
-        setFetchLog([]);
+        if (!keep_log) {
+            setFetchLog([]);
+        }
         setIsFinished(false);
         setActiveRuleset(0);
         setLoadDurationMs(0);
@@ -227,9 +229,18 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
             }
             setIsFinished(true);
         } catch (error: any) {
-            reset(); //reset all data on error to prevent showing incomplete data
+            reset(true); //reset all data on error to prevent showing incomplete data
             console.error("Error fetching full profile:", error);
-            setErrorMessage(error.message || "An unknown error occurred while fetching profile data.");
+            // setErrorMessage(error.message || "An unknown error occurred while fetching profile data.");
+            //the API may return an error (.error), so check for that
+            let errorMsg: string = "An unknown error occurred while fetching profile data.";
+            console.log("Error object:", error);
+            if (error?.error) {
+                errorMsg = error.error;
+            } else if (error?.message) {
+                errorMsg = error.message;
+            }
+            setErrorMessage(errorMsg);
             setIsFinished(false);
         }
     }
